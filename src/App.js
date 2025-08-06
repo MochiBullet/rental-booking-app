@@ -52,11 +52,8 @@ function App() {
       <div className="App">
         <header className="main-header">
           <div className="header-container">
-            <div className="logo-section" onClick={handleLogoClick}>
-              <svg className="logo" viewBox="0 0 50 50" width="40" height="40">
-                <circle cx="25" cy="25" r="20" fill="#2d7a2d"/>
-                <path d="M15 25 L35 25 M20 20 L30 20 M20 30 L30 30" stroke="white" strokeWidth="2"/>
-              </svg>
+            <div className="logo-section" onClick={handleLogoClick} style={{cursor: 'pointer'}}>
+              <div className="logo">GR</div>
               <h1 className="site-title">GreenRide</h1>
             </div>
             
