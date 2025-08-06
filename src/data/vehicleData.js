@@ -13,6 +13,10 @@ export const vehicleData = [
       fuelType: "ハイブリッド",
       cc: 1800
     },
+    insurance: {
+      dailyRate: 1500,
+      description: "車両・対物・対人保険込み"
+    },
     available: true
   },
   {
@@ -28,6 +32,10 @@ export const vehicleData = [
       transmission: "AT",
       fuelType: "ガソリン",
       cc: 1500
+    },
+    insurance: {
+      dailyRate: 1500,
+      description: "車両・対物・対人保険込み"
     },
     available: true
   },
@@ -45,6 +53,10 @@ export const vehicleData = [
       fuelType: "ガソリン",
       cc: 660
     },
+    insurance: {
+      dailyRate: 1200,
+      description: "車両・対物・対人保険込み"
+    },
     available: true
   },
   {
@@ -60,6 +72,10 @@ export const vehicleData = [
       transmission: "AT",
       fuelType: "ガソリン",
       cc: 2000
+    },
+    insurance: {
+      dailyRate: 2500,
+      description: "車両・対物・対人保険込み"
     },
     available: true
   },
@@ -77,6 +93,10 @@ export const vehicleData = [
       fuelType: "ガソリン",
       cc: 689
     },
+    insurance: {
+      dailyRate: 800,
+      description: "車両・対物・対人保険込み"
+    },
     available: true
   },
   {
@@ -92,6 +112,10 @@ export const vehicleData = [
       transmission: "AT",
       fuelType: "ガソリン",
       cc: 157
+    },
+    insurance: {
+      dailyRate: 600,
+      description: "車両・対物・対人保険込み"
     },
     available: true
   },
@@ -109,6 +133,10 @@ export const vehicleData = [
       fuelType: "ガソリン",
       cc: 399
     },
+    insurance: {
+      dailyRate: 1000,
+      description: "車両・対物・対人保険込み"
+    },
     available: true
   },
   {
@@ -124,6 +152,10 @@ export const vehicleData = [
       transmission: "MT",
       fuelType: "ガソリン",
       cc: 883
+    },
+    insurance: {
+      dailyRate: 1800,
+      description: "車両・対物・対人保険込み"
     },
     available: false
   }

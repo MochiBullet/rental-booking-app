@@ -7,28 +7,44 @@ const ReservationForm = ({ vehicle, onSubmit, onCancel }) => {
     customerPhone: '',
     startDate: '',
     endDate: '',
-    notes: ''
+    notes: '',
+    includeInsurance: false
   });
   const [totalPrice, setTotalPrice] = useState(0);
   const [errors, setErrors] = useState({});
 
-  useEffect(() => {
+  // 日数計算用の共通関数
+  const getDays = () => {
     if (formData.startDate && formData.endDate) {
       const start = new Date(formData.startDate);
       const end = new Date(formData.endDate);
       const diffTime = Math.abs(end - start);
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-      setTotalPrice(vehicle.price * diffDays);
+      return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+    }
+    return 0;
+  };
+
+  useEffect(() => {
+    const days = getDays();
+    if (days > 0) {
+      let basePrice = vehicle.price * days;
+      let insurancePrice = 0;
+      
+      if (formData.includeInsurance) {
+        insurancePrice = vehicle.insurance.dailyRate * days;
+      }
+      
+      setTotalPrice(basePrice + insurancePrice);
     } else {
       setTotalPrice(0);
     }
-  }, [formData.startDate, formData.endDate, vehicle.price]);
+  }, [formData.startDate, formData.endDate, formData.includeInsurance, vehicle.price, vehicle.insurance.dailyRate]);
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: type === 'checkbox' ? checked : value
     }));
     
     if (errors[name]) {
@@ -224,23 +240,61 @@ const ReservationForm = ({ vehicle, onSubmit, onCancel }) => {
           />
         </div>
 
+        <div className="form-group insurance-option">
+          <div className="insurance-toggle">
+            <label className="toggle-switch">
+              <input
+                type="checkbox"
+                name="includeInsurance"
+                checked={formData.includeInsurance}
+                onChange={handleInputChange}
+              />
+              <span className="toggle-slider"></span>
+            </label>
+            <div className="insurance-info">
+              <h4>デイリー保険</h4>
+              <p>{vehicle.insurance.description}</p>
+              <p className="insurance-price">{formatPrice(vehicle.insurance.dailyRate)}/日</p>
+            </div>
+          </div>
+        </div>
+
         <div className="price-summary">
           <div className="price-breakdown">
             <div className="price-item">
               <span>基本料金:</span>
               <span>{formatPrice(vehicle.price)} / 日</span>
             </div>
-            {formData.startDate && formData.endDate && (
+            {formData.includeInsurance && (
+              <div className="price-item">
+                <span>デイリー保険:</span>
+                <span>{formatPrice(vehicle.insurance.dailyRate)} / 日</span>
+              </div>
+            )}
+            {(!formData.startDate || !formData.endDate) && (
+              <div className="price-placeholder">
+                <p>📅 利用期間を選択すると料金が表示されます</p>
+              </div>
+            )}
+            {formData.startDate && formData.endDate && getDays() > 0 && (
               <>
                 <div className="price-item">
                   <span>利用期間:</span>
-                  <span>
-                    {Math.ceil((new Date(formData.endDate) - new Date(formData.startDate)) / (1000 * 60 * 60 * 24)) + 1}日
-                  </span>
+                  <span>{getDays()}日</span>
                 </div>
+                <div className="price-item subtotal">
+                  <span>車両料金小計:</span>
+                  <span>{formatPrice(vehicle.price * getDays())}</span>
+                </div>
+                {formData.includeInsurance && (
+                  <div className="price-item subtotal">
+                    <span>保険料小計:</span>
+                    <span>{formatPrice(vehicle.insurance.dailyRate * getDays())}</span>
+                  </div>
+                )}
                 <div className="price-item total">
-                  <span>合計金額:</span>
-                  <span>{formatPrice(totalPrice)}</span>
+                  <span>🧾 合計金額:</span>
+                  <span className="total-amount">{formatPrice(totalPrice)}</span>
                 </div>
               </>
             )}
