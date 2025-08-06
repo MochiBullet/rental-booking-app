@@ -185,29 +185,42 @@ function App() {
       
       <main>
         {currentView === 'home' && (
-          <>
-            <Hero onViewChange={handleViewChange} />
-            <section id="vehicles" className="vehicles-section">
-              <div className="container">
-                <h2>車両一覧</h2>
-                <VehicleList 
-                  vehicles={vehicles} 
-                  onVehicleSelect={handleVehicleSelect}
-                  initialFilter={vehicleFilter}
-                />
-              </div>
-            </section>
-          </>
+          <Hero onViewChange={handleViewChange} />
         )}
         
-        {currentView === 'vehicles' && (
+        {currentView === 'cars' && (
           <section className="vehicles-section">
             <div className="container">
-              <h2>車両一覧</h2>
+              <div className="page-header">
+                <button className="back-button" onClick={() => handleViewChange('home')}>
+                  ← ホームに戻る
+                </button>
+                <h2>🚗 車両一覧</h2>
+              </div>
               <VehicleList 
                 vehicles={vehicles} 
                 onVehicleSelect={handleVehicleSelect}
-                initialFilter={vehicleFilter}
+                initialFilter="car"
+                hideFilters={true}
+              />
+            </div>
+          </section>
+        )}
+        
+        {currentView === 'motorcycles' && (
+          <section className="vehicles-section">
+            <div className="container">
+              <div className="page-header">
+                <button className="back-button" onClick={() => handleViewChange('home')}>
+                  ← ホームに戻る
+                </button>
+                <h2>🏍️ バイク一覧</h2>
+              </div>
+              <VehicleList 
+                vehicles={vehicles} 
+                onVehicleSelect={handleVehicleSelect}
+                initialFilter="motorcycle"
+                hideFilters={true}
               />
             </div>
           </section>
@@ -220,7 +233,10 @@ function App() {
               <ReservationForm 
                 vehicle={selectedVehicle}
                 onSubmit={handleReservationSubmit}
-                onCancel={() => handleViewChange('vehicles')}
+                onCancel={() => {
+                  const vehicleType = selectedVehicle?.category === 'car' ? 'cars' : 'motorcycles';
+                  handleViewChange(vehicleType);
+                }}
               />
             </div>
           </section>

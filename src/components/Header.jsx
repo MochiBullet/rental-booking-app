@@ -56,10 +56,18 @@ const Header = ({ currentView, onViewChange, reservationCount, isAdminLoggedIn, 
           </li>
           <li>
             <button 
-              className={currentView === 'vehicles' ? 'active' : ''}
-              onClick={() => onViewChange('vehicles')}
+              className={currentView === 'cars' ? 'active' : ''}
+              onClick={() => onViewChange('cars')}
             >
-              車両一覧
+              🚗 車両
+            </button>
+          </li>
+          <li>
+            <button 
+              className={currentView === 'motorcycles' ? 'active' : ''}
+              onClick={() => onViewChange('motorcycles')}
+            >
+              🏍️ バイク
             </button>
           </li>
           <li>

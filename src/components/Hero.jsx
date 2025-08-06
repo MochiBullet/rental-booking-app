@@ -41,19 +41,46 @@ const Hero = ({ onViewChange }) => {
             </div>
           ))}
         </div>
-        <div className="hero-buttons">
-          <button 
-            className="cta-button car-button"
-            onClick={() => onViewChange('vehicles', 'car')}
-          >
-            🚗 車を探す
-          </button>
-          <button 
-            className="cta-button motorcycle-button"
-            onClick={() => onViewChange('vehicles', 'motorcycle')}
-          >
-            🏍️ バイクを探す
-          </button>
+        
+        <div className="vehicle-selection">
+          <h3 className="selection-title">車両を選択してください</h3>
+          <div className="vehicle-tiles">
+            <div 
+              className="vehicle-tile car-tile"
+              onClick={() => onViewChange('cars')}
+            >
+              <div className="tile-icon">🚗</div>
+              <div className="tile-content">
+                <h4>車両レンタル</h4>
+                <p>軽自動車からSUVまで<br/>豊富な車種をご用意</p>
+                <div className="tile-features">
+                  <span>• 軽自動車</span>
+                  <span>• コンパクトカー</span>
+                  <span>• SUV</span>
+                  <span>• ワンボックス</span>
+                </div>
+              </div>
+              <div className="tile-arrow">→</div>
+            </div>
+            
+            <div 
+              className="vehicle-tile motorcycle-tile"
+              onClick={() => onViewChange('motorcycles')}
+            >
+              <div className="tile-icon">🏍️</div>
+              <div className="tile-content">
+                <h4>バイクレンタル</h4>
+                <p>原付からスポーツバイクまで<br/>多彩なラインナップ</p>
+                <div className="tile-features">
+                  <span>• 原付・スクーター</span>
+                  <span>• 中型バイク</span>
+                  <span>• 大型バイク</span>
+                  <span>• スポーツバイク</span>
+                </div>
+              </div>
+              <div className="tile-arrow">→</div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
