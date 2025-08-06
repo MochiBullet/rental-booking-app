@@ -1,14 +1,18 @@
 /* Instagram-inspired Modern Design System */
 
 :root {
-  --gradient-1: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-  --gradient-2: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  --blue: #0095f6;
-  --blue-hover: #1877f2;
-  --dark-gray: #262626;
-  --gray: #8e8e8e;
-  --light-gray: #dbdbdb;
-  --extra-light-gray: #fafafa;
+  --gradient-1: linear-gradient(135deg, #43a047 0%, #66bb6a 50%, #81c784 100%);
+  --gradient-2: linear-gradient(135deg, #2e7d32 0%, #43a047 100%);
+  --gradient-soft: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  --green: #43a047;
+  --green-hover: #388e3c;
+  --green-dark: #2e7d32;
+  --green-light: #66bb6a;
+  --green-pale: #e8f5e9;
+  --dark-gray: #1b5e20;
+  --gray: #689f38;
+  --light-gray: #c5e1a5;
+  --extra-light-gray: #f1f8e9;
   --white: #ffffff;
 }
 
@@ -131,7 +135,7 @@ body {
 
 .login-btn {
   padding: 10px 28px;
-  background: var(--blue);
+  background: var(--green);
   color: var(--white);
   text-decoration: none;
   border-radius: 22px;
@@ -162,14 +166,14 @@ body {
 }
 
 .login-btn:hover {
-  background: var(--blue-hover);
+  background: var(--green-hover);
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 149, 246, 0.3);
+  box-shadow: 0 8px 20px rgba(67, 160, 71, 0.3);
 }
 
 .register-btn {
   padding: 10px 28px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--gradient-1);
   color: var(--white);
   text-decoration: none;
   border-radius: 22px;
@@ -178,12 +182,12 @@ body {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: inline-block;
   position: relative;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+  box-shadow: 0 4px 15px rgba(67, 160, 71, 0.2);
 }
 
 .register-btn:hover {
   transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 8px 25px rgba(67, 160, 71, 0.4);
 }
 
 /* Main Footer */

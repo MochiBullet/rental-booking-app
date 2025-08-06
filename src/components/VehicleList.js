@@ -48,10 +48,10 @@ const VehicleList = ({ user }) => {
   };
 
   const plans = {
-    daily: { label: 'Daily Plan', multiplier: 1, unit: 'day' },
-    weekly: { label: 'Weekly Plan', multiplier: 0.85, unit: 'week', discount: '15% OFF' },
-    monthly: { label: 'Monthly Plan', multiplier: 0.7, unit: 'month', discount: '30% OFF' },
-    purchase: { label: 'Purchase Option', multiplier: 365, unit: 'purchase', discount: 'Best Value' }
+    daily: { label: 'デイリープラン', multiplier: 1, unit: '日' },
+    weekly: { label: 'ウィークリープラン', multiplier: 0.85, unit: '週', discount: '15% OFF' },
+    monthly: { label: 'マンスリープラン', multiplier: 0.7, unit: '月', discount: '30% OFF' },
+    purchase: { label: '購入オプション', multiplier: 365, unit: '購入', discount: 'お得' }
   };
 
   const insurancePrices = {
@@ -59,6 +59,13 @@ const VehicleList = ({ user }) => {
     collision: 2000,
     comprehensive: 3500,
     personal: 1500
+  };
+
+  const insuranceNames = {
+    basic: '基本補償',
+    collision: '車両・対物補償',
+    comprehensive: '完全補償',
+    personal: '搭乗者傷害保険'
   };
 
   useEffect(() => {
@@ -184,7 +191,7 @@ const VehicleList = ({ user }) => {
 
   const confirmBooking = () => {
     if (!selectedDate) {
-      alert('Please select a start date');
+      alert('開始日を選択してください');
       return;
     }
 
@@ -240,8 +247,8 @@ const VehicleList = ({ user }) => {
   return (
     <div className="vehicle-list-container">
       <div className="vehicle-list-header">
-        <h1>{type ? `${type.charAt(0).toUpperCase() + type.slice(1)} Vehicles` : 'All Vehicles'}</h1>
-        <p>Choose from our premium selection of vehicles</p>
+        <h1>{type === 'car' ? '車両一覧' : type === 'bike' ? 'バイク一覧' : '全車両'}</h1>
+        <p>プレミアムな車両ラインナップからお選びください</p>
       </div>
 
       <div className="vehicles-grid">
@@ -253,14 +260,14 @@ const VehicleList = ({ user }) => {
                 alt={vehicle.name}
                 className="vehicle-image"
               />
-              <span className="vehicle-badge">{vehicle.type === 'car' ? 'Car' : vehicle.type === 'bike' ? 'Bike' : vehicle.type}</span>
-              {vehicle.available && <span className="available-badge">Available</span>}
+              <span className="vehicle-badge">{vehicle.type === 'car' ? '車' : vehicle.type === 'bike' ? 'バイク' : vehicle.type}</span>
+              {vehicle.available && <span className="available-badge">予約可能</span>}
             </div>
             
             <div className="vehicle-details">
               <h3>{vehicle.name}</h3>
               <div className="vehicle-features">
-                <span className="feature-tag">👥 {vehicle.passengers} seats</span>
+                <span className="feature-tag">👥 {vehicle.passengers}人乗り</span>
                 {vehicle.features?.split(',').slice(0, 2).map((feature, idx) => (
                   <span key={idx} className="feature-tag">{feature.trim()}</span>
                 ))}
@@ -269,14 +276,14 @@ const VehicleList = ({ user }) => {
               <div className="vehicle-pricing">
                 <div className="price-display">
                   <span className="price-amount">{formatCurrency(vehicle.price)}</span>
-                  <span className="price-period">/ day</span>
+                  <span className="price-period">/ 日</span>
                 </div>
                 <button 
                   className="modern-book-btn"
                   onClick={() => handleBookVehicle(vehicle)}
                   disabled={!vehicle.available}
                 >
-                  Book Now
+                  予約する
                 </button>
               </div>
             </div>
@@ -290,13 +297,13 @@ const VehicleList = ({ user }) => {
             {bookingSuccess ? (
               <div className="success-animation">
                 <div className="success-icon">✓</div>
-                <h2>Booking Confirmed!</h2>
-                <p>Your {selectedVehicle.name} has been reserved</p>
+                <h2>予約完了！</h2>
+                <p>{selectedVehicle.name}の予約が完了しました</p>
               </div>
             ) : (
               <>
                 <div className="modal-header">
-                  <h2>Complete Your Booking</h2>
+                  <h2>予約内容の確認</h2>
                   <button className="close-btn" onClick={() => setShowBookingModal(false)}>×</button>
                 </div>
 
@@ -309,13 +316,13 @@ const VehicleList = ({ user }) => {
                     />
                     <div className="summary-details">
                       <h3>{selectedVehicle.name}</h3>
-                      <p>{selectedVehicle.type === 'car' ? 'Car' : 'Bike'} • {selectedVehicle.passengers} {selectedVehicle.type === 'bike' ? 'riders' : 'passengers'}</p>
+                      <p>{selectedVehicle.type === 'car' ? '車' : 'バイク'} • {selectedVehicle.passengers}人乗り</p>
                     </div>
                   </div>
 
                   <div className="booking-form">
                     <div className="form-section">
-                      <h4>Select Your Plan</h4>
+                      <h4>プランを選択</h4>
                       <div className="plan-options">
                         {Object.entries(plans).map(([key, plan]) => (
                           <div 
@@ -331,10 +338,10 @@ const VehicleList = ({ user }) => {
                     </div>
 
                     <div className="form-section">
-                      <h4>Select Dates</h4>
+                      <h4>日程を選択</h4>
                       <div className="date-inputs">
                         <div className="date-input-group">
-                          <label>Start Date</label>
+                          <label>開始日</label>
                           <input 
                             type="date"
                             value={selectedDate}
@@ -344,7 +351,7 @@ const VehicleList = ({ user }) => {
                           />
                         </div>
                         <div className="date-input-group">
-                          <label>End Date</label>
+                          <label>終了日</label>
                           <input 
                             type="date"
                             value={selectedEndDate}
@@ -353,10 +360,10 @@ const VehicleList = ({ user }) => {
                           />
                         </div>
                         <div className="duration-input-group">
-                          <label>Duration</label>
+                          <label>期間</label>
                           <div className="duration-selector">
                             <button onClick={() => setSelectedDuration(Math.max(1, selectedDuration - 1))}>-</button>
-                            <span>{selectedDuration} {plans[selectedPlan].unit}(s)</span>
+                            <span>{selectedDuration} {plans[selectedPlan].unit}</span>
                             <button onClick={() => setSelectedDuration(selectedDuration + 1)}>+</button>
                           </div>
                         </div>
@@ -364,7 +371,7 @@ const VehicleList = ({ user }) => {
                     </div>
 
                     <div className="form-section">
-                      <h4>Insurance Options</h4>
+                      <h4>保険オプション</h4>
                       <div className="insurance-options">
                         <div className="insurance-item">
                           <label className="toggle-label">
@@ -375,8 +382,8 @@ const VehicleList = ({ user }) => {
                             />
                             <span className="toggle-slider"></span>
                             <div className="insurance-info">
-                              <span className="insurance-name">Basic Coverage</span>
-                              <span className="insurance-price">Included</span>
+                              <span className="insurance-name">基本補償</span>
+                              <span className="insurance-price">含まれています</span>
                             </div>
                           </label>
                         </div>
@@ -390,7 +397,7 @@ const VehicleList = ({ user }) => {
                             />
                             <span className="toggle-slider"></span>
                             <div className="insurance-info">
-                              <span className="insurance-name">Collision Damage Waiver</span>
+                              <span className="insurance-name">車両・対物補償</span>
                               <span className="insurance-price">+{formatCurrency(insurancePrices.collision)}/day</span>
                             </div>
                           </label>
@@ -405,7 +412,7 @@ const VehicleList = ({ user }) => {
                             />
                             <span className="toggle-slider"></span>
                             <div className="insurance-info">
-                              <span className="insurance-name">Comprehensive Coverage</span>
+                              <span className="insurance-name">完全補償</span>
                               <span className="insurance-price">+{formatCurrency(insurancePrices.comprehensive)}/day</span>
                             </div>
                           </label>
@@ -420,7 +427,7 @@ const VehicleList = ({ user }) => {
                             />
                             <span className="toggle-slider"></span>
                             <div className="insurance-info">
-                              <span className="insurance-name">Personal Accident Insurance</span>
+                              <span className="insurance-name">搭乗者傷害保険</span>
                               <span className="insurance-price">+{formatCurrency(insurancePrices.personal)}/day</span>
                             </div>
                           </label>
@@ -430,29 +437,29 @@ const VehicleList = ({ user }) => {
 
                     <div className="price-breakdown">
                       <div className="price-row">
-                        <span>Vehicle ({selectedDuration} {plans[selectedPlan].unit}s)</span>
+                        <span>車両料金 ({selectedDuration} {plans[selectedPlan].unit}間)</span>
                         <span>{formatCurrency(selectedVehicle.price * plans[selectedPlan].multiplier * selectedDuration)}</span>
                       </div>
                       {Object.entries(insuranceOptions).map(([key, enabled]) => 
                         enabled && key !== 'basic' && (
                           <div key={key} className="price-row">
-                            <span>{key.charAt(0).toUpperCase() + key.slice(1)} Insurance</span>
+                            <span>{insuranceNames[key]}</span>
                             <span>{formatCurrency(insurancePrices[key] * selectedDuration)}</span>
                           </div>
                         )
                       )}
                       <div className="price-row total">
-                        <span>Total Amount</span>
+                        <span>合計金額</span>
                         <span className="total-amount">{formatCurrency(totalPrice)}</span>
                       </div>
                     </div>
 
                     <div className="modal-actions">
                       <button className="cancel-btn" onClick={() => setShowBookingModal(false)}>
-                        Cancel
+                        キャンセル
                       </button>
                       <button className="confirm-btn" onClick={confirmBooking}>
-                        Confirm Booking
+                        予約を確定
                       </button>
                     </div>
                   </div>

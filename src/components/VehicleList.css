@@ -3,7 +3,7 @@
 .vehicle-list-container {
   min-height: calc(100vh - 200px);
   padding: 3rem 2rem;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
 }
 
 .vehicle-list-header {
@@ -15,7 +15,7 @@
 .vehicle-list-header h1 {
   font-size: 3rem;
   font-weight: 800;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #2e7d32 0%, #43a047 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -55,7 +55,7 @@
   position: relative;
   height: 220px;
   overflow: hidden;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #43a047 0%, #66bb6a 100%);
 }
 
 .vehicle-image {
@@ -80,7 +80,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: #667eea;
+  color: #43a047;
   backdrop-filter: blur(10px);
 }
 
@@ -145,7 +145,7 @@
 .price-amount {
   font-size: 1.75rem;
   font-weight: 800;
-  color: #667eea;
+  color: #43a047;
 }
 
 .price-period {
@@ -155,7 +155,7 @@
 
 .modern-book-btn {
   padding: 0.875rem 2rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #43a047 0%, #66bb6a 100%);
   color: white;
   border: none;
   border-radius: 50px;
@@ -163,12 +163,12 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 15px rgba(67, 160, 71, 0.3);
 }
 
 .modern-book-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 8px 25px rgba(67, 160, 71, 0.4);
 }
 
 .modern-book-btn:disabled {
@@ -297,13 +297,13 @@
 }
 
 .plan-card:hover {
-  border-color: #667eea;
-  background: #f8faff;
+  border-color: #43a047;
+  background: #f1f8e9;
 }
 
 .plan-card.selected {
-  border-color: #667eea;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-color: #43a047;
+  background: linear-gradient(135deg, #43a047 0%, #66bb6a 100%);
   color: white;
 }
 
@@ -326,7 +326,7 @@
 }
 
 .plan-card.selected .plan-discount {
-  color: #667eea;
+  color: #43a047;
 }
 
 /* Date Inputs */
@@ -360,8 +360,8 @@
 
 .modern-date-input:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #43a047;
+  box-shadow: 0 0 0 3px rgba(67, 160, 71, 0.1);
 }
 
 .duration-selector {
@@ -378,7 +378,7 @@
   height: 32px;
   border-radius: 50%;
   border: none;
-  background: #667eea;
+  background: #43a047;
   color: white;
   font-size: 1.25rem;
   cursor: pointer;
@@ -386,7 +386,7 @@
 }
 
 .duration-selector button:hover {
-  background: #764ba2;
+  background: #388e3c;
   transform: scale(1.1);
 }
 
@@ -451,7 +451,7 @@
 }
 
 .toggle-label input[type="checkbox"]:checked + .toggle-slider {
-  background: #667eea;
+  background: #43a047;
 }
 
 .toggle-label input[type="checkbox"]:checked + .toggle-slider::after {
@@ -476,7 +476,7 @@
 
 .insurance-price {
   font-weight: 700;
-  color: #667eea;
+  color: #43a047;
 }
 
 /* Price Breakdown */
@@ -506,7 +506,7 @@
 
 .total-amount {
   font-size: 1.5rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #43a047 0%, #66bb6a 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -541,15 +541,15 @@
 }
 
 .confirm-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #43a047 0%, #66bb6a 100%);
   color: white;
   border: none;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 15px rgba(67, 160, 71, 0.3);
 }
 
 .confirm-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 8px 25px rgba(67, 160, 71, 0.4);
 }
 
 /* Success Animation */
