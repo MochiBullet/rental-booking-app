@@ -55,10 +55,10 @@ function App() {
       <div className="App">
         <header className="main-header">
           <div className="header-container">
-            <div className="logo-section" onClick={handleLogoClick} style={{cursor: 'pointer'}}>
+            <Link to="/" className="logo-section" onClick={handleLogoClick} style={{cursor: 'pointer', textDecoration: 'none', color: 'inherit'}}>
               <div className="logo">GR</div>
               <h1 className="site-title">GreenRide</h1>
-            </div>
+            </Link>
             
             <nav className="header-nav">
               {user ? (
