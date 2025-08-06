@@ -103,6 +103,23 @@ body {
   gap: 16px;
 }
 
+.mypage-link {
+  padding: 8px 20px;
+  background: linear-gradient(135deg, #43a047 0%, #66bb6a 100%);
+  color: white;
+  text-decoration: none;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(67, 160, 71, 0.2);
+}
+
+.mypage-link:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(67, 160, 71, 0.3);
+}
+
 .welcome-text {
   color: var(--gray);
   font-size: 14px;

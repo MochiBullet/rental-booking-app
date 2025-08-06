@@ -1,0 +1,262 @@
+.email-registration-container {
+  min-height: calc(100vh - 160px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+}
+
+.registration-card {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  width: 100%;
+  overflow: hidden;
+}
+
+.card-header {
+  background: linear-gradient(135deg, #43a047 0%, #66bb6a 100%);
+  color: white;
+  padding: 2rem;
+  text-align: center;
+}
+
+.card-header h1 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.card-header p {
+  opacity: 0.95;
+  font-size: 1.1rem;
+}
+
+.email-form {
+  padding: 2rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+.email-input {
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.email-input:focus {
+  outline: none;
+  border-color: #43a047;
+  box-shadow: 0 0 0 3px rgba(67, 160, 71, 0.1);
+}
+
+.email-input:disabled {
+  background: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.error-message {
+  color: #d32f2f;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.benefits-list {
+  background: linear-gradient(135deg, #f1f8e9 0%, #e8f5e9 100%);
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.benefits-list h3 {
+  color: #2e7d32;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+.benefits-list ul {
+  list-style: none;
+  padding: 0;
+}
+
+.benefits-list li {
+  padding: 0.5rem 0;
+  color: #424242;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 1rem;
+  background: linear-gradient(135deg, #43a047 0%, #66bb6a 100%);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(67, 160, 71, 0.3);
+}
+
+.submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(67, 160, 71, 0.4);
+}
+
+.submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.loading-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.privacy-notice {
+  text-align: center;
+  color: #666;
+  font-size: 0.875rem;
+  margin-top: 1.5rem;
+}
+
+.privacy-notice a {
+  color: #43a047;
+  text-decoration: none;
+  margin: 0 0.25rem;
+}
+
+.privacy-notice a:hover {
+  text-decoration: underline;
+}
+
+/* Success Card */
+.success-card {
+  text-align: center;
+  padding: 3rem 2rem;
+}
+
+.success-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  animation: bounce 1s ease;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+.success-card h2 {
+  color: #2e7d32;
+  margin-bottom: 1rem;
+}
+
+.success-message {
+  color: #666;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+}
+
+.success-message strong {
+  color: #2e7d32;
+}
+
+.email-notice {
+  background: #f5f5f5;
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.email-notice h3 {
+  color: #2e7d32;
+  margin-bottom: 1rem;
+}
+
+.email-notice ol {
+  color: #666;
+  padding-left: 1.5rem;
+}
+
+.email-notice li {
+  margin: 0.5rem 0;
+}
+
+.demo-notice {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border: 2px solid #ff9800;
+  border-radius: 10px;
+  padding: 1rem;
+  margin: 1.5rem 0;
+}
+
+.demo-label {
+  color: #e65100;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.demo-link {
+  display: inline-block;
+  color: #43a047;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  background: white;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+}
+
+.demo-link:hover {
+  background: #43a047;
+  color: white;
+}
+
+.resend-section {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.resend-section p {
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+.resend-btn {
+  padding: 0.75rem 2rem;
+  background: transparent;
+  color: #43a047;
+  border: 2px solid #43a047;
+  border-radius: 50px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.resend-btn:hover {
+  background: #43a047;
+  color: white;
+}

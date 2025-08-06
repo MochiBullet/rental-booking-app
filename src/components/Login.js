@@ -16,16 +16,31 @@ function Login({ setUser }) {
     setLoading(true);
 
     setTimeout(() => {
-      const userData = {
-        id: Date.now(),
-        name: formData.email.split('@')[0],
-        email: formData.email
-      };
+      // Check if user exists in localStorage
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      const existingUser = users.find(user => user.email === formData.email);
       
-      localStorage.setItem('user', JSON.stringify(userData));
-      setUser(userData);
-      setLoading(false);
-      navigate('/');
+      if (existingUser) {
+        // Use existing user data
+        localStorage.setItem('currentUser', JSON.stringify(existingUser));
+        setUser(existingUser);
+        setLoading(false);
+        navigate('/mypage');
+      } else {
+        // Create simple user for demo (backward compatibility)
+        const userData = {
+          id: Date.now(),
+          name: formData.email.split('@')[0],
+          email: formData.email,
+          points: 0,
+          createdAt: new Date().toISOString()
+        };
+        
+        localStorage.setItem('currentUser', JSON.stringify(userData));
+        setUser(userData);
+        setLoading(false);
+        navigate('/');
+      }
     }, 1000);
   };
 

@@ -215,6 +215,33 @@ const VehicleList = ({ user }) => {
     existingBookings.push(booking);
     localStorage.setItem('bookings', JSON.stringify(existingBookings));
 
+    // Award points if user is logged in (5% of total price)
+    if (user?.id) {
+      const earnedPoints = Math.floor(totalPrice * 0.05);
+      
+      // Update user points
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      const userIndex = users.findIndex(u => u.id === user.id);
+      if (userIndex !== -1) {
+        users[userIndex].points = (users[userIndex].points || 0) + earnedPoints;
+        localStorage.setItem('users', JSON.stringify(users));
+        localStorage.setItem('currentUser', JSON.stringify(users[userIndex]));
+      }
+      
+      // Add point history
+      const pointHistory = JSON.parse(localStorage.getItem('pointHistory') || '[]');
+      pointHistory.push({
+        id: Date.now() + 1,
+        userId: user.id,
+        type: 'earn',
+        amount: earnedPoints,
+        description: `${selectedVehicle.name}の利用で獲得`,
+        date: new Date().toISOString(),
+        bookingId: booking.id
+      });
+      localStorage.setItem('pointHistory', JSON.stringify(pointHistory));
+    }
+
     setBookingSuccess(true);
     setTimeout(() => {
       setShowBookingModal(false);
@@ -299,6 +326,14 @@ const VehicleList = ({ user }) => {
                 <div className="success-icon">✓</div>
                 <h2>予約完了！</h2>
                 <p>{selectedVehicle.name}の予約が完了しました</p>
+                {user?.id && (
+                  <div className="points-earned">
+                    <span className="points-icon">🎁</span>
+                    <span className="points-text">
+                      {Math.floor(totalPrice * 0.05)}ポイント獲得！
+                    </span>
+                  </div>
+                )}
               </div>
             ) : (
               <>

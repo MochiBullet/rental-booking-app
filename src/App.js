@@ -5,6 +5,9 @@ import HomePage from './components/HomePage';
 import VehicleList from './components/VehicleList';
 import Login from './components/Login';
 import Register from './components/Register';
+import EmailRegistration from './components/EmailRegistration';
+import CompleteRegistration from './components/CompleteRegistration';
+import MyPage from './components/MyPage';
 import AdminLogin from './components/AdminLogin';
 import AdminDashboard from './components/AdminDashboard';
 
@@ -15,7 +18,7 @@ function App() {
   const [logoClickTimer, setLogoClickTimer] = useState(null);
 
   useEffect(() => {
-    const savedUser = localStorage.getItem('user');
+    const savedUser = localStorage.getItem('currentUser');
     if (savedUser) {
       setUser(JSON.parse(savedUser));
     }
@@ -43,7 +46,7 @@ function App() {
   const handleLogout = () => {
     setUser(null);
     setIsAdmin(false);
-    localStorage.removeItem('user');
+    localStorage.removeItem('currentUser');
     localStorage.removeItem('isAdmin');
   };
 
@@ -60,6 +63,7 @@ function App() {
             <nav className="header-nav">
               {user ? (
                 <div className="user-menu">
+                  <Link to="/mypage" className="mypage-link">マイページ</Link>
                   <span className="welcome-text">ようこそ、{user.name}様</span>
                   <button className="logout-btn" onClick={handleLogout}>ログアウト</button>
                 </div>
@@ -77,7 +81,9 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/vehicles/:type" element={<VehicleList user={user} />} />
           <Route path="/login" element={<Login setUser={setUser} />} />
-          <Route path="/register" element={<Register />} />
+          <Route path="/register" element={<EmailRegistration />} />
+          <Route path="/complete-registration/:token" element={<CompleteRegistration />} />
+          <Route path="/mypage" element={<MyPage user={user} setUser={setUser} />} />
           <Route path="/admin-login" element={<AdminLogin setIsAdmin={setIsAdmin} />} />
           <Route path="/admin" element={isAdmin ? <AdminDashboard /> : <AdminLogin setIsAdmin={setIsAdmin} />} />
         </Routes>
