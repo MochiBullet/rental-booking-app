@@ -22,6 +22,7 @@ const VehicleList = ({ user }) => {
   
   // Vehicle images mapping
   const vehicleImages = {
+    // Cars
     'Toyota Camry': 'https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?w=400&h=250&fit=crop',
     'Honda Civic': 'https://images.unsplash.com/photo-1590362891991-f776e747a588?w=400&h=250&fit=crop',
     'Ford Explorer': 'https://images.unsplash.com/photo-1519641766812-1cfa1137dc16?w=400&h=250&fit=crop',
@@ -30,6 +31,19 @@ const VehicleList = ({ user }) => {
     'Toyota Sienna': 'https://images.unsplash.com/photo-1533473359331-0135ef1f614e?w=400&h=250&fit=crop',
     'Mercedes S-Class': 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=400&h=250&fit=crop',
     'BMW 7 Series': 'https://images.unsplash.com/photo-1555215858-9f41d89c0e7f?w=400&h=250&fit=crop',
+    'Nissan Altima': 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=400&h=250&fit=crop',
+    'Tesla Model 3': 'https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=400&h=250&fit=crop',
+    // Bikes
+    'Honda PCX': 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=250&fit=crop',
+    'Yamaha MT-07': 'https://images.unsplash.com/photo-1609630875171-b1321377ee65?w=400&h=250&fit=crop',
+    'Kawasaki Ninja 400': 'https://images.unsplash.com/photo-1580310614729-ccd69652491d?w=400&h=250&fit=crop',
+    'Honda CB400': 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=250&fit=crop',
+    'Suzuki Burgman': 'https://images.unsplash.com/photo-1571008887538-b36bb32f4571?w=400&h=250&fit=crop',
+    'Harley-Davidson Iron 883': 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=250&fit=crop',
+    'BMW R1250GS': 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?w=400&h=250&fit=crop',
+    'Ducati Monster': 'https://images.unsplash.com/photo-1580341289255-5b47c98a59dd?w=400&h=250&fit=crop',
+    'Vespa Primavera': 'https://images.unsplash.com/photo-1594736797933-d0501ba2fe65?w=400&h=250&fit=crop',
+    'Triumph Street Triple': 'https://images.unsplash.com/photo-1599819811279-d5ad9cccf838?w=400&h=250&fit=crop',
     'Default': 'https://images.unsplash.com/photo-1502877338535-766e1452684a?w=400&h=250&fit=crop'
   };
 
@@ -71,18 +85,39 @@ const VehicleList = ({ user }) => {
   }, [selectedVehicle, selectedPlan, selectedDuration, insuranceOptions]);
 
   const generateDefaultVehicles = (vehicleType) => {
-    const allVehicles = [
-      { id: 1, name: 'Toyota Camry', type: 'Sedan', price: 8000, passengers: 5, features: 'GPS, Bluetooth, Backup Camera', available: true },
-      { id: 2, name: 'Honda Civic', type: 'Sedan', price: 7000, passengers: 5, features: 'Apple CarPlay, Lane Assist', available: true },
-      { id: 3, name: 'Ford Explorer', type: 'SUV', price: 12000, passengers: 7, features: '4WD, Navigation, Leather Seats', available: true },
-      { id: 4, name: 'Chevrolet Tahoe', type: 'SUV', price: 15000, passengers: 8, features: 'Premium Audio, Sunroof, DVD Player', available: true },
-      { id: 5, name: 'Honda Odyssey', type: 'Van', price: 11000, passengers: 8, features: 'Sliding Doors, Entertainment System', available: true },
-      { id: 6, name: 'Toyota Sienna', type: 'Van', price: 12000, passengers: 8, features: 'All-Wheel Drive, Spacious Interior', available: true },
-      { id: 7, name: 'Mercedes S-Class', type: 'Luxury', price: 25000, passengers: 5, features: 'Massage Seats, Premium Sound, Autopilot', available: true },
-      { id: 8, name: 'BMW 7 Series', type: 'Luxury', price: 23000, passengers: 5, features: 'Night Vision, Gesture Control, Wi-Fi', available: true }
+    const carVehicles = [
+      { id: 1, name: 'Toyota Camry', type: 'car', price: 8000, passengers: 5, features: 'GPS, Bluetooth, Backup Camera', available: true },
+      { id: 2, name: 'Honda Civic', type: 'car', price: 7000, passengers: 5, features: 'Apple CarPlay, Lane Assist', available: true },
+      { id: 3, name: 'Ford Explorer', type: 'car', price: 12000, passengers: 7, features: '4WD, Navigation, Leather Seats', available: true },
+      { id: 4, name: 'Chevrolet Tahoe', type: 'car', price: 15000, passengers: 8, features: 'Premium Audio, Sunroof, DVD Player', available: true },
+      { id: 5, name: 'Honda Odyssey', type: 'car', price: 11000, passengers: 8, features: 'Sliding Doors, Entertainment System', available: true },
+      { id: 6, name: 'Toyota Sienna', type: 'car', price: 12000, passengers: 8, features: 'All-Wheel Drive, Spacious Interior', available: true },
+      { id: 7, name: 'Mercedes S-Class', type: 'car', price: 25000, passengers: 5, features: 'Massage Seats, Premium Sound, Autopilot', available: true },
+      { id: 8, name: 'BMW 7 Series', type: 'car', price: 23000, passengers: 5, features: 'Night Vision, Gesture Control, Wi-Fi', available: true },
+      { id: 9, name: 'Nissan Altima', type: 'car', price: 7500, passengers: 5, features: 'ProPILOT Assist, Remote Start', available: true },
+      { id: 10, name: 'Tesla Model 3', type: 'car', price: 18000, passengers: 5, features: 'Autopilot, Electric, Supercharging', available: true }
     ];
 
-    if (vehicleType && vehicleType !== 'all') {
+    const bikeVehicles = [
+      { id: 11, name: 'Honda PCX', type: 'bike', price: 3000, passengers: 2, features: 'Automatic, Storage Box, Fuel Efficient', available: true },
+      { id: 12, name: 'Yamaha MT-07', type: 'bike', price: 5000, passengers: 2, features: 'Sport Naked, ABS, LED Lights', available: true },
+      { id: 13, name: 'Kawasaki Ninja 400', type: 'bike', price: 5500, passengers: 2, features: 'Sport Bike, Slipper Clutch, Digital Display', available: true },
+      { id: 14, name: 'Honda CB400', type: 'bike', price: 4500, passengers: 2, features: 'Classic Style, VTEC Engine, Comfortable', available: true },
+      { id: 15, name: 'Suzuki Burgman', type: 'bike', price: 4000, passengers: 2, features: 'Maxi Scooter, Large Storage, Windshield', available: true },
+      { id: 16, name: 'Harley-Davidson Iron 883', type: 'bike', price: 8000, passengers: 2, features: 'Cruiser, V-Twin Engine, Classic Style', available: true },
+      { id: 17, name: 'BMW R1250GS', type: 'bike', price: 9500, passengers: 2, features: 'Adventure, Boxer Engine, Electronic Suspension', available: true },
+      { id: 18, name: 'Ducati Monster', type: 'bike', price: 7000, passengers: 2, features: 'Naked Sport, L-Twin Engine, Trellis Frame', available: true },
+      { id: 19, name: 'Vespa Primavera', type: 'bike', price: 2500, passengers: 2, features: 'Classic Scooter, Retro Style, City Friendly', available: true },
+      { id: 20, name: 'Triumph Street Triple', type: 'bike', price: 6500, passengers: 2, features: 'Street Fighter, Triple Engine, Quick Shifter', available: true }
+    ];
+
+    const allVehicles = [...carVehicles, ...bikeVehicles];
+
+    if (vehicleType === 'car') {
+      return carVehicles;
+    } else if (vehicleType === 'bike') {
+      return bikeVehicles;
+    } else if (vehicleType && vehicleType !== 'all') {
       return allVehicles.filter(v => v.type.toLowerCase() === vehicleType.toLowerCase());
     }
     return allVehicles;
@@ -218,7 +253,7 @@ const VehicleList = ({ user }) => {
                 alt={vehicle.name}
                 className="vehicle-image"
               />
-              <span className="vehicle-badge">{vehicle.type}</span>
+              <span className="vehicle-badge">{vehicle.type === 'car' ? 'Car' : vehicle.type === 'bike' ? 'Bike' : vehicle.type}</span>
               {vehicle.available && <span className="available-badge">Available</span>}
             </div>
             
@@ -274,7 +309,7 @@ const VehicleList = ({ user }) => {
                     />
                     <div className="summary-details">
                       <h3>{selectedVehicle.name}</h3>
-                      <p>{selectedVehicle.type} • {selectedVehicle.passengers} passengers</p>
+                      <p>{selectedVehicle.type === 'car' ? 'Car' : 'Bike'} • {selectedVehicle.passengers} {selectedVehicle.type === 'bike' ? 'riders' : 'passengers'}</p>
                     </div>
                   </div>
 
