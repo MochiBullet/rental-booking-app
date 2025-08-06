@@ -1,0 +1,25 @@
+{
+  "name": "rental-booking-app-cdk",
+  "version": "1.0.0",
+  "description": "AWS CDK infrastructure for Rental Booking App",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "cdk": "cdk",
+    "deploy": "cdk deploy --all --require-approval never",
+    "destroy": "cdk destroy --all",
+    "synth": "cdk synth"
+  },
+  "devDependencies": {
+    "@types/node": "20.11.0",
+    "aws-cdk": "2.118.0",
+    "typescript": "~5.3.3"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "2.118.0",
+    "constructs": "^10.3.0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
