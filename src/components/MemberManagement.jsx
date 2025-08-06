@@ -5,6 +5,9 @@ const MemberManagement = ({ members, onMemberUpdate }) => {
   const [selectedMember, setSelectedMember] = useState(null);
   const [filterStatus, setFilterStatus] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [showPointModal, setShowPointModal] = useState(false);
+  const [pointsToAdd, setPointsToAdd] = useState('');
+  const [pointsReason, setPointsReason] = useState('');
 
   const filterOptions = [
     { value: 'all', label: 'すべて' },
@@ -46,6 +49,42 @@ const MemberManagement = ({ members, onMemberUpdate }) => {
         updatedAt: new Date()
       });
     }
+  };
+
+  const handlePointsAdd = () => {
+    const points = parseInt(pointsToAdd);
+    if (isNaN(points) || points <= 0) {
+      alert('有効なポイント数を入力してください');
+      return;
+    }
+
+    if (!pointsReason.trim()) {
+      alert('ポイント付与理由を入力してください');
+      return;
+    }
+
+    const updatedMember = {
+      ...selectedMember,
+      membershipInfo: {
+        ...selectedMember.membershipInfo,
+        points: selectedMember.membershipInfo.points + points,
+        pointHistory: [
+          ...(selectedMember.membershipInfo.pointHistory || []),
+          {
+            date: new Date(),
+            points: points,
+            reason: pointsReason,
+            type: 'manual_add'
+          }
+        ]
+      }
+    };
+
+    onMemberUpdate(updatedMember);
+    setShowPointModal(false);
+    setPointsToAdd('');
+    setPointsReason('');
+    alert(`${points}ポイントを付与しました`);
   };
 
   const handleLicenseVerification = (memberId, status) => {
@@ -253,6 +292,16 @@ const MemberManagement = ({ members, onMemberUpdate }) => {
                       再審査
                     </button>
                   )}
+                  
+                  <button
+                    onClick={() => {
+                      setSelectedMember(member);
+                      setShowPointModal(true);
+                    }}
+                    className="points-button"
+                  >
+                    💰 ポイント付与
+                  </button>
                 </div>
 
                 {selectedMember === member.id && (
@@ -316,6 +365,67 @@ const MemberManagement = ({ members, onMemberUpdate }) => {
           </div>
         )}
       </div>
+      
+      {/* ポイント付与モーダル */}
+      {showPointModal && selectedMember && (
+        <div className="modal-overlay">
+          <div className="modal-content points-modal">
+            <h3>ポイント手動付与</h3>
+            <p className="modal-description">
+              {selectedMember.profile?.name}さん（{selectedMember.membershipInfo?.memberNumber}）にポイントを付与します
+            </p>
+            
+            <div className="form-group">
+              <label>現在のポイント:</label>
+              <p className="current-points">{selectedMember.membershipInfo?.points || 0} pt</p>
+            </div>
+            
+            <div className="form-group">
+              <label>付与するポイント数 <span className="required">*</span></label>
+              <input
+                type="number"
+                min="1"
+                value={pointsToAdd}
+                onChange={(e) => setPointsToAdd(e.target.value)}
+                placeholder="例: 500"
+                className="points-input"
+              />
+            </div>
+            
+            <div className="form-group">
+              <label>付与理由 <span className="required">*</span></label>
+              <textarea
+                value={pointsReason}
+                onChange={(e) => setPointsReason(e.target.value)}
+                placeholder="例: キャンペーン特典、サービス補償等"
+                rows={3}
+                className="reason-textarea"
+              />
+            </div>
+            
+            <div className="modal-actions">
+              <button
+                onClick={() => {
+                  setShowPointModal(false);
+                  setPointsToAdd('');
+                  setPointsReason('');
+                  setSelectedMember(null);
+                }}
+                className="cancel-button"
+              >
+                キャンセル
+              </button>
+              <button
+                onClick={handlePointsAdd}
+                className="confirm-button"
+                disabled={!pointsToAdd || !pointsReason}
+              >
+                ポイントを付与
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

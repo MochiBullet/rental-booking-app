@@ -37,7 +37,10 @@ export const initialMembers = [
       memberNumber: "M000001",
       joinDate: "2024-01-01",
       membershipType: "regular", // regular, premium
-      points: 1500
+      points: 1500,
+      inviteCode: "TEST001",
+      invitedBy: null,
+      invitedUsers: []
     },
     reservationHistory: [],
     createdAt: new Date("2024-01-01"),
@@ -111,5 +114,47 @@ export const memberUtils = {
   // 割引率取得
   getDiscountRate: (membershipType = 'regular') => {
     return membershipType === 'premium' ? 0.10 : 0.05;
+  },
+
+  // 免許証有効期限チェック関数
+  isLicenseExpired: (expiryDate) => {
+    if (!expiryDate) return true;
+    const today = new Date();
+    const expiry = new Date(expiryDate);
+    return expiry <= today;
+  },
+
+  // 免許証有効期限まで日数計算
+  getDaysUntilExpiry: (expiryDate) => {
+    if (!expiryDate) return -1;
+    const today = new Date();
+    const expiry = new Date(expiryDate);
+    const diffTime = expiry - today;
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  },
+
+  // 免許証ステータスが予約可能かチェック
+  canMakeReservation: (member) => {
+    if (!member?.profile?.driverLicense) return false;
+    
+    const license = member.profile.driverLicense;
+    
+    // 審査が承認されているかチェック
+    if (license.verificationStatus !== 'approved') return false;
+    
+    // 有効期限チェック
+    if (memberUtils.isLicenseExpired(license.expiryDate)) return false;
+    
+    return true;
+  },
+
+  // 招待コード生成
+  generateInviteCode: (memberId) => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let code = '';
+    for (let i = 0; i < 6; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return code + memberId;
   }
 };

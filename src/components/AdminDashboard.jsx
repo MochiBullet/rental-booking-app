@@ -60,6 +60,7 @@ const AdminDashboard = ({ vehicles, reservations, members, onVehicleUpdate, onRe
             <ReservationManagement 
               reservations={reservations}
               vehicles={vehicles}
+              members={members}
               onReservationUpdate={onReservationUpdate}
             />
           )}

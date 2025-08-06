@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 
-const ReservationManagement = ({ reservations, vehicles, onReservationUpdate }) => {
+const ReservationManagement = ({ reservations, vehicles, members, onReservationUpdate }) => {
   const [selectedReservation, setSelectedReservation] = useState(null);
   const [filterStatus, setFilterStatus] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const statusOptions = [
     { value: 'all', label: 'すべて' },
@@ -12,8 +13,26 @@ const ReservationManagement = ({ reservations, vehicles, onReservationUpdate }) 
   ];
 
   const filteredReservations = reservations.filter(reservation => {
-    if (filterStatus === 'all') return true;
-    return reservation.status === filterStatus;
+    // ステータスフィルター
+    if (filterStatus !== 'all' && reservation.status !== filterStatus) return false;
+    
+    // 検索クエリフィルター
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      const searchFields = [
+        reservation.customerName,
+        reservation.customerEmail,
+        reservation.customerPhone,
+        reservation.id?.toString(),
+        vehicles.find(v => v.id === reservation.vehicleId)?.name
+      ].filter(field => field);
+      
+      return searchFields.some(field => 
+        field.toLowerCase().includes(query)
+      );
+    }
+    
+    return true;
   });
 
   const handleStatusChange = (reservationId, newStatus) => {
@@ -88,6 +107,16 @@ const ReservationManagement = ({ reservations, vehicles, onReservationUpdate }) 
       </div>
 
       <div className="reservation-filters">
+        <div className="filter-group">
+          <label>検索:</label>
+          <input
+            type="text"
+            placeholder="予約ID、名前、メール、電話番号、車両名で検索"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="search-input"
+          />
+        </div>
         <div className="filter-group">
           <label>ステータス絞り込み:</label>
           <select

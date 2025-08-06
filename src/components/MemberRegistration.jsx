@@ -35,7 +35,8 @@ const MemberRegistration = ({ onRegister, onCancel }) => {
     // 設定
     newsletterSubscription: true,
     smsNotification: false,
-    termsAccepted: false
+    termsAccepted: false,
+    inviteCode: '' // 招待コード
   });
   
   const [errors, setErrors] = useState({});
@@ -606,6 +607,24 @@ const MemberRegistration = ({ onRegister, onCancel }) => {
               </div>
             </div>
             
+            <div className="invite-code-section">
+              <h4>招待コード（任意）</h4>
+              <div className="form-group">
+                <label>友達から招待コードをもらった方は入力してください</label>
+                <input
+                  type="text"
+                  name="inviteCode"
+                  value={formData.inviteCode}
+                  onChange={handleInputChange}
+                  placeholder="例: ABC123"
+                  className="invite-code-input"
+                />
+                <p className="invite-code-hint">
+                  招待コードを入力すると、あなたと招待者の両方に500ポイントが付与されます！
+                </p>
+              </div>
+            </div>
+            
             <div className="preferences-section">
               <h4>設定</h4>
               <label className="checkbox-label">
@@ -670,25 +689,31 @@ const MemberRegistration = ({ onRegister, onCancel }) => {
           {renderStepContent()}
           
           <div className="form-actions">
-            {step > 1 && (
-              <button type="button" onClick={handlePrevious} className="previous-button">
-                ← 前へ
-              </button>
-            )}
+            <div className="left-buttons">
+              {step > 1 && (
+                <button type="button" onClick={handlePrevious} className="previous-button">
+                  ← 前へ
+                </button>
+              )}
+            </div>
             
-            <button type="button" onClick={onCancel} className="cancel-button">
-              キャンセル
-            </button>
+            <div className="center-buttons">
+              <button type="button" onClick={onCancel} className="cancel-button">
+                キャンセル
+              </button>
+            </div>
             
-            {step < 6 ? (
-              <button type="button" onClick={handleNext} className="next-button">
-                次へ →
-              </button>
-            ) : (
-              <button type="submit" className="submit-button">
-                登録完了
-              </button>
-            )}
+            <div className="right-buttons">
+              {step < 6 ? (
+                <button type="button" onClick={handleNext} className="next-button">
+                  次へ →
+                </button>
+              ) : (
+                <button type="submit" className="submit-button">
+                  登録完了
+                </button>
+              )}
+            </div>
           </div>
         </form>
       </div>

@@ -103,14 +103,24 @@ const Header = ({ currentView, onViewChange, reservationCount, isAdminLoggedIn, 
               </button>
             </li>
           ) : (
-            <li>
-              <button 
-                className="member-login-button"
-                onClick={onMemberLogin}
-              >
-                👤 会員ログイン
-              </button>
-            </li>
+            <>
+              <li>
+                <button 
+                  className="member-register-button"
+                  onClick={() => onViewChange('member-register')}
+                >
+                  📝 会員登録
+                </button>
+              </li>
+              <li>
+                <button 
+                  className="member-login-button"
+                  onClick={onMemberLogin}
+                >
+                  👤 ログイン
+                </button>
+              </li>
+            </>
           )}
         </ul>
       </nav>

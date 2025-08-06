@@ -79,6 +79,16 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
     }));
   };
 
+  const updateTermsSettings = (section, field, value) => {
+    setSettings(prev => ({
+      ...prev,
+      [section]: {
+        ...prev[section],
+        [field]: value
+      }
+    }));
+  };
+
   return (
     <div className="site-settings-management">
       <div className="settings-header">
@@ -98,7 +108,9 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
           { key: 'hero', label: 'ヒーローセクション' },
           { key: 'features', label: '特徴・機能' },
           { key: 'contact', label: 'お問い合わせ情報' },
-          { key: 'services', label: 'サービス内容' }
+          { key: 'services', label: 'サービス内容' },
+          { key: 'terms', label: '利用規約' },
+          { key: 'privacy', label: 'プライバシーポリシー' }
         ].map(tab => (
           <button
             key={tab.key}
@@ -242,6 +254,56 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
                 />
               </div>
             ))}
+          </div>
+        )}
+
+        {activeSection === 'terms' && (
+          <div className="section">
+            <h3>利用規約設定</h3>
+            <div className="form-group">
+              <label>タイトル</label>
+              <input
+                type="text"
+                value={settings.terms?.title || ''}
+                onChange={(e) => updateTermsSettings('terms', 'title', e.target.value)}
+                placeholder="利用規約"
+              />
+            </div>
+            <div className="form-group">
+              <label>内容</label>
+              <textarea
+                value={settings.terms?.content || ''}
+                onChange={(e) => updateTermsSettings('terms', 'content', e.target.value)}
+                placeholder="利用規約の内容を入力してください..."
+                rows={15}
+                className="terms-textarea"
+              />
+            </div>
+          </div>
+        )}
+
+        {activeSection === 'privacy' && (
+          <div className="section">
+            <h3>プライバシーポリシー設定</h3>
+            <div className="form-group">
+              <label>タイトル</label>
+              <input
+                type="text"
+                value={settings.privacy?.title || ''}
+                onChange={(e) => updateTermsSettings('privacy', 'title', e.target.value)}
+                placeholder="プライバシーポリシー"
+              />
+            </div>
+            <div className="form-group">
+              <label>内容</label>
+              <textarea
+                value={settings.privacy?.content || ''}
+                onChange={(e) => updateTermsSettings('privacy', 'content', e.target.value)}
+                placeholder="プライバシーポリシーの内容を入力してください..."
+                rows={15}
+                className="terms-textarea"
+              />
+            </div>
           </div>
         )}
       </div>

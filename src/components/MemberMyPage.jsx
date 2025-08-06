@@ -1,9 +1,15 @@
 import React, { useState } from 'react';
-import { membershipTypes } from '../data/memberData';
+import { membershipTypes, memberUtils } from '../data/memberData';
 
 const MemberMyPage = ({ member, reservations, onLogout, onUpdateProfile }) => {
   const [activeTab, setActiveTab] = useState('profile');
   const [isEditing, setIsEditing] = useState(false);
+  const [isReuploadingLicense, setIsReuploadingLicense] = useState(false);
+  const [licenseUploadData, setLicenseUploadData] = useState({
+    frontImage: null,
+    backImage: null
+  });
+  const [uploadErrors, setUploadErrors] = useState({});
   const [editData, setEditData] = useState({
     name: member.profile?.name || '',
     nameKana: member.profile?.nameKana || '',
@@ -23,7 +29,8 @@ const MemberMyPage = ({ member, reservations, onLogout, onUpdateProfile }) => {
     { id: 'profile', name: 'プロフィール', icon: '👤' },
     { id: 'reservations', name: '予約履歴', icon: '📅' },
     { id: 'points', name: 'ポイント', icon: '🎁' },
-    { id: 'license', name: '免許証', icon: '🆔' }
+    { id: 'license', name: '免許証', icon: '🆔' },
+    { id: 'invite', name: '友達招待', icon: '💌' }
   ];
 
   const handleInputChange = (e) => {
@@ -60,6 +67,72 @@ const MemberMyPage = ({ member, reservations, onLogout, onUpdateProfile }) => {
 
     onUpdateProfile(updatedProfile, updatedPreferences);
     setIsEditing(false);
+  };
+
+  const handleLicenseImageUpload = async (e, imageType) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // ファイルサイズチェック (5MB以下)
+    if (file.size > 5 * 1024 * 1024) {
+      setUploadErrors(prev => ({
+        ...prev,
+        [imageType]: 'ファイルサイズは5MB以下にしてください'
+      }));
+      return;
+    }
+
+    // ファイルタイプチェック
+    if (!file.type.startsWith('image/')) {
+      setUploadErrors(prev => ({
+        ...prev,
+        [imageType]: '画像ファイルを選択してください'
+      }));
+      return;
+    }
+
+    try {
+      // Base64に変換
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setLicenseUploadData(prev => ({
+          ...prev,
+          [imageType]: event.target.result
+        }));
+        setUploadErrors(prev => ({
+          ...prev,
+          [imageType]: ''
+        }));
+      };
+      reader.readAsDataURL(file);
+    } catch (error) {
+      setUploadErrors(prev => ({
+        ...prev,
+        [imageType]: 'ファイルのアップロードに失敗しました'
+      }));
+    }
+  };
+
+  const handleLicenseReupload = () => {
+    if (!licenseUploadData.frontImage || !licenseUploadData.backImage) {
+      alert('表面と裏面の両方の画像をアップロードしてください');
+      return;
+    }
+
+    const updatedProfile = {
+      ...member.profile,
+      driverLicense: {
+        ...member.profile.driverLicense,
+        frontImage: licenseUploadData.frontImage,
+        backImage: licenseUploadData.backImage,
+        verificationStatus: 'pending' // 再審査待ち状態にリセット
+      }
+    };
+
+    onUpdateProfile(updatedProfile, member.preferences);
+    setIsReuploadingLicense(false);
+    setLicenseUploadData({ frontImage: null, backImage: null });
+    alert('免許証画像を再アップロードしました。審査完了まで1-2営業日お待ちください。');
   };
 
   const formatPrice = (price) => {
@@ -457,9 +530,190 @@ const MemberMyPage = ({ member, reservations, onLogout, onUpdateProfile }) => {
                   <div className="status-message error">
                     <p>❌ 免許証の再提出が必要です</p>
                     <p>お手数ですが、明瞭な画像で再度アップロードしてください。</p>
-                    <button className="reupload-button">画像を再アップロード</button>
+                    <button 
+                      className="reupload-button"
+                      onClick={() => setIsReuploadingLicense(true)}
+                    >
+                      画像を再アップロード
+                    </button>
                   </div>
                 )}
+                
+                {/* 免許証有効期限切れチェック */}
+                {member.profile?.driverLicense && memberUtils.isLicenseExpired(member.profile.driverLicense.expiryDate) && (
+                  <div className="status-message error">
+                    <p>⚠️ 免許証の有効期限が切れています</p>
+                    <p>免許証を更新後、新しい画像をアップロードしてください。</p>
+                    <button 
+                      className="reupload-button"
+                      onClick={() => setIsReuploadingLicense(true)}
+                    >
+                      更新した免許証をアップロード
+                    </button>
+                  </div>
+                )}
+                
+                {/* 再アップロードフォーム */}
+                {isReuploadingLicense && (
+                  <div className="license-reupload-form">
+                    <h4>免許証画像の再アップロード</h4>
+                    
+                    <div className="reupload-section">
+                      <div className="upload-group">
+                        <label>免許証表面画像 *</label>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => handleLicenseImageUpload(e, 'frontImage')}
+                          className="file-input"
+                        />
+                        {licenseUploadData.frontImage && (
+                          <div className="image-preview">
+                            <img 
+                              src={licenseUploadData.frontImage} 
+                              alt="免許証表面プレビュー" 
+                              className="preview-image"
+                            />
+                            <p>✅ アップロード完了</p>
+                          </div>
+                        )}
+                        {uploadErrors.frontImage && (
+                          <span className="error-message">{uploadErrors.frontImage}</span>
+                        )}
+                      </div>
+                      
+                      <div className="upload-group">
+                        <label>免許証裏面画像 *</label>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => handleLicenseImageUpload(e, 'backImage')}
+                          className="file-input"
+                        />
+                        {licenseUploadData.backImage && (
+                          <div className="image-preview">
+                            <img 
+                              src={licenseUploadData.backImage} 
+                              alt="免許証裏面プレビュー" 
+                              className="preview-image"
+                            />
+                            <p>✅ アップロード完了</p>
+                          </div>
+                        )}
+                        {uploadErrors.backImage && (
+                          <span className="error-message">{uploadErrors.backImage}</span>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div className="reupload-actions">
+                      <button 
+                        className="cancel-button"
+                        onClick={() => {
+                          setIsReuploadingLicense(false);
+                          setLicenseUploadData({ frontImage: null, backImage: null });
+                          setUploadErrors({});
+                        }}
+                      >
+                        キャンセル
+                      </button>
+                      <button 
+                        className="submit-button"
+                        onClick={handleLicenseReupload}
+                        disabled={!licenseUploadData.frontImage || !licenseUploadData.backImage}
+                      >
+                        アップロード完了
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'invite':
+        return (
+          <div className="tab-content">
+            <h3>友達招待</h3>
+            
+            <div className="invite-section">
+              <div className="invite-code-section">
+                <h4>あなたの招待コード</h4>
+                <div className="invite-code-display">
+                  <div className="code-box">
+                    <span className="code-label">招待コード:</span>
+                    <span className="code-value">{member.membershipInfo?.inviteCode || memberUtils.generateInviteCode(member.id)}</span>
+                  </div>
+                  <button 
+                    className="copy-button"
+                    onClick={() => {
+                      navigator.clipboard.writeText(member.membershipInfo?.inviteCode || '');
+                      alert('招待コードをコピーしました！');
+                    }}
+                  >
+                    📋 コピー
+                  </button>
+                </div>
+                <p className="invite-description">
+                  このコードを友達に共有して、会員登録時に入力してもらうと、
+                  あなたと友達の両方に<strong>500ポイント</strong>が付与されます！
+                </p>
+              </div>
+
+              <div className="invite-benefits">
+                <h4>招待特典</h4>
+                <div className="benefit-cards">
+                  <div className="benefit-card">
+                    <div className="benefit-icon">🎁</div>
+                    <div className="benefit-content">
+                      <h5>招待した方</h5>
+                      <p>500ポイント獲得</p>
+                    </div>
+                  </div>
+                  <div className="benefit-card">
+                    <div className="benefit-icon">🎉</div>
+                    <div className="benefit-content">
+                      <h5>招待された方</h5>
+                      <p>500ポイント獲得</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="invite-history">
+                <h4>招待履歴</h4>
+                {member.membershipInfo?.invitedUsers?.length > 0 ? (
+                  <div className="invited-users-list">
+                    {member.membershipInfo.invitedUsers.map((invitedUser, index) => (
+                      <div key={index} className="invited-user">
+                        <span className="user-info">
+                          👤 {invitedUser.name || `ユーザー${index + 1}`}
+                        </span>
+                        <span className="invite-date">
+                          {new Date(invitedUser.date).toLocaleDateString('ja-JP')}
+                        </span>
+                        <span className="points-earned">
+                          +500ポイント
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="no-invites">
+                    まだ友達を招待していません。招待コードを共有して500ポイントをゲットしましょう！
+                  </p>
+                )}
+              </div>
+
+              <div className="invite-share">
+                <h4>招待方法</h4>
+                <ol className="invite-steps">
+                  <li>上記の招待コードをコピーする</li>
+                  <li>友達にコードを共有する（LINE、メール等）</li>
+                  <li>友達が会員登録時にコードを入力</li>
+                  <li>両方に500ポイントが自動付与されます！</li>
+                </ol>
               </div>
             </div>
           </div>

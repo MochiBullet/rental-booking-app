@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { vehicleData } from './data/vehicleData';
-import { initialMembers } from './data/memberData';
+import { initialMembers, memberUtils } from './data/memberData';
 import { siteSettingsManager } from './data/siteSettings';
 import Header from './components/Header';
 import Hero from './components/Hero';
@@ -11,6 +11,8 @@ import AdminLogin from './components/AdminLogin';
 import MemberLogin from './components/MemberLogin';
 import MemberRegistration from './components/MemberRegistration';
 import MemberMyPage from './components/MemberMyPage';
+import TermsPage from './components/TermsPage';
+import PrivacyPage from './components/PrivacyPage';
 import './App.css';
 
 function App() {
@@ -52,11 +54,59 @@ function App() {
       ...reservationData,
       id: Date.now(),
       createdAt: new Date(),
-      status: 'confirmed'
+      status: 'confirmed',
+      memberId: currentMember?.id || null
     };
     setReservations(prev => [...prev, newReservation]);
     
-    alert('予約が完了しました！ご利用ありがとうございます。');
+    // ログインユーザーの場合、ポイントを計算して付与
+    if (isMemberLoggedIn && currentMember) {
+      // 保険料を除いたレンタル料金を計算
+      const days = Math.ceil(
+        (new Date(reservationData.endDate) - new Date(reservationData.startDate)) / 
+        (1000 * 60 * 60 * 24)
+      ) + 1;
+      
+      let basePrice = selectedVehicle.price * days;
+      
+      // プラン割引適用
+      if (reservationData.rentalPlan === 'weekly' && days >= 7) {
+        basePrice = basePrice * 0.85;
+      } else if (reservationData.rentalPlan === 'monthly' && days >= 30) {
+        basePrice = basePrice * 0.75;
+      }
+      
+      // ポイント計算（100円につき1ポイント）
+      const earnedPoints = Math.floor(basePrice / 100);
+      
+      // メンバー情報を更新
+      const updatedMember = {
+        ...currentMember,
+        membershipInfo: {
+          ...currentMember.membershipInfo,
+          points: currentMember.membershipInfo.points + earnedPoints
+        },
+        reservationHistory: [
+          ...(currentMember.reservationHistory || []),
+          {
+            reservationId: newReservation.id,
+            earnedPoints: earnedPoints,
+            date: new Date()
+          }
+        ]
+      };
+      
+      setCurrentMember(updatedMember);
+      setMembers(prev => 
+        prev.map(member => 
+          member.id === updatedMember.id ? updatedMember : member
+        )
+      );
+      
+      alert(`予約が完了しました！${earnedPoints}ポイントを獲得しました。\nご利用ありがとうございます。`);
+    } else {
+      alert('予約が完了しました！ご利用ありがとうございます。');
+    }
     
     setSelectedVehicle(null);
     setCurrentView('home');
@@ -116,14 +166,54 @@ function App() {
   };
 
   const handleMemberRegister = (memberData) => {
+    let initialPoints = 1000; // 基本登録ボーナス
+    let invitedByMemberId = null;
+    
+    // 招待コードの処理
+    if (memberData.inviteCode) {
+      const inviter = members.find(m => 
+        m.membershipInfo?.inviteCode === memberData.inviteCode
+      );
+      
+      if (inviter) {
+        initialPoints += 500; // 招待された側に500ポイント追加
+        invitedByMemberId = inviter.id;
+        
+        // 招待した側にも500ポイント追加
+        const updatedInviter = {
+          ...inviter,
+          membershipInfo: {
+            ...inviter.membershipInfo,
+            points: inviter.membershipInfo.points + 500,
+            invitedUsers: [
+              ...(inviter.membershipInfo.invitedUsers || []),
+              {
+                name: memberData.profile.name,
+                date: new Date(),
+                memberId: Date.now()
+              }
+            ]
+          }
+        };
+        
+        setMembers(prev => 
+          prev.map(m => m.id === inviter.id ? updatedInviter : m)
+        );
+      }
+    }
+    
+    const newMemberId = Date.now();
     const newMember = {
       ...memberData,
-      id: Date.now(),
+      id: newMemberId,
       membershipInfo: {
-        memberNumber: `M${String(Date.now()).slice(-6)}`,
+        memberNumber: `M${String(newMemberId).slice(-6)}`,
         joinDate: new Date().toISOString().split('T')[0],
         membershipType: 'regular',
-        points: 1000 // 登録ボーナス
+        points: initialPoints,
+        inviteCode: memberUtils.generateInviteCode(newMemberId),
+        invitedBy: invitedByMemberId,
+        invitedUsers: []
       },
       reservationHistory: [],
       createdAt: new Date(),
@@ -132,7 +222,13 @@ function App() {
     };
     
     setMembers(prev => [...prev, newMember]);
-    alert('会員登録が完了しました！ログインしてご利用ください。');
+    
+    if (memberData.inviteCode && invitedByMemberId) {
+      alert(`会員登録が完了しました！\n招待特典として500ポイントが追加され、合計${initialPoints}ポイントを獲得しました。\nログインしてご利用ください。`);
+    } else {
+      alert('会員登録が完了しました！ログインしてご利用ください。');
+    }
+    
     setCurrentView('member-login');
   };
 
@@ -232,6 +328,8 @@ function App() {
               <h2>予約フォーム</h2>
               <ReservationForm 
                 vehicle={selectedVehicle}
+                currentMember={currentMember}
+                isMemberLoggedIn={isMemberLoggedIn}
                 onSubmit={handleReservationSubmit}
                 onCancel={() => {
                   const vehicleType = selectedVehicle?.category === 'car' ? 'cars' : 'motorcycles';
@@ -309,10 +407,37 @@ function App() {
             onUpdateProfile={handleMemberProfileUpdate}
           />
         )}
+        
+        {currentView === 'terms' && (
+          <TermsPage onBack={() => setCurrentView('home')} />
+        )}
+        
+        {currentView === 'privacy' && (
+          <PrivacyPage onBack={() => setCurrentView('home')} />
+        )}
       </main>
       
-      <footer style={{background: '#333', color: 'white', padding: '1rem', textAlign: 'center'}}>
-        <p>&copy; 2024 RentalEasy. All rights reserved.</p>
+      <footer className="site-footer">
+        <div className="container">
+          <div className="footer-content">
+            <div className="footer-links">
+              <button 
+                className="footer-link" 
+                onClick={() => setCurrentView('terms')}
+              >
+                利用規約
+              </button>
+              <span className="footer-separator">|</span>
+              <button 
+                className="footer-link" 
+                onClick={() => setCurrentView('privacy')}
+              >
+                プライバシーポリシー
+              </button>
+            </div>
+            <p className="footer-copyright">&copy; 2024 RentalEasy. All rights reserved.</p>
+          </div>
+        </div>
       </footer>
     </div>
   );
