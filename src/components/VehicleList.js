@@ -1,208 +1,434 @@
-import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import './VehicleList.css';
 
-function VehicleList({ user }) {
+const VehicleList = ({ user }) => {
   const { type } = useParams();
-  const navigate = useNavigate();
+  const [vehicles, setVehicles] = useState([]);
+  const [selectedVehicle, setSelectedVehicle] = useState(null);
+  const [showBookingModal, setShowBookingModal] = useState(false);
+  const [bookingSuccess, setBookingSuccess] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState('daily');
+  const [selectedDuration, setSelectedDuration] = useState(1);
+  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedEndDate, setSelectedEndDate] = useState('');
+  const [insuranceOptions, setInsuranceOptions] = useState({
+    basic: true,
+    collision: false,
+    comprehensive: false,
+    personal: false
+  });
+  const [totalPrice, setTotalPrice] = useState(0);
   
-  const vehicles = {
-    car: [
-      { id: 1, name: 'Toyota Prius', category: 'エコカー', price: 6000, seats: 5, fuel: 'ハイブリッド', image: '🚗' },
-      { id: 2, name: 'Honda Fit', category: 'コンパクト', price: 5000, seats: 5, fuel: 'ガソリン', image: '🚙' },
-      { id: 3, name: 'Nissan Serena', category: 'ミニバン', price: 8000, seats: 8, fuel: 'ガソリン', image: '🚐' },
-      { id: 4, name: 'Mazda CX-5', category: 'SUV', price: 7500, seats: 5, fuel: 'ディーゼル', image: '🚙' },
-      { id: 5, name: 'Toyota Alphard', category: '高級ミニバン', price: 12000, seats: 7, fuel: 'ガソリン', image: '🚐' },
-    ],
-    bike: [
-      { id: 6, name: 'Honda PCX', category: 'スクーター', price: 3000, cc: 125, type: 'AT', image: '🛵' },
-      { id: 7, name: 'Yamaha MT-07', category: 'ネイキッド', price: 5000, cc: 700, type: 'MT', image: '🏍️' },
-      { id: 8, name: 'Kawasaki Ninja 400', category: 'スポーツ', price: 5500, cc: 400, type: 'MT', image: '🏍️' },
-      { id: 9, name: 'Honda CB400', category: 'ネイキッド', price: 4500, cc: 400, type: 'MT', image: '🏍️' },
-      { id: 10, name: 'Suzuki Burgman', category: 'ビッグスクーター', price: 4000, cc: 400, type: 'AT', image: '🛵' },
-    ]
+  // Vehicle images mapping
+  const vehicleImages = {
+    'Toyota Camry': 'https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?w=400&h=250&fit=crop',
+    'Honda Civic': 'https://images.unsplash.com/photo-1590362891991-f776e747a588?w=400&h=250&fit=crop',
+    'Ford Explorer': 'https://images.unsplash.com/photo-1519641766812-1cfa1137dc16?w=400&h=250&fit=crop',
+    'Chevrolet Tahoe': 'https://images.unsplash.com/photo-1563720223809-b9a3d1694e2a?w=400&h=250&fit=crop',
+    'Honda Odyssey': 'https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=400&h=250&fit=crop',
+    'Toyota Sienna': 'https://images.unsplash.com/photo-1533473359331-0135ef1f614e?w=400&h=250&fit=crop',
+    'Mercedes S-Class': 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=400&h=250&fit=crop',
+    'BMW 7 Series': 'https://images.unsplash.com/photo-1555215858-9f41d89c0e7f?w=400&h=250&fit=crop',
+    'Default': 'https://images.unsplash.com/photo-1502877338535-766e1452684a?w=400&h=250&fit=crop'
   };
 
-  const [selectedVehicle, setSelectedVehicle] = useState(null);
-  const [bookingData, setBookingData] = useState({
-    startDate: '',
-    endDate: '',
-    startTime: '10:00',
-    endTime: '18:00'
-  });
+  const plans = {
+    daily: { label: 'Daily Plan', multiplier: 1, unit: 'day' },
+    weekly: { label: 'Weekly Plan', multiplier: 0.85, unit: 'week', discount: '15% OFF' },
+    monthly: { label: 'Monthly Plan', multiplier: 0.7, unit: 'month', discount: '30% OFF' },
+    purchase: { label: 'Purchase Option', multiplier: 365, unit: 'purchase', discount: 'Best Value' }
+  };
 
-  const currentVehicles = vehicles[type] || [];
+  const insurancePrices = {
+    basic: 0,
+    collision: 2000,
+    comprehensive: 3500,
+    personal: 1500
+  };
 
-  const handleBooking = (vehicle) => {
-    if (!user) {
-      alert('予約にはログインが必要です');
-      navigate('/login');
+  useEffect(() => {
+    const storedVehicles = JSON.parse(localStorage.getItem('vehicles') || '[]');
+    let filteredVehicles = storedVehicles;
+    
+    if (type && type !== 'all') {
+      filteredVehicles = storedVehicles.filter(v => 
+        v.type.toLowerCase() === type.toLowerCase()
+      );
+    }
+    
+    if (filteredVehicles.length === 0) {
+      const defaultVehicles = generateDefaultVehicles(type);
+      setVehicles(defaultVehicles);
+      localStorage.setItem('vehicles', JSON.stringify(defaultVehicles));
+    } else {
+      setVehicles(filteredVehicles);
+    }
+  }, [type]);
+
+  useEffect(() => {
+    calculateTotalPrice();
+  }, [selectedVehicle, selectedPlan, selectedDuration, insuranceOptions]);
+
+  const generateDefaultVehicles = (vehicleType) => {
+    const allVehicles = [
+      { id: 1, name: 'Toyota Camry', type: 'Sedan', price: 8000, passengers: 5, features: 'GPS, Bluetooth, Backup Camera', available: true },
+      { id: 2, name: 'Honda Civic', type: 'Sedan', price: 7000, passengers: 5, features: 'Apple CarPlay, Lane Assist', available: true },
+      { id: 3, name: 'Ford Explorer', type: 'SUV', price: 12000, passengers: 7, features: '4WD, Navigation, Leather Seats', available: true },
+      { id: 4, name: 'Chevrolet Tahoe', type: 'SUV', price: 15000, passengers: 8, features: 'Premium Audio, Sunroof, DVD Player', available: true },
+      { id: 5, name: 'Honda Odyssey', type: 'Van', price: 11000, passengers: 8, features: 'Sliding Doors, Entertainment System', available: true },
+      { id: 6, name: 'Toyota Sienna', type: 'Van', price: 12000, passengers: 8, features: 'All-Wheel Drive, Spacious Interior', available: true },
+      { id: 7, name: 'Mercedes S-Class', type: 'Luxury', price: 25000, passengers: 5, features: 'Massage Seats, Premium Sound, Autopilot', available: true },
+      { id: 8, name: 'BMW 7 Series', type: 'Luxury', price: 23000, passengers: 5, features: 'Night Vision, Gesture Control, Wi-Fi', available: true }
+    ];
+
+    if (vehicleType && vehicleType !== 'all') {
+      return allVehicles.filter(v => v.type.toLowerCase() === vehicleType.toLowerCase());
+    }
+    return allVehicles;
+  };
+
+  const calculateTotalPrice = () => {
+    if (!selectedVehicle) return;
+
+    let basePrice = selectedVehicle.price;
+    const plan = plans[selectedPlan];
+    let duration = selectedDuration;
+
+    // Calculate base rental price
+    let rentalPrice = basePrice * plan.multiplier * duration;
+    
+    // Add insurance costs
+    let insuranceTotal = 0;
+    Object.keys(insuranceOptions).forEach(key => {
+      if (insuranceOptions[key]) {
+        insuranceTotal += insurancePrices[key] * duration;
+      }
+    });
+
+    const total = rentalPrice + insuranceTotal;
+    setTotalPrice(total);
+  };
+
+  const handlePlanChange = (plan) => {
+    setSelectedPlan(plan);
+    // Adjust duration defaults based on plan
+    if (plan === 'weekly') setSelectedDuration(1);
+    else if (plan === 'monthly') setSelectedDuration(1);
+    else if (plan === 'purchase') setSelectedDuration(1);
+    else setSelectedDuration(1);
+  };
+
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
+    
+    // Auto-calculate end date based on plan
+    if (date) {
+      const startDate = new Date(date);
+      let endDate = new Date(date);
+      
+      if (selectedPlan === 'daily') {
+        endDate.setDate(startDate.getDate() + selectedDuration);
+      } else if (selectedPlan === 'weekly') {
+        endDate.setDate(startDate.getDate() + (selectedDuration * 7));
+      } else if (selectedPlan === 'monthly') {
+        endDate.setMonth(startDate.getMonth() + selectedDuration);
+      }
+      
+      setSelectedEndDate(endDate.toISOString().split('T')[0]);
+    }
+  };
+
+  const handleBookVehicle = (vehicle) => {
+    setSelectedVehicle(vehicle);
+    setShowBookingModal(true);
+    const today = new Date().toISOString().split('T')[0];
+    setSelectedDate(today);
+    handleDateChange(today);
+  };
+
+  const confirmBooking = () => {
+    if (!selectedDate) {
+      alert('Please select a start date');
       return;
     }
-    setSelectedVehicle(vehicle);
+
+    const booking = {
+      id: Date.now(),
+      vehicleId: selectedVehicle.id,
+      vehicleName: selectedVehicle.name,
+      userId: user?.id,
+      userName: user?.name || 'Guest',
+      pickupDate: selectedDate,
+      returnDate: selectedEndDate,
+      plan: selectedPlan,
+      duration: selectedDuration,
+      insurance: insuranceOptions,
+      totalPrice: totalPrice,
+      status: 'confirmed',
+      bookingDate: new Date().toISOString()
+    };
+
+    const existingBookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+    existingBookings.push(booking);
+    localStorage.setItem('bookings', JSON.stringify(existingBookings));
+
+    setBookingSuccess(true);
+    setTimeout(() => {
+      setShowBookingModal(false);
+      setBookingSuccess(false);
+      setSelectedVehicle(null);
+      resetBookingForm();
+    }, 2000);
   };
 
-  const submitBooking = () => {
-    const days = calculateDays();
-    const totalPrice = selectedVehicle.price * days;
-    alert(`予約が完了しました！\n車両: ${selectedVehicle.name}\n期間: ${days}日間\n合計金額: ¥${totalPrice.toLocaleString()}`);
-    setSelectedVehicle(null);
-    setBookingData({ startDate: '', endDate: '', startTime: '10:00', endTime: '18:00' });
+  const resetBookingForm = () => {
+    setSelectedPlan('daily');
+    setSelectedDuration(1);
+    setSelectedDate('');
+    setSelectedEndDate('');
+    setInsuranceOptions({
+      basic: true,
+      collision: false,
+      comprehensive: false,
+      personal: false
+    });
   };
 
-  const calculateDays = () => {
-    if (!bookingData.startDate || !bookingData.endDate) return 1;
-    const start = new Date(bookingData.startDate);
-    const end = new Date(bookingData.endDate);
-    const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
-    return days > 0 ? days : 1;
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('ja-JP', {
+      style: 'currency',
+      currency: 'JPY'
+    }).format(amount);
   };
 
   return (
-    <div className="vehicle-list-page">
-      <div className="list-header">
-        <button className="back-button" onClick={() => navigate('/')}>← 戻る</button>
-        <h2 className="list-title">{type === 'car' ? '車' : 'バイク'}のラインナップ</h2>
+    <div className="vehicle-list-container">
+      <div className="vehicle-list-header">
+        <h1>{type ? `${type.charAt(0).toUpperCase() + type.slice(1)} Vehicles` : 'All Vehicles'}</h1>
+        <p>Choose from our premium selection of vehicles</p>
       </div>
 
       <div className="vehicles-grid">
-        {currentVehicles.map(vehicle => (
+        {vehicles.map(vehicle => (
           <div key={vehicle.id} className="vehicle-card">
-            <div className="vehicle-image">{vehicle.image}</div>
-            <div className="vehicle-info">
-              <h3 className="vehicle-name">{vehicle.name}</h3>
-              <span className="vehicle-category">{vehicle.category}</span>
+            <div className="vehicle-image-container">
+              <img 
+                src={vehicleImages[vehicle.name] || vehicleImages['Default']} 
+                alt={vehicle.name}
+                className="vehicle-image"
+              />
+              <span className="vehicle-badge">{vehicle.type}</span>
+              {vehicle.available && <span className="available-badge">Available</span>}
+            </div>
+            
+            <div className="vehicle-details">
+              <h3>{vehicle.name}</h3>
+              <div className="vehicle-features">
+                <span className="feature-tag">👥 {vehicle.passengers} seats</span>
+                {vehicle.features?.split(',').slice(0, 2).map((feature, idx) => (
+                  <span key={idx} className="feature-tag">{feature.trim()}</span>
+                ))}
+              </div>
               
-              <div className="vehicle-specs">
-                {type === 'car' ? (
-                  <>
-                    <div className="spec">
-                      <span className="spec-label">定員</span>
-                      <span className="spec-value">{vehicle.seats}名</span>
-                    </div>
-                    <div className="spec">
-                      <span className="spec-label">燃料</span>
-                      <span className="spec-value">{vehicle.fuel}</span>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="spec">
-                      <span className="spec-label">排気量</span>
-                      <span className="spec-value">{vehicle.cc}cc</span>
-                    </div>
-                    <div className="spec">
-                      <span className="spec-label">タイプ</span>
-                      <span className="spec-value">{vehicle.type}</span>
-                    </div>
-                  </>
-                )}
+              <div className="vehicle-pricing">
+                <div className="price-display">
+                  <span className="price-amount">{formatCurrency(vehicle.price)}</span>
+                  <span className="price-period">/ day</span>
+                </div>
+                <button 
+                  className="modern-book-btn"
+                  onClick={() => handleBookVehicle(vehicle)}
+                  disabled={!vehicle.available}
+                >
+                  Book Now
+                </button>
               </div>
-
-              <div className="vehicle-price">
-                <span className="price-label">1日あたり</span>
-                <span className="price-value">¥{vehicle.price.toLocaleString()}</span>
-              </div>
-
-              <button className="book-button" onClick={() => handleBooking(vehicle)}>
-                この{type === 'car' ? '車' : 'バイク'}を予約
-              </button>
             </div>
           </div>
         ))}
       </div>
 
-      {selectedVehicle && (
-        <div className="booking-modal">
-          <div className="modal-content">
-            <h3>予約内容の確認</h3>
-            <div className="booking-vehicle">
-              <span className="booking-icon">{selectedVehicle.image}</span>
-              <span className="booking-name">{selectedVehicle.name}</span>
-            </div>
-
-            <div className="booking-form">
-              <div className="date-group">
-                <label>
-                  開始日
-                  <input
-                    type="date"
-                    value={bookingData.startDate}
-                    onChange={(e) => setBookingData({...bookingData, startDate: e.target.value})}
-                    min={new Date().toISOString().split('T')[0]}
-                    required
-                  />
-                </label>
-                <label>
-                  開始時刻
-                  <select 
-                    value={bookingData.startTime}
-                    onChange={(e) => setBookingData({...bookingData, startTime: e.target.value})}
-                  >
-                    {[...Array(14)].map((_, i) => (
-                      <option key={i} value={`${i+8}:00`}>{i+8}:00</option>
-                    ))}
-                  </select>
-                </label>
+      {showBookingModal && selectedVehicle && (
+        <div className="modern-modal-overlay">
+          <div className="modern-modal">
+            {bookingSuccess ? (
+              <div className="success-animation">
+                <div className="success-icon">✓</div>
+                <h2>Booking Confirmed!</h2>
+                <p>Your {selectedVehicle.name} has been reserved</p>
               </div>
-
-              <div className="date-group">
-                <label>
-                  終了日
-                  <input
-                    type="date"
-                    value={bookingData.endDate}
-                    onChange={(e) => setBookingData({...bookingData, endDate: e.target.value})}
-                    min={bookingData.startDate || new Date().toISOString().split('T')[0]}
-                    required
-                  />
-                </label>
-                <label>
-                  返却時刻
-                  <select 
-                    value={bookingData.endTime}
-                    onChange={(e) => setBookingData({...bookingData, endTime: e.target.value})}
-                  >
-                    {[...Array(14)].map((_, i) => (
-                      <option key={i} value={`${i+8}:00`}>{i+8}:00</option>
-                    ))}
-                  </select>
-                </label>
-              </div>
-
-              <div className="price-summary">
-                <div className="price-row">
-                  <span>レンタル日数</span>
-                  <span>{calculateDays()}日間</span>
+            ) : (
+              <>
+                <div className="modal-header">
+                  <h2>Complete Your Booking</h2>
+                  <button className="close-btn" onClick={() => setShowBookingModal(false)}>×</button>
                 </div>
-                <div className="price-row">
-                  <span>1日あたり</span>
-                  <span>¥{selectedVehicle.price.toLocaleString()}</span>
-                </div>
-                <div className="price-row total">
-                  <span>合計金額</span>
-                  <span>¥{(selectedVehicle.price * calculateDays()).toLocaleString()}</span>
-                </div>
-              </div>
 
-              <div className="modal-buttons">
-                <button 
-                  className="confirm-button"
-                  onClick={submitBooking}
-                  disabled={!bookingData.startDate || !bookingData.endDate}
-                >
-                  予約を確定する
-                </button>
-                <button className="cancel-button" onClick={() => setSelectedVehicle(null)}>
-                  キャンセル
-                </button>
-              </div>
-            </div>
+                <div className="booking-content">
+                  <div className="vehicle-summary">
+                    <img 
+                      src={vehicleImages[selectedVehicle.name] || vehicleImages['Default']} 
+                      alt={selectedVehicle.name}
+                      className="summary-image"
+                    />
+                    <div className="summary-details">
+                      <h3>{selectedVehicle.name}</h3>
+                      <p>{selectedVehicle.type} • {selectedVehicle.passengers} passengers</p>
+                    </div>
+                  </div>
+
+                  <div className="booking-form">
+                    <div className="form-section">
+                      <h4>Select Your Plan</h4>
+                      <div className="plan-options">
+                        {Object.entries(plans).map(([key, plan]) => (
+                          <div 
+                            key={key}
+                            className={`plan-card ${selectedPlan === key ? 'selected' : ''}`}
+                            onClick={() => handlePlanChange(key)}
+                          >
+                            <div className="plan-name">{plan.label}</div>
+                            {plan.discount && <div className="plan-discount">{plan.discount}</div>}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="form-section">
+                      <h4>Select Dates</h4>
+                      <div className="date-inputs">
+                        <div className="date-input-group">
+                          <label>Start Date</label>
+                          <input 
+                            type="date"
+                            value={selectedDate}
+                            onChange={(e) => handleDateChange(e.target.value)}
+                            min={new Date().toISOString().split('T')[0]}
+                            className="modern-date-input"
+                          />
+                        </div>
+                        <div className="date-input-group">
+                          <label>End Date</label>
+                          <input 
+                            type="date"
+                            value={selectedEndDate}
+                            readOnly
+                            className="modern-date-input"
+                          />
+                        </div>
+                        <div className="duration-input-group">
+                          <label>Duration</label>
+                          <div className="duration-selector">
+                            <button onClick={() => setSelectedDuration(Math.max(1, selectedDuration - 1))}>-</button>
+                            <span>{selectedDuration} {plans[selectedPlan].unit}(s)</span>
+                            <button onClick={() => setSelectedDuration(selectedDuration + 1)}>+</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="form-section">
+                      <h4>Insurance Options</h4>
+                      <div className="insurance-options">
+                        <div className="insurance-item">
+                          <label className="toggle-label">
+                            <input 
+                              type="checkbox"
+                              checked={insuranceOptions.basic}
+                              disabled
+                            />
+                            <span className="toggle-slider"></span>
+                            <div className="insurance-info">
+                              <span className="insurance-name">Basic Coverage</span>
+                              <span className="insurance-price">Included</span>
+                            </div>
+                          </label>
+                        </div>
+                        
+                        <div className="insurance-item">
+                          <label className="toggle-label">
+                            <input 
+                              type="checkbox"
+                              checked={insuranceOptions.collision}
+                              onChange={(e) => setInsuranceOptions({...insuranceOptions, collision: e.target.checked})}
+                            />
+                            <span className="toggle-slider"></span>
+                            <div className="insurance-info">
+                              <span className="insurance-name">Collision Damage Waiver</span>
+                              <span className="insurance-price">+{formatCurrency(insurancePrices.collision)}/day</span>
+                            </div>
+                          </label>
+                        </div>
+
+                        <div className="insurance-item">
+                          <label className="toggle-label">
+                            <input 
+                              type="checkbox"
+                              checked={insuranceOptions.comprehensive}
+                              onChange={(e) => setInsuranceOptions({...insuranceOptions, comprehensive: e.target.checked})}
+                            />
+                            <span className="toggle-slider"></span>
+                            <div className="insurance-info">
+                              <span className="insurance-name">Comprehensive Coverage</span>
+                              <span className="insurance-price">+{formatCurrency(insurancePrices.comprehensive)}/day</span>
+                            </div>
+                          </label>
+                        </div>
+
+                        <div className="insurance-item">
+                          <label className="toggle-label">
+                            <input 
+                              type="checkbox"
+                              checked={insuranceOptions.personal}
+                              onChange={(e) => setInsuranceOptions({...insuranceOptions, personal: e.target.checked})}
+                            />
+                            <span className="toggle-slider"></span>
+                            <div className="insurance-info">
+                              <span className="insurance-name">Personal Accident Insurance</span>
+                              <span className="insurance-price">+{formatCurrency(insurancePrices.personal)}/day</span>
+                            </div>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="price-breakdown">
+                      <div className="price-row">
+                        <span>Vehicle ({selectedDuration} {plans[selectedPlan].unit}s)</span>
+                        <span>{formatCurrency(selectedVehicle.price * plans[selectedPlan].multiplier * selectedDuration)}</span>
+                      </div>
+                      {Object.entries(insuranceOptions).map(([key, enabled]) => 
+                        enabled && key !== 'basic' && (
+                          <div key={key} className="price-row">
+                            <span>{key.charAt(0).toUpperCase() + key.slice(1)} Insurance</span>
+                            <span>{formatCurrency(insurancePrices[key] * selectedDuration)}</span>
+                          </div>
+                        )
+                      )}
+                      <div className="price-row total">
+                        <span>Total Amount</span>
+                        <span className="total-amount">{formatCurrency(totalPrice)}</span>
+                      </div>
+                    </div>
+
+                    <div className="modal-actions">
+                      <button className="cancel-btn" onClick={() => setShowBookingModal(false)}>
+                        Cancel
+                      </button>
+                      <button className="confirm-btn" onClick={confirmBooking}>
+                        Confirm Booking
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
     </div>
   );
-}
+};
 
 export default VehicleList;
