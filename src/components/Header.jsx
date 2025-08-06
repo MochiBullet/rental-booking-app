@@ -12,15 +12,28 @@ const Header = ({ currentView, onViewChange, reservationCount, isAdminLoggedIn, 
       const newClickCount = clickCount + 1;
       setClickCount(newClickCount);
       
+      // デバッグ用：コンソールにクリック回数を表示
+      console.log(`Admin click count: ${newClickCount}/10`);
+      
       // 10回連続クリックで管理者ログイン画面を表示
       if (newClickCount >= 10) {
-        onAdminLogin();
+        console.log('Admin access triggered!');
+        if (!isAdminLoggedIn) {
+          onAdminLogin(); // 管理者ログインしていない場合のみログイン
+        } else {
+          onViewChange('admin'); // 既にログイン済みの場合は管理画面に移動
+        }
         setClickCount(0); // リセット
       }
     } else {
-      // 2秒以上間が空いた場合は通常のホーム遷移とカウントリセット
-      onViewChange('home');
+      // 2秒以上間が空いた場合
+      console.log('Click timeout - reset count');
+      if (clickCount === 0) {
+        // カウントが0の場合は通常のホーム遷移
+        onViewChange('home');
+      }
       setClickCount(1);
+      console.log('Admin click count: 1/10');
     }
     
     setLastClickTime(currentTime);
