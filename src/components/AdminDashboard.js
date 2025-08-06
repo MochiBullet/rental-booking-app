@@ -76,7 +76,7 @@ const AdminDashboard = () => {
 
   const handleAddVehicle = () => {
     if (!newVehicle.name || !newVehicle.price) {
-      alert(' !h°<o≈gY');
+      alert('Vehicle name and price are required');
       return;
     }
     
@@ -106,7 +106,7 @@ const AdminDashboard = () => {
 
   const handleEditVehicle = () => {
     if (!selectedVehicle.name || !selectedVehicle.price) {
-      alert(' !h°<o≈gY');
+      alert('Vehicle name and price are required');
       return;
     }
     
@@ -122,7 +122,7 @@ const AdminDashboard = () => {
   };
 
   const handleDeleteVehicle = (vehicleId) => {
-    if (window.confirm('Sn !íJdWfÇàçWDgYK')) {
+    if (window.confirm('Delete this vehicle?')) {
       const updatedVehicles = vehicles.filter(v => v.id !== vehicleId);
       setVehicles(updatedVehicles);
       localStorage.setItem('vehicles', JSON.stringify(updatedVehicles));
@@ -140,7 +140,7 @@ const AdminDashboard = () => {
   };
 
   const handleCancelBooking = (bookingId) => {
-    if (window.confirm('Snàí≠„ÛªÎWfÇàçWDgYK')) {
+    if (window.confirm('Cancel this booking?')) {
       const updatedBookings = bookings.map(b => 
         b.id === bookingId ? { ...b, status: 'cancelled' } : b
       );
@@ -170,8 +170,8 @@ const AdminDashboard = () => {
     <div className="admin-dashboard">
       <div className="admin-sidebar">
         <div className="admin-logo">
-          <div className="logo-icon">=ó</div>
-          <h2>°—ÕÎ</h2>
+          <div className="logo-icon">üöó</div>
+          <h2>Admin Panel</h2>
         </div>
         
         <nav className="admin-nav">
@@ -179,57 +179,56 @@ const AdminDashboard = () => {
             className={activeSection === 'overview' ? 'active' : ''}
             onClick={() => setActiveSection('overview')}
           >
-            <span className="nav-icon">= </span>
-            ÇÅ
+            <span className="nav-icon">üìä</span>
+            Overview
           </button>
           <button 
             className={activeSection === 'bookings' ? 'active' : ''}
             onClick={() => setActiveSection('bookings')}
           >
-            <span className="nav-icon">=≈</span>
-            à°
+            <span className="nav-icon">üìÖ</span>
+            Bookings
           </button>
           <button 
             className={activeSection === 'vehicles' ? 'active' : ''}
             onClick={() => setActiveSection('vehicles')}
           >
-            <span className="nav-icon">=ó</span>
-             !°
+            <span className="nav-icon">üöó</span>
+            Vehicles
           </button>
           <button 
             className={activeSection === 'users' ? 'active' : ''}
             onClick={() => setActiveSection('users')}
           >
-            <span className="nav-icon">=e</span>
-            Ê¸∂¸°
+            <span className="nav-icon">üë•</span>
+            Users
           </button>
           <button 
             className={activeSection === 'analytics' ? 'active' : ''}
             onClick={() => setActiveSection('analytics')}
           >
-            <span className="nav-icon">=»</span>
-            ê
+            <span className="nav-icon">üìà</span>
+            Analytics
           </button>
         </nav>
         
         <button className="admin-logout-btn" onClick={handleLogout}>
-          Ì∞¢¶»
+          Logout
         </button>
       </div>
       
       <div className="admin-main">
         <div className="admin-header">
           <h1>
-            {activeSection === 'overview' && '¿√∑Â‹¸…ÇÅ'}
-            {activeSection === 'bookings' && 'à°'}
-            {activeSection === 'vehicles' && ' !°'}
-            {activeSection === 'users' && 'Ê¸∂¸°'}
-            {activeSection === 'analytics' && 'Ú
-ê'}
+            {activeSection === 'overview' && 'Dashboard Overview'}
+            {activeSection === 'bookings' && 'Booking Management'}
+            {activeSection === 'vehicles' && 'Vehicle Management'}
+            {activeSection === 'users' && 'User Management'}
+            {activeSection === 'analytics' && 'Sales Analytics'}
           </h1>
           <div className="admin-header-info">
             <span className="admin-date">{new Date().toLocaleDateString('ja-JP')}</span>
-            <span className="admin-user">°</span>
+            <span className="admin-user">Administrator</span>
           </div>
         </div>
         
@@ -238,63 +237,62 @@ const AdminDashboard = () => {
             <div className="overview-section">
               <div className="stats-grid">
                 <div className="stat-card">
-                  <div className="stat-icon">=≈</div>
+                  <div className="stat-icon">üìÖ</div>
                   <div className="stat-details">
-                    <h3>œàp</h3>
+                    <h3>Total Bookings</h3>
                     <p className="stat-number">{stats.totalBookings}</p>
-                    <span className="stat-label">hì</span>
+                    <span className="stat-label">All Time</span>
                   </div>
                 </div>
                 
                 <div className="stat-card">
-                  <div className="stat-icon"></div>
+                  <div className="stat-icon">‚úÖ</div>
                   <div className="stat-details">
-                    <h3>¢Ø∆£÷à</h3>
+                    <h3>Active Bookings</h3>
                     <p className="stat-number">{stats.activeBookings}</p>
-                    <span className="stat-label">˛(2L-</span>
+                    <span className="stat-label">Current</span>
                   </div>
                 </div>
                 
                 <div className="stat-card">
-                  <div className="stat-icon">=∞</div>
+                  <div className="stat-icon">üí∞</div>
                   <div className="stat-details">
-                    <h3>œÚ
-</h3>
+                    <h3>Total Revenue</h3>
                     <p className="stat-number">{formatCurrency(stats.totalRevenue)}</p>
-                    <span className="stat-label">hì</span>
+                    <span className="stat-label">All Time</span>
                   </div>
                 </div>
                 
                 <div className="stat-card">
-                  <div className="stat-icon">=ó</div>
+                  <div className="stat-icon">üöó</div>
                   <div className="stat-details">
-                    <h3>{2 !</h3>
+                    <h3>Total Vehicles</h3>
                     <p className="stat-number">{stats.totalVehicles}</p>
-                    <span className="stat-label"></span>
+                    <span className="stat-label">Registered</span>
                   </div>
                 </div>
                 
                 <div className="stat-card">
-                  <div className="stat-icon">=e</div>
+                  <div className="stat-icon">üë•</div>
                   <div className="stat-details">
-                    <h3>{2Ê¸∂¸</h3>
+                    <h3>Total Users</h3>
                     <p className="stat-number">{stats.totalUsers}</p>
-                    <span className="stat-label">∫</span>
+                    <span className="stat-label">Registered</span>
                   </div>
                 </div>
                 
                 <div className="stat-card">
-                  <div className="stat-icon">=∆</div>
+                  <div className="stat-icon">üìÜ</div>
                   <div className="stat-details">
-                    <h3>,Ânà</h3>
+                    <h3>Today's Bookings</h3>
                     <p className="stat-number">{stats.todayBookings}</p>
-                    <span className="stat-label">ˆ</span>
+                    <span className="stat-label">New</span>
                   </div>
                 </div>
               </div>
               
               <div className="recent-activities">
-                <h2> —nà</h2>
+                <h2>Recent Bookings</h2>
                 <div className="activity-list">
                   {bookings.slice(0, 5).map(booking => (
                     <div key={booking.id} className="activity-item">
@@ -305,9 +303,9 @@ const AdminDashboard = () => {
                         </p>
                       </div>
                       <span className={`activity-status status-${booking.status}`}>
-                        {booking.status === 'confirmed' ? '∫ö' : 
-                         booking.status === 'active' ? '¢Ø∆£÷' : 
-                         booking.status === 'cancelled' ? '≠„ÛªÎ' : '›Y'}
+                        {booking.status === 'confirmed' ? 'Confirmed' : 
+                         booking.status === 'active' ? 'Active' : 
+                         booking.status === 'cancelled' ? 'Cancelled' : 'Pending'}
                       </span>
                     </div>
                   ))}
@@ -319,12 +317,12 @@ const AdminDashboard = () => {
           {activeSection === 'bookings' && (
             <div className="bookings-section">
               <div className="section-header">
-                <h2>à ß</h2>
+                <h2>Booking List</h2>
                 <div className="filter-buttons">
-                  <button className="filter-btn active">Yyf</button>
-                  <button className="filter-btn">∫ö</button>
-                  <button className="filter-btn">›Y-</button>
-                  <button className="filter-btn">≠„ÛªÎ</button>
+                  <button className="filter-btn active">All</button>
+                  <button className="filter-btn">Confirmed</button>
+                  <button className="filter-btn">Pending</button>
+                  <button className="filter-btn">Cancelled</button>
                 </div>
               </div>
               
@@ -332,30 +330,30 @@ const AdminDashboard = () => {
                 <table>
                   <thead>
                     <tr>
-                      <th>àID</th>
-                      <th>g¢</th>
-                      <th> !</th>
-                      <th>ãÀÂ</th>
-                      <th>BÜÂ</th>
-                      <th>ô—</th>
-                      <th>π∆¸øπ</th>
-                      <th>Õ\</th>
+                      <th>Booking ID</th>
+                      <th>Customer</th>
+                      <th>Vehicle</th>
+                      <th>Start Date</th>
+                      <th>End Date</th>
+                      <th>Price</th>
+                      <th>Status</th>
+                      <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {bookings.map(booking => (
                       <tr key={booking.id}>
                         <td>#{booking.id}</td>
-                        <td>{booking.userName || '≤π»'}</td>
+                        <td>{booking.userName || 'Guest'}</td>
                         <td>{booking.vehicleName}</td>
                         <td>{new Date(booking.pickupDate).toLocaleDateString('ja-JP')}</td>
                         <td>{new Date(booking.returnDate).toLocaleDateString('ja-JP')}</td>
                         <td>{formatCurrency(booking.totalPrice)}</td>
                         <td>
                           <span className={`status-badge status-${booking.status}`}>
-                            {booking.status === 'confirmed' ? '∫ö' : 
-                             booking.status === 'active' ? '¢Ø∆£÷' : 
-                             booking.status === 'cancelled' ? '≠„ÛªÎ' : '›Y'}
+                            {booking.status === 'confirmed' ? 'Confirmed' : 
+                             booking.status === 'active' ? 'Active' : 
+                             booking.status === 'cancelled' ? 'Cancelled' : 'Pending'}
                           </span>
                         </td>
                         <td>
@@ -365,7 +363,7 @@ const AdminDashboard = () => {
                                 className="action-btn confirm"
                                 onClick={() => handleConfirmBooking(booking.id)}
                               >
-                                ∫ö
+                                Confirm
                               </button>
                             )}
                             {booking.status !== 'cancelled' && (
@@ -373,7 +371,7 @@ const AdminDashboard = () => {
                                 className="action-btn cancel"
                                 onClick={() => handleCancelBooking(booking.id)}
                               >
-                                ≠„ÛªÎ
+                                Cancel
                               </button>
                             )}
                           </div>
@@ -389,12 +387,12 @@ const AdminDashboard = () => {
           {activeSection === 'vehicles' && (
             <div className="vehicles-section">
               <div className="section-header">
-                <h2> ! ß</h2>
+                <h2>Vehicle List</h2>
                 <button 
                   className="add-btn"
                   onClick={() => setShowAddVehicleModal(true)}
                 >
-                  + ∞è !˝†
+                  + Add New Vehicle
                 </button>
               </div>
               
@@ -404,14 +402,14 @@ const AdminDashboard = () => {
                     <div className="vehicle-admin-header">
                       <h3>{vehicle.name}</h3>
                       <span className={`availability-badge ${vehicle.available ? 'available' : 'unavailable'}`}>
-                        {vehicle.available ? ')(Ô˝' : ')(Ô'}
+                        {vehicle.available ? 'Available' : 'Unavailable'}
                       </span>
                     </div>
                     <div className="vehicle-admin-details">
-                      <p><strong>ø§◊:</strong> {vehicle.type}</p>
-                      <p><strong>ô—:</strong> {formatCurrency(vehicle.price)}/Â</p>
-                      <p><strong>ö·:</strong> {vehicle.passengers}∫</p>
-                      <p><strong>y¥:</strong> {vehicle.features || 'jW'}</p>
+                      <p><strong>Type:</strong> {vehicle.type}</p>
+                      <p><strong>Price:</strong> {formatCurrency(vehicle.price)}/day</p>
+                      <p><strong>Capacity:</strong> {vehicle.passengers} passengers</p>
+                      <p><strong>Features:</strong> {vehicle.features || 'None'}</p>
                     </div>
                     <div className="vehicle-admin-actions">
                       <button 
@@ -421,19 +419,19 @@ const AdminDashboard = () => {
                           setShowEditVehicleModal(true);
                         }}
                       >
-                        Ë∆
+                        Edit
                       </button>
                       <button 
                         className={`toggle-btn ${vehicle.available ? 'disable' : 'enable'}`}
                         onClick={() => handleToggleVehicleAvailability(vehicle.id)}
                       >
-                        {vehicle.available ? '!π' : '	π'}
+                        {vehicle.available ? 'Disable' : 'Enable'}
                       </button>
                       <button 
                         className="delete-btn"
                         onClick={() => handleDeleteVehicle(vehicle.id)}
                       >
-                        Jd
+                        Delete
                       </button>
                     </div>
                   </div>
@@ -445,11 +443,11 @@ const AdminDashboard = () => {
           {activeSection === 'users' && (
             <div className="users-section">
               <div className="section-header">
-                <h2>Ê¸∂¸ ß</h2>
+                <h2>User List</h2>
                 <div className="search-bar">
                   <input 
                     type="text" 
-                    placeholder="Ê¸∂¸í"..." 
+                    placeholder="Search users..." 
                   />
                 </div>
               </div>
@@ -459,12 +457,12 @@ const AdminDashboard = () => {
                   <thead>
                     <tr>
                       <th>ID</th>
-                      <th>M</th>
-                      <th>·¸Î¢…Ïπ</th>
-                      <th>{2Â</th>
-                      <th>àp</th>
-                      <th>œ/UM</th>
-                      <th>π∆¸øπ</th>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Join Date</th>
+                      <th>Bookings</th>
+                      <th>Total Spent</th>
+                      <th>Status</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -481,7 +479,7 @@ const AdminDashboard = () => {
                           <td>{userBookings.length}</td>
                           <td>{formatCurrency(totalSpent)}</td>
                           <td>
-                            <span className="status-badge status-active">¢Ø∆£÷</span>
+                            <span className="status-badge status-active">Active</span>
                           </td>
                         </tr>
                       );
@@ -495,20 +493,18 @@ const AdminDashboard = () => {
           {activeSection === 'analytics' && (
             <div className="analytics-section">
               <div className="analytics-header">
-                <h2>Ú
-ê</h2>
+                <h2>Sales Analytics</h2>
                 <div className="date-range-selector">
-                  <button className="range-btn active"> </button>
-                  <button className="range-btn">H</button>
-                  <button className="range-btn">Nª3ˆ</button>
-                  <button className="range-btn"> t</button>
+                  <button className="range-btn active">This Month</button>
+                  <button className="range-btn">Last Month</button>
+                  <button className="range-btn">Last 3 Months</button>
+                  <button className="range-btn">This Year</button>
                 </div>
               </div>
               
               <div className="analytics-cards">
                 <div className="analytics-card">
-                  <h3>ìÚ
-®˚</h3>
+                  <h3>Monthly Revenue Trend</h3>
                   <div className="chart-placeholder">
                     <div className="chart-bar" style={{height: '60%'}}></div>
                     <div className="chart-bar" style={{height: '80%'}}></div>
@@ -519,7 +515,7 @@ const AdminDashboard = () => {
                 </div>
                 
                 <div className="analytics-card">
-                  <h3> !%∫¶</h3>
+                  <h3>Vehicle Popularity</h3>
                   <div className="popularity-list">
                     {vehicles.slice(0, 5).map((vehicle, index) => (
                       <div key={vehicle.id} className="popularity-item">
@@ -537,22 +533,22 @@ const AdminDashboard = () => {
                 </div>
                 
                 <div className="analytics-card">
-                  <h3>à∂¡</h3>
+                  <h3>Booking Status</h3>
                   <div className="booking-stats">
                     <div className="stat-row">
-                      <span>åÜ</span>
+                      <span>Completed</span>
                       <span className="stat-value">
                         {bookings.filter(b => b.status === 'completed').length}
                       </span>
                     </div>
                     <div className="stat-row">
-                      <span>2L-</span>
+                      <span>Active</span>
                       <span className="stat-value">
                         {bookings.filter(b => b.status === 'active').length}
                       </span>
                     </div>
                     <div className="stat-row">
-                      <span>≠„ÛªÎ</span>
+                      <span>Cancelled</span>
                       <span className="stat-value">
                         {bookings.filter(b => b.status === 'cancelled').length}
                       </span>
@@ -568,30 +564,30 @@ const AdminDashboard = () => {
       {showAddVehicleModal && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <h2>∞è !˝†</h2>
+            <h2>Add New Vehicle</h2>
             <div className="form-group">
-              <label> !</label>
+              <label>Vehicle Name</label>
               <input 
                 type="text"
                 value={newVehicle.name}
                 onChange={(e) => setNewVehicle({...newVehicle, name: e.target.value})}
-                placeholder="ã: Toyota Camry"
+                placeholder="e.g., Toyota Camry"
               />
             </div>
             <div className="form-group">
-              <label>ø§◊</label>
+              <label>Type</label>
               <select 
                 value={newVehicle.type}
                 onChange={(e) => setNewVehicle({...newVehicle, type: e.target.value})}
               >
-                <option value="Sedan">ª¿Û</option>
+                <option value="Sedan">Sedan</option>
                 <option value="SUV">SUV</option>
-                <option value="Van">–Û</option>
-                <option value="Luxury">ÿ </option>
+                <option value="Van">Van</option>
+                <option value="Luxury">Luxury</option>
               </select>
             </div>
             <div className="form-group">
-              <label>ô—ÂM	</label>
+              <label>Price (per day)</label>
               <input 
                 type="number"
                 value={newVehicle.price}
@@ -600,7 +596,7 @@ const AdminDashboard = () => {
               />
             </div>
             <div className="form-group">
-              <label>ö·</label>
+              <label>Passenger Capacity</label>
               <input 
                 type="number"
                 value={newVehicle.passengers}
@@ -609,16 +605,16 @@ const AdminDashboard = () => {
               />
             </div>
             <div className="form-group">
-              <label>y¥</label>
+              <label>Features</label>
               <textarea 
                 value={newVehicle.features}
                 onChange={(e) => setNewVehicle({...newVehicle, features: e.target.value})}
-                placeholder="GPS, Bluetooth, –√Ø´·È"
+                placeholder="GPS, Bluetooth, Backup Camera"
               />
             </div>
             <div className="modal-actions">
-              <button className="save-btn" onClick={handleAddVehicle}>›X</button>
-              <button className="cancel-btn" onClick={() => setShowAddVehicleModal(false)}>≠„ÛªÎ</button>
+              <button className="save-btn" onClick={handleAddVehicle}>Save</button>
+              <button className="cancel-btn" onClick={() => setShowAddVehicleModal(false)}>Cancel</button>
             </div>
           </div>
         </div>
@@ -627,9 +623,9 @@ const AdminDashboard = () => {
       {showEditVehicleModal && selectedVehicle && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <h2> !Ë∆</h2>
+            <h2>Edit Vehicle</h2>
             <div className="form-group">
-              <label> !</label>
+              <label>Vehicle Name</label>
               <input 
                 type="text"
                 value={selectedVehicle.name}
@@ -637,19 +633,19 @@ const AdminDashboard = () => {
               />
             </div>
             <div className="form-group">
-              <label>ø§◊</label>
+              <label>Type</label>
               <select 
                 value={selectedVehicle.type}
                 onChange={(e) => setSelectedVehicle({...selectedVehicle, type: e.target.value})}
               >
-                <option value="Sedan">ª¿Û</option>
+                <option value="Sedan">Sedan</option>
                 <option value="SUV">SUV</option>
-                <option value="Van">–Û</option>
-                <option value="Luxury">ÿ </option>
+                <option value="Van">Van</option>
+                <option value="Luxury">Luxury</option>
               </select>
             </div>
             <div className="form-group">
-              <label>ô—ÂM	</label>
+              <label>Price (per day)</label>
               <input 
                 type="number"
                 value={selectedVehicle.price}
@@ -657,7 +653,7 @@ const AdminDashboard = () => {
               />
             </div>
             <div className="form-group">
-              <label>ö·</label>
+              <label>Passenger Capacity</label>
               <input 
                 type="number"
                 value={selectedVehicle.passengers}
@@ -665,18 +661,18 @@ const AdminDashboard = () => {
               />
             </div>
             <div className="form-group">
-              <label>y¥</label>
+              <label>Features</label>
               <textarea 
                 value={selectedVehicle.features || ''}
                 onChange={(e) => setSelectedVehicle({...selectedVehicle, features: e.target.value})}
               />
             </div>
             <div className="modal-actions">
-              <button className="save-btn" onClick={handleEditVehicle}>Ù∞</button>
+              <button className="save-btn" onClick={handleEditVehicle}>Update</button>
               <button className="cancel-btn" onClick={() => {
                 setShowEditVehicleModal(false);
                 setSelectedVehicle(null);
-              }}>≠„ÛªÎ</button>
+              }}>Cancel</button>
             </div>
           </div>
         </div>
