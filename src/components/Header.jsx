@@ -62,6 +62,16 @@ const Header = ({ currentView, onViewChange, reservationCount, isAdminLoggedIn, 
               <span className="badge">{reservationCount}</span>
             </li>
           )}
+          {isAdminLoggedIn && (
+            <li>
+              <button 
+                className="admin-menu-button"
+                onClick={() => onViewChange('admin')}
+              >
+                🔧 管理者メニュー
+              </button>
+            </li>
+          )}
           {isMemberLoggedIn ? (
             <li>
               <button 

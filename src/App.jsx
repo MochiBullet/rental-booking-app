@@ -27,6 +27,11 @@ function App() {
 
   useEffect(() => {
     setSiteSettings(siteSettingsManager.getSettings());
+    // 管理者ログイン状態を復元
+    const savedAdminState = sessionStorage.getItem('isAdminLoggedIn');
+    if (savedAdminState === 'true') {
+      setIsAdminLoggedIn(true);
+    }
   }, []);
 
   const handleViewChange = (view, filter = 'all') => {
@@ -88,11 +93,13 @@ function App() {
 
   const handleAdminLogin = () => {
     setIsAdminLoggedIn(true);
+    sessionStorage.setItem('isAdminLoggedIn', 'true');
     setCurrentView('admin');
   };
 
   const handleAdminLogout = () => {
     setIsAdminLoggedIn(false);
+    sessionStorage.removeItem('isAdminLoggedIn');
     setCurrentView('home');
   };
 

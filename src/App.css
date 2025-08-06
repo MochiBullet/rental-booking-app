@@ -2252,6 +2252,16 @@ body {
   opacity: 0.8;
 }
 
+/* Admin Menu Button */
+.admin-menu-button {
+  background: rgba(255, 255, 255, 0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+}
+
+.admin-menu-button:hover {
+  background: rgba(255, 255, 255, 0.4) !important;
+}
+
 /* Footer */
 .footer {
   background: #333;
