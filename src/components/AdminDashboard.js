@@ -22,11 +22,19 @@ const AdminDashboard = () => {
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [newVehicle, setNewVehicle] = useState({
     name: '',
-    type: 'Sedan',
+    type: 'car',
     price: '',
     passengers: '',
     features: ''
   });
+  const [siteSettings, setSiteSettings] = useState({
+    primaryColor: '#43a047',
+    secondaryColor: '#66bb6a',
+    accentColor: '#81c784',
+    siteName: 'GreenRide',
+    theme: 'green'
+  });
+  const [showDesignModal, setShowDesignModal] = useState(false);
 
   useEffect(() => {
     const adminUser = localStorage.getItem('adminUser');
@@ -35,7 +43,15 @@ const AdminDashboard = () => {
       return;
     }
     loadDashboardData();
+    loadSiteSettings();
   }, [navigate]);
+
+  const loadSiteSettings = () => {
+    const savedSettings = localStorage.getItem('siteSettings');
+    if (savedSettings) {
+      setSiteSettings(JSON.parse(savedSettings));
+    }
+  };
 
   const loadDashboardData = () => {
     const storedBookings = JSON.parse(localStorage.getItem('bookings') || '[]');
@@ -95,7 +111,7 @@ const AdminDashboard = () => {
     
     setNewVehicle({
       name: '',
-      type: 'Sedan',
+      type: 'car',
       price: '',
       passengers: '',
       features: ''
@@ -137,6 +153,22 @@ const AdminDashboard = () => {
     setVehicles(updatedVehicles);
     localStorage.setItem('vehicles', JSON.stringify(updatedVehicles));
     loadDashboardData();
+  };
+
+  const handleSaveDesignSettings = () => {
+    localStorage.setItem('siteSettings', JSON.stringify(siteSettings));
+    
+    // Update CSS variables dynamically
+    const root = document.documentElement;
+    root.style.setProperty('--gradient-1', `linear-gradient(135deg, ${siteSettings.primaryColor} 0%, ${siteSettings.secondaryColor} 50%, ${siteSettings.accentColor} 100%)`);
+    root.style.setProperty('--gradient-2', `linear-gradient(135deg, ${siteSettings.primaryColor} 0%, ${siteSettings.secondaryColor} 100%)`);
+    root.style.setProperty('--green', siteSettings.primaryColor);
+    root.style.setProperty('--green-hover', siteSettings.primaryColor + 'dd');
+    root.style.setProperty('--green-dark', siteSettings.primaryColor);
+    root.style.setProperty('--green-light', siteSettings.secondaryColor);
+    
+    setShowDesignModal(false);
+    alert('デザイン設定が保存されました！');
   };
 
   const handleCancelBooking = (bookingId) => {
@@ -210,6 +242,13 @@ const AdminDashboard = () => {
             <span className="nav-icon">📈</span>
             Analytics
           </button>
+          <button 
+            className={activeSection === 'settings' ? 'active' : ''}
+            onClick={() => setActiveSection('settings')}
+          >
+            <span className="nav-icon">⚙️</span>
+            Site Settings
+          </button>
         </nav>
         
         <button className="admin-logout-btn" onClick={handleLogout}>
@@ -225,6 +264,7 @@ const AdminDashboard = () => {
             {activeSection === 'vehicles' && 'Vehicle Management'}
             {activeSection === 'users' && 'User Management'}
             {activeSection === 'analytics' && 'Sales Analytics'}
+            {activeSection === 'settings' && 'Site Settings'}
           </h1>
           <div className="admin-header-info">
             <span className="admin-date">{new Date().toLocaleDateString('ja-JP')}</span>
@@ -443,49 +483,107 @@ const AdminDashboard = () => {
           {activeSection === 'users' && (
             <div className="users-section">
               <div className="section-header">
-                <h2>User List</h2>
-                <div className="search-bar">
-                  <input 
-                    type="text" 
-                    placeholder="Search users..." 
-                  />
+                <h2>Customer Management</h2>
+                <div className="user-stats-summary">
+                  <div className="user-stat-card">
+                    <span className="stat-number">{users.length}</span>
+                    <span className="stat-label">Total Users</span>
+                  </div>
+                  <div className="user-stat-card">
+                    <span className="stat-number">{users.filter(u => u.createdAt && new Date(u.createdAt) > new Date(Date.now() - 30*24*60*60*1000)).length}</span>
+                    <span className="stat-label">New This Month</span>
+                  </div>
+                  <div className="user-stat-card">
+                    <span className="stat-number">{users.filter(u => u.points && u.points > 0).length}</span>
+                    <span className="stat-label">With Points</span>
+                  </div>
                 </div>
               </div>
               
-              <div className="users-table">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>ID</th>
-                      <th>Name</th>
-                      <th>Email</th>
-                      <th>Join Date</th>
-                      <th>Bookings</th>
-                      <th>Total Spent</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {users.map(user => {
-                      const userBookings = bookings.filter(b => b.userId === user.id);
-                      const totalSpent = userBookings.reduce((sum, b) => sum + (b.totalPrice || 0), 0);
-                      
-                      return (
-                        <tr key={user.id}>
-                          <td>#{user.id}</td>
-                          <td>{user.name}</td>
-                          <td>{user.email}</td>
-                          <td>{new Date(user.createdAt).toLocaleDateString('ja-JP')}</td>
-                          <td>{userBookings.length}</td>
-                          <td>{formatCurrency(totalSpent)}</td>
-                          <td>
-                            <span className="status-badge status-active">Active</span>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+              <div className="users-table-container">
+                <div className="table-controls">
+                  <div className="search-bar">
+                    <input 
+                      type="text" 
+                      placeholder="顧客名またはメールアドレスで検索..." 
+                    />
+                    <button className="search-btn">🔍</button>
+                  </div>
+                  <div className="filter-options">
+                    <select className="filter-select">
+                      <option value="all">全ての顧客</option>
+                      <option value="active">アクティブ</option>
+                      <option value="new">新規登録</option>
+                      <option value="vip">VIP顧客</option>
+                    </select>
+                    <button className="export-btn">📊 エクスポート</button>
+                  </div>
+                </div>
+                
+                <div className="users-table">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>顧客ID</th>
+                        <th>氏名</th>
+                        <th>メールアドレス</th>
+                        <th>電話番号</th>
+                        <th>登録日</th>
+                        <th>利用回数</th>
+                        <th>累計利用額</th>
+                        <th>保有ポイント</th>
+                        <th>ステータス</th>
+                        <th>アクション</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {users.map(user => {
+                        const userBookings = bookings.filter(b => b.userId === user.id);
+                        const totalSpent = userBookings.reduce((sum, b) => sum + (b.totalPrice || 0), 0);
+                        const userStatus = totalSpent > 100000 ? 'VIP' : totalSpent > 50000 ? 'Premium' : 'Regular';
+                        
+                        return (
+                          <tr key={user.id}>
+                            <td>#{String(user.id).slice(-6)}</td>
+                            <td>
+                              <div className="user-info">
+                                <div className="user-avatar">
+                                  {user.name ? user.name.charAt(0) : '?'}
+                                </div>
+                                <div className="user-details">
+                                  <div className="user-name">{user.name || 'Unknown'}</div>
+                                  {user.nameKana && <div className="user-kana">{user.nameKana}</div>}
+                                </div>
+                              </div>
+                            </td>
+                            <td>{user.email}</td>
+                            <td>{user.phone || '未設定'}</td>
+                            <td>{user.createdAt ? new Date(user.createdAt).toLocaleDateString('ja-JP') : '不明'}</td>
+                            <td>{userBookings.length}回</td>
+                            <td>{formatCurrency(totalSpent)}</td>
+                            <td>
+                              <span className="points-display">
+                                {user.points || 0}pt
+                              </span>
+                            </td>
+                            <td>
+                              <span className={`status-badge status-${userStatus.toLowerCase()}`}>
+                                {userStatus}
+                              </span>
+                            </td>
+                            <td>
+                              <div className="user-actions">
+                                <button className="action-btn view" title="詳細表示">👁️</button>
+                                <button className="action-btn edit" title="編集">✏️</button>
+                                <button className="action-btn message" title="メッセージ送信">💬</button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           )}
@@ -558,6 +656,97 @@ const AdminDashboard = () => {
               </div>
             </div>
           )}
+          
+          {activeSection === 'settings' && (
+            <div className="settings-section">
+              <div className="settings-grid">
+                <div className="settings-card">
+                  <h3>🎨 サイトデザイン設定</h3>
+                  <p>サイト全体のカラーテーマとデザインをカスタマイズできます。</p>
+                  <button 
+                    className="design-btn"
+                    onClick={() => setShowDesignModal(true)}
+                  >
+                    デザインを変更
+                  </button>
+                </div>
+                
+                <div className="settings-card">
+                  <h3>⚙️ サイト基本設定</h3>
+                  <div className="setting-item">
+                    <label>サイト名</label>
+                    <input 
+                      type="text"
+                      value={siteSettings.siteName}
+                      onChange={(e) => setSiteSettings({...siteSettings, siteName: e.target.value})}
+                    />
+                  </div>
+                  <div className="setting-item">
+                    <label>現在のテーマ</label>
+                    <select 
+                      value={siteSettings.theme}
+                      onChange={(e) => setSiteSettings({...siteSettings, theme: e.target.value})}
+                    >
+                      <option value="green">Green (現在)</option>
+                      <option value="blue">Blue</option>
+                      <option value="purple">Purple</option>
+                      <option value="orange">Orange</option>
+                    </select>
+                  </div>
+                  <button className="save-settings-btn" onClick={handleSaveDesignSettings}>
+                    設定を保存
+                  </button>
+                </div>
+                
+                <div className="settings-card">
+                  <h3>🚗 車両管理設定</h3>
+                  <div className="setting-item">
+                    <label>デフォルト価格 (円/日)</label>
+                    <input type="number" placeholder="8000" />
+                  </div>
+                  <div className="setting-item">
+                    <label>在庫アラート</label>
+                    <input type="number" placeholder="5" />
+                    <small>この台数以下になるとアラート表示</small>
+                  </div>
+                </div>
+                
+                <div className="settings-card">
+                  <h3>📊 分析設定</h3>
+                  <div className="setting-item">
+                    <label>レポート送信</label>
+                    <div className="checkbox-group">
+                      <label><input type="checkbox" /> 日次レポート</label>
+                      <label><input type="checkbox" /> 週次レポート</label>
+                      <label><input type="checkbox" /> 月次レポート</label>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="settings-card">
+                  <h3>💳 ポイント設定</h3>
+                  <div className="setting-item">
+                    <label>ポイント還元率 (%)</label>
+                    <input type="number" defaultValue="5" min="0" max="10" />
+                  </div>
+                  <div className="setting-item">
+                    <label>新規登録ボーナス</label>
+                    <input type="number" defaultValue="1000" />
+                    <small>ポイント</small>
+                  </div>
+                </div>
+                
+                <div className="settings-card">
+                  <h3>🔒 システム設定</h3>
+                  <div className="setting-actions">
+                    <button className="danger-btn">データベースリセット</button>
+                    <button className="export-btn">データエクスポート</button>
+                    <button className="backup-btn">バックアップ作成</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
       
@@ -580,10 +769,8 @@ const AdminDashboard = () => {
                 value={newVehicle.type}
                 onChange={(e) => setNewVehicle({...newVehicle, type: e.target.value})}
               >
-                <option value="Sedan">Sedan</option>
-                <option value="SUV">SUV</option>
-                <option value="Van">Van</option>
-                <option value="Luxury">Luxury</option>
+                <option value="car">Car</option>
+                <option value="bike">Bike</option>
               </select>
             </div>
             <div className="form-group">
@@ -638,10 +825,8 @@ const AdminDashboard = () => {
                 value={selectedVehicle.type}
                 onChange={(e) => setSelectedVehicle({...selectedVehicle, type: e.target.value})}
               >
-                <option value="Sedan">Sedan</option>
-                <option value="SUV">SUV</option>
-                <option value="Van">Van</option>
-                <option value="Luxury">Luxury</option>
+                <option value="car">Car</option>
+                <option value="bike">Bike</option>
               </select>
             </div>
             <div className="form-group">
@@ -673,6 +858,195 @@ const AdminDashboard = () => {
                 setShowEditVehicleModal(false);
                 setSelectedVehicle(null);
               }}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {showDesignModal && (
+        <div className="modal-overlay">
+          <div className="modal-content design-modal">
+            <h2>🎨 サイトデザイン設定</h2>
+            
+            <div className="design-sections">
+              <div className="color-section">
+                <h3>カラーテーマ</h3>
+                <div className="color-inputs">
+                  <div className="color-input-group">
+                    <label>メインカラー</label>
+                    <div className="color-input-wrapper">
+                      <input 
+                        type="color"
+                        value={siteSettings.primaryColor}
+                        onChange={(e) => setSiteSettings({...siteSettings, primaryColor: e.target.value})}
+                        className="color-picker"
+                      />
+                      <input 
+                        type="text"
+                        value={siteSettings.primaryColor}
+                        onChange={(e) => setSiteSettings({...siteSettings, primaryColor: e.target.value})}
+                        className="color-text"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="color-input-group">
+                    <label>セカンダリーカラー</label>
+                    <div className="color-input-wrapper">
+                      <input 
+                        type="color"
+                        value={siteSettings.secondaryColor}
+                        onChange={(e) => setSiteSettings({...siteSettings, secondaryColor: e.target.value})}
+                        className="color-picker"
+                      />
+                      <input 
+                        type="text"
+                        value={siteSettings.secondaryColor}
+                        onChange={(e) => setSiteSettings({...siteSettings, secondaryColor: e.target.value})}
+                        className="color-text"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="color-input-group">
+                    <label>アクセントカラー</label>
+                    <div className="color-input-wrapper">
+                      <input 
+                        type="color"
+                        value={siteSettings.accentColor}
+                        onChange={(e) => setSiteSettings({...siteSettings, accentColor: e.target.value})}
+                        className="color-picker"
+                      />
+                      <input 
+                        type="text"
+                        value={siteSettings.accentColor}
+                        onChange={(e) => setSiteSettings({...siteSettings, accentColor: e.target.value})}
+                        className="color-text"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="preset-section">
+                <h3>プリセットテーマ</h3>
+                <div className="theme-presets">
+                  <button 
+                    className="preset-btn green-theme"
+                    onClick={() => setSiteSettings({
+                      ...siteSettings,
+                      primaryColor: '#43a047',
+                      secondaryColor: '#66bb6a',
+                      accentColor: '#81c784',
+                      theme: 'green'
+                    })}
+                  >
+                    <div className="preset-colors">
+                      <span style={{backgroundColor: '#43a047'}}></span>
+                      <span style={{backgroundColor: '#66bb6a'}}></span>
+                      <span style={{backgroundColor: '#81c784'}}></span>
+                    </div>
+                    <span>Green (デフォルト)</span>
+                  </button>
+                  
+                  <button 
+                    className="preset-btn blue-theme"
+                    onClick={() => setSiteSettings({
+                      ...siteSettings,
+                      primaryColor: '#1976d2',
+                      secondaryColor: '#42a5f5',
+                      accentColor: '#90caf9',
+                      theme: 'blue'
+                    })}
+                  >
+                    <div className="preset-colors">
+                      <span style={{backgroundColor: '#1976d2'}}></span>
+                      <span style={{backgroundColor: '#42a5f5'}}></span>
+                      <span style={{backgroundColor: '#90caf9'}}></span>
+                    </div>
+                    <span>Blue</span>
+                  </button>
+                  
+                  <button 
+                    className="preset-btn purple-theme"
+                    onClick={() => setSiteSettings({
+                      ...siteSettings,
+                      primaryColor: '#7b1fa2',
+                      secondaryColor: '#ab47bc',
+                      accentColor: '#ce93d8',
+                      theme: 'purple'
+                    })}
+                  >
+                    <div className="preset-colors">
+                      <span style={{backgroundColor: '#7b1fa2'}}></span>
+                      <span style={{backgroundColor: '#ab47bc'}}></span>
+                      <span style={{backgroundColor: '#ce93d8'}}></span>
+                    </div>
+                    <span>Purple</span>
+                  </button>
+                  
+                  <button 
+                    className="preset-btn orange-theme"
+                    onClick={() => setSiteSettings({
+                      ...siteSettings,
+                      primaryColor: '#f57c00',
+                      secondaryColor: '#ff9800',
+                      accentColor: '#ffb74d',
+                      theme: 'orange'
+                    })}
+                  >
+                    <div className="preset-colors">
+                      <span style={{backgroundColor: '#f57c00'}}></span>
+                      <span style={{backgroundColor: '#ff9800'}}></span>
+                      <span style={{backgroundColor: '#ffb74d'}}></span>
+                    </div>
+                    <span>Orange</span>
+                  </button>
+                </div>
+              </div>
+              
+              <div className="preview-section">
+                <h3>プレビュー</h3>
+                <div className="design-preview">
+                  <div 
+                    className="preview-header"
+                    style={{
+                      background: `linear-gradient(135deg, ${siteSettings.primaryColor} 0%, ${siteSettings.secondaryColor} 100%)`
+                    }}
+                  >
+                    <div className="preview-logo">GR</div>
+                    <span>{siteSettings.siteName}</span>
+                  </div>
+                  <div className="preview-content">
+                    <div 
+                      className="preview-button"
+                      style={{
+                        background: `linear-gradient(135deg, ${siteSettings.primaryColor} 0%, ${siteSettings.secondaryColor} 100%)`
+                      }}
+                    >
+                      サンプルボタン
+                    </div>
+                    <div 
+                      className="preview-card"
+                      style={{
+                        borderTopColor: siteSettings.primaryColor
+                      }}
+                    >
+                      <h4 style={{color: siteSettings.primaryColor}}>サンプルカード</h4>
+                      <p>新しいカラーテーマのプレビューです</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="modal-actions design-actions">
+              <button className="save-btn" onClick={handleSaveDesignSettings}>
+                変更を適用
+              </button>
+              <button className="cancel-btn" onClick={() => setShowDesignModal(false)}>
+                キャンセル
+              </button>
             </div>
           </div>
         </div>
