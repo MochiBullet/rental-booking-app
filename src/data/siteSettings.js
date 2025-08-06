@@ -2,7 +2,7 @@
 export const initialSiteSettings = {
   hero: {
     title: "車・バイクレンタル RentalEasy",
-    subtitle: "お手軽価格で快適な移動体験を",
+    subtitle: "お手軽価格で快適な移動体験を - AWS CDK自動デプロイ対応",
     description: "最新の車両とバイクを、お客様のニーズに合わせてご提供。短時間から長期まで、柔軟なレンタルプランをご用意しています。",
   },
   features: [
