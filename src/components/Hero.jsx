@@ -1,28 +1,45 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { siteSettingsManager } from '../data/siteSettings';
 
 const Hero = ({ onViewChange }) => {
+  const [settings, setSettings] = useState(null);
+
+  useEffect(() => {
+    setSettings(siteSettingsManager.getSettings());
+    
+    // 設定変更を監視
+    const handleStorageChange = () => {
+      setSettings(siteSettingsManager.getSettings());
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('siteSettingsUpdate', handleStorageChange);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('siteSettingsUpdate', handleStorageChange);
+    };
+  }, []);
+
+  if (!settings) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <section className="hero">
       <div className="hero-content">
-        <h2>車・バイクレンタルサービス</h2>
-        <p>お得な料金で車やバイクをレンタルできます</p>
+        <h2>{settings.hero.title}</h2>
+        <p>{settings.hero.subtitle}</p>
+        {settings.hero.description && (
+          <p className="hero-description">{settings.hero.description}</p>
+        )}
         <div className="hero-features">
-          <div className="feature">
-            <span className="feature-icon">🚗</span>
-            <span>豊富な車種</span>
-          </div>
-          <div className="feature">
-            <span className="feature-icon">🏍️</span>
-            <span>バイクも充実</span>
-          </div>
-          <div className="feature">
-            <span className="feature-icon">💰</span>
-            <span>お手頃料金</span>
-          </div>
-          <div className="feature">
-            <span className="feature-icon">📱</span>
-            <span>簡単予約</span>
-          </div>
+          {settings.features.map((feature, index) => (
+            <div key={index} className="feature">
+              <span className="feature-text">{feature.title}</span>
+              <span className="feature-description">{feature.description}</span>
+            </div>
+          ))}
         </div>
         <div className="hero-buttons">
           <button 

@@ -2,15 +2,17 @@ import React, { useState } from 'react';
 import VehicleManagement from './VehicleManagement';
 import ReservationManagement from './ReservationManagement';
 import MemberManagement from './MemberManagement';
+import SiteSettingsManagement from './SiteSettingsManagement';
 import AdminLogin from './AdminLogin';
 
-const AdminDashboard = ({ vehicles, reservations, members, onVehicleUpdate, onReservationUpdate, onMemberUpdate, onLogout }) => {
+const AdminDashboard = ({ vehicles, reservations, members, onVehicleUpdate, onReservationUpdate, onMemberUpdate, onSiteSettingsUpdate, onLogout }) => {
   const [activeTab, setActiveTab] = useState('vehicles');
 
   const tabs = [
     { id: 'vehicles', name: '車両管理', icon: '🚗' },
     { id: 'reservations', name: '予約管理', icon: '📅' },
     { id: 'members', name: '会員管理', icon: '👥' },
+    { id: 'settings', name: 'サイト設定', icon: '⚙️' },
     { id: 'analytics', name: '分析', icon: '📊' }
   ];
 
@@ -66,6 +68,12 @@ const AdminDashboard = ({ vehicles, reservations, members, onVehicleUpdate, onRe
             <MemberManagement 
               members={members}
               onMemberUpdate={onMemberUpdate}
+            />
+          )}
+          
+          {activeTab === 'settings' && (
+            <SiteSettingsManagement 
+              onSettingsUpdate={onSiteSettingsUpdate}
             />
           )}
           

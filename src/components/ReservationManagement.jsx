@@ -41,7 +41,7 @@ const ReservationManagement = ({ reservations, vehicles, onReservationUpdate }) 
       cancelled: '#dc3545',
       completed: '#6c757d'
     };
-    return colorMap[status] || '#667eea';
+    return colorMap[status] || '#ff9a9e';
   };
 
   const formatPrice = (price) => {

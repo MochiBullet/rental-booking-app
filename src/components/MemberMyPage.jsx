@@ -84,7 +84,7 @@ const MemberMyPage = ({ member, reservations, onLogout, onUpdateProfile }) => {
       cancelled: '#dc3545',
       completed: '#6c757d'
     };
-    return colorMap[status] || '#667eea';
+    return colorMap[status] || '#ff9a9e';
   };
 
   const getStatusLabel = (status) => {

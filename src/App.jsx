@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { vehicleData } from './data/vehicleData';
 import { initialMembers } from './data/memberData';
+import { siteSettingsManager } from './data/siteSettings';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import VehicleList from './components/VehicleList';
@@ -22,6 +23,11 @@ function App() {
   const [members, setMembers] = useState(initialMembers);
   const [currentMember, setCurrentMember] = useState(null);
   const [isMemberLoggedIn, setIsMemberLoggedIn] = useState(false);
+  const [siteSettings, setSiteSettings] = useState(null);
+
+  useEffect(() => {
+    setSiteSettings(siteSettingsManager.getSettings());
+  }, []);
 
   const handleViewChange = (view, filter = 'all') => {
     setCurrentView(view);
@@ -151,6 +157,12 @@ function App() {
     );
   };
 
+  const handleSiteSettingsUpdate = (newSettings) => {
+    setSiteSettings(newSettings);
+    // カスタムイベントを発生させて他のコンポーネントに通知
+    window.dispatchEvent(new CustomEvent('siteSettingsUpdate'));
+  };
+
   return (
     <div className="App">
       <Header 
@@ -207,28 +219,27 @@ function App() {
           </section>
         )}
         
-        {currentView === 'contact' && (
+        {currentView === 'contact' && siteSettings && (
           <section className="contact-section">
             <div className="container">
               <h2>お問い合わせ</h2>
               <div className="contact-info">
                 <div className="contact-card">
                   <h3>営業時間</h3>
-                  <p>平日: 9:00 - 18:00</p>
-                  <p>土日祝: 9:00 - 17:00</p>
+                  <p>{siteSettings.contact.businessHours.weekday}</p>
+                  <p>{siteSettings.contact.businessHours.weekend}</p>
                 </div>
                 <div className="contact-card">
                   <h3>連絡先</h3>
-                  <p>📞 電話: 03-1234-5678</p>
-                  <p>📧 メール: <a href="mailto:info@rentaleasy.com">info@rentaleasy.com</a></p>
-                  <p>📍 住所: 東京都渋谷区xxx-xxx</p>
+                  <p>📞 電話: {siteSettings.contact.phone}</p>
+                  <p>📧 メール: <a href={`mailto:${siteSettings.contact.email}`}>{siteSettings.contact.email}</a></p>
+                  <p>📍 住所: {siteSettings.contact.address}</p>
                 </div>
                 <div className="contact-card">
                   <h3>サービス内容</h3>
-                  <p>・車両レンタル</p>
-                  <p>・バイクレンタル</p>
-                  <p>・配車サービス</p>
-                  <p>・24時間サポート</p>
+                  {siteSettings.services.map((service, index) => (
+                    <p key={index}>{service}</p>
+                  ))}
                 </div>
               </div>
             </div>
@@ -247,6 +258,7 @@ function App() {
             onVehicleUpdate={handleVehicleUpdate}
             onReservationUpdate={handleReservationUpdate}
             onMemberUpdate={handleMemberUpdate}
+            onSiteSettingsUpdate={handleSiteSettingsUpdate}
             onLogout={handleAdminLogout}
           />
         )}
