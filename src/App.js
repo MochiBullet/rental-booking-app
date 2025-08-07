@@ -11,11 +11,12 @@ import MyPage from './components/MyPage';
 import AdminLogin from './components/AdminLogin';
 import AdminDashboard from './components/AdminDashboard';
 
-function App() {
+function AppContent() {
   const [user, setUser] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [logoClickCount, setLogoClickCount] = useState(0);
   const [logoClickTimer, setLogoClickTimer] = useState(null);
+  const location = useLocation();
 
   useEffect(() => {
     const savedUser = localStorage.getItem('currentUser');
@@ -76,8 +77,7 @@ function App() {
   };
 
   return (
-    <Router>
-      <div className="App">
+    <div className="App">
         <header className="main-header">
           <div className="header-container">
             <Link to="/" className="logo-section" onClick={handleLogoClick} style={{cursor: 'pointer', textDecoration: 'none', color: 'inherit'}}>
@@ -86,7 +86,12 @@ function App() {
             </Link>
             
             <nav className="header-nav">
-              {user ? (
+              {location.pathname === '/admin' || location.pathname === '/admin-login' ? (
+                // 管理者画面では認証ボタンを非表示
+                <div className="admin-indicator">
+                  {isAdmin && <span className="admin-badge">管理者モード</span>}
+                </div>
+              ) : user ? (
                 <div className="user-menu">
                   <Link to="/mypage" className="mypage-link">マイページ</Link>
                   <span className="welcome-text">ようこそ、{user.name}様</span>
@@ -124,6 +129,13 @@ function App() {
           </div>
         </footer>
       </div>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppContent />
     </Router>
   );
 }
