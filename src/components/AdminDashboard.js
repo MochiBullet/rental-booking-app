@@ -97,36 +97,6 @@ const AdminDashboard = () => {
     navigate('/');
   };
 
-  const showNotification = (message, type = 'success') => {
-    const notification = document.createElement('div');
-    const colors = {
-      success: `linear-gradient(135deg, ${siteSettings.primaryColor} 0%, ${siteSettings.secondaryColor} 100%)`,
-      error: 'linear-gradient(135deg, #d63031 0%, #e84393 100%)',
-      info: 'linear-gradient(135deg, #0984e3 0%, #74b9ff 100%)'
-    };
-    
-    notification.style.cssText = `
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: ${colors[type]};
-      color: white;
-      padding: 1rem 2rem;
-      border-radius: 10px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-      z-index: 10000;
-      animation: slideIn 0.3s ease;
-      max-width: 300px;
-    `;
-    notification.innerHTML = message;
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-      notification.style.animation = 'slideIn 0.3s ease reverse';
-      setTimeout(() => notification.remove(), 300);
-    }, 3000);
-  };
-
   const handleAddVehicle = () => {
     if (!newVehicle.name || !newVehicle.price) {
       showNotification('❌ 車両名と価格は必須項目です', 'error');
