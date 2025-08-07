@@ -64,6 +64,36 @@ const CompleteRegistration = () => {
     front: null,
     back: null
   });
+  const [isAddressLoading, setIsAddressLoading] = useState(false);
+
+  // 郵便番号から住所を取得する関数
+  const fetchAddressFromPostalCode = async (postalCode) => {
+    if (!postalCode || postalCode.length !== 7) return;
+    
+    setIsAddressLoading(true);
+    try {
+      // 日本郵便の郵便番号検索API（zipcloud）を使用
+      const response = await fetch(`https://zipcloud.ibsnet.co.jp/api/search?zipcode=${postalCode}`);
+      const data = await response.json();
+      
+      if (data.status === 200 && data.results && data.results.length > 0) {
+        const address = data.results[0];
+        setFormData(prev => ({
+          ...prev,
+          prefecture: address.address1,
+          city: address.address2,
+          address: address.address3
+        }));
+      } else {
+        // 郵便番号が見つからない場合の処理
+        console.log('該当する住所が見つかりませんでした');
+      }
+    } catch (error) {
+      console.error('住所取得エラー:', error);
+    } finally {
+      setIsAddressLoading(false);
+    }
+  };
 
   useEffect(() => {
     // Verify token
@@ -87,6 +117,11 @@ const CompleteRegistration = () => {
     // Clear error for this field
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+
+    // 郵便番号が7桁入力された場合、自動で住所を取得
+    if (name === 'postalCode' && value.length === 7 && /^\d{7}$/.test(value)) {
+      fetchAddressFromPostalCode(value);
     }
   };
 
@@ -450,21 +485,43 @@ const CompleteRegistration = () => {
               
               <div className="form-field">
                 <label>郵便番号 *</label>
-                <input
-                  type="text"
-                  name="postalCode"
-                  value={formData.postalCode}
-                  onChange={handleInputChange}
-                  placeholder="123-4567"
-                  maxLength="8"
-                />
+                <div className="postal-code-field">
+                  <input
+                    type="text"
+                    name="postalCode"
+                    value={formData.postalCode}
+                    onChange={handleInputChange}
+                    placeholder="1234567"
+                    maxLength="7"
+                  />
+                  <button
+                    type="button"
+                    className="address-search-btn"
+                    onClick={() => fetchAddressFromPostalCode(formData.postalCode)}
+                    disabled={formData.postalCode.length !== 7 || isAddressLoading}
+                  >
+                    {isAddressLoading ? (
+                      <span className="loading-spinner">🔄</span>
+                    ) : (
+                      '住所検索'
+                    )}
+                  </button>
+                </div>
+                <div className="postal-code-hint">
+                  ハイフンなしで7桁の数字を入力してください（例：1234567）
+                </div>
                 {errors.postalCode && <span className="error">{errors.postalCode}</span>}
               </div>
               
               <div className="form-field">
                 <label>都道府県 *</label>
-                <select name="prefecture" value={formData.prefecture} onChange={handleInputChange}>
-                  <option value="">選択してください</option>
+                <select 
+                  name="prefecture" 
+                  value={formData.prefecture} 
+                  onChange={handleInputChange}
+                  className={isAddressLoading ? 'loading' : ''}
+                >
+                  <option value="">{isAddressLoading ? '検索中...' : '選択してください'}</option>
                   {prefectures.map(pref => (
                     <option key={pref} value={pref}>{pref}</option>
                   ))}
@@ -479,19 +536,21 @@ const CompleteRegistration = () => {
                   name="city"
                   value={formData.city}
                   onChange={handleInputChange}
-                  placeholder="渋谷区"
+                  placeholder={isAddressLoading ? '自動入力中...' : '渋谷区'}
+                  className={isAddressLoading ? 'loading' : ''}
                 />
                 {errors.city && <span className="error">{errors.city}</span>}
               </div>
               
               <div className="form-field">
-                <label>番地 *</label>
+                <label>町域 *</label>
                 <input
                   type="text"
                   name="address"
                   value={formData.address}
                   onChange={handleInputChange}
-                  placeholder="道玄坂1-2-3"
+                  placeholder={isAddressLoading ? '自動入力中...' : '道玄坂'}
+                  className={isAddressLoading ? 'loading' : ''}
                 />
                 {errors.address && <span className="error">{errors.address}</span>}
               </div>

@@ -14,10 +14,15 @@ const AdminDashboard = () => {
     name: '',
     email: '',
     phone: '',
+    postalCode: '',
+    prefecture: '',
+    city: '',
     address: '',
+    building: '',
     licenseNumber: '',
     points: 0
   });
+  const [isAddressLoading, setIsAddressLoading] = useState(false);
   const [stats, setStats] = useState({
     totalBookings: 0,
     activeBookings: 0,
@@ -470,6 +475,50 @@ const AdminDashboard = () => {
     return `${year}${month}${lastFourDigits}`;
   };
 
+  // 郵便番号から住所を取得する関数
+  const fetchAddressFromPostalCode = async (postalCode) => {
+    if (!postalCode || postalCode.length !== 7) return;
+    
+    setIsAddressLoading(true);
+    try {
+      const response = await fetch(`https://zipcloud.ibsnet.co.jp/api/search?zipcode=${postalCode}`);
+      const data = await response.json();
+      
+      if (data.status === 200 && data.results && data.results.length > 0) {
+        const address = data.results[0];
+        
+        // 新規ユーザー追加時
+        if (showAddUserModal) {
+          setNewUser(prev => ({
+            ...prev,
+            prefecture: address.address1,
+            city: address.address2,
+            address: address.address3
+          }));
+        }
+        
+        // ユーザー編集時
+        if (showEditUserModal && selectedUser) {
+          setSelectedUser(prev => ({
+            ...prev,
+            prefecture: address.address1,
+            city: address.address2,
+            address: address.address3
+          }));
+        }
+        
+        showNotification('📍 住所を自動入力しました', 'success');
+      } else {
+        showNotification('❌ 該当する住所が見つかりませんでした', 'error');
+      }
+    } catch (error) {
+      console.error('住所取得エラー:', error);
+      showNotification('❌ 住所の取得に失敗しました', 'error');
+    } finally {
+      setIsAddressLoading(false);
+    }
+  };
+
   // ユーザー管理ハンドラー
   const handleAddUser = () => {
     if (!newUser.name || !newUser.email) {
@@ -504,7 +553,11 @@ const AdminDashboard = () => {
       name: '',
       email: '',
       phone: '',
+      postalCode: '',
+      prefecture: '',
+      city: '',
       address: '',
+      building: '',
       licenseNumber: '',
       points: 0
     });
@@ -1821,12 +1874,69 @@ const AdminDashboard = () => {
               />
             </div>
             <div className="form-group">
-              <label>住所</label>
+              <label>郵便番号</label>
+              <div className="postal-code-field">
+                <input 
+                  type="text"
+                  value={newUser.postalCode}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setNewUser({...newUser, postalCode: value});
+                    if (value.length === 7 && /^\d{7}$/.test(value)) {
+                      fetchAddressFromPostalCode(value);
+                    }
+                  }}
+                  placeholder="1234567"
+                  maxLength="7"
+                />
+                <button
+                  type="button"
+                  className="address-search-btn"
+                  onClick={() => fetchAddressFromPostalCode(newUser.postalCode)}
+                  disabled={newUser.postalCode.length !== 7 || isAddressLoading}
+                >
+                  {isAddressLoading ? '🔄' : '住所検索'}
+                </button>
+              </div>
+              <small>ハイフンなしで7桁入力</small>
+            </div>
+            <div className="form-group">
+              <label>都道府県</label>
+              <input 
+                type="text"
+                value={newUser.prefecture}
+                onChange={(e) => setNewUser({...newUser, prefecture: e.target.value})}
+                placeholder="東京都"
+                className={isAddressLoading ? 'loading' : ''}
+              />
+            </div>
+            <div className="form-group">
+              <label>市区町村</label>
+              <input 
+                type="text"
+                value={newUser.city}
+                onChange={(e) => setNewUser({...newUser, city: e.target.value})}
+                placeholder="渋谷区"
+                className={isAddressLoading ? 'loading' : ''}
+              />
+            </div>
+            <div className="form-group">
+              <label>町域・番地</label>
               <input 
                 type="text"
                 value={newUser.address}
                 onChange={(e) => setNewUser({...newUser, address: e.target.value})}
-                placeholder="東京都渋谷区..."
+                placeholder="道玄坂1-2-3"
+                className={isAddressLoading ? 'loading' : ''}
+              />
+            </div>
+            <div className="form-group">
+              <label>建物名・部屋番号</label>
+              <input 
+                type="text"
+                value={newUser.building}
+                onChange={(e) => setNewUser({...newUser, building: e.target.value})}
+                placeholder="○○ビル 101号室"
               />
             </div>
             <div className="form-group">
@@ -1887,12 +1997,69 @@ const AdminDashboard = () => {
               />
             </div>
             <div className="form-group">
-              <label>住所</label>
+              <label>郵便番号</label>
+              <div className="postal-code-field">
+                <input 
+                  type="text"
+                  value={selectedUser.postalCode || ''}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setSelectedUser({...selectedUser, postalCode: value});
+                    if (value.length === 7 && /^\d{7}$/.test(value)) {
+                      fetchAddressFromPostalCode(value);
+                    }
+                  }}
+                  placeholder="1234567"
+                  maxLength="7"
+                />
+                <button
+                  type="button"
+                  className="address-search-btn"
+                  onClick={() => fetchAddressFromPostalCode(selectedUser.postalCode)}
+                  disabled={(selectedUser.postalCode || '').length !== 7 || isAddressLoading}
+                >
+                  {isAddressLoading ? '🔄' : '住所検索'}
+                </button>
+              </div>
+              <small>ハイフンなしで7桁入力</small>
+            </div>
+            <div className="form-group">
+              <label>都道府県</label>
+              <input 
+                type="text"
+                value={selectedUser.prefecture || ''}
+                onChange={(e) => setSelectedUser({...selectedUser, prefecture: e.target.value})}
+                placeholder="東京都"
+                className={isAddressLoading ? 'loading' : ''}
+              />
+            </div>
+            <div className="form-group">
+              <label>市区町村</label>
+              <input 
+                type="text"
+                value={selectedUser.city || ''}
+                onChange={(e) => setSelectedUser({...selectedUser, city: e.target.value})}
+                placeholder="渋谷区"
+                className={isAddressLoading ? 'loading' : ''}
+              />
+            </div>
+            <div className="form-group">
+              <label>町域・番地</label>
               <input 
                 type="text"
                 value={selectedUser.address || ''}
                 onChange={(e) => setSelectedUser({...selectedUser, address: e.target.value})}
-                placeholder="東京都渋谷区..."
+                placeholder="道玄坂1-2-3"
+                className={isAddressLoading ? 'loading' : ''}
+              />
+            </div>
+            <div className="form-group">
+              <label>建物名・部屋番号</label>
+              <input 
+                type="text"
+                value={selectedUser.building || ''}
+                onChange={(e) => setSelectedUser({...selectedUser, building: e.target.value})}
+                placeholder="○○ビル 101号室"
               />
             </div>
             <div className="form-group">
