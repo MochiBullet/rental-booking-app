@@ -182,10 +182,6 @@ const VehicleList = ({ user }) => {
   };
 
   const handleBookVehicle = (vehicle) => {
-    if (!user) {
-      alert('予約にはログインが必要です。ログインページに移動してください。');
-      return;
-    }
     setSelectedVehicle(vehicle);
     setShowBookingModal(true);
     const today = new Date().toISOString().split('T')[0];
@@ -194,6 +190,10 @@ const VehicleList = ({ user }) => {
   };
 
   const confirmBooking = () => {
+    if (!user) {
+      alert('予約を確定するにはログインが必要です。ログインページに移動してください。');
+      return;
+    }
     if (!selectedDate) {
       alert('開始日を選択してください');
       return;
@@ -309,20 +309,13 @@ const VehicleList = ({ user }) => {
                   <span className="price-amount">{formatCurrency(vehicle.price)}</span>
                   <span className="price-period">/ 日</span>
                 </div>
-                {user ? (
-                  <button 
-                    className="modern-book-btn"
-                    onClick={() => handleBookVehicle(vehicle)}
-                    disabled={!vehicle.available}
-                  >
-                    予約する
-                  </button>
-                ) : (
-                  <div className="member-only-notice">
-                    <p className="login-required">ログインが必要です</p>
-                    <p className="price-only">料金: {formatCurrency(vehicle.price)} / 日</p>
-                  </div>
-                )}
+                <button 
+                  className="modern-book-btn"
+                  onClick={() => handleBookVehicle(vehicle)}
+                  disabled={!vehicle.available}
+                >
+                  {user ? '予約する' : '料金を確認'}
+                </button>
               </div>
             </div>
           </div>
@@ -349,7 +342,7 @@ const VehicleList = ({ user }) => {
             ) : (
               <>
                 <div className="modal-header">
-                  <h2>予約内容の確認</h2>
+                  <h2>{user ? '予約内容の確認' : '料金計算・見積もり'}</h2>
                   <button className="close-btn" onClick={() => setShowBookingModal(false)}>×</button>
                 </div>
 
@@ -504,9 +497,18 @@ const VehicleList = ({ user }) => {
                       <button className="cancel-btn" onClick={() => setShowBookingModal(false)}>
                         キャンセル
                       </button>
-                      <button className="confirm-btn" onClick={confirmBooking}>
-                        予約を確定
-                      </button>
+                      {user ? (
+                        <button className="confirm-btn" onClick={confirmBooking}>
+                          予約を確定
+                        </button>
+                      ) : (
+                        <div className="login-required-section">
+                          <p className="login-message">予約を確定するにはログインが必要です</p>
+                          <button className="login-btn" onClick={() => window.location.href = '/login'}>
+                            ログインして予約
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
