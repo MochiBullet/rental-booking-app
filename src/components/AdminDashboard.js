@@ -165,7 +165,7 @@ const AdminDashboard = () => {
     setShowAddVehicleModal(false);
     loadDashboardData();
     
-    showNotification(`✅ ${vehicle.name}が正常に追加されました`);
+    showNotification(`🚗 車両「${vehicle.name}」が正常に追加されました！`, 'save');
   };
 
   const handleEditVehicle = () => {
@@ -185,7 +185,7 @@ const AdminDashboard = () => {
     setSelectedVehicle(null);
     loadDashboardData();
     
-    showNotification(`✅ ${vehicleName}の情報が更新されました`);
+    showNotification(`✏️ 車両「${vehicleName}」の情報が正常に更新されました！`, 'save');
   };
 
   const handleDeleteVehicle = (vehicleId) => {
@@ -195,7 +195,7 @@ const AdminDashboard = () => {
       setVehicles(updatedVehicles);
       localStorage.setItem('vehicles', JSON.stringify(updatedVehicles));
       loadDashboardData();
-      showNotification(`車両「${vehicle?.name}」を削除しました`, 'success');
+      showNotification(`🗑️ 車両「${vehicle?.name}」を削除しました。`, 'info');
     }
   };
 
@@ -208,8 +208,8 @@ const AdminDashboard = () => {
     localStorage.setItem('vehicles', JSON.stringify(updatedVehicles));
     loadDashboardData();
     showNotification(
-      `車両「${vehicle?.name}」を${!vehicle?.available ? '有効' : '無効'}にしました`, 
-      'success'
+      `🔄 車両「${vehicle?.name}」を${!vehicle?.available ? '有効' : '無効'}に変更しました。`, 
+      'info'
     );
   };
 
@@ -227,11 +227,18 @@ const AdminDashboard = () => {
     updateCSSVariables(preset);
   };
 
-  // 通知システム
-  const showNotification = (message, type = 'success') => {
+  // 改善された通知システム
+  const showNotification = (message, type = 'success', duration = 4000) => {
+    // 既存の通知があれば削除
+    const existingToast = document.querySelector('.success-toast');
+    if (existingToast) {
+      existingToast.remove();
+    }
+
     const notification = document.createElement('div');
     const icons = {
-      success: '✅',
+      success: '🎉',
+      save: '💾',
       error: '❌',
       info: 'ℹ️',
       warning: '⚠️'
@@ -239,46 +246,38 @@ const AdminDashboard = () => {
     
     const colors = {
       success: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+      save: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
       error: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
       info: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
       warning: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
     };
 
-    notification.style.cssText = `
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: ${colors[type] || colors.success};
-      color: white;
-      padding: 1rem 2rem;
-      border-radius: 12px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-      z-index: 10000;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      transform: translateX(400px);
-      opacity: 0;
-      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      backdrop-filter: blur(10px);
+    notification.className = 'success-toast';
+    notification.style.background = colors[type] || colors.success;
+    
+    notification.innerHTML = `
+      <div class="toast-icon">${icons[type] || icons.success}</div>
+      <div class="toast-message">${message}</div>
+      <button class="toast-close" onclick="this.parentElement.remove()">×</button>
     `;
     
-    notification.innerHTML = `${icons[type] || icons.success} ${message}`;
     document.body.appendChild(notification);
     
     // アニメーション開始
     setTimeout(() => {
-      notification.style.transform = 'translateX(0)';
-      notification.style.opacity = '1';
+      notification.classList.add('show');
     }, 100);
     
     // 自動削除
     setTimeout(() => {
-      notification.style.transform = 'translateX(400px)';
-      notification.style.opacity = '0';
-      setTimeout(() => notification.remove(), 300);
-    }, 3000);
+      notification.classList.remove('show');
+      notification.classList.add('hide');
+      setTimeout(() => {
+        if (notification.parentElement) {
+          notification.remove();
+        }
+      }, 400);
+    }, duration);
   };
 
   const handleSaveDesignSettings = () => {
@@ -291,7 +290,7 @@ const AdminDashboard = () => {
     }
     
     setShowDesignModal(false);
-    showNotification('デザイン設定が保存され、リアルタイムで適用されました！', 'success');
+    showNotification('🎨 デザイン設定が正常に保存されました！サイトに即座反映されます。', 'save', 5000);
   };
 
   const handleCancelBooking = (bookingId) => {
@@ -303,7 +302,7 @@ const AdminDashboard = () => {
       setBookings(updatedBookings);
       localStorage.setItem('bookings', JSON.stringify(updatedBookings));
       loadDashboardData();
-      showNotification(`予約 #${booking?.id} をキャンセルしました`, 'info');
+      showNotification(`❌ 予約 #${booking?.id} をキャンセルしました。`, 'warning');
     }
   };
 
@@ -315,7 +314,7 @@ const AdminDashboard = () => {
     setBookings(updatedBookings);
     localStorage.setItem('bookings', JSON.stringify(updatedBookings));
     loadDashboardData();
-    showNotification(`予約 #${booking?.id} を承認しました`, 'success');
+    showNotification(`✅ 予約 #${booking?.id} を承認しました！お客様に通知されます。`, 'success');
   };
 
   const formatCurrency = (amount) => {
@@ -1012,7 +1011,7 @@ const AdminDashboard = () => {
                 <div className="form-actions">
                   <button className="save-btn" onClick={() => {
                     localStorage.setItem('homeContent', JSON.stringify(homeContent));
-                    showNotification('ホームページコンテンツが保存されました！', 'success');
+                    showNotification('📝 ホームページコンテンツが正常に保存されました！ページをリロードして確認してください。', 'save', 5000);
                   }}>
                     コンテンツを保存
                   </button>

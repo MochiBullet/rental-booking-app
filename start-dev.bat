@@ -1,26 +1,27 @@
 @echo off
+chcp 65001 > nul
 echo ===============================================
-echo  M's BASE Rental 開発環境スタート
+echo  M's BASE Rental Development Server
 echo ===============================================
 echo.
 
-echo [1/3] プロジェクトディレクトリを確認中...
+echo [1/3] Checking project directory...
 cd /d "%~dp0"
-echo 現在の場所: %CD%
+echo Current location: %CD%
 
 echo.
-echo [2/3] Git状況を確認中...
+echo [2/3] Checking Git status...
 git status --short
 
 echo.
-echo [3/3] 開発サーバーを起動中...
-echo ブラウザで http://localhost:3000 が開きます
+echo [3/3] Starting development server...
+echo Browser will open at http://localhost:3000
 echo.
-echo 管理者画面へのアクセス:
-echo 1. ロゴ「MB」を10回クリック
-echo 2. admin / admin123 でログイン
+echo Admin access:
+echo 1. Click "MB" logo 10 times
+echo 2. Login: admin / admin123
 echo.
-echo 終了するには Ctrl+C を押してください
+echo Press Ctrl+C to stop the server
 echo.
 
 npm start
