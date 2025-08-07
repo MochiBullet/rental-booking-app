@@ -62,6 +62,172 @@ src/
 - [x] ユーザー管理
 - [x] 売上分析
 
+## 🚀 クイックスタート（次回の作業開始手順）
+
+### 1. 開発環境の起動
+```bash
+# プロジェクトディレクトリに移動
+cd C:\Users\hiyok\projects\rental-booking-app
+
+# 開発サーバー起動
+npm start
+# → http://localhost:3000 でサイト確認
+
+# ビルド実行（デプロイ前）
+npm run build
+```
+
+### 2. Git操作
+```bash
+# 変更を確認
+git status
+
+# すべての変更をステージング
+git add -A
+
+# コミット
+git commit -m "変更内容の説明"
+
+# GitHubにプッシュ（自動でAWS S3にデプロイされる）
+git push origin master
+
+# デプロイ状況確認
+# → https://github.com/MochiBullet/rental-booking-app/actions
+```
+
+### 3. 管理者画面へのアクセス
+1. サイトのロゴ「MB」を**10回クリック**
+2. ログイン情報入力：
+   - Username: `admin`
+   - Password: `admin123`
+3. 管理機能一覧：
+   - **Overview**: ダッシュボード概要
+   - **Bookings**: 予約管理
+   - **Users**: ユーザー管理
+   - **Vehicles**: 車両管理
+   - **Analytics**: 売上分析
+   - **Site Settings**: サイトデザイン設定（色・テーマ）
+   - **Content Editor**: ホームページコンテンツ編集
+
+### 4. よく編集するファイル
+```
+src/
+├── App.js                     # メインアプリケーション、ルーティング
+├── App.css                    # グローバルCSS変数、全体スタイル
+└── components/
+    ├── HomePage.js            # ホームページコンポーネント
+    ├── HomePage.css           # ホームページスタイル
+    ├── VehicleList.js         # 車両一覧・予約機能
+    ├── VehicleList.css        # 車両一覧スタイル
+    ├── AdminDashboard.js      # 管理者ダッシュボード
+    ├── AdminDashboard.css     # 管理者画面スタイル
+    ├── MyPage.js              # マイページ
+    └── CompleteRegistration.js # 会員登録詳細
+```
+
+## 🎯 現在の実装状況
+
+### ✅ 実装済み機能
+- **基本機能**
+  - ユーザー認証（ログイン・会員登録）
+  - 2段階会員登録（メール → 詳細情報）
+  - 車両予約システム
+  - ポイントシステム（5%還元）
+  
+- **管理者機能**
+  - 予約管理（承認・キャンセル）
+  - 車両管理（CRUD操作）
+  - ユーザー管理（VIP/Premium/Regular分類）
+  - 売上分析
+  - サイトデザイン設定（リアルタイム変更）
+  - ホームページコンテンツ編集
+
+- **技術的特徴**
+  - LocalStorage永続化
+  - リアルタイム通知システム
+  - レスポンシブデザイン
+  - GitHub Actions CI/CD
+  - AWS S3静的ホスティング
+
+### 🔄 次の作業候補
+
+#### 優先度：高
+1. **決済システム統合**
+   - Stripe/PayPal API連携
+   - クレジットカード情報管理
+   - 領収書発行機能
+
+2. **バックエンド実装**
+   - Node.js/Express APIサーバー
+   - MongoDB/PostgreSQLデータベース
+   - JWT認証システム
+
+3. **予約カレンダー強化**
+   - Google Calendar連携
+   - リマインダー通知
+   - 複数日予約の最適化
+
+#### 優先度：中
+4. **メール通知システム**
+   - SendGrid/AWS SES統合
+   - 予約確認メール
+   - パスワードリセット
+
+5. **画像管理システム**
+   - 車両画像のアップロード
+   - AWS S3画像ストレージ
+   - 画像圧縮・最適化
+
+6. **多言語対応**
+   - 英語・中国語サポート
+   - 言語切り替えボタン
+   - i18n実装
+
+#### 優先度：低
+7. **レビュー・評価システム**
+   - 車両レビュー機能
+   - 星評価システム
+   - レビュー管理
+
+8. **分析機能強化**
+   - Google Analytics統合
+   - 詳細レポート生成
+   - CSVエクスポート
+
+9. **SEO最適化**
+   - メタタグ管理
+   - サイトマップ生成
+   - 構造化データ
+
+## 📝 開発メモ
+
+### 現在の課題
+- LocalStorageのみでデータ管理（データベース未実装）
+- セキュリティ強化が必要（本番環境向け）
+- テスト未実装
+
+### 環境情報
+- **Node.js**: 必要（npm使用）
+- **React**: 18.x
+- **React Router**: 6.x
+- **デプロイ**: GitHub → AWS S3（自動）
+
+### トラブルシューティング
+1. **ビルドエラー時**
+   ```bash
+   # node_modules削除して再インストール
+   rm -rf node_modules
+   npm install
+   ```
+
+2. **デプロイが反映されない時**
+   - GitHub Actions確認: https://github.com/MochiBullet/rental-booking-app/actions
+   - CloudFrontキャッシュクリア（必要に応じて）
+
+3. **LocalStorage確認**
+   - Chrome DevTools → Application → Local Storage
+   - 主なキー: `siteSettings`, `homeContent`, `vehicles`, `bookings`, `users`
+
 ## 作業ログ & 振り返り
 
 ### 2024/08/07 - リアルタイム管理者編集機能実装完了
