@@ -6,8 +6,6 @@ import { siteSettingsManager } from '../data/siteSettings';
 function HomePage() {
   const navigate = useNavigate();
   const [siteSettings, setSiteSettings] = useState(null);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [previousImageIndex, setPreviousImageIndex] = useState(-1);
   const [homeContent, setHomeContent] = useState({
     heroTitle: 'あなたの旅を、私たちがサポート',
     heroSubtitle: '安心・安全・快適なレンタルサービス',
@@ -55,22 +53,6 @@ function HomePage() {
     return () => window.removeEventListener('siteSettingsUpdate', handleSettingsUpdate);
   }, []);
 
-  // 背景画像スライダーのロジック
-  useEffect(() => {
-    const images = getBackgroundImages();
-    if (images.length <= 1) return;
-
-    const interval = setInterval(() => {
-      setPreviousImageIndex((prevIndex) => prevIndex);
-      setCurrentImageIndex((prevIndex) => {
-        setPreviousImageIndex(prevIndex);
-        return (prevIndex + 1) % images.length;
-      });
-    }, 4000); // 4秒ごとに切り替え
-
-    return () => clearInterval(interval);
-  }, [siteSettings]);
-
   const getBackgroundImages = () => {
     if (siteSettings?.hero?.backgroundImages?.length > 0 && !siteSettings.hero.useDefaultImages) {
       return siteSettings.hero.backgroundImages;
@@ -78,23 +60,28 @@ function HomePage() {
     return defaultImages;
   };
 
+  // 画像を2セット分作成（シームレスループ用）
+  const getDoubledImages = () => {
+    const images = getBackgroundImages();
+    return [...images, ...images]; // 画像を2回繰り返す
+  };
+
   return (
     <div className="home-page">
       <div className="hero-section">
-        {/* 背景画像スライダー */}
+        {/* 背景画像スライダー（無限スクロール） */}
         <div className="background-slider">
-          {getBackgroundImages().map((image, index) => (
-            <div
-              key={index}
-              className={`background-image ${
-                index === currentImageIndex ? 'active' : 
-                index === previousImageIndex ? 'exit' : ''
-              }`}
-              style={{
-                backgroundImage: `url(${image})`,
-              }}
-            />
-          ))}
+          <div className="slider-track">
+            {getDoubledImages().map((image, index) => (
+              <div
+                key={index}
+                className="background-image"
+                style={{
+                  backgroundImage: `url(${image})`,
+                }}
+              />
+            ))}
+          </div>
         </div>
         
         {/* オーバーレイ */}
@@ -104,17 +91,6 @@ function HomePage() {
         <div className="hero-content">
           <h2 className="hero-title">{homeContent.heroTitle}</h2>
           <p className="hero-subtitle">{homeContent.heroSubtitle}</p>
-        </div>
-        
-        {/* スライダーインジケーター */}
-        <div className="slider-indicators">
-          {getBackgroundImages().map((_, index) => (
-            <button
-              key={index}
-              className={`indicator ${index === currentImageIndex ? 'active' : ''}`}
-              onClick={() => setCurrentImageIndex(index)}
-            />
-          ))}
         </div>
       </div>
 

@@ -16,7 +16,7 @@
   overflow: hidden;
 }
 
-/* 背景スライダー */
+/* 背景スライダー（無限スクロール） */
 .background-slider {
   position: absolute;
   top: 0;
@@ -27,26 +27,29 @@
   overflow: hidden;
 }
 
+.slider-track {
+  display: flex;
+  width: fit-content;
+  height: 100%;
+  animation: infiniteScroll 40s linear infinite;
+}
+
 .background-image {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
+  width: 100vw;
   height: 100%;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  transform: translateX(100%);
-  transition: transform 1.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+  flex-shrink: 0;
 }
 
-.background-image.active {
-  transform: translateX(0);
-}
-
-.background-image.exit {
-  transform: translateX(-100%);
-  transition: transform 1.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+@keyframes infiniteScroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 /* オーバーレイ */
@@ -107,36 +110,6 @@
   line-height: 1.4;
 }
 
-/* スライダーインジケーター */
-.slider-indicators {
-  position: absolute;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 12px;
-  z-index: 4;
-}
-
-.indicator {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.5);
-  background: transparent;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.indicator.active {
-  background: white;
-  border-color: white;
-  transform: scale(1.2);
-}
-
-.indicator:hover {
-  border-color: rgba(255, 255, 255, 0.8);
-}
 
 /* レスポンシブ対応 */
 @media (max-width: 768px) {
