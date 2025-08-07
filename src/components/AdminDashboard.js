@@ -7,6 +7,17 @@ const AdminDashboard = () => {
   const [activeSection, setActiveSection] = useState('overview');
   const [detailsType, setDetailsType] = useState(null);
   const [monthlyStats, setMonthlyStats] = useState({});
+  const [showAddUserModal, setShowAddUserModal] = useState(false);
+  const [showEditUserModal, setShowEditUserModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [newUser, setNewUser] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
+    licenseNumber: '',
+    points: 0
+  });
   const [stats, setStats] = useState({
     totalBookings: 0,
     activeBookings: 0,
@@ -427,6 +438,101 @@ const AdminDashboard = () => {
     setMonthlyStats({ type, months });
   };
 
+  // ユーザー管理ハンドラー
+  const handleAddUser = () => {
+    if (!newUser.name || !newUser.email) {
+      showNotification('❌ 氏名とメールアドレスは必須項目です', 'error');
+      return;
+    }
+    
+    // メールアドレスの重複チェック
+    const existingUser = users.find(u => u.email === newUser.email);
+    if (existingUser) {
+      showNotification('❌ このメールアドレスは既に登録されています', 'error');
+      return;
+    }
+    
+    const user = {
+      id: Date.now(),
+      ...newUser,
+      points: parseInt(newUser.points) || 0,
+      createdAt: new Date().toISOString(),
+      isActive: true
+    };
+    
+    const updatedUsers = [...users, user];
+    setUsers(updatedUsers);
+    localStorage.setItem('users', JSON.stringify(updatedUsers));
+    
+    setNewUser({
+      name: '',
+      email: '',
+      phone: '',
+      address: '',
+      licenseNumber: '',
+      points: 0
+    });
+    setShowAddUserModal(false);
+    loadDashboardData();
+    
+    showNotification(`👤 ユーザー「${user.name}」が正常に追加されました！`, 'success');
+  };
+
+  const handleEditUser = () => {
+    if (!selectedUser.name || !selectedUser.email) {
+      showNotification('❌ 氏名とメールアドレスは必須項目です', 'error');
+      return;
+    }
+    
+    // メールアドレスの重複チェック（自分以外）
+    const existingUser = users.find(u => u.email === selectedUser.email && u.id !== selectedUser.id);
+    if (existingUser) {
+      showNotification('❌ このメールアドレスは既に登録されています', 'error');
+      return;
+    }
+    
+    const updatedUsers = users.map(u => 
+      u.id === selectedUser.id ? { ...selectedUser, points: parseInt(selectedUser.points) || 0 } : u
+    );
+    
+    setUsers(updatedUsers);
+    localStorage.setItem('users', JSON.stringify(updatedUsers));
+    setShowEditUserModal(false);
+    const userName = selectedUser.name;
+    setSelectedUser(null);
+    loadDashboardData();
+    
+    showNotification(`✏️ ユーザー「${userName}」の情報が正常に更新されました！`, 'success');
+  };
+
+  const handleDeleteUser = (userId) => {
+    const user = users.find(u => u.id === userId);
+    if (window.confirm(`ユーザー「${user?.name}」を削除しますか？この操作は取り消せません。`)) {
+      const updatedUsers = users.filter(u => u.id !== userId);
+      setUsers(updatedUsers);
+      localStorage.setItem('users', JSON.stringify(updatedUsers));
+      loadDashboardData();
+      showNotification(`🗑️ ユーザー「${user?.name}」を削除しました。`, 'info');
+    }
+  };
+
+  const handleViewUser = (userId) => {
+    const user = users.find(u => u.id === userId);
+    const userBookings = bookings.filter(b => b.userId === userId);
+    const totalSpent = userBookings.reduce((sum, b) => sum + (b.totalPrice || 0), 0);
+    
+    alert(`ユーザー詳細情報:
+氏名: ${user.name}
+メール: ${user.email}
+電話: ${user.phone || 'なし'}
+住所: ${user.address || 'なし'}
+免許証番号: ${user.licenseNumber || 'なし'}
+ポイント: ${user.points || 0}
+登録日: ${user.createdAt ? new Date(user.createdAt).toLocaleDateString('ja-JP') : 'なし'}
+利用回数: ${userBookings.length}回
+累計利用額: ${formatCurrency(totalSpent)}`);
+  };
+
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('ja-JP', {
       style: 'currency',
@@ -774,20 +880,26 @@ const AdminDashboard = () => {
           {activeSection === 'users' && (
             <div className="users-section">
               <div className="section-header">
-                <h2>Customer Management</h2>
-                <div className="user-stats-summary">
-                  <div className="user-stat-card">
-                    <span className="stat-number">{users.length}</span>
-                    <span className="stat-label">Total Users</span>
-                  </div>
-                  <div className="user-stat-card">
-                    <span className="stat-number">{users.filter(u => u.createdAt && new Date(u.createdAt) > new Date(Date.now() - 30*24*60*60*1000)).length}</span>
-                    <span className="stat-label">New This Month</span>
-                  </div>
-                  <div className="user-stat-card">
-                    <span className="stat-number">{users.filter(u => u.points && u.points > 0).length}</span>
-                    <span className="stat-label">With Points</span>
-                  </div>
+                <h2>ユーザー管理</h2>
+                <button 
+                  className="add-btn"
+                  onClick={() => setShowAddUserModal(true)}
+                >
+                  ➕ 新規ユーザー追加
+                </button>
+              </div>
+              <div className="user-stats-summary">
+                <div className="user-stat-card">
+                  <span className="stat-number">{users.length}</span>
+                  <span className="stat-label">総ユーザー数</span>
+                </div>
+                <div className="user-stat-card">
+                  <span className="stat-number">{users.filter(u => u.createdAt && new Date(u.createdAt) > new Date(Date.now() - 30*24*60*60*1000)).length}</span>
+                  <span className="stat-label">今月の新規登録</span>
+                </div>
+                <div className="user-stat-card">
+                  <span className="stat-number">{users.filter(u => u.points && u.points > 0).length}</span>
+                  <span className="stat-label">ポイント保有者</span>
                 </div>
               </div>
               
@@ -864,9 +976,30 @@ const AdminDashboard = () => {
                             </td>
                             <td>
                               <div className="user-actions">
-                                <button className="action-btn view" title="詳細表示">👁️</button>
-                                <button className="action-btn edit" title="編集">✏️</button>
-                                <button className="action-btn message" title="メッセージ送信">💬</button>
+                                <button 
+                                  className="action-btn view" 
+                                  title="詳細表示"
+                                  onClick={() => handleViewUser(user.id)}
+                                >
+                                  👁️
+                                </button>
+                                <button 
+                                  className="action-btn edit" 
+                                  title="編集"
+                                  onClick={() => {
+                                    setSelectedUser({...user});
+                                    setShowEditUserModal(true);
+                                  }}
+                                >
+                                  ✏️
+                                </button>
+                                <button 
+                                  className="action-btn delete" 
+                                  title="削除"
+                                  onClick={() => handleDeleteUser(user.id)}
+                                >
+                                  🗑️
+                                </button>
                               </div>
                             </td>
                           </tr>
@@ -1600,6 +1733,142 @@ const AdminDashboard = () => {
               <button className="cancel-btn" onClick={() => setShowDesignModal(false)}>
                 キャンセル
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ユーザー追加モーダル */}
+      {showAddUserModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h2>新規ユーザー追加</h2>
+            <div className="form-group">
+              <label>氏名 *</label>
+              <input 
+                type="text"
+                value={newUser.name}
+                onChange={(e) => setNewUser({...newUser, name: e.target.value})}
+                placeholder="山田太郎"
+              />
+            </div>
+            <div className="form-group">
+              <label>メールアドレス *</label>
+              <input 
+                type="email"
+                value={newUser.email}
+                onChange={(e) => setNewUser({...newUser, email: e.target.value})}
+                placeholder="yamada@example.com"
+              />
+            </div>
+            <div className="form-group">
+              <label>電話番号</label>
+              <input 
+                type="tel"
+                value={newUser.phone}
+                onChange={(e) => setNewUser({...newUser, phone: e.target.value})}
+                placeholder="090-1234-5678"
+              />
+            </div>
+            <div className="form-group">
+              <label>住所</label>
+              <input 
+                type="text"
+                value={newUser.address}
+                onChange={(e) => setNewUser({...newUser, address: e.target.value})}
+                placeholder="東京都渋谷区..."
+              />
+            </div>
+            <div className="form-group">
+              <label>免許証番号</label>
+              <input 
+                type="text"
+                value={newUser.licenseNumber}
+                onChange={(e) => setNewUser({...newUser, licenseNumber: e.target.value})}
+                placeholder="123456789012"
+              />
+            </div>
+            <div className="form-group">
+              <label>初期ポイント</label>
+              <input 
+                type="number"
+                value={newUser.points}
+                onChange={(e) => setNewUser({...newUser, points: e.target.value})}
+                placeholder="0"
+                min="0"
+              />
+            </div>
+            <div className="modal-actions">
+              <button className="save-btn" onClick={handleAddUser}>ユーザー追加</button>
+              <button className="cancel-btn" onClick={() => setShowAddUserModal(false)}>キャンセル</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ユーザー編集モーダル */}
+      {showEditUserModal && selectedUser && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h2>ユーザー情報編集</h2>
+            <div className="form-group">
+              <label>氏名 *</label>
+              <input 
+                type="text"
+                value={selectedUser.name}
+                onChange={(e) => setSelectedUser({...selectedUser, name: e.target.value})}
+              />
+            </div>
+            <div className="form-group">
+              <label>メールアドレス *</label>
+              <input 
+                type="email"
+                value={selectedUser.email}
+                onChange={(e) => setSelectedUser({...selectedUser, email: e.target.value})}
+              />
+            </div>
+            <div className="form-group">
+              <label>電話番号</label>
+              <input 
+                type="tel"
+                value={selectedUser.phone || ''}
+                onChange={(e) => setSelectedUser({...selectedUser, phone: e.target.value})}
+                placeholder="090-1234-5678"
+              />
+            </div>
+            <div className="form-group">
+              <label>住所</label>
+              <input 
+                type="text"
+                value={selectedUser.address || ''}
+                onChange={(e) => setSelectedUser({...selectedUser, address: e.target.value})}
+                placeholder="東京都渋谷区..."
+              />
+            </div>
+            <div className="form-group">
+              <label>免許証番号</label>
+              <input 
+                type="text"
+                value={selectedUser.licenseNumber || ''}
+                onChange={(e) => setSelectedUser({...selectedUser, licenseNumber: e.target.value})}
+                placeholder="123456789012"
+              />
+            </div>
+            <div className="form-group">
+              <label>保有ポイント</label>
+              <input 
+                type="number"
+                value={selectedUser.points || 0}
+                onChange={(e) => setSelectedUser({...selectedUser, points: e.target.value})}
+                min="0"
+              />
+            </div>
+            <div className="modal-actions">
+              <button className="save-btn" onClick={handleEditUser}>変更を保存</button>
+              <button className="cancel-btn" onClick={() => {
+                setShowEditUserModal(false);
+                setSelectedUser(null);
+              }}>キャンセル</button>
             </div>
           </div>
         </div>

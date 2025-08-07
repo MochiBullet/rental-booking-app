@@ -1460,6 +1460,15 @@
   color: white;
 }
 
+.action-btn.delete {
+  background: #d63031;
+  color: white;
+}
+
+.action-btn.delete:hover {
+  background: #c62828;
+}
+
 .action-btn:hover {
   transform: scale(1.1);
 }
