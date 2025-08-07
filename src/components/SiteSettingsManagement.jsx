@@ -158,17 +158,6 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
     }
   };
 
-  // ヒーロー設定の更新
-  const updateHeroSettings = (field, value) => {
-    setSettings(prev => ({
-      ...prev,
-      hero: {
-        ...prev.hero,
-        [field]: value
-      }
-    }));
-  };
-
   // ヒーロー背景画像のアップロード処理
   const handleHeroImageUpload = (event) => {
     const file = event.target.files[0];
