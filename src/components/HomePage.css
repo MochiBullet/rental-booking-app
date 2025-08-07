@@ -160,6 +160,8 @@
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   border: 2px solid transparent;
   position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 .vehicle-tile::before {
@@ -184,20 +186,31 @@
   border-color: var(--green);
 }
 
+.tile-image {
+  width: 100%;
+  height: 250px;
+  overflow: hidden;
+  position: relative;
+}
+
+.tile-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.vehicle-tile:hover .tile-img {
+  transform: scale(1.05);
+}
+
 .tile-content {
-  padding: 40px;
+  padding: 30px;
   text-align: center;
+  flex: 1;
 }
 
-.tile-icon {
-  margin-bottom: 20px;
-  animation: pulse 3s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-}
+/* タイルアイコンのスタイルを削除（画像に置き換え） */
 
 .tile-title {
   font-size: 2rem;

@@ -245,6 +245,115 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
     }
   };
 
+  // タイル設定の更新
+  const updateTileSettings = (field, value) => {
+    setSettings(prev => ({
+      ...prev,
+      tiles: {
+        ...prev.tiles,
+        [field]: value
+      }
+    }));
+  };
+
+  // タイル画像のアップロード処理（車用）
+  const handleCarTileUpload = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // ファイルサイズチェック（最大3MB）
+    if (file.size > 3 * 1024 * 1024) {
+      alert('ファイルサイズは3MB以下にしてください。');
+      return;
+    }
+
+    // 画像ファイルかチェック
+    if (!file.type.startsWith('image/')) {
+      alert('画像ファイルを選択してください。');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const base64Data = e.target.result;
+      updateTileSettings('carImage', base64Data);
+      updateTileSettings('useDefaultImages', false);
+      
+      // リアルタイム更新の実行
+      if (onSettingsUpdate) {
+        const updatedSettings = {
+          ...settings,
+          tiles: {
+            ...settings.tiles,
+            carImage: base64Data,
+            useDefaultImages: false
+          }
+        };
+        onSettingsUpdate(updatedSettings);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // タイル画像のアップロード処理（バイク用）
+  const handleBikeTileUpload = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // ファイルサイズチェック（最大3MB）
+    if (file.size > 3 * 1024 * 1024) {
+      alert('ファイルサイズは3MB以下にしてください。');
+      return;
+    }
+
+    // 画像ファイルかチェック
+    if (!file.type.startsWith('image/')) {
+      alert('画像ファイルを選択してください。');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const base64Data = e.target.result;
+      updateTileSettings('bikeImage', base64Data);
+      updateTileSettings('useDefaultImages', false);
+      
+      // リアルタイム更新の実行
+      if (onSettingsUpdate) {
+        const updatedSettings = {
+          ...settings,
+          tiles: {
+            ...settings.tiles,
+            bikeImage: base64Data,
+            useDefaultImages: false
+          }
+        };
+        onSettingsUpdate(updatedSettings);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // タイル画像をデフォルトに戻す
+  const resetTilesToDefault = () => {
+    updateTileSettings('carImage', null);
+    updateTileSettings('bikeImage', null);
+    updateTileSettings('useDefaultImages', true);
+    
+    // リアルタイム更新の実行
+    if (onSettingsUpdate) {
+      const updatedSettings = {
+        ...settings,
+        tiles: {
+          carImage: null,
+          bikeImage: null,
+          useDefaultImages: true
+        }
+      };
+      onSettingsUpdate(updatedSettings);
+    }
+  };
+
   return (
     <div className="site-settings-management">
       <div className="settings-header">
@@ -263,6 +372,7 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
         {[
           { key: 'branding', label: '🎨 ブランディング' },
           { key: 'hero-images', label: '🏞️ ヒーロー画像' },
+          { key: 'tile-images', label: '🚗 タイル画像' },
           { key: 'hero', label: 'ヒーローセクション' },
           { key: 'features', label: '特徴・機能' },
           { key: 'contact', label: 'お問い合わせ情報' },
@@ -432,6 +542,154 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
                     • 対応形式: PNG, JPG, WEBP<br/>
                     • 最大サイズ: 5MB<br/>
                     • 複数枚追加可能（自動でスライダー表示）
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeSection === 'tile-images' && (
+          <div className="section">
+            <h3>🚗 車・バイクタイル画像管理</h3>
+            
+            <div className="form-group">
+              <label>タイル画像設定</label>
+              <div className="tile-image-management">
+                <div className="tile-previews">
+                  <div className="tile-preview-section">
+                    <h4>車タイル画像</h4>
+                    <div className="tile-preview">
+                      {!settings.tiles?.useDefaultImages && settings.tiles?.carImage ? (
+                        <img 
+                          src={settings.tiles.carImage} 
+                          alt="カスタム車画像"
+                          style={{ 
+                            width: '200px', 
+                            height: '150px', 
+                            objectFit: 'cover',
+                            borderRadius: '8px'
+                          }}
+                        />
+                      ) : (
+                        <div 
+                          style={{ 
+                            width: '200px', 
+                            height: '150px', 
+                            background: 'url(https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=600&q=80)',
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                            borderRadius: '8px',
+                            position: 'relative'
+                          }}
+                        >
+                          <div style={{
+                            position: 'absolute',
+                            bottom: '8px',
+                            left: '8px',
+                            background: 'rgba(0,0,0,0.7)',
+                            color: 'white',
+                            padding: '4px 8px',
+                            borderRadius: '4px',
+                            fontSize: '12px'
+                          }}>
+                            デフォルト画像
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="tile-preview-section">
+                    <h4>バイクタイル画像</h4>
+                    <div className="tile-preview">
+                      {!settings.tiles?.useDefaultImages && settings.tiles?.bikeImage ? (
+                        <img 
+                          src={settings.tiles.bikeImage} 
+                          alt="カスタムバイク画像"
+                          style={{ 
+                            width: '200px', 
+                            height: '150px', 
+                            objectFit: 'cover',
+                            borderRadius: '8px'
+                          }}
+                        />
+                      ) : (
+                        <div 
+                          style={{ 
+                            width: '200px', 
+                            height: '150px', 
+                            background: 'url(https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80)',
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                            borderRadius: '8px',
+                            position: 'relative'
+                          }}
+                        >
+                          <div style={{
+                            position: 'absolute',
+                            bottom: '8px',
+                            left: '8px',
+                            background: 'rgba(0,0,0,0.7)',
+                            color: 'white',
+                            padding: '4px 8px',
+                            borderRadius: '4px',
+                            fontSize: '12px'
+                          }}>
+                            デフォルト画像
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="tile-upload-controls">
+                  <div className="upload-section">
+                    <h4>車タイル画像をアップロード</h4>
+                    <input
+                      type="file"
+                      id="carTileUpload"
+                      accept="image/*"
+                      onChange={handleCarTileUpload}
+                      style={{ display: 'none' }}
+                    />
+                    <label htmlFor="carTileUpload" className="upload-button">
+                      🚗 車の画像をアップロード
+                    </label>
+                  </div>
+
+                  <div className="upload-section">
+                    <h4>バイクタイル画像をアップロード</h4>
+                    <input
+                      type="file"
+                      id="bikeTileUpload"
+                      accept="image/*"
+                      onChange={handleBikeTileUpload}
+                      style={{ display: 'none' }}
+                    />
+                    <label htmlFor="bikeTileUpload" className="upload-button">
+                      🏍️ バイクの画像をアップロード
+                    </label>
+                  </div>
+
+                  <div className="reset-section">
+                    {(!settings.tiles?.useDefaultImages && (settings.tiles?.carImage || settings.tiles?.bikeImage)) && (
+                      <button 
+                        type="button" 
+                        onClick={resetTilesToDefault}
+                        className="reset-icon-button"
+                      >
+                        🔄 デフォルト画像に戻す
+                      </button>
+                    )}
+                  </div>
+
+                  <p className="upload-info">
+                    • 推奨サイズ: 600x400px 以上<br/>
+                    • 対応形式: PNG, JPG, WEBP<br/>
+                    • 最大サイズ: 3MB<br/>
+                    • 車やバイクがはっきり見える写真を推奨
                   </p>
                 </div>
               </div>

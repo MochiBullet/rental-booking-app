@@ -12,6 +12,11 @@ export const initialSiteSettings = {
     backgroundImages: [], // カスタム背景画像（Base64形式の配列）
     useDefaultImages: true // デフォルト画像を使用するか
   },
+  tiles: {
+    carImage: null, // カスタム車タイル画像（Base64形式）
+    bikeImage: null, // カスタムバイクタイル画像（Base64形式）
+    useDefaultImages: true // デフォルト画像を使用するか
+  },
   features: [
     {
       title: "🚗 多彩な車両",

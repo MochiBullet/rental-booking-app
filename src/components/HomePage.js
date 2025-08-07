@@ -35,6 +35,12 @@ function HomePage() {
     'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=1920&q=80', // バイク
   ];
 
+  // デフォルトタイル画像
+  const defaultTileImages = {
+    car: 'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=600&q=80', // 美しい車
+    bike: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80' // スポーツバイク
+  };
+
   useEffect(() => {
     // サイト設定を読み込み
     setSiteSettings(siteSettingsManager.getSettings());
@@ -64,6 +70,19 @@ function HomePage() {
   const getDoubledImages = () => {
     const images = getBackgroundImages();
     return [...images, ...images]; // 画像を2回繰り返す
+  };
+
+  // タイル画像を取得する関数
+  const getTileImage = (type) => {
+    if (siteSettings?.tiles?.useDefaultImages === false) {
+      if (type === 'car' && siteSettings?.tiles?.carImage) {
+        return siteSettings.tiles.carImage;
+      }
+      if (type === 'bike' && siteSettings?.tiles?.bikeImage) {
+        return siteSettings.tiles.bikeImage;
+      }
+    }
+    return defaultTileImages[type];
   };
 
   return (
@@ -99,15 +118,14 @@ function HomePage() {
         
         <div className="vehicle-tiles">
           <div className="vehicle-tile car-tile" onClick={() => navigate('/vehicles/car')}>
+            <div className="tile-image">
+              <img 
+                src={getTileImage('car')} 
+                alt="車レンタル" 
+                className="tile-img"
+              />
+            </div>
             <div className="tile-content">
-              <div className="tile-icon">
-                <svg viewBox="0 0 100 100" width="80" height="80">
-                  <rect x="20" y="40" width="60" height="25" rx="5" fill="#2d7a2d"/>
-                  <rect x="25" y="30" width="50" height="15" rx="3" fill="#3a9a3a"/>
-                  <circle cx="30" cy="65" r="8" fill="#1a5a1a"/>
-                  <circle cx="70" cy="65" r="8" fill="#1a5a1a"/>
-                </svg>
-              </div>
               <h3 className="tile-title">{homeContent.carTile.title}</h3>
               <p className="tile-description">
                 {homeContent.carTile.description.split('\n').map((line, i) => (
@@ -127,16 +145,14 @@ function HomePage() {
           </div>
 
           <div className="vehicle-tile bike-tile" onClick={() => navigate('/vehicles/bike')}>
+            <div className="tile-image">
+              <img 
+                src={getTileImage('bike')} 
+                alt="バイクレンタル" 
+                className="tile-img"
+              />
+            </div>
             <div className="tile-content">
-              <div className="tile-icon">
-                <svg viewBox="0 0 100 100" width="80" height="80">
-                  <circle cx="25" cy="65" r="10" fill="#1a5a1a"/>
-                  <circle cx="75" cy="65" r="10" fill="#1a5a1a"/>
-                  <path d="M25 65 L40 45 L60 45 L75 65" stroke="#2d7a2d" strokeWidth="4" fill="none"/>
-                  <path d="M40 45 L35 35" stroke="#3a9a3a" strokeWidth="3"/>
-                  <path d="M55 45 L60 30" stroke="#3a9a3a" strokeWidth="3"/>
-                </svg>
-              </div>
               <h3 className="tile-title">{homeContent.bikeTile.title}</h3>
               <p className="tile-description">
                 {homeContent.bikeTile.description.split('\n').map((line, i) => (

@@ -139,7 +139,10 @@ function AppContent() {
               ) : user ? (
                 <div className="user-menu">
                   <Link to="/mypage" className="mypage-link">マイページ</Link>
-                  <span className="welcome-text">ようこそ、{user.name}様</span>
+                  <div className="welcome-text">
+                    <span className="greeting">ようこそ</span>
+                    <span className="username">{user.name}様</span>
+                  </div>
                   <button className="logout-btn" onClick={handleLogout}>ログアウト</button>
                 </div>
               ) : (
