@@ -23,6 +23,12 @@ function App() {
       setUser(JSON.parse(savedUser));
     }
     
+    // 管理者ログイン状態を復元
+    const adminUser = localStorage.getItem('adminUser');
+    if (adminUser === 'true') {
+      setIsAdmin(true);
+    }
+    
     // サイト設定を読み込んでCSSに適用
     const savedSettings = localStorage.getItem('siteSettings');
     if (savedSettings) {
@@ -66,7 +72,7 @@ function App() {
     setUser(null);
     setIsAdmin(false);
     localStorage.removeItem('currentUser');
-    localStorage.removeItem('isAdmin');
+    localStorage.removeItem('adminUser');
   };
 
   return (
