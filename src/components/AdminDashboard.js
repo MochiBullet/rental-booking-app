@@ -5,6 +5,8 @@ import './AdminDashboard.css';
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('overview');
+  const [detailsType, setDetailsType] = useState(null);
+  const [monthlyStats, setMonthlyStats] = useState({});
   const [stats, setStats] = useState({
     totalBookings: 0,
     activeBookings: 0,
@@ -351,6 +353,80 @@ const AdminDashboard = () => {
     }
   };
 
+  // 統計カードクリックハンドラー
+  const handleCardClick = (type) => {
+    setDetailsType(type);
+    setActiveSection('details');
+    calculateMonthlyStats(type);
+    showNotification(`📊 ${getTypeDisplayName(type)}の詳細データを表示中...`, 'info');
+  };
+
+  // タイプの表示名を取得
+  const getTypeDisplayName = (type) => {
+    switch (type) {
+      case 'confirmed': return '予約確定';
+      case 'cancelled': return 'キャンセル';
+      case 'active': return '進行中';
+      case 'completed': return '完了済み';
+      case 'revenue': return '実収益';
+      case 'cancelled-revenue': return 'キャンセル損失';
+      default: return type;
+    }
+  };
+
+  // 月ごとの集計を計算
+  const calculateMonthlyStats = (type) => {
+    const now = new Date();
+    const months = [];
+    
+    // 過去12ヶ月のデータを生成
+    for (let i = 11; i >= 0; i--) {
+      const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const monthKey = date.toISOString().slice(0, 7); // YYYY-MM
+      months.push({
+        key: monthKey,
+        name: date.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long' }),
+        data: 0
+      });
+    }
+
+    // 予約データから月ごとの集計を計算
+    bookings.forEach(booking => {
+      const bookingDate = new Date(booking.bookingDate || booking.pickupDate);
+      const monthKey = bookingDate.toISOString().slice(0, 7);
+      const monthIndex = months.findIndex(m => m.key === monthKey);
+      
+      if (monthIndex !== -1) {
+        switch (type) {
+          case 'confirmed':
+            if (booking.status === 'confirmed') months[monthIndex].data++;
+            break;
+          case 'cancelled':
+            if (booking.status === 'cancelled') months[monthIndex].data++;
+            break;
+          case 'active':
+            if (booking.status === 'active') months[monthIndex].data++;
+            break;
+          case 'completed':
+            if (booking.status === 'completed') months[monthIndex].data++;
+            break;
+          case 'revenue':
+            if (booking.status === 'confirmed' || booking.status === 'completed') {
+              months[monthIndex].data += booking.totalPrice || 0;
+            }
+            break;
+          case 'cancelled-revenue':
+            if (booking.status === 'cancelled') {
+              months[monthIndex].data += booking.totalPrice || 0;
+            }
+            break;
+        }
+      }
+    });
+
+    setMonthlyStats({ type, months });
+  };
+
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('ja-JP', {
       style: 'currency',
@@ -433,6 +509,7 @@ const AdminDashboard = () => {
             {activeSection === 'analytics' && 'Sales Analytics'}
             {activeSection === 'settings' && 'Site Settings'}
             {activeSection === 'content' && 'Content Editor'}
+            {activeSection === 'details' && `詳細分析 - ${getTypeDisplayName(detailsType)}`}
           </h1>
           <div className="admin-header-info">
             <span className="admin-date">{new Date().toLocaleDateString('ja-JP')}</span>
@@ -444,58 +521,64 @@ const AdminDashboard = () => {
           {activeSection === 'overview' && (
             <div className="overview-section">
               <div className="stats-grid">
-                <div className="stat-card confirmed">
+                <div className="stat-card confirmed clickable" onClick={() => handleCardClick('confirmed')}>
                   <div className="stat-icon">✅</div>
                   <div className="stat-details">
                     <h3>予約確定</h3>
                     <p className="stat-number">{stats.confirmedBookings}</p>
                     <span className="stat-label">Confirmed</span>
                   </div>
+                  <div className="card-arrow">▶</div>
                 </div>
                 
-                <div className="stat-card cancelled">
+                <div className="stat-card cancelled clickable" onClick={() => handleCardClick('cancelled')}>
                   <div className="stat-icon">❌</div>
                   <div className="stat-details">
                     <h3>キャンセル</h3>
                     <p className="stat-number">{stats.cancelledBookings}</p>
                     <span className="stat-label">Cancelled</span>
                   </div>
+                  <div className="card-arrow">▶</div>
                 </div>
                 
-                <div className="stat-card active">
+                <div className="stat-card active clickable" onClick={() => handleCardClick('active')}>
                   <div className="stat-icon">🚀</div>
                   <div className="stat-details">
                     <h3>進行中</h3>
                     <p className="stat-number">{stats.activeBookings}</p>
                     <span className="stat-label">Active</span>
                   </div>
+                  <div className="card-arrow">▶</div>
                 </div>
                 
-                <div className="stat-card completed">
+                <div className="stat-card completed clickable" onClick={() => handleCardClick('completed')}>
                   <div className="stat-icon">🏁</div>
                   <div className="stat-details">
                     <h3>完了済み</h3>
                     <p className="stat-number">{stats.completedBookings}</p>
                     <span className="stat-label">Completed</span>
                   </div>
+                  <div className="card-arrow">▶</div>
                 </div>
                 
-                <div className="stat-card revenue">
+                <div className="stat-card revenue clickable" onClick={() => handleCardClick('revenue')}>
                   <div className="stat-icon">💰</div>
                   <div className="stat-details">
                     <h3>実収益</h3>
                     <p className="stat-number">{formatCurrency(stats.totalRevenue)}</p>
                     <span className="stat-label">確定・完了のみ</span>
                   </div>
+                  <div className="card-arrow">▶</div>
                 </div>
                 
-                <div className="stat-card cancelled-revenue">
+                <div className="stat-card cancelled-revenue clickable" onClick={() => handleCardClick('cancelled-revenue')}>
                   <div className="stat-icon">📉</div>
                   <div className="stat-details">
                     <h3>キャンセル損失</h3>
                     <p className="stat-number">{formatCurrency(stats.cancelledRevenue)}</p>
                     <span className="stat-label">Lost Revenue</span>
                   </div>
+                  <div className="card-arrow">▶</div>
                 </div>
                 
                 <div className="stat-card">
@@ -1090,6 +1173,130 @@ const AdminDashboard = () => {
                     コンテンツを保存
                   </button>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {activeSection === 'details' && detailsType && (
+            <div className="details-section">
+              <div className="details-header">
+                <button 
+                  className="back-to-overview-btn"
+                  onClick={() => setActiveSection('overview')}
+                >
+                  ← Overview に戻る
+                </button>
+                <h2>{getTypeDisplayName(detailsType)}の詳細分析</h2>
+                <p className="details-subtitle">過去12ヶ月の月別推移</p>
+              </div>
+
+              <div className="monthly-chart">
+                <div className="chart-container">
+                  <div className="chart-bars">
+                    {monthlyStats.months && monthlyStats.months.map((month, index) => {
+                      const maxValue = Math.max(...monthlyStats.months.map(m => m.data), 1);
+                      const height = (month.data / maxValue) * 200;
+                      const isRevenue = detailsType.includes('revenue');
+                      
+                      return (
+                        <div key={month.key} className="chart-bar-group">
+                          <div 
+                            className={`chart-bar ${detailsType}`}
+                            style={{ height: `${height}px` }}
+                          >
+                            <div className="bar-value">
+                              {isRevenue ? formatCurrency(month.data) : month.data}
+                            </div>
+                          </div>
+                          <div className="chart-label">
+                            {month.name.split(' ')[1]}月
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              <div className="details-summary">
+                <div className="summary-grid">
+                  <div className="summary-card">
+                    <h3>合計</h3>
+                    <p className="summary-number">
+                      {monthlyStats.months && 
+                        (detailsType.includes('revenue') ? 
+                          formatCurrency(monthlyStats.months.reduce((sum, m) => sum + m.data, 0)) :
+                          monthlyStats.months.reduce((sum, m) => sum + m.data, 0))
+                      }
+                    </p>
+                  </div>
+                  <div className="summary-card">
+                    <h3>月平均</h3>
+                    <p className="summary-number">
+                      {monthlyStats.months && 
+                        (detailsType.includes('revenue') ? 
+                          formatCurrency(monthlyStats.months.reduce((sum, m) => sum + m.data, 0) / 12) :
+                          Math.round(monthlyStats.months.reduce((sum, m) => sum + m.data, 0) / 12))
+                      }
+                    </p>
+                  </div>
+                  <div className="summary-card">
+                    <h3>最高記録</h3>
+                    <p className="summary-number">
+                      {monthlyStats.months && 
+                        (detailsType.includes('revenue') ? 
+                          formatCurrency(Math.max(...monthlyStats.months.map(m => m.data))) :
+                          Math.max(...monthlyStats.months.map(m => m.data)))
+                      }
+                    </p>
+                  </div>
+                  <div className="summary-card">
+                    <h3>今月</h3>
+                    <p className="summary-number">
+                      {monthlyStats.months && monthlyStats.months[11] &&
+                        (detailsType.includes('revenue') ? 
+                          formatCurrency(monthlyStats.months[11].data) :
+                          monthlyStats.months[11].data)
+                      }
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="details-table">
+                <h3>月別詳細データ</h3>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>月</th>
+                      <th>{detailsType.includes('revenue') ? '金額' : '件数'}</th>
+                      <th>前月比</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {monthlyStats.months && monthlyStats.months.map((month, index) => {
+                      const prevMonth = index > 0 ? monthlyStats.months[index - 1] : null;
+                      const change = prevMonth ? month.data - prevMonth.data : 0;
+                      const changePercent = prevMonth && prevMonth.data > 0 ? 
+                        Math.round((change / prevMonth.data) * 100) : 0;
+                      
+                      return (
+                        <tr key={month.key}>
+                          <td>{month.name}</td>
+                          <td>
+                            {detailsType.includes('revenue') ? 
+                              formatCurrency(month.data) : month.data
+                            }
+                          </td>
+                          <td className={change >= 0 ? 'positive' : 'negative'}>
+                            {change >= 0 ? '+' : ''}{changePercent}%
+                            {change >= 0 ? ' ↗' : ' ↘'}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
             </div>
           )}
