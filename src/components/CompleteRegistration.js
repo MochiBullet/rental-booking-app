@@ -28,7 +28,7 @@ const CompleteRegistration = () => {
     
     // License Information
     licenseNumber: '',
-    licenseType: 'regular',
+    licenseTypes: [],  // 複数の免許種類を配列で保持
     issueDate: '',
     expiryDate: '',
     licenseColor: 'blue',
@@ -228,6 +228,7 @@ const CompleteRegistration = () => {
         
       case 3:
         if (!formData.licenseNumber) newErrors.licenseNumber = '免許証番号を入力してください';
+        if (!formData.licenseTypes || formData.licenseTypes.length === 0) newErrors.licenseTypes = '保有免許を少なくとも1つ選択してください';
         if (!formData.issueDate) newErrors.issueDate = '交付日を入力してください';
         if (!formData.expiryDate) newErrors.expiryDate = '有効期限を入力してください';
         if (!formData.licenseFront) newErrors.licenseFront = '免許証（表面）をアップロードしてください';
@@ -293,7 +294,7 @@ const CompleteRegistration = () => {
         },
         license: {
           number: formData.licenseNumber,
-          type: formData.licenseType,
+          types: formData.licenseTypes,  // 複数の免許種類
           issueDate: formData.issueDate,
           expiryDate: formData.expiryDate,
           color: formData.licenseColor,
@@ -587,15 +588,509 @@ const CompleteRegistration = () => {
               </div>
               
               <div className="form-field">
-                <label>免許の種類 *</label>
-                <select name="licenseType" value={formData.licenseType} onChange={handleInputChange}>
-                  <option value="regular">普通免許</option>
-                  <option value="regular_at">普通免許（AT限定）</option>
-                  <option value="large">大型免許</option>
-                  <option value="medium">中型免許</option>
-                  <option value="motorcycle">普通二輪免許</option>
-                  <option value="large_motorcycle">大型二輪免許</option>
-                </select>
+                <label>保有免許 *</label>
+                <div className="license-types-container">
+                  <div className="license-category">
+                    <h4>自動車免許</h4>
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        value="regular"
+                        checked={formData.licenseTypes.includes('regular')}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (e.target.checked) {
+                            setFormData(prev => ({
+                              ...prev,
+                              licenseTypes: [...prev.licenseTypes, value]
+                            }));
+                          } else {
+                            setFormData(prev => ({
+                              ...prev,
+                              licenseTypes: prev.licenseTypes.filter(t => t !== value)
+                            }));
+                          }
+                        }}
+                      />
+                      <span>普通免許</span>
+                    </label>
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        value="regular_at"
+                        checked={formData.licenseTypes.includes('regular_at')}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (e.target.checked) {
+                            setFormData(prev => ({
+                              ...prev,
+                              licenseTypes: [...prev.licenseTypes, value]
+                            }));
+                          } else {
+                            setFormData(prev => ({
+                              ...prev,
+                              licenseTypes: prev.licenseTypes.filter(t => t !== value)
+                            }));
+                          }
+                        }}
+                      />
+                      <span>普通免許（AT限定）</span>
+                    </label>
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        value="semi_medium"
+                        checked={formData.licenseTypes.includes('semi_medium')}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (e.target.checked) {
+                            setFormData(prev => ({
+                              ...prev,
+                              licenseTypes: [...prev.licenseTypes, value]
+                            }));
+                          } else {
+                            setFormData(prev => ({
+                              ...prev,
+                              licenseTypes: prev.licenseTypes.filter(t => t !== value)
+                            }));
+                          }
+                        }}
+                      />
+                      <span>準中型免許</span>
+                    </label>
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        value="semi_medium_5t"
+                        checked={formData.licenseTypes.includes('semi_medium_5t')}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (e.target.checked) {
+                            setFormData(prev => ({
+                              ...prev,
+                              licenseTypes: [...prev.licenseTypes, value]
+                            }));
+                          } else {
+                            setFormData(prev => ({
+                              ...prev,
+                              licenseTypes: prev.licenseTypes.filter(t => t !== value)
+                            }));
+                          }
+                        }}
+                      />
+                      <span>準中型免許（5t限定）</span>
+                    </label>
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        value="medium"
+                        checked={formData.licenseTypes.includes('medium')}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (e.target.checked) {
+                            setFormData(prev => ({
+                              ...prev,
+                              licenseTypes: [...prev.licenseTypes, value]
+                            }));
+                          } else {
+                            setFormData(prev => ({
+                              ...prev,
+                              licenseTypes: prev.licenseTypes.filter(t => t !== value)
+                            }));
+                          }
+                        }}
+                      />
+                      <span>中型免許</span>
+                    </label>
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        value="medium_8t"
+                        checked={formData.licenseTypes.includes('medium_8t')}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (e.target.checked) {
+                            setFormData(prev => ({
+                              ...prev,
+                              licenseTypes: [...prev.licenseTypes, value]
+                            }));
+                          } else {
+                            setFormData(prev => ({
+                              ...prev,
+                              licenseTypes: prev.licenseTypes.filter(t => t !== value)
+                            }));
+                          }
+                        }}
+                      />
+                      <span>中型免許（8t限定）</span>
+                    </label>
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        value="large"
+                        checked={formData.licenseTypes.includes('large')}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (e.target.checked) {
+                            setFormData(prev => ({
+                              ...prev,
+                              licenseTypes: [...prev.licenseTypes, value]
+                            }));
+                          } else {
+                            setFormData(prev => ({
+                              ...prev,
+                              licenseTypes: prev.licenseTypes.filter(t => t !== value)
+                            }));
+                          }
+                        }}
+                      />
+                      <span>大型免許</span>
+                    </label>
+                  </div>
+                  
+                  <div className="license-category">
+                    <h4>二輪免許</h4>
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        value="moped"
+                        checked={formData.licenseTypes.includes('moped')}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (e.target.checked) {
+                            setFormData(prev => ({
+                              ...prev,
+                              licenseTypes: [...prev.licenseTypes, value]
+                            }));
+                          } else {
+                            setFormData(prev => ({
+                              ...prev,
+                              licenseTypes: prev.licenseTypes.filter(t => t !== value)
+                            }));
+                          }
+                        }}
+                      />
+                      <span>原動機付自転車免許</span>
+                    </label>
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        value="small_motorcycle"
+                        checked={formData.licenseTypes.includes('small_motorcycle')}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (e.target.checked) {
+                            setFormData(prev => ({
+                              ...prev,
+                              licenseTypes: [...prev.licenseTypes, value]
+                            }));
+                          } else {
+                            setFormData(prev => ({
+                              ...prev,
+                              licenseTypes: prev.licenseTypes.filter(t => t !== value)
+                            }));
+                          }
+                        }}
+                      />
+                      <span>小型限定普通二輪免許</span>
+                    </label>
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        value="small_motorcycle_at"
+                        checked={formData.licenseTypes.includes('small_motorcycle_at')}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (e.target.checked) {
+                            setFormData(prev => ({
+                              ...prev,
+                              licenseTypes: [...prev.licenseTypes, value]
+                            }));
+                          } else {
+                            setFormData(prev => ({
+                              ...prev,
+                              licenseTypes: prev.licenseTypes.filter(t => t !== value)
+                            }));
+                          }
+                        }}
+                      />
+                      <span>小型限定普通二輪免許（AT限定）</span>
+                    </label>
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        value="motorcycle"
+                        checked={formData.licenseTypes.includes('motorcycle')}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (e.target.checked) {
+                            setFormData(prev => ({
+                              ...prev,
+                              licenseTypes: [...prev.licenseTypes, value]
+                            }));
+                          } else {
+                            setFormData(prev => ({
+                              ...prev,
+                              licenseTypes: prev.licenseTypes.filter(t => t !== value)
+                            }));
+                          }
+                        }}
+                      />
+                      <span>普通二輪免許</span>
+                    </label>
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        value="motorcycle_at"
+                        checked={formData.licenseTypes.includes('motorcycle_at')}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (e.target.checked) {
+                            setFormData(prev => ({
+                              ...prev,
+                              licenseTypes: [...prev.licenseTypes, value]
+                            }));
+                          } else {
+                            setFormData(prev => ({
+                              ...prev,
+                              licenseTypes: prev.licenseTypes.filter(t => t !== value)
+                            }));
+                          }
+                        }}
+                      />
+                      <span>普通二輪免許（AT限定）</span>
+                    </label>
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        value="large_motorcycle"
+                        checked={formData.licenseTypes.includes('large_motorcycle')}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (e.target.checked) {
+                            setFormData(prev => ({
+                              ...prev,
+                              licenseTypes: [...prev.licenseTypes, value]
+                            }));
+                          } else {
+                            setFormData(prev => ({
+                              ...prev,
+                              licenseTypes: prev.licenseTypes.filter(t => t !== value)
+                            }));
+                          }
+                        }}
+                      />
+                      <span>大型二輪免許</span>
+                    </label>
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        value="large_motorcycle_at"
+                        checked={formData.licenseTypes.includes('large_motorcycle_at')}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (e.target.checked) {
+                            setFormData(prev => ({
+                              ...prev,
+                              licenseTypes: [...prev.licenseTypes, value]
+                            }));
+                          } else {
+                            setFormData(prev => ({
+                              ...prev,
+                              licenseTypes: prev.licenseTypes.filter(t => t !== value)
+                            }));
+                          }
+                        }}
+                      />
+                      <span>大型二輪免許（AT限定）</span>
+                    </label>
+                  </div>
+                  
+                  <div className="license-category">
+                    <h4>特殊免許</h4>
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        value="large_special"
+                        checked={formData.licenseTypes.includes('large_special')}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (e.target.checked) {
+                            setFormData(prev => ({
+                              ...prev,
+                              licenseTypes: [...prev.licenseTypes, value]
+                            }));
+                          } else {
+                            setFormData(prev => ({
+                              ...prev,
+                              licenseTypes: prev.licenseTypes.filter(t => t !== value)
+                            }));
+                          }
+                        }}
+                      />
+                      <span>大型特殊免許</span>
+                    </label>
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        value="small_special"
+                        checked={formData.licenseTypes.includes('small_special')}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (e.target.checked) {
+                            setFormData(prev => ({
+                              ...prev,
+                              licenseTypes: [...prev.licenseTypes, value]
+                            }));
+                          } else {
+                            setFormData(prev => ({
+                              ...prev,
+                              licenseTypes: prev.licenseTypes.filter(t => t !== value)
+                            }));
+                          }
+                        }}
+                      />
+                      <span>小型特殊免許</span>
+                    </label>
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        value="towing"
+                        checked={formData.licenseTypes.includes('towing')}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (e.target.checked) {
+                            setFormData(prev => ({
+                              ...prev,
+                              licenseTypes: [...prev.licenseTypes, value]
+                            }));
+                          } else {
+                            setFormData(prev => ({
+                              ...prev,
+                              licenseTypes: prev.licenseTypes.filter(t => t !== value)
+                            }));
+                          }
+                        }}
+                      />
+                      <span>けん引免許</span>
+                    </label>
+                  </div>
+                  
+                  <div className="license-category">
+                    <h4>第二種免許</h4>
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        value="regular_second"
+                        checked={formData.licenseTypes.includes('regular_second')}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (e.target.checked) {
+                            setFormData(prev => ({
+                              ...prev,
+                              licenseTypes: [...prev.licenseTypes, value]
+                            }));
+                          } else {
+                            setFormData(prev => ({
+                              ...prev,
+                              licenseTypes: prev.licenseTypes.filter(t => t !== value)
+                            }));
+                          }
+                        }}
+                      />
+                      <span>普通第二種免許</span>
+                    </label>
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        value="medium_second"
+                        checked={formData.licenseTypes.includes('medium_second')}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (e.target.checked) {
+                            setFormData(prev => ({
+                              ...prev,
+                              licenseTypes: [...prev.licenseTypes, value]
+                            }));
+                          } else {
+                            setFormData(prev => ({
+                              ...prev,
+                              licenseTypes: prev.licenseTypes.filter(t => t !== value)
+                            }));
+                          }
+                        }}
+                      />
+                      <span>中型第二種免許</span>
+                    </label>
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        value="large_second"
+                        checked={formData.licenseTypes.includes('large_second')}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (e.target.checked) {
+                            setFormData(prev => ({
+                              ...prev,
+                              licenseTypes: [...prev.licenseTypes, value]
+                            }));
+                          } else {
+                            setFormData(prev => ({
+                              ...prev,
+                              licenseTypes: prev.licenseTypes.filter(t => t !== value)
+                            }));
+                          }
+                        }}
+                      />
+                      <span>大型第二種免許</span>
+                    </label>
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        value="large_special_second"
+                        checked={formData.licenseTypes.includes('large_special_second')}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (e.target.checked) {
+                            setFormData(prev => ({
+                              ...prev,
+                              licenseTypes: [...prev.licenseTypes, value]
+                            }));
+                          } else {
+                            setFormData(prev => ({
+                              ...prev,
+                              licenseTypes: prev.licenseTypes.filter(t => t !== value)
+                            }));
+                          }
+                        }}
+                      />
+                      <span>大型特殊第二種免許</span>
+                    </label>
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        value="towing_second"
+                        checked={formData.licenseTypes.includes('towing_second')}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (e.target.checked) {
+                            setFormData(prev => ({
+                              ...prev,
+                              licenseTypes: [...prev.licenseTypes, value]
+                            }));
+                          } else {
+                            setFormData(prev => ({
+                              ...prev,
+                              licenseTypes: prev.licenseTypes.filter(t => t !== value)
+                            }));
+                          }
+                        }}
+                      />
+                      <span>けん引第二種免許</span>
+                    </label>
+                  </div>
+                </div>
+                {errors.licenseTypes && <span className="error">{errors.licenseTypes}</span>}
               </div>
               
               <div className="form-row">

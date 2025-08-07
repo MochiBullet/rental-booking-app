@@ -506,6 +506,74 @@
   }
 }
 
+/* 免許証種類のスタイル */
+.license-types-container {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 10px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.license-category {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.license-category:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.license-category h4 {
+  color: #2e7d32;
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
+
+.license-types-container .checkbox-label {
+  padding: 0.5rem;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+  margin-bottom: 0.5rem;
+}
+
+.license-types-container .checkbox-label:hover {
+  background-color: #e8f5e9;
+}
+
+.license-types-container input[type="checkbox"] {
+  margin-right: 0.75rem;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.license-types-container input[type="checkbox"]:checked {
+  accent-color: #43a047;
+}
+
+/* スクロールバーのスタイル */
+.license-types-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.license-types-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.license-types-container::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+.license-types-container::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
 /* モバイル対応 */
 @media (max-width: 768px) {
   .postal-code-field {
@@ -516,5 +584,10 @@
   .address-search-btn {
     min-width: auto;
     width: 100%;
+  }
+  
+  .license-types-container {
+    max-height: 300px;
+    padding: 1rem;
   }
 }
