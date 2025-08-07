@@ -24,6 +24,11 @@ jobs:
         node --version
         npm ci || npm install
     
+    - name: Fix permissions
+      run: |
+        chmod +x node_modules/.bin/react-scripts
+        ls -la node_modules/.bin/react-scripts
+    
     - name: Build application
       run: npm run build
       env:
