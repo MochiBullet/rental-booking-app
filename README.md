@@ -1,101 +1,104 @@
-# レンタル予約サービス - AWS S3 自動デプロイ設定
+# 車・バイクレンタル予約サイト (RentalEasy)
 
-## セットアップ手順
+React で作成した車とバイクのレンタル予約システムです。
 
-### 1. AWS S3バケットの設定
+## 📚 ドキュメント構成
 
-1. AWS S3でバケットを作成（まだの場合）
-2. バケットの「プロパティ」→「静的ウェブサイトホスティング」を有効化
-3. インデックスドキュメント: `index.html`
-4. エラードキュメント: `index.html` (React SPAの場合)
+- **[実装計画](docs/planning/IMPLEMENTATION_PLAN.md)** - 実稼働に向けた段階的計画
+- **[TODO一覧](docs/planning/TODO.md)** - 実装が必要な機能リスト
+- **[開発履歴](docs/development/CHANGELOG.md)** - これまでの開発記録
+- **[デプロイガイド](docs/deployment/)** - AWS/Vercel等へのデプロイ方法
 
-### 2. S3バケットポリシーの設定
+## 機能
 
-バケットの「アクセス許可」→「バケットポリシー」に以下を追加：
+- 🚗 車両一覧表示（車・バイク）
+- 🔍 車種・料金での絞り込み・並び替え
+- 📅 予約フォーム（日付選択・料金計算）
+- 📱 レスポンシブデザイン
+- ✅ フォームバリデーション
+- 💰 リアルタイム料金計算
+- 👤 会員登録・ログイン機能
+- 🔐 管理者ダッシュボード
+- 🎁 ポイントシステム
 
-```json
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "PublicReadGetObject",
-            "Effect": "Allow",
-            "Principal": "*",
-            "Action": "s3:GetObject",
-            "Resource": "arn:aws:s3:::YOUR-BUCKET-NAME/*"
-        }
-    ]
-}
+## 車両の種類
+
+### 車
+- トヨタ プリウス（エコカー）- ¥8,000/日
+- ホンダ フリード（ミニバン）- ¥9,500/日
+- 日産 軽自動車 - ¥6,000/日
+- BMW X3（SUV）- ¥15,000/日
+
+### バイク
+- ヤマハ MT-07（スポーツバイク）- ¥4,000/日
+- ホンダ PCX160（スクーター）- ¥3,000/日
+- カワサキ Ninja 400（スポーツバイク）- ¥5,000/日
+- ハーレーダビッドソン（クルーザー）- ¥8,000/日
+
+## セットアップ
+
+1. 依存関係のインストール:
+   ```bash
+   npm install
+   ```
+
+2. 開発サーバーの起動:
+   ```bash
+   npm start
+   ```
+
+3. ブラウザで `http://localhost:3000` を開く
+
+## テストアカウント
+
+- **会員ログイン**: test@example.com / password123
+- **管理者アクセス**: ロゴ「RentalEasy」を10回連続クリック → admin / rental123
+
+## プロジェクト構造
+
+```
+src/
+├── components/          # Reactコンポーネント
+│   ├── Header.jsx      # ヘッダーナビゲーション
+│   ├── Hero.jsx        # ヒーローセクション
+│   ├── VehicleList.jsx # 車両一覧
+│   ├── VehicleCard.jsx # 車両カード
+│   ├── ReservationForm.jsx # 予約フォーム
+│   ├── MemberRegistration.jsx # 会員登録
+│   ├── MemberLogin.jsx # 会員ログイン
+│   ├── AdminDashboard.jsx # 管理者ダッシュボード
+│   └── その他のコンポーネント
+├── data/
+│   ├── vehicleData.js  # 車両データ
+│   ├── memberData.js   # 会員データ
+│   └── siteSettings.js # サイト設定
+├── utils/
+│   └── memberUtils.js  # 会員関連ユーティリティ
+├── App.jsx             # メインアプリケーション
+├── App.css            # スタイルシート
+└── index.js           # エントリーポイント
 ```
 
-### 3. GitHub Secretsの設定
+## 使用技術
 
-GitHubリポジトリの Settings → Secrets and variables → Actions で以下のシークレットを追加：
+- React 18
+- CSS3（Grid、Flexbox）
+- JavaScript ES6+
 
-- `AWS_ACCESS_KEY_ID`: AWSアクセスキーID
-- `AWS_SECRET_ACCESS_KEY`: AWSシークレットアクセスキー
-- `AWS_REGION`: リージョン（例: ap-northeast-1）
-- `S3_BUCKET_NAME`: S3バケット名
-- `CLOUDFRONT_DISTRIBUTION_ID`: (オプション) CloudFrontを使用する場合
+## デプロイ
 
-### 4. デプロイの実行
+### AWS S3 + GitHub Actions
 
-1. このコードをGitHubリポジトリにプッシュ
-```bash
-git add .
-git commit -m "Add S3 deployment configuration"
-git remote add origin https://github.com/YOUR-USERNAME/rental-booking-app.git
-git push -u origin main
-```
+1. AWS S3バケットの作成と設定
+2. GitHub Secretsの設定
+3. プッシュで自動デプロイ
 
-2. GitHub Actionsが自動的に実行され、S3にデプロイされます
+詳細は[デプロイガイド](docs/deployment/)を参照してください。
 
-### 5. アクセス確認
+## 今後の拡張予定
 
-S3の静的ウェブサイトホスティングURLでアプリケーションにアクセス：
-`http://YOUR-BUCKET-NAME.s3-website-REGION.amazonaws.com`
-
-## ローカル開発
-
-```bash
-# 依存関係のインストール
-npm install
-
-# 開発サーバーの起動
-npm start
-
-# ビルド
-npm run build
-```
-
-## トラブルシューティング
-
-### デプロイが失敗する場合
-
-1. GitHub Secretsが正しく設定されているか確認
-2. S3バケット名が正しいか確認
-3. IAMユーザーに必要な権限があるか確認（S3FullAccess または カスタムポリシー）
-
-### 必要なIAM権限
-
-```json
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "s3:PutObject",
-                "s3:PutObjectAcl",
-                "s3:GetObject",
-                "s3:DeleteObject",
-                "s3:ListBucket"
-            ],
-            "Resource": [
-                "arn:aws:s3:::YOUR-BUCKET-NAME",
-                "arn:aws:s3:::YOUR-BUCKET-NAME/*"
-            ]
-        }
-    ]
-}
-```
+- バックエンドAPI連携（Hono + Lambda）
+- データベース統合（DynamoDB + Prisma）
+- Turborepoによるモノレポ構成
+- 決済システム統合
+- メール通知機能
