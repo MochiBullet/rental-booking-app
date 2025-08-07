@@ -2,11 +2,11 @@
 
 .home-page {
   min-height: calc(100vh - 160px);
-  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  background: var(--gradient-soft);
 }
 
 .hero-section {
-  background: linear-gradient(135deg, #2e7d32 0%, #43a047 50%, #66bb6a 100%);
+  background: var(--gradient-1);
   color: white;
   padding: 80px 20px;
   text-align: center;
@@ -57,7 +57,7 @@
 .selection-title {
   text-align: center;
   font-size: 2.2rem;
-  background: linear-gradient(135deg, #2e7d32 0%, #43a047 100%);
+  background: var(--gradient-2);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -90,7 +90,7 @@
   left: 0;
   right: 0;
   height: 5px;
-  background: linear-gradient(135deg, #43a047 0%, #66bb6a 100%);
+  background: var(--gradient-2);
   transform: scaleX(0);
   transition: transform 0.4s ease;
 }
@@ -102,7 +102,7 @@
 .vehicle-tile:hover {
   transform: translateY(-10px) scale(1.02);
   box-shadow: 0 20px 60px rgba(67, 160, 71, 0.25);
-  border-color: #43a047;
+  border-color: var(--green);
 }
 
 .tile-content {
@@ -122,7 +122,7 @@
 
 .tile-title {
   font-size: 2rem;
-  background: linear-gradient(135deg, #2e7d32 0%, #43a047 100%);
+  background: var(--gradient-2);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -146,17 +146,17 @@
 }
 
 .feature {
-  background: linear-gradient(135deg, #f1f8e9 0%, #e8f5e9 100%);
+  background: var(--gradient-soft);
   padding: 8px 16px;
   border-radius: 20px;
-  color: #2e7d32;
+  color: var(--green-dark);
   font-size: 0.9rem;
   font-weight: 500;
   border: 1px solid rgba(67, 160, 71, 0.2);
 }
 
 .tile-button {
-  background: linear-gradient(135deg, #43a047 0%, #66bb6a 100%);
+  background: var(--gradient-2);
   color: white;
   border: none;
   padding: 15px 40px;
@@ -211,7 +211,7 @@
   text-align: center;
   padding: 30px;
   border-radius: 15px;
-  background: linear-gradient(135deg, #f9fcf9 0%, #f1f8e9 100%);
+  background: var(--gradient-soft);
   transition: all 0.3s ease;
   border: 1px solid rgba(67, 160, 71, 0.1);
   position: relative;
@@ -252,7 +252,7 @@
 }
 
 .info-card h4 {
-  background: linear-gradient(135deg, #2e7d32 0%, #43a047 100%);
+  background: var(--gradient-2);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

@@ -1,14 +1,15 @@
 /* Instagram-inspired Modern Design System */
 
 :root {
+  /* デフォルト値 - 管理者画面から動的に変更可能 */
   --gradient-1: linear-gradient(135deg, #43a047 0%, #66bb6a 50%, #81c784 100%);
-  --gradient-2: linear-gradient(135deg, #2e7d32 0%, #43a047 100%);
-  --gradient-soft: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  --gradient-2: linear-gradient(135deg, #43a047 0%, #66bb6a 100%);
+  --gradient-soft: linear-gradient(135deg, #43a04722 0%, #66bb6a22 100%);
   --green: #43a047;
-  --green-hover: #388e3c;
-  --green-dark: #2e7d32;
+  --green-hover: #43a047dd;
+  --green-dark: #43a047;
   --green-light: #66bb6a;
-  --green-pale: #e8f5e9;
+  --green-pale: #81c78422;
   --dark-gray: #1b5e20;
   --gray: #689f38;
   --light-gray: #c5e1a5;
