@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { siteSettingsManager, initialSiteSettings } from '../data/siteSettings';
+import { siteSettingsManager, initialSiteSettings, announcementManager } from '../data/siteSettings';
 
 const SiteSettingsManagement = ({ onSettingsUpdate }) => {
   const [settings, setSettings] = useState(initialSiteSettings);
+  const [announcements, setAnnouncements] = useState([]);
+  const [editingAnnouncement, setEditingAnnouncement] = useState(null);
+  const [showAnnouncementForm, setShowAnnouncementForm] = useState(false);
   const [activeSection, setActiveSection] = useState('branding');
 
   useEffect(() => {
     setSettings(siteSettingsManager.getSettings());
+    setAnnouncements(announcementManager.getAllAnnouncements());
   }, []);
 
   const handleSave = () => {
@@ -354,6 +358,78 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
     }
   };
 
+  // お知らせ関連の関数
+  const handleCreateAnnouncement = () => {
+    setEditingAnnouncement({
+      id: null,
+      date: new Date().toISOString().split('T')[0],
+      title: '',
+      content: '',
+      published: false
+    });
+    setShowAnnouncementForm(true);
+  };
+
+  const handleEditAnnouncement = (announcement) => {
+    setEditingAnnouncement(announcement);
+    setShowAnnouncementForm(true);
+  };
+
+  const handleSaveAnnouncement = () => {
+    if (!editingAnnouncement.title.trim()) {
+      alert('タイトルを入力してください');
+      return;
+    }
+
+    if (editingAnnouncement.id) {
+      // 更新
+      announcementManager.updateAnnouncement(editingAnnouncement.id, editingAnnouncement);
+    } else {
+      // 新規作成
+      announcementManager.createAnnouncement(editingAnnouncement);
+    }
+
+    // 状態を更新
+    setAnnouncements(announcementManager.getAllAnnouncements());
+    setShowAnnouncementForm(false);
+    setEditingAnnouncement(null);
+
+    // リアルタイム更新
+    if (onSettingsUpdate) {
+      const updatedSettings = siteSettingsManager.getSettings();
+      onSettingsUpdate(updatedSettings);
+    }
+
+    alert('お知らせを保存しました');
+  };
+
+  const handleDeleteAnnouncement = (id) => {
+    if (window.confirm('このお知らせを削除しますか？')) {
+      announcementManager.deleteAnnouncement(id);
+      setAnnouncements(announcementManager.getAllAnnouncements());
+
+      // リアルタイム更新
+      if (onSettingsUpdate) {
+        const updatedSettings = siteSettingsManager.getSettings();
+        onSettingsUpdate(updatedSettings);
+      }
+
+      alert('お知らせを削除しました');
+    }
+  };
+
+  const handleCancelAnnouncementEdit = () => {
+    setShowAnnouncementForm(false);
+    setEditingAnnouncement(null);
+  };
+
+  const updateEditingAnnouncement = (field, value) => {
+    setEditingAnnouncement(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
   return (
     <div className="site-settings-management">
       <div className="settings-header">
@@ -373,6 +449,7 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
           { key: 'branding', label: '🎨 ブランディング' },
           { key: 'hero-images', label: '🏞️ ヒーロー画像' },
           { key: 'tile-images', label: '🚗 タイル画像' },
+          { key: 'announcements', label: '📢 お知らせ管理' },
           { key: 'hero', label: 'ヒーローセクション' },
           { key: 'features', label: '特徴・機能' },
           { key: 'contact', label: 'お問い合わせ情報' },
@@ -852,6 +929,121 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
                 rows={15}
                 className="terms-textarea"
               />
+            </div>
+          </div>
+        )}
+
+        {activeSection === 'announcements' && (
+          <div className="section">
+            <h3>📢 お知らせ管理</h3>
+            
+            <div className="announcements-header">
+              <button 
+                className="create-announcement-btn" 
+                onClick={handleCreateAnnouncement}
+              >
+                ➕ 新しいお知らせを作成
+              </button>
+            </div>
+
+            {showAnnouncementForm && (
+              <div className="announcement-form">
+                <h4>{editingAnnouncement?.id ? 'お知らせを編集' : '新しいお知らせを作成'}</h4>
+                
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>日付</label>
+                    <input
+                      type="date"
+                      value={editingAnnouncement?.date || ''}
+                      onChange={(e) => updateEditingAnnouncement('date', e.target.value)}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>公開状態</label>
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        checked={editingAnnouncement?.published || false}
+                        onChange={(e) => updateEditingAnnouncement('published', e.target.checked)}
+                      />
+                      公開する
+                    </label>
+                  </div>
+                </div>
+                
+                <div className="form-group">
+                  <label>タイトル</label>
+                  <input
+                    type="text"
+                    value={editingAnnouncement?.title || ''}
+                    onChange={(e) => updateEditingAnnouncement('title', e.target.value)}
+                    placeholder="お知らせのタイトルを入力..."
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label>内容</label>
+                  <textarea
+                    value={editingAnnouncement?.content || ''}
+                    onChange={(e) => updateEditingAnnouncement('content', e.target.value)}
+                    placeholder="お知らせの内容を入力..."
+                    rows={8}
+                  />
+                </div>
+                
+                <div className="form-buttons">
+                  <button className="save-button" onClick={handleSaveAnnouncement}>
+                    💾 保存
+                  </button>
+                  <button className="cancel-button" onClick={handleCancelAnnouncementEdit}>
+                    ❌ キャンセル
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <div className="announcements-list-admin">
+              <h4>現在のお知らせ一覧</h4>
+              
+              {announcements.length === 0 ? (
+                <p className="no-announcements">お知らせがありません。</p>
+              ) : (
+                <div className="announcements-table">
+                  {announcements.map((announcement) => (
+                    <div key={announcement.id} className="announcement-row">
+                      <div className="announcement-info">
+                        <div className="announcement-header-info">
+                          <span className="announcement-date">{announcement.date}</span>
+                          <span className={`announcement-status ${announcement.published ? 'published' : 'draft'}`}>
+                            {announcement.published ? '公開中' : '下書き'}
+                          </span>
+                        </div>
+                        <h5 className="announcement-title">{announcement.title}</h5>
+                        <p className="announcement-preview">
+                          {announcement.content.length > 100 
+                            ? announcement.content.substring(0, 100) + '...' 
+                            : announcement.content}
+                        </p>
+                      </div>
+                      <div className="announcement-actions">
+                        <button 
+                          className="edit-btn" 
+                          onClick={() => handleEditAnnouncement(announcement)}
+                        >
+                          ✏️ 編集
+                        </button>
+                        <button 
+                          className="delete-btn" 
+                          onClick={() => handleDeleteAnnouncement(announcement.id)}
+                        >
+                          🗑️ 削除
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         )}

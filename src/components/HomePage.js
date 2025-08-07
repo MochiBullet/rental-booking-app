@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './HomePage.css';
-import { siteSettingsManager } from '../data/siteSettings';
+import { siteSettingsManager, announcementManager } from '../data/siteSettings';
 
 function HomePage() {
   const navigate = useNavigate();
   const [siteSettings, setSiteSettings] = useState(null);
+  const [announcements, setAnnouncements] = useState([]);
   const [homeContent, setHomeContent] = useState({
     heroTitle: 'あなたの旅を、私たちがサポート',
     heroSubtitle: '安心・安全・快適なレンタルサービス',
@@ -45,6 +46,9 @@ function HomePage() {
     // サイト設定を読み込み
     setSiteSettings(siteSettingsManager.getSettings());
     
+    // お知らせを読み込み
+    setAnnouncements(announcementManager.getPublishedAnnouncements());
+    
     const savedContent = localStorage.getItem('homeContent');
     if (savedContent) {
       setHomeContent(JSON.parse(savedContent));
@@ -53,6 +57,7 @@ function HomePage() {
     // カスタムイベントリスナーを追加（管理者画面からの更新を受け取る）
     const handleSettingsUpdate = () => {
       setSiteSettings(siteSettingsManager.getSettings());
+      setAnnouncements(announcementManager.getPublishedAnnouncements());
     };
     
     window.addEventListener('siteSettingsUpdate', handleSettingsUpdate);
@@ -114,6 +119,21 @@ function HomePage() {
       </div>
 
       <div className="selection-container">
+        {/* お知らせセクション */}
+        {announcements.length > 0 && (
+          <div className="announcements-section">
+            <h3 className="announcements-title">📢 お知らせ</h3>
+            <div className="announcements-list">
+              {announcements.slice(0, 5).map((announcement) => (
+                <div key={announcement.id} className="announcement-item" onClick={() => navigate(`/announcement/${announcement.id}`)}>
+                  <span className="announcement-date">{announcement.date}</span>
+                  <span className="announcement-title">{announcement.title}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        
         <h3 className="selection-title">レンタルする車両を選択してください</h3>
         
         <div className="vehicle-tiles">

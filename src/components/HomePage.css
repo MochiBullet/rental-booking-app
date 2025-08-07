@@ -133,6 +133,72 @@
   margin: 0 auto;
 }
 
+/* お知らせセクション */
+.announcements-section {
+  background: white;
+  border-radius: 15px;
+  padding: 30px;
+  margin-bottom: 40px;
+  box-shadow: 0 5px 20px rgba(67, 160, 71, 0.1);
+  border: 1px solid rgba(67, 160, 71, 0.1);
+}
+
+.announcements-title {
+  font-size: 1.5rem;
+  color: var(--green-dark);
+  margin-bottom: 20px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.announcements-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.announcement-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px 20px;
+  background: var(--green-pale);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+}
+
+.announcement-item:hover {
+  background: rgba(67, 160, 71, 0.1);
+  border-color: var(--green);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(67, 160, 71, 0.2);
+}
+
+.announcement-date {
+  font-size: 0.9rem;
+  color: var(--gray);
+  font-weight: 500;
+  min-width: 100px;
+  background: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  text-align: center;
+}
+
+.announcement-title {
+  font-size: 1rem;
+  color: var(--dark-gray);
+  font-weight: 500;
+  flex: 1;
+  text-decoration: none;
+}
+
+.announcement-title:hover {
+  color: var(--green-dark);
+}
+
 .selection-title {
   text-align: center;
   font-size: 2.2rem;
@@ -377,5 +443,22 @@
   
   .info-cards {
     grid-template-columns: 1fr;
+  }
+  
+  /* お知らせのレスポンシブ対応 */
+  .announcements-section {
+    padding: 20px;
+    margin-bottom: 30px;
+  }
+  
+  .announcement-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .announcement-date {
+    align-self: flex-start;
+    min-width: auto;
   }
 }

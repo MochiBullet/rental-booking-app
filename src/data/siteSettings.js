@@ -17,6 +17,29 @@ export const initialSiteSettings = {
     bikeImage: null, // カスタムバイクタイル画像（Base64形式）
     useDefaultImages: true // デフォルト画像を使用するか
   },
+  announcements: [
+    {
+      id: 1,
+      date: '2024-12-10',
+      title: 'サービス開始のお知らせ',
+      content: 'RentalEasyのサービスを開始しました。お客様に安心で快適なレンタルサービスを提供いたします。',
+      published: true
+    },
+    {
+      id: 2,
+      date: '2024-12-08',
+      title: '新車種の追加のお知らせ',
+      content: '人気のコンパクトカーとSUVタイプを新たに追加しました。より幅広い選択肢でお客様のニーズにお応えします。',
+      published: true
+    },
+    {
+      id: 3,
+      date: '2024-12-05',
+      title: 'キャンペーン情報',
+      content: '新規会員登録キャンペーン実施中！初回利用で20%オフの特典がございます。この機会にぶひご利用ください。',
+      published: true
+    }
+  ],
   features: [
     {
       title: "🚗 多彩な車両",
@@ -112,5 +135,83 @@ export const siteSettingsManager = {
   resetSettings: () => {
     localStorage.removeItem('rentalEasySiteSettings');
     return initialSiteSettings;
+  }
+};
+
+// お知らせ管理ユーティリティ
+export const announcementManager = {
+  // 公開中のお知らせを取得（日付順）
+  getPublishedAnnouncements: () => {
+    const settings = siteSettingsManager.getSettings();
+    return settings.announcements
+      ?.filter(announcement => announcement.published)
+      ?.sort((a, b) => new Date(b.date) - new Date(a.date)) || [];
+  },
+
+  // 全てのお知らせを取得（管理用）
+  getAllAnnouncements: () => {
+    const settings = siteSettingsManager.getSettings();
+    return settings.announcements?.sort((a, b) => new Date(b.date) - new Date(a.date)) || [];
+  },
+
+  // IDでお知らせを取得
+  getAnnouncementById: (id) => {
+    const settings = siteSettingsManager.getSettings();
+    return settings.announcements?.find(announcement => announcement.id === parseInt(id));
+  },
+
+  // お知らせを保存
+  saveAnnouncements: (announcements) => {
+    const settings = siteSettingsManager.getSettings();
+    const updatedSettings = {
+      ...settings,
+      announcements: announcements
+    };
+    siteSettingsManager.saveSettings(updatedSettings);
+    return updatedSettings;
+  },
+
+  // 新しいお知らせを作成
+  createAnnouncement: (announcementData) => {
+    const settings = siteSettingsManager.getSettings();
+    const currentAnnouncements = settings.announcements || [];
+    const maxId = currentAnnouncements.length > 0 ? Math.max(...currentAnnouncements.map(a => a.id)) : 0;
+    
+    const newAnnouncement = {
+      id: maxId + 1,
+      date: announcementData.date || new Date().toISOString().split('T')[0],
+      title: announcementData.title || '',
+      content: announcementData.content || '',
+      published: announcementData.published || false
+    };
+    
+    const updatedAnnouncements = [...currentAnnouncements, newAnnouncement];
+    return this.saveAnnouncements(updatedAnnouncements);
+  },
+
+  // お知らせを更新
+  updateAnnouncement: (id, announcementData) => {
+    const settings = siteSettingsManager.getSettings();
+    const currentAnnouncements = settings.announcements || [];
+    
+    const updatedAnnouncements = currentAnnouncements.map(announcement => 
+      announcement.id === parseInt(id) 
+        ? { ...announcement, ...announcementData }
+        : announcement
+    );
+    
+    return this.saveAnnouncements(updatedAnnouncements);
+  },
+
+  // お知らせを削除
+  deleteAnnouncement: (id) => {
+    const settings = siteSettingsManager.getSettings();
+    const currentAnnouncements = settings.announcements || [];
+    
+    const updatedAnnouncements = currentAnnouncements.filter(
+      announcement => announcement.id !== parseInt(id)
+    );
+    
+    return this.saveAnnouncements(updatedAnnouncements);
   }
 };

@@ -15,6 +15,7 @@ import Terms from './components/Terms';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import ForgotPassword from './components/ForgotPassword';
 import ResetPassword from './components/ResetPassword';
+import AnnouncementDetail from './components/AnnouncementDetail';
 
 function AppContent() {
   const [user, setUser] = useState(null);
@@ -169,6 +170,7 @@ function AppContent() {
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
+          <Route path="/announcement/:id" element={<AnnouncementDetail />} />
         </Routes>
 
         <footer className="main-footer">
