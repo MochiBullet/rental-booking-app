@@ -31,7 +31,7 @@ const AdminDashboard = () => {
     primaryColor: '#43a047',
     secondaryColor: '#66bb6a',
     accentColor: '#81c784',
-    siteName: 'GreenRide',
+    siteName: "M's BASE Rental",
     theme: 'green'
   });
   const [showDesignModal, setShowDesignModal] = useState(false);
@@ -1115,7 +1115,7 @@ const AdminDashboard = () => {
                       background: `linear-gradient(135deg, ${siteSettings.primaryColor} 0%, ${siteSettings.secondaryColor} 100%)`
                     }}
                   >
-                    <div className="preview-logo">GR</div>
+                    <div className="preview-logo">MB</div>
                     <span>{siteSettings.siteName}</span>
                   </div>
                   <div className="preview-content">

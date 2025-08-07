@@ -75,8 +75,8 @@ function App() {
         <header className="main-header">
           <div className="header-container">
             <Link to="/" className="logo-section" onClick={handleLogoClick} style={{cursor: 'pointer', textDecoration: 'none', color: 'inherit'}}>
-              <div className="logo">GR</div>
-              <h1 className="site-title">GreenRide</h1>
+              <div className="logo">MB</div>
+              <h1 className="site-title">M's BASE Rental</h1>
             </Link>
             
             <nav className="header-nav">
@@ -109,7 +109,7 @@ function App() {
 
         <footer className="main-footer">
           <div className="footer-container">
-            <p>&copy; 2024 GreenRide - 信頼のレンタルサービス</p>
+            <p>&copy; 2024 M's BASE Rental - 信頼のレンタルサービス</p>
             <div className="footer-links">
               <a href="#">利用規約</a>
               <a href="#">プライバシーポリシー</a>
