@@ -12,25 +12,25 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        version: 8
+    
     - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
         node-version: '18'
-        cache: 'npm'
+        cache: 'pnpm'
     
     - name: Install dependencies
       run: |
-        npm --version
+        pnpm --version
         node --version
-        npm ci --include=dev || npm install
-    
-    - name: Fix permissions
-      run: |
-        chmod +x node_modules/.bin/react-scripts
-        ls -la node_modules/.bin/react-scripts
+        pnpm install --frozen-lockfile
     
     - name: Build application
-      run: npm run build
+      run: pnpm run build
       env:
         CI: false
     

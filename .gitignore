@@ -4,6 +4,7 @@ node_modules/.cache/
 .cache/
 /.pnp
 .pnp.js
+.pnpm-debug.log*
 
 # Build outputs
 build/
