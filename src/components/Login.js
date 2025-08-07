@@ -16,26 +16,39 @@ function Login({ setUser }) {
     setLoading(true);
 
     setTimeout(() => {
-      // 管理者簡易ログインチェック
+      // テストユーザーログインチェック
       if (formData.email === 'admin' && formData.password === 'admin0123') {
-        const adminUser = {
-          id: 'admin-001',
-          name: '管理者',
-          email: 'admin@system.internal',
-          points: 0,
-          isAdmin: true,
-          memberNumber: 'ADMIN001',
+        const testUser = {
+          id: 'test-001',
+          name: 'テストユーザー',
+          email: 'admin@test.local',
+          points: 2500,
+          memberNumber: 'TEST001',
           createdAt: new Date().toISOString(),
-          // 管理者用の追加情報
-          role: 'administrator',
-          permissions: ['all']
+          // テストユーザー用の追加情報
+          phone: '090-1234-5678',
+          birthDate: '1985-06-15',
+          gender: 'male',
+          address: {
+            postalCode: '1000001',
+            prefecture: '東京都',
+            city: '千代田区',
+            address: '千代田',
+            building: 'テストマンション 101号室'
+          },
+          license: {
+            number: '123456789012',
+            types: ['regular', 'motorcycle'],
+            issueDate: '2020-04-01',
+            expiryDate: '2027-04-01',
+            color: 'gold'
+          }
         };
         
-        localStorage.setItem('currentUser', JSON.stringify(adminUser));
-        localStorage.setItem('adminUser', 'true');
-        setUser(adminUser);
+        localStorage.setItem('currentUser', JSON.stringify(testUser));
+        setUser(testUser);
         setLoading(false);
-        navigate('/admin');
+        navigate('/mypage');
         return;
       }
 
