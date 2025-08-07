@@ -13,6 +13,8 @@ import AdminDashboard from './components/AdminDashboard';
 import ContactForm from './components/ContactForm';
 import Terms from './components/Terms';
 import PrivacyPolicy from './components/PrivacyPolicy';
+import ForgotPassword from './components/ForgotPassword';
+import ResetPassword from './components/ResetPassword';
 
 function AppContent() {
   const [user, setUser] = useState(null);
@@ -122,6 +124,8 @@ function AppContent() {
           <Route path="/contact" element={<ContactForm />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
         </Routes>
 
         <footer className="main-footer">

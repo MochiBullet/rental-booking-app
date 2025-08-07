@@ -91,6 +91,22 @@ function Login({ setUser }) {
           </button>
         </form>
         
+        <div style={{ textAlign: 'center', marginTop: '1rem' }}>
+          <Link 
+            to="/forgot-password" 
+            style={{ 
+              color: '#666', 
+              textDecoration: 'none', 
+              fontSize: '0.9rem',
+              transition: 'color 0.3s ease'
+            }}
+            onMouseOver={(e) => e.target.style.color = '#2d7a2d'}
+            onMouseOut={(e) => e.target.style.color = '#666'}
+          >
+            パスワードをお忘れですか？
+          </Link>
+        </div>
+        
         <div style={{ textAlign: 'center', marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid #eee' }}>
           <p style={{ color: '#666', marginBottom: '0.5rem' }}>アカウントをお持ちでない方は</p>
           <Link to="/register" style={{ color: '#2d7a2d', textDecoration: 'none', fontWeight: '600' }}>新規会員登録</Link>
