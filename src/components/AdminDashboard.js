@@ -35,6 +35,26 @@ const AdminDashboard = () => {
     theme: 'green'
   });
   const [showDesignModal, setShowDesignModal] = useState(false);
+  const [homeContent, setHomeContent] = useState({
+    heroTitle: 'あなたの旅を、私たちがサポート',
+    heroSubtitle: '安心・安全・快適なレンタルサービス',
+    carTile: {
+      title: '車',
+      description: 'ファミリー向けから\nビジネスまで幅広く対応',
+      features: ['最新モデル', '保険完備', '24時間サポート']
+    },
+    bikeTile: {
+      title: 'バイク',
+      description: '街乗りから\nツーリングまで対応',
+      features: ['ヘルメット付', '整備済み', 'ロードサービス']
+    },
+    infoCards: [
+      { icon: '📱', title: '簡単予約', description: '24時間いつでもオンラインで予約可能' },
+      { icon: '🛡️', title: '安心保証', description: '充実の保険と補償制度' },
+      { icon: '💰', title: '明朗会計', description: '追加料金なしの安心価格' },
+      { icon: '🏆', title: '高品質', description: '定期メンテナンス済みの車両' }
+    ]
+  });
 
   // CSS変数を更新する関数を先に定義
   const updateCSSVariables = (settings) => {
@@ -60,6 +80,12 @@ const AdminDashboard = () => {
       if (settings.siteName) {
         document.title = settings.siteName;
       }
+    }
+    
+    // ホームコンテンツも読み込み
+    const savedContent = localStorage.getItem('homeContent');
+    if (savedContent) {
+      setHomeContent(JSON.parse(savedContent));
     }
   };
 
@@ -350,6 +376,13 @@ const AdminDashboard = () => {
             <span className="nav-icon">⚙️</span>
             Site Settings
           </button>
+          <button 
+            className={`${activeSection === 'content' ? 'active' : ''}`}
+            onClick={() => setActiveSection('content')}
+          >
+            <span className="nav-icon">📝</span>
+            Content Editor
+          </button>
         </nav>
         
         <button className="admin-logout-btn" onClick={handleLogout}>
@@ -366,6 +399,7 @@ const AdminDashboard = () => {
             {activeSection === 'users' && 'User Management'}
             {activeSection === 'analytics' && 'Sales Analytics'}
             {activeSection === 'settings' && 'Site Settings'}
+            {activeSection === 'content' && 'Content Editor'}
           </h1>
           <div className="admin-header-info">
             <span className="admin-date">{new Date().toLocaleDateString('ja-JP')}</span>
@@ -844,6 +878,144 @@ const AdminDashboard = () => {
                     <button className="export-btn">データエクスポート</button>
                     <button className="backup-btn">バックアップ作成</button>
                   </div>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {activeSection === 'content' && (
+            <div className="content-section">
+              <div className="content-editor">
+                <h2>ホームページコンテンツ編集</h2>
+                
+                <div className="editor-section">
+                  <h3>ヒーローセクション</h3>
+                  <div className="form-group">
+                    <label>メインタイトル</label>
+                    <input 
+                      type="text"
+                      value={homeContent.heroTitle}
+                      onChange={(e) => setHomeContent({...homeContent, heroTitle: e.target.value})}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>サブタイトル</label>
+                    <input 
+                      type="text"
+                      value={homeContent.heroSubtitle}
+                      onChange={(e) => setHomeContent({...homeContent, heroSubtitle: e.target.value})}
+                    />
+                  </div>
+                </div>
+                
+                <div className="editor-section">
+                  <h3>車タイル設定</h3>
+                  <div className="form-group">
+                    <label>タイトル</label>
+                    <input 
+                      type="text"
+                      value={homeContent.carTile.title}
+                      onChange={(e) => setHomeContent({...homeContent, carTile: {...homeContent.carTile, title: e.target.value}})}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>説明文</label>
+                    <textarea 
+                      value={homeContent.carTile.description}
+                      onChange={(e) => setHomeContent({...homeContent, carTile: {...homeContent.carTile, description: e.target.value}})}
+                      rows="3"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>特徴（カンマ区切り）</label>
+                    <input 
+                      type="text"
+                      value={homeContent.carTile.features.join(', ')}
+                      onChange={(e) => setHomeContent({...homeContent, carTile: {...homeContent.carTile, features: e.target.value.split(', ')}})}
+                    />
+                  </div>
+                </div>
+                
+                <div className="editor-section">
+                  <h3>バイクタイル設定</h3>
+                  <div className="form-group">
+                    <label>タイトル</label>
+                    <input 
+                      type="text"
+                      value={homeContent.bikeTile.title}
+                      onChange={(e) => setHomeContent({...homeContent, bikeTile: {...homeContent.bikeTile, title: e.target.value}})}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>説明文</label>
+                    <textarea 
+                      value={homeContent.bikeTile.description}
+                      onChange={(e) => setHomeContent({...homeContent, bikeTile: {...homeContent.bikeTile, description: e.target.value}})}
+                      rows="3"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>特徴（カンマ区切り）</label>
+                    <input 
+                      type="text"
+                      value={homeContent.bikeTile.features.join(', ')}
+                      onChange={(e) => setHomeContent({...homeContent, bikeTile: {...homeContent.bikeTile, features: e.target.value.split(', ')}})}
+                    />
+                  </div>
+                </div>
+                
+                <div className="editor-section">
+                  <h3>情報カード設定</h3>
+                  {homeContent.infoCards.map((card, index) => (
+                    <div key={index} className="info-card-editor">
+                      <h4>カード {index + 1}</h4>
+                      <div className="form-group">
+                        <label>アイコン</label>
+                        <input 
+                          type="text"
+                          value={card.icon}
+                          onChange={(e) => {
+                            const newCards = [...homeContent.infoCards];
+                            newCards[index].icon = e.target.value;
+                            setHomeContent({...homeContent, infoCards: newCards});
+                          }}
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>タイトル</label>
+                        <input 
+                          type="text"
+                          value={card.title}
+                          onChange={(e) => {
+                            const newCards = [...homeContent.infoCards];
+                            newCards[index].title = e.target.value;
+                            setHomeContent({...homeContent, infoCards: newCards});
+                          }}
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>説明</label>
+                        <input 
+                          type="text"
+                          value={card.description}
+                          onChange={(e) => {
+                            const newCards = [...homeContent.infoCards];
+                            newCards[index].description = e.target.value;
+                            setHomeContent({...homeContent, infoCards: newCards});
+                          }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="form-actions">
+                  <button className="save-btn" onClick={() => {
+                    localStorage.setItem('homeContent', JSON.stringify(homeContent));
+                    showNotification('ホームページコンテンツが保存されました！', 'success');
+                  }}>
+                    コンテンツを保存
+                  </button>
                 </div>
               </div>
             </div>

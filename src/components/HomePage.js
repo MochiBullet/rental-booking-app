@@ -1,15 +1,42 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './HomePage.css';
 
 function HomePage() {
   const navigate = useNavigate();
+  const [homeContent, setHomeContent] = useState({
+    heroTitle: 'あなたの旅を、私たちがサポート',
+    heroSubtitle: '安心・安全・快適なレンタルサービス',
+    carTile: {
+      title: '車',
+      description: 'ファミリー向けから\nビジネスまで幅広く対応',
+      features: ['最新モデル', '保険完備', '24時間サポート']
+    },
+    bikeTile: {
+      title: 'バイク',
+      description: '街乗りから\nツーリングまで対応',
+      features: ['ヘルメット付', '整備済み', 'ロードサービス']
+    },
+    infoCards: [
+      { icon: '📱', title: '簡単予約', description: '24時間いつでもオンラインで予約可能' },
+      { icon: '🛡️', title: '安心保証', description: '充実の保険と補償制度' },
+      { icon: '💰', title: '明朗会計', description: '追加料金なしの安心価格' },
+      { icon: '🏆', title: '高品質', description: '定期メンテナンス済みの車両' }
+    ]
+  });
+
+  useEffect(() => {
+    const savedContent = localStorage.getItem('homeContent');
+    if (savedContent) {
+      setHomeContent(JSON.parse(savedContent));
+    }
+  }, []);
 
   return (
     <div className="home-page">
       <div className="hero-section">
-        <h2 className="hero-title">あなたの旅を、私たちがサポート</h2>
-        <p className="hero-subtitle">安心・安全・快適なレンタルサービス</p>
+        <h2 className="hero-title">{homeContent.heroTitle}</h2>
+        <p className="hero-subtitle">{homeContent.heroSubtitle}</p>
       </div>
 
       <div className="selection-container">
@@ -26,15 +53,19 @@ function HomePage() {
                   <circle cx="70" cy="65" r="8" fill="#1a5a1a"/>
                 </svg>
               </div>
-              <h3 className="tile-title">車</h3>
+              <h3 className="tile-title">{homeContent.carTile.title}</h3>
               <p className="tile-description">
-                ファミリー向けから<br/>
-                ビジネスまで幅広く対応
+                {homeContent.carTile.description.split('\n').map((line, i) => (
+                  <React.Fragment key={i}>
+                    {line}
+                    {i < homeContent.carTile.description.split('\n').length - 1 && <br/>}
+                  </React.Fragment>
+                ))}
               </p>
               <div className="tile-features">
-                <span className="feature">✓ 最新モデル</span>
-                <span className="feature">✓ 保険完備</span>
-                <span className="feature">✓ 24時間サポート</span>
+                {homeContent.carTile.features.map((feature, i) => (
+                  <span key={i} className="feature">✓ {feature}</span>
+                ))}
               </div>
               <button className="tile-button">車を見る →</button>
             </div>
@@ -51,15 +82,19 @@ function HomePage() {
                   <path d="M55 45 L60 30" stroke="#3a9a3a" strokeWidth="3"/>
                 </svg>
               </div>
-              <h3 className="tile-title">バイク</h3>
+              <h3 className="tile-title">{homeContent.bikeTile.title}</h3>
               <p className="tile-description">
-                街乗りから<br/>
-                ツーリングまで対応
+                {homeContent.bikeTile.description.split('\n').map((line, i) => (
+                  <React.Fragment key={i}>
+                    {line}
+                    {i < homeContent.bikeTile.description.split('\n').length - 1 && <br/>}
+                  </React.Fragment>
+                ))}
               </p>
               <div className="tile-features">
-                <span className="feature">✓ ヘルメット付</span>
-                <span className="feature">✓ 整備済み</span>
-                <span className="feature">✓ ロードサービス</span>
+                {homeContent.bikeTile.features.map((feature, i) => (
+                  <span key={i} className="feature">✓ {feature}</span>
+                ))}
               </div>
               <button className="tile-button">バイクを見る →</button>
             </div>
@@ -69,26 +104,13 @@ function HomePage() {
 
       <div className="info-section">
         <div className="info-cards">
-          <div className="info-card">
-            <div className="info-icon">📱</div>
-            <h4>簡単予約</h4>
-            <p>24時間いつでもオンラインで予約可能</p>
-          </div>
-          <div className="info-card">
-            <div className="info-icon">🛡️</div>
-            <h4>安心保証</h4>
-            <p>充実の保険と補償制度</p>
-          </div>
-          <div className="info-card">
-            <div className="info-icon">💰</div>
-            <h4>明朗会計</h4>
-            <p>追加料金なしの安心価格</p>
-          </div>
-          <div className="info-card">
-            <div className="info-icon">🏆</div>
-            <h4>高品質</h4>
-            <p>定期メンテナンス済みの車両</p>
-          </div>
+          {homeContent.infoCards.map((card, i) => (
+            <div key={i} className="info-card">
+              <div className="info-icon">{card.icon}</div>
+              <h4>{card.title}</h4>
+              <p>{card.description}</p>
+            </div>
+          ))}
         </div>
       </div>
     </div>
