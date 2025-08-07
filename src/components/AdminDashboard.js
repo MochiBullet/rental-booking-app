@@ -1824,37 +1824,37 @@ const AdminDashboard = () => {
                 
                 <div className="editor-section">
                   <h3>プライバシーポリシータイトル</h3>
-                  <div className="form-group'>
+                  <div className="form-group">
                     <label>タイトル</label>
                     <input 
-                      type="text'
+                      type="text"
                       value={privacyPolicyContent.title}
                       onChange={(e) => setPrivacyPolicyContent({...privacyPolicyContent, title: e.target.value})}
                     />
                   </div>
                 </div>
                 
-                <div className="editor-section'>
-                  <div className="section-header'>
+                <div className="editor-section">
+                  <div className="section-header">
                     <h3>プライバシーポリシーセクション</h3>
                     <button 
-                      className="add-btn'
+                      className="add-btn"
                       onClick={() => setShowAddPrivacyModal(true)}
                     >
                       + 新しいセクションを追加
                     </button>
                   </div>
                   
-                  <div className="privacy-sections-list'>
+                  <div className="privacy-sections-list">
                     {privacyPolicyContent.sections.map((section, index) => (
-                      <div key={section.id || index} className="privacy-section-item'>
-                        <div className="section-info'>
+                      <div key={section.id || index} className="privacy-section-item">
+                        <div className="section-info">
                           <h4>{section.title}</h4>
-                          <p className="section-preview'>{section.content.substring(0, 100)}...</p>
+                          <p className="section-preview">{section.content.substring(0, 100)}...</p>
                         </div>
-                        <div className="section-actions'>
+                        <div className="section-actions">
                           <button 
-                            className="edit-btn'
+                            className="edit-btn"
                             onClick={() => {
                               setSelectedPrivacySection({...section, index});
                               setShowEditPrivacyModal(true);
@@ -1863,7 +1863,7 @@ const AdminDashboard = () => {
                             編集
                           </button>
                           <button 
-                            className="delete-btn'
+                            className="delete-btn"
                             onClick={() => {
                               if (window.confirm('このセクションを削除しますか？')) {
                                 const updatedSections = privacyPolicyContent.sections.filter((_, i) => i !== index);
@@ -1881,8 +1881,8 @@ const AdminDashboard = () => {
                   </div>
                 </div>
                 
-                <div className="form-actions'>
-                  <button className="save-btn' onClick={() => {
+                <div className="form-actions">
+                  <button className="save-btn" onClick={() => {
                     const updatedPolicy = {
                       ...privacyPolicyContent,
                       lastUpdated: new Date().toISOString()
@@ -2552,29 +2552,29 @@ const AdminDashboard = () => {
 
       {/* プライバシーポリシーセクション追加モーダル */}
       {showAddPrivacyModal && (
-        <div className="modal-overlay'>
-          <div className="modal-content'>
+        <div className="modal-overlay">
+          <div className="modal-content">
             <h2>新しいプライバシーポリシーセクションを追加</h2>
-            <div className="form-group'>
+            <div className="form-group">
               <label>セクションタイトル</label>
               <input 
-                type="text'
+                type="text"
                 value={newPrivacySection.title}
                 onChange={(e) => setNewPrivacySection({...newPrivacySection, title: e.target.value})}
-                placeholder="第1条（個人情報の定義）'
+                placeholder="第1条（個人情報の定義）"
               />
             </div>
-            <div className="form-group'>
+            <div className="form-group">
               <label>セクション内容</label>
               <textarea 
                 value={newPrivacySection.content}
                 onChange={(e) => setNewPrivacySection({...newPrivacySection, content: e.target.value})}
-                rows="6'
-                placeholder="プライバシーポリシーの内容を入力してください...'
+                rows="6"
+                placeholder="プライバシーポリシーの内容を入力してください..."
               />
             </div>
-            <div className="modal-actions'>
-              <button className="save-btn' onClick={() => {
+            <div className="modal-actions">
+              <button className="save-btn" onClick={() => {
                 if (!newPrivacySection.title || !newPrivacySection.content) {
                   showNotification('❌ タイトルと内容は必須項目です', 'error');
                   return;
@@ -2589,7 +2589,7 @@ const AdminDashboard = () => {
                 setShowAddPrivacyModal(false);
                 showNotification('🔒 新しいプライバシーポリシーセクションが追加されました', 'success');
               }}>セクションを追加</button>
-              <button className="cancel-btn' onClick={() => {
+              <button className="cancel-btn" onClick={() => {
                 setShowAddPrivacyModal(false);
                 setNewPrivacySection({ title: '', content: '' });
               }}>キャンセル</button>
@@ -2600,27 +2600,27 @@ const AdminDashboard = () => {
 
       {/* プライバシーポリシーセクション編集モーダル */}
       {showEditPrivacyModal && selectedPrivacySection && (
-        <div className="modal-overlay'>
-          <div className="modal-content'>
+        <div className="modal-overlay">
+          <div className="modal-content">
             <h2>プライバシーポリシーセクションを編集</h2>
-            <div className="form-group'>
+            <div className="form-group">
               <label>セクションタイトル</label>
               <input 
-                type="text'
+                type="text"
                 value={selectedPrivacySection.title}
                 onChange={(e) => setSelectedPrivacySection({...selectedPrivacySection, title: e.target.value})}
               />
             </div>
-            <div className="form-group'>
+            <div className="form-group">
               <label>セクション内容</label>
               <textarea 
                 value={selectedPrivacySection.content}
                 onChange={(e) => setSelectedPrivacySection({...selectedPrivacySection, content: e.target.value})}
-                rows="6'
+                rows="6"
               />
             </div>
-            <div className="modal-actions'>
-              <button className="save-btn' onClick={() => {
+            <div className="modal-actions">
+              <button className="save-btn" onClick={() => {
                 if (!selectedPrivacySection.title || !selectedPrivacySection.content) {
                   showNotification('❌ タイトルと内容は必須項目です', 'error');
                   return;
@@ -2635,7 +2635,7 @@ const AdminDashboard = () => {
                 setSelectedPrivacySection(null);
                 showNotification('🔒 プライバシーポリシーセクションが更新されました', 'success');
               }}>変更を保存</button>
-              <button className="cancel-btn' onClick={() => {
+              <button className="cancel-btn" onClick={() => {
                 setShowEditPrivacyModal(false);
                 setSelectedPrivacySection(null);
               }}>キャンセル</button>
