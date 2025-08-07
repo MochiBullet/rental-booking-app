@@ -1,25 +1,40 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './AdminLogin.css';
+import dataSyncService from '../services/dataSync';
 
 const AdminLogin = ({ setIsAdmin }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLogging, setIsLogging] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLogging(true);
     
     // Simple admin authentication (in production, this should be handled by a backend)
     if (username === 'admin' && password === 'admin123') {
-      setIsAdmin(true);
-      localStorage.setItem('adminUser', 'true');
-      navigate('/admin');
+      try {
+        setIsAdmin(true);
+        localStorage.setItem('adminUser', 'true');
+        
+        // Sync all admin data from cloud when logging in
+        await dataSyncService.syncAllAdminData();
+        
+        navigate('/admin');
+      } catch (error) {
+        console.error('Failed to sync data during login:', error);
+        // Still proceed to admin panel even if sync fails
+        navigate('/admin');
+      }
     } else {
       setError('Invalid username or password');
       setTimeout(() => setError(''), 3000);
     }
+    
+    setIsLogging(false);
   };
 
   return (
@@ -56,8 +71,8 @@ const AdminLogin = ({ setIsAdmin }) => {
             />
           </div>
           
-          <button type="submit" className="admin-login-btn">
-            Login to Dashboard
+          <button type="submit" className="admin-login-btn" disabled={isLogging}>
+            {isLogging ? '🔄 ログイン中... データ同期中' : 'Login to Dashboard'}
           </button>
         </form>
         
@@ -71,7 +86,7 @@ const AdminLogin = ({ setIsAdmin }) => {
           className="back-btn"
           onClick={() => navigate('/')}
         >
-          � Back to Home
+          � Back to Home
         </button>
       </div>
     </div>

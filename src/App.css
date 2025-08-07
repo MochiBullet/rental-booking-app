@@ -1,10 +1,8 @@
 /* Instagram-inspired Modern Design System */
 
 :root {
+  
   /* デフォルト値 - 管理者画面から動的に変更可能 */
-  --gradient-1: linear-gradient(135deg, #43a047 0%, #66bb6a 50%, #81c784 100%);
-  --gradient-2: linear-gradient(135deg, #43a047 0%, #66bb6a 100%);
-  --gradient-soft: linear-gradient(135deg, #43a04722 0%, #66bb6a22 100%);
   --green: #43a047;
   --green-hover: #43a047dd;
   --green-dark: #43a047;
@@ -21,12 +19,15 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: 'Comic Sans MS', 'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif;
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background: var(--extra-light-gray);
   color: var(--dark-gray);
+  font-family: 'Comic Sans MS', 'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -61,17 +62,12 @@ body {
   align-items: center;
   gap: 12px;
   cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.logo-section:hover {
-  transform: scale(1.02);
 }
 
 .logo {
   width: 40px;
   height: 40px;
-  background: var(--gradient-1);
+  background: #43a047;
   border-radius: 10px;
   display: flex;
   align-items: center;
@@ -84,10 +80,7 @@ body {
 .site-title {
   font-size: 24px;
   font-weight: 600;
-  background: var(--gradient-1);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #43a047;
   letter-spacing: -0.5px;
 }
 
@@ -106,19 +99,16 @@ body {
 
 .mypage-link {
   padding: 8px 20px;
-  background: linear-gradient(135deg, #43a047 0%, #66bb6a 100%);
+  background: #43a047;
   color: white;
   text-decoration: none;
-  border-radius: 20px;
+  border-radius: 8px;
   font-size: 14px;
   font-weight: 600;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(67, 160, 71, 0.2);
 }
 
 .mypage-link:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 15px rgba(67, 160, 71, 0.3);
+  background: #388e3c;
 }
 
 .welcome-text {
@@ -136,12 +126,10 @@ body {
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
 }
 
 .logout-btn:hover {
   background: var(--extra-light-gray);
-  transform: translateY(-1px);
 }
 
 /* Auth Buttons with Better Spacing and Style */
@@ -156,56 +144,29 @@ body {
   background: var(--green);
   color: var(--white);
   text-decoration: none;
-  border-radius: 22px;
+  border-radius: 8px;
   font-size: 14px;
   font-weight: 600;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: inline-block;
-  position: relative;
-  overflow: hidden;
-}
-
-.login-btn::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
-  transform: translate(-50%, -50%);
-  transition: width 0.6s, height 0.6s;
-}
-
-.login-btn:hover::before {
-  width: 300px;
-  height: 300px;
 }
 
 .login-btn:hover {
   background: var(--green-hover);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(67, 160, 71, 0.3);
 }
 
 .register-btn {
   padding: 10px 28px;
-  background: var(--gradient-1);
+  background: var(--green);
   color: var(--white);
   text-decoration: none;
-  border-radius: 22px;
+  border-radius: 8px;
   font-size: 14px;
   font-weight: 600;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: inline-block;
-  position: relative;
-  box-shadow: 0 4px 15px rgba(67, 160, 71, 0.2);
 }
 
 .register-btn:hover {
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 8px 25px rgba(67, 160, 71, 0.4);
+  background: var(--green-hover);
 }
 
 /* Main Footer */
@@ -282,25 +243,12 @@ body {
 }
 
 .admin-badge {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #667eea;
   color: white;
   padding: 8px 16px;
-  border-radius: 20px;
+  border-radius: 8px;
   font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-  animation: adminPulse 2s infinite;
-}
-
-@keyframes adminPulse {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.05);
-    opacity: 0.9;
-  }
 }

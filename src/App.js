@@ -10,6 +10,9 @@ import CompleteRegistration from './components/CompleteRegistration';
 import MyPage from './components/MyPage';
 import AdminLogin from './components/AdminLogin';
 import AdminDashboard from './components/AdminDashboard';
+import ContactForm from './components/ContactForm';
+import Terms from './components/Terms';
+import PrivacyPolicy from './components/PrivacyPolicy';
 
 function AppContent() {
   const [user, setUser] = useState(null);
@@ -20,8 +23,11 @@ function AppContent() {
 
   useEffect(() => {
     const savedUser = localStorage.getItem('currentUser');
+    console.log('App.js savedUser:', savedUser);
     if (savedUser) {
-      setUser(JSON.parse(savedUser));
+      const parsedUser = JSON.parse(savedUser);
+      console.log('App.js parsed user:', parsedUser);
+      setUser(parsedUser);
     }
     
     // 管理者ログイン状態を復元
@@ -116,15 +122,18 @@ function AppContent() {
           <Route path="/mypage" element={<MyPage user={user} setUser={setUser} />} />
           <Route path="/admin-login" element={<AdminLogin setIsAdmin={setIsAdmin} />} />
           <Route path="/admin" element={isAdmin ? <AdminDashboard /> : <AdminLogin setIsAdmin={setIsAdmin} />} />
+          <Route path="/contact" element={<ContactForm />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
         </Routes>
 
         <footer className="main-footer">
           <div className="footer-container">
             <p>&copy; 2024 M's BASE Rental - 信頼のレンタルサービス</p>
             <div className="footer-links">
-              <a href="#">利用規約</a>
-              <a href="#">プライバシーポリシー</a>
-              <a href="#">お問い合わせ</a>
+              <Link to="/terms">利用規約</Link>
+              <Link to="/privacy">プライバシーポリシー</Link>
+              <Link to="/contact">お問い合わせ</Link>
             </div>
           </div>
         </footer>

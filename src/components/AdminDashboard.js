@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './AdminDashboard.css';
+import dataSyncService from '../services/dataSync';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -73,6 +74,30 @@ const AdminDashboard = () => {
       { icon: '🏆', title: '高品質', description: '定期メンテナンス済みの車両' }
     ]
   });
+  const [termsContent, setTermsContent] = useState({
+    title: 'M\'s BASE Rental 利用規約',
+    sections: []
+  });
+  const [showAddTermsModal, setShowAddTermsModal] = useState(false);
+  const [showEditTermsModal, setShowEditTermsModal] = useState(false);
+  const [selectedTermsSection, setSelectedTermsSection] = useState(null);
+  const [newTermsSection, setNewTermsSection] = useState({
+    title: '',
+    content: ''
+  });
+  const [privacyPolicyContent, setPrivacyPolicyContent] = useState({
+    title: 'M\'s BASE Rental プライバシーポリシー',
+    sections: []
+  });
+  const [showAddPrivacyModal, setShowAddPrivacyModal] = useState(false);
+  const [showEditPrivacyModal, setShowEditPrivacyModal] = useState(false);
+  const [selectedPrivacySection, setSelectedPrivacySection] = useState(null);
+  const [newPrivacySection, setNewPrivacySection] = useState({
+    title: '',
+    content: ''
+  });
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncStatus, setSyncStatus] = useState(null);
 
   // CSS変数を更新する関数を先に定義
   const updateCSSVariables = (settings) => {
@@ -105,6 +130,18 @@ const AdminDashboard = () => {
     if (savedContent) {
       setHomeContent(JSON.parse(savedContent));
     }
+    
+    // 約款コンテンツも読み込み
+    const savedTerms = localStorage.getItem('termsContent');
+    if (savedTerms) {
+      setTermsContent(JSON.parse(savedTerms));
+    }
+    
+    // プライバシーポリシーコンテンツも読み込み
+    const savedPrivacy = localStorage.getItem('privacyPolicyContent');
+    if (savedPrivacy) {
+      setPrivacyPolicyContent(JSON.parse(savedPrivacy));
+    }
   };
 
   useEffect(() => {
@@ -117,7 +154,25 @@ const AdminDashboard = () => {
     loadSiteSettings();
   }, [navigate]);
 
-  const loadDashboardData = () => {
+  const loadDashboardData = async () => {
+    // First try to sync data from cloud
+    try {
+      setIsSyncing(true);
+      const syncResults = await dataSyncService.syncAllAdminData();
+      setSyncStatus(syncResults);
+      
+      // Show sync status notification
+      const syncedCount = Object.values(syncResults).filter(r => r.success).length;
+      if (syncedCount > 0) {
+        showNotification(`📡 ${syncedCount}個のデータセットを同期しました`, 'info', 3000);
+      }
+    } catch (error) {
+      console.error('Data sync failed:', error);
+      showNotification('⚠️ データ同期に失敗しました。ローカルデータを使用します。', 'warning', 3000);
+    } finally {
+      setIsSyncing(false);
+    }
+    
     const storedBookings = JSON.parse(localStorage.getItem('bookings') || '[]');
     const storedVehicles = JSON.parse(localStorage.getItem('vehicles') || '[]');
     const storedUsers = JSON.parse(localStorage.getItem('users') || '[]');
@@ -204,6 +259,9 @@ const AdminDashboard = () => {
     setVehicles(updatedVehicles);
     localStorage.setItem('vehicles', JSON.stringify(updatedVehicles));
     
+    // Sync to cloud
+    dataSyncService.saveToCloud('vehicles', updatedVehicles).catch(console.error);
+    
     setNewVehicle({
       name: '',
       type: 'car',
@@ -229,6 +287,10 @@ const AdminDashboard = () => {
     
     setVehicles(updatedVehicles);
     localStorage.setItem('vehicles', JSON.stringify(updatedVehicles));
+    
+    // Sync to cloud
+    dataSyncService.saveToCloud('vehicles', updatedVehicles).catch(console.error);
+    
     setShowEditVehicleModal(false);
     const vehicleName = selectedVehicle.name;
     setSelectedVehicle(null);
@@ -333,6 +395,9 @@ const AdminDashboard = () => {
     localStorage.setItem('siteSettings', JSON.stringify(siteSettings));
     updateCSSVariables(siteSettings);
     
+    // Sync to cloud
+    dataSyncService.saveToCloud('siteSettings', siteSettings).catch(console.error);
+    
     // サイト名も更新
     if (siteSettings.siteName) {
       document.title = siteSettings.siteName;
@@ -350,6 +415,10 @@ const AdminDashboard = () => {
       );
       setBookings(updatedBookings);
       localStorage.setItem('bookings', JSON.stringify(updatedBookings));
+      
+      // Sync to cloud
+      dataSyncService.saveToCloud('bookings', updatedBookings).catch(console.error);
+      
       loadDashboardData();
       showNotification(`❌ 予約 #${booking?.id} をキャンセルしました。`, 'warning');
     }
@@ -383,6 +452,10 @@ const AdminDashboard = () => {
       );
       setBookings(updatedBookings);
       localStorage.setItem('bookings', JSON.stringify(updatedBookings));
+      
+      // Sync to cloud
+      dataSyncService.saveToCloud('bookings', updatedBookings).catch(console.error);
+      
       loadDashboardData();
       showNotification(`🏁 予約 #${booking?.id} の車両引き渡しを確定しました！`, 'success');
     }
@@ -549,6 +622,9 @@ const AdminDashboard = () => {
     setUsers(updatedUsers);
     localStorage.setItem('users', JSON.stringify(updatedUsers));
     
+    // Sync to cloud
+    dataSyncService.saveToCloud('users', updatedUsers).catch(console.error);
+    
     setNewUser({
       name: '',
       email: '',
@@ -697,6 +773,27 @@ const AdminDashboard = () => {
             <span className="nav-icon">📝</span>
             Content Editor
           </button>
+          <button 
+            className={`${activeSection === 'terms' ? 'active' : ''}`}
+            onClick={() => setActiveSection('terms')}
+          >
+            <span className="nav-icon">📋</span>
+            Terms Editor
+          </button>
+          <button 
+            className={`${activeSection === 'contacts' ? 'active' : ''}`}
+            onClick={() => setActiveSection('contacts')}
+          >
+            <span className="nav-icon">📧</span>
+            Contact Management
+          </button>
+          <button 
+            className={`${activeSection === 'privacy' ? 'active' : ''}`}
+            onClick={() => setActiveSection('privacy')}
+          >
+            <span className="nav-icon">🔒</span>
+            Privacy Policy Editor
+          </button>
         </nav>
         
         <button className="admin-logout-btn" onClick={handleLogout}>
@@ -714,9 +811,35 @@ const AdminDashboard = () => {
             {activeSection === 'analytics' && 'Sales Analytics'}
             {activeSection === 'settings' && 'Site Settings'}
             {activeSection === 'content' && 'Content Editor'}
+            {activeSection === 'terms' && 'Terms Editor'}
+            {activeSection === 'contacts' && 'Contact Management'}
+            {activeSection === 'privacy' && 'Privacy Policy Editor'}
             {activeSection === 'details' && `詳細分析 - ${getTypeDisplayName(detailsType)}`}
           </h1>
           <div className="admin-header-info">
+            <div className="sync-status">
+              {isSyncing && <span className="sync-indicator syncing">🔄 同期中...</span>}
+              {!isSyncing && syncStatus && (
+                <button 
+                  className="sync-btn"
+                  onClick={async () => {
+                    setIsSyncing(true);
+                    try {
+                      await dataSyncService.forceSyncAll();
+                      await loadDashboardData();
+                      showNotification('📡 手動同期が完了しました', 'success');
+                    } catch (error) {
+                      showNotification('❌ 同期に失敗しました', 'error');
+                    } finally {
+                      setIsSyncing(false);
+                    }
+                  }}
+                  disabled={isSyncing}
+                >
+                  📡 データ同期
+                </button>
+              )}
+            </div>
             <span className="admin-date">{new Date().toLocaleDateString('ja-JP')}</span>
             <span className="admin-user">Administrator</span>
           </div>
@@ -1404,6 +1527,10 @@ const AdminDashboard = () => {
                 <div className="form-actions">
                   <button className="save-btn" onClick={() => {
                     localStorage.setItem('homeContent', JSON.stringify(homeContent));
+                    
+                    // Sync to cloud
+                    dataSyncService.saveToCloud('homeContent', homeContent).catch(console.error);
+                    
                     showNotification('📝 ホームページコンテンツが正常に保存されました！ページをリロードして確認してください。', 'save', 5000);
                   }}>
                     コンテンツを保存
@@ -1533,6 +1660,244 @@ const AdminDashboard = () => {
                     })}
                   </tbody>
                 </table>
+              </div>
+            </div>
+          )}
+          
+          {activeSection === 'terms' && (
+            <div className="terms-section">
+              <div className="terms-editor">
+                <h2>約款内容編集</h2>
+                
+                <div className="editor-section">
+                  <h3>約款タイトル</h3>
+                  <div className="form-group">
+                    <label>タイトル</label>
+                    <input 
+                      type="text"
+                      value={termsContent.title}
+                      onChange={(e) => setTermsContent({...termsContent, title: e.target.value})}
+                    />
+                  </div>
+                </div>
+                
+                <div className="editor-section">
+                  <div className="section-header">
+                    <h3>約款セクション</h3>
+                    <button 
+                      className="add-btn"
+                      onClick={() => setShowAddTermsModal(true)}
+                    >
+                      + 新しいセクションを追加
+                    </button>
+                  </div>
+                  
+                  <div className="terms-sections-list">
+                    {termsContent.sections.map((section, index) => (
+                      <div key={section.id || index} className="terms-section-item">
+                        <div className="section-info">
+                          <h4>{section.title}</h4>
+                          <p className="section-preview">{section.content.substring(0, 100)}...</p>
+                        </div>
+                        <div className="section-actions">
+                          <button 
+                            className="edit-btn"
+                            onClick={() => {
+                              setSelectedTermsSection({...section, index});
+                              setShowEditTermsModal(true);
+                            }}
+                          >
+                            編集
+                          </button>
+                          <button 
+                            className="delete-btn"
+                            onClick={() => {
+                              if (window.confirm('このセクションを削除しますか？')) {
+                                const updatedSections = termsContent.sections.filter((_, i) => i !== index);
+                                const updatedTerms = {...termsContent, sections: updatedSections};
+                                setTermsContent(updatedTerms);
+                                showNotification('📋 約款セクションを削除しました', 'info');
+                              }
+                            }}
+                          >
+                            削除
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="form-actions">
+                  <button className="save-btn" onClick={() => {
+                    const updatedTerms = {
+                      ...termsContent,
+                      lastUpdated: new Date().toISOString()
+                    };
+                    localStorage.setItem('termsContent', JSON.stringify(updatedTerms));
+                    setTermsContent(updatedTerms);
+                    
+                    // Sync to cloud
+                    dataSyncService.saveToCloud('termsContent', updatedTerms).catch(console.error);
+                    
+                    showNotification('📋 約款内容が正常に保存されました！', 'save', 5000);
+                  }}>
+                    約款を保存
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {activeSection === 'contacts' && (
+            <div className="contacts-section">
+              <div className="section-header">
+                <h2>お問い合わせ管理</h2>
+              </div>
+              
+              <div className="contacts-table">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>名前</th>
+                      <th>メール</th>
+                      <th>カテゴリ</th>
+                      <th>件名</th>
+                      <th>送信日</th>
+                      <th>ステータス</th>
+                      <th>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {JSON.parse(localStorage.getItem('contacts') || '[]').map(contact => (
+                      <tr key={contact.id}>
+                        <td>#{contact.id}</td>
+                        <td>{contact.name}</td>
+                        <td>{contact.email}</td>
+                        <td>{contact.category}</td>
+                        <td>{contact.subject}</td>
+                        <td>{new Date(contact.submittedAt).toLocaleDateString('ja-JP')}</td>
+                        <td>
+                          <span className={`status-badge status-${contact.status}`}>
+                            {contact.status === 'pending' ? '未対応' : 
+                             contact.status === 'resolved' ? '対応済み' : contact.status}
+                          </span>
+                        </td>
+                        <td>
+                          <button 
+                            className="action-btn view"
+                            onClick={() => {
+                              alert(`お問い合わせ内容:\\n\\n件名: ${contact.subject}\\n\\nメッセージ:\\n${contact.message}\\n\\n電話: ${contact.phone || 'なし'}`);
+                            }}
+                          >
+                            詳細
+                          </button>
+                          <button 
+                            className="action-btn confirm"
+                            onClick={() => {
+                              const contacts = JSON.parse(localStorage.getItem('contacts') || '[]');
+                              const updatedContacts = contacts.map(c => 
+                                c.id === contact.id ? { ...c, status: 'resolved' } : c
+                              );
+                              localStorage.setItem('contacts', JSON.stringify(updatedContacts));
+                              dataSyncService.saveToCloud('contacts', updatedContacts).catch(console.error);
+                              loadDashboardData();
+                              showNotification('📧 お問い合わせを対応済みにしました', 'success');
+                            }}
+                          >
+                            対応済み
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+          
+          {activeSection === 'privacy' && (
+            <div className="privacy-section">
+              <div className="privacy-editor">
+                <h2>プライバシーポリシー編集</h2>
+                
+                <div className="editor-section">
+                  <h3>プライバシーポリシータイトル</h3>
+                  <div className="form-group'>
+                    <label>タイトル</label>
+                    <input 
+                      type="text'
+                      value={privacyPolicyContent.title}
+                      onChange={(e) => setPrivacyPolicyContent({...privacyPolicyContent, title: e.target.value})}
+                    />
+                  </div>
+                </div>
+                
+                <div className="editor-section'>
+                  <div className="section-header'>
+                    <h3>プライバシーポリシーセクション</h3>
+                    <button 
+                      className="add-btn'
+                      onClick={() => setShowAddPrivacyModal(true)}
+                    >
+                      + 新しいセクションを追加
+                    </button>
+                  </div>
+                  
+                  <div className="privacy-sections-list'>
+                    {privacyPolicyContent.sections.map((section, index) => (
+                      <div key={section.id || index} className="privacy-section-item'>
+                        <div className="section-info'>
+                          <h4>{section.title}</h4>
+                          <p className="section-preview'>{section.content.substring(0, 100)}...</p>
+                        </div>
+                        <div className="section-actions'>
+                          <button 
+                            className="edit-btn'
+                            onClick={() => {
+                              setSelectedPrivacySection({...section, index});
+                              setShowEditPrivacyModal(true);
+                            }}
+                          >
+                            編集
+                          </button>
+                          <button 
+                            className="delete-btn'
+                            onClick={() => {
+                              if (window.confirm('このセクションを削除しますか？')) {
+                                const updatedSections = privacyPolicyContent.sections.filter((_, i) => i !== index);
+                                const updatedPolicy = {...privacyPolicyContent, sections: updatedSections};
+                                setPrivacyPolicyContent(updatedPolicy);
+                                showNotification('🔒 プライバシーポリシーセクションを削除しました', 'info');
+                              }
+                            }}
+                          >
+                            削除
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="form-actions'>
+                  <button className="save-btn' onClick={() => {
+                    const updatedPolicy = {
+                      ...privacyPolicyContent,
+                      lastUpdated: new Date().toISOString()
+                    };
+                    localStorage.setItem('privacyPolicyContent', JSON.stringify(updatedPolicy));
+                    setPrivacyPolicyContent(updatedPolicy);
+                    
+                    // Sync to cloud
+                    dataSyncService.saveToCloud('privacyPolicyContent', updatedPolicy).catch(console.error);
+                    
+                    showNotification('🔒 プライバシーポリシーが正常に保存されました！', 'save', 5000);
+                  }}>
+                    プライバシーポリシーを保存
+                  </button>
+                </div>
               </div>
             </div>
           )}
@@ -2085,6 +2450,194 @@ const AdminDashboard = () => {
               <button className="cancel-btn" onClick={() => {
                 setShowEditUserModal(false);
                 setSelectedUser(null);
+              }}>キャンセル</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 約款セクション追加モーダル */}
+      {showAddTermsModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h2>新しい約款セクションを追加</h2>
+            <div className="form-group">
+              <label>セクションタイトル</label>
+              <input 
+                type="text"
+                value={newTermsSection.title}
+                onChange={(e) => setNewTermsSection({...newTermsSection, title: e.target.value})}
+                placeholder="第1条（適用）"
+              />
+            </div>
+            <div className="form-group">
+              <label>セクション内容</label>
+              <textarea 
+                value={newTermsSection.content}
+                onChange={(e) => setNewTermsSection({...newTermsSection, content: e.target.value})}
+                rows="6"
+                placeholder="約款の内容を入力してください..."
+              />
+            </div>
+            <div className="modal-actions">
+              <button className="save-btn" onClick={() => {
+                if (!newTermsSection.title || !newTermsSection.content) {
+                  showNotification('❌ タイトルと内容は必須項目です', 'error');
+                  return;
+                }
+                const newSection = {
+                  id: Date.now(),
+                  ...newTermsSection
+                };
+                const updatedSections = [...termsContent.sections, newSection];
+                setTermsContent({...termsContent, sections: updatedSections});
+                setNewTermsSection({ title: '', content: '' });
+                setShowAddTermsModal(false);
+                showNotification('📋 新しい約款セクションが追加されました', 'success');
+              }}>セクションを追加</button>
+              <button className="cancel-btn" onClick={() => {
+                setShowAddTermsModal(false);
+                setNewTermsSection({ title: '', content: '' });
+              }}>キャンセル</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 約款セクション編集モーダル */}
+      {showEditTermsModal && selectedTermsSection && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h2>約款セクションを編集</h2>
+            <div className="form-group">
+              <label>セクションタイトル</label>
+              <input 
+                type="text"
+                value={selectedTermsSection.title}
+                onChange={(e) => setSelectedTermsSection({...selectedTermsSection, title: e.target.value})}
+              />
+            </div>
+            <div className="form-group">
+              <label>セクション内容</label>
+              <textarea 
+                value={selectedTermsSection.content}
+                onChange={(e) => setSelectedTermsSection({...selectedTermsSection, content: e.target.value})}
+                rows="6"
+              />
+            </div>
+            <div className="modal-actions">
+              <button className="save-btn" onClick={() => {
+                if (!selectedTermsSection.title || !selectedTermsSection.content) {
+                  showNotification('❌ タイトルと内容は必須項目です', 'error');
+                  return;
+                }
+                const updatedSections = termsContent.sections.map((section, i) => 
+                  i === selectedTermsSection.index ? 
+                    { id: section.id, title: selectedTermsSection.title, content: selectedTermsSection.content } : 
+                    section
+                );
+                setTermsContent({...termsContent, sections: updatedSections});
+                setShowEditTermsModal(false);
+                setSelectedTermsSection(null);
+                showNotification('📋 約款セクションが更新されました', 'success');
+              }}>変更を保存</button>
+              <button className="cancel-btn" onClick={() => {
+                setShowEditTermsModal(false);
+                setSelectedTermsSection(null);
+              }}>キャンセル</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* プライバシーポリシーセクション追加モーダル */}
+      {showAddPrivacyModal && (
+        <div className="modal-overlay'>
+          <div className="modal-content'>
+            <h2>新しいプライバシーポリシーセクションを追加</h2>
+            <div className="form-group'>
+              <label>セクションタイトル</label>
+              <input 
+                type="text'
+                value={newPrivacySection.title}
+                onChange={(e) => setNewPrivacySection({...newPrivacySection, title: e.target.value})}
+                placeholder="第1条（個人情報の定義）'
+              />
+            </div>
+            <div className="form-group'>
+              <label>セクション内容</label>
+              <textarea 
+                value={newPrivacySection.content}
+                onChange={(e) => setNewPrivacySection({...newPrivacySection, content: e.target.value})}
+                rows="6'
+                placeholder="プライバシーポリシーの内容を入力してください...'
+              />
+            </div>
+            <div className="modal-actions'>
+              <button className="save-btn' onClick={() => {
+                if (!newPrivacySection.title || !newPrivacySection.content) {
+                  showNotification('❌ タイトルと内容は必須項目です', 'error');
+                  return;
+                }
+                const newSection = {
+                  id: Date.now(),
+                  ...newPrivacySection
+                };
+                const updatedSections = [...privacyPolicyContent.sections, newSection];
+                setPrivacyPolicyContent({...privacyPolicyContent, sections: updatedSections});
+                setNewPrivacySection({ title: '', content: '' });
+                setShowAddPrivacyModal(false);
+                showNotification('🔒 新しいプライバシーポリシーセクションが追加されました', 'success');
+              }}>セクションを追加</button>
+              <button className="cancel-btn' onClick={() => {
+                setShowAddPrivacyModal(false);
+                setNewPrivacySection({ title: '', content: '' });
+              }}>キャンセル</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* プライバシーポリシーセクション編集モーダル */}
+      {showEditPrivacyModal && selectedPrivacySection && (
+        <div className="modal-overlay'>
+          <div className="modal-content'>
+            <h2>プライバシーポリシーセクションを編集</h2>
+            <div className="form-group'>
+              <label>セクションタイトル</label>
+              <input 
+                type="text'
+                value={selectedPrivacySection.title}
+                onChange={(e) => setSelectedPrivacySection({...selectedPrivacySection, title: e.target.value})}
+              />
+            </div>
+            <div className="form-group'>
+              <label>セクション内容</label>
+              <textarea 
+                value={selectedPrivacySection.content}
+                onChange={(e) => setSelectedPrivacySection({...selectedPrivacySection, content: e.target.value})}
+                rows="6'
+              />
+            </div>
+            <div className="modal-actions'>
+              <button className="save-btn' onClick={() => {
+                if (!selectedPrivacySection.title || !selectedPrivacySection.content) {
+                  showNotification('❌ タイトルと内容は必須項目です', 'error');
+                  return;
+                }
+                const updatedSections = privacyPolicyContent.sections.map((section, i) => 
+                  i === selectedPrivacySection.index ? 
+                    { id: section.id, title: selectedPrivacySection.title, content: selectedPrivacySection.content } : 
+                    section
+                );
+                setPrivacyPolicyContent({...privacyPolicyContent, sections: updatedSections});
+                setShowEditPrivacyModal(false);
+                setSelectedPrivacySection(null);
+                showNotification('🔒 プライバシーポリシーセクションが更新されました', 'success');
+              }}>変更を保存</button>
+              <button className="cancel-btn' onClick={() => {
+                setShowEditPrivacyModal(false);
+                setSelectedPrivacySection(null);
               }}>キャンセル</button>
             </div>
           </div>

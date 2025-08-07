@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './MyPage.css';
+import dataSyncService from '../services/dataSync';
 
 const MyPage = ({ user, setUser }) => {
   const navigate = useNavigate();
@@ -8,17 +9,35 @@ const MyPage = ({ user, setUser }) => {
   const [bookings, setBookings] = useState([]);
   const [pointHistory, setPointHistory] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [showEditProfile, setShowEditProfile] = useState(false);
+  const [editFormData, setEditFormData] = useState({});
 
   useEffect(() => {
-    if (!user) {
+    // localStorageからユーザー情報を復元
+    const savedUser = localStorage.getItem('currentUser');
+    if (!user && savedUser) {
+      setUser(JSON.parse(savedUser));
+      return;
+    }
+    
+    if (!user && !savedUser) {
       navigate('/login');
       return;
     }
     
     loadUserData();
-  }, [user, navigate]);
+  }, [user, navigate, setUser]);
+
+  // ユーザー情報が変更されたときにデータを再読み込み
+  useEffect(() => {
+    if (user) {
+      loadUserData();
+    }
+  }, [user]);
 
   const loadUserData = () => {
+    if (!user) return; // userが存在しない場合は何もしない
+    
     // Load bookings
     const allBookings = JSON.parse(localStorage.getItem('bookings') || '[]');
     const userBookings = allBookings.filter(booking => booking.userId === user.id);
@@ -117,6 +136,51 @@ const MyPage = ({ user, setUser }) => {
         ? total + history.amount 
         : total - history.amount;
     }, 0);
+  };
+
+  const handleEditProfile = () => {
+    setEditFormData({
+      name: user.name || '',
+      nameKana: user.nameKana || '',
+      phone: user.phone || '',
+      birthDate: user.birthDate || '',
+      gender: user.gender || ''
+    });
+    setShowEditProfile(true);
+  };
+
+  const handleSaveProfile = async () => {
+    const updatedUser = { ...user, ...editFormData };
+    
+    try {
+      // localStorageを更新
+      localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+      
+      // 管理者データベースも更新
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      const updatedUsers = users.map(u => u.id === user.id ? updatedUser : u);
+      localStorage.setItem('users', JSON.stringify(updatedUsers));
+      
+      // クラウド同期
+      await dataSyncService.saveToCloud('users', updatedUsers);
+      
+      // アプリの状態を更新
+      setUser(updatedUser);
+      setShowEditProfile(false);
+      
+      // 成功メッセージ（簡易実装）
+      alert('プロフィールが更新され、全端末に同期されました！');
+    } catch (error) {
+      console.error('Profile sync failed:', error);
+      // エラーが発生してもローカルの更新は完了しているので、状態更新は続行
+      setUser(updatedUser);
+      setShowEditProfile(false);
+      alert('プロフィールが更新されました！（同期は後で行われます）');
+    }
+  };
+
+  const handleFormChange = (field, value) => {
+    setEditFormData(prev => ({ ...prev, [field]: value }));
   };
 
   const upcomingBookings = bookings.filter(booking => 
@@ -409,7 +473,7 @@ const MyPage = ({ user, setUser }) => {
           <div className="profile-tab">
             <div className="profile-header">
               <h2>プロフィール情報</h2>
-              <button className="btn-edit">編集</button>
+              <button className="btn-edit" onClick={handleEditProfile}>編集</button>
             </div>
             
             <div className="profile-sections">
@@ -496,6 +560,86 @@ const MyPage = ({ user, setUser }) => {
           </div>
         )}
       </div>
+      
+      {/* プロフィール編集モーダル */}
+      {showEditProfile && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h2>プロフィール編集</h2>
+              <button 
+                className="modal-close" 
+                onClick={() => setShowEditProfile(false)}
+              >
+                ×
+              </button>
+            </div>
+            
+            <div className="modal-body">
+              <div className="form-group">
+                <label>お名前</label>
+                <input
+                  type="text"
+                  value={editFormData.name || ''}
+                  onChange={(e) => handleFormChange('name', e.target.value)}
+                  placeholder="山田太郎"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>フリガナ</label>
+                <input
+                  type="text"
+                  value={editFormData.nameKana || ''}
+                  onChange={(e) => handleFormChange('nameKana', e.target.value)}
+                  placeholder="ヤマダタロウ"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>電話番号</label>
+                <input
+                  type="tel"
+                  value={editFormData.phone || ''}
+                  onChange={(e) => handleFormChange('phone', e.target.value)}
+                  placeholder="090-1234-5678"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>生年月日</label>
+                <input
+                  type="date"
+                  value={editFormData.birthDate || ''}
+                  onChange={(e) => handleFormChange('birthDate', e.target.value)}
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>性別</label>
+                <select
+                  value={editFormData.gender || ''}
+                  onChange={(e) => handleFormChange('gender', e.target.value)}
+                >
+                  <option value="">選択してください</option>
+                  <option value="male">男性</option>
+                  <option value="female">女性</option>
+                  <option value="other">その他</option>
+                </select>
+              </div>
+            </div>
+            
+            <div className="modal-actions">
+              <button className="btn-save" onClick={handleSaveProfile}>
+                保存
+              </button>
+              <button className="btn-cancel" onClick={() => setShowEditProfile(false)}>
+                キャンセル
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
