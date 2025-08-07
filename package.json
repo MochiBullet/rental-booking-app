@@ -1,6 +1,7 @@
 {
   "name": "rental-booking-app",
   "version": "1.0.0",
+  "description": "車・バイクレンタル予約サイト",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",
@@ -13,11 +14,14 @@
     "axios": "^1.6.0",
     "date-fns": "^2.30.0"
   },
+  "homepage": "https://rentaleasy-demo.netlify.app",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
@@ -36,5 +40,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "gh-pages": "^6.3.0"
   }
 }
