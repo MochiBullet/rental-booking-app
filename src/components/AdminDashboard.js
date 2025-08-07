@@ -36,15 +36,18 @@ const AdminDashboard = () => {
   });
   const [showDesignModal, setShowDesignModal] = useState(false);
 
-  useEffect(() => {
-    const adminUser = localStorage.getItem('adminUser');
-    if (!adminUser) {
-      navigate('/admin-login');
-      return;
-    }
-    loadDashboardData();
-    loadSiteSettings();
-  }, [navigate]);
+  // CSS変数を更新する関数を先に定義
+  const updateCSSVariables = (settings) => {
+    const root = document.documentElement;
+    root.style.setProperty('--gradient-1', `linear-gradient(135deg, ${settings.primaryColor} 0%, ${settings.secondaryColor} 50%, ${settings.accentColor} 100%)`);
+    root.style.setProperty('--gradient-2', `linear-gradient(135deg, ${settings.primaryColor} 0%, ${settings.secondaryColor} 100%)`);
+    root.style.setProperty('--gradient-soft', `linear-gradient(135deg, ${settings.primaryColor}22 0%, ${settings.secondaryColor}22 100%)`);
+    root.style.setProperty('--green', settings.primaryColor);
+    root.style.setProperty('--green-hover', settings.primaryColor + 'dd');
+    root.style.setProperty('--green-dark', settings.primaryColor);
+    root.style.setProperty('--green-light', settings.secondaryColor);
+    root.style.setProperty('--green-pale', settings.accentColor + '22');
+  };
 
   const loadSiteSettings = () => {
     const savedSettings = localStorage.getItem('siteSettings');
@@ -59,6 +62,16 @@ const AdminDashboard = () => {
       }
     }
   };
+
+  useEffect(() => {
+    const adminUser = localStorage.getItem('adminUser');
+    if (!adminUser) {
+      navigate('/admin-login');
+      return;
+    }
+    loadDashboardData();
+    loadSiteSettings();
+  }, [navigate]);
 
   const loadDashboardData = () => {
     const storedBookings = JSON.parse(localStorage.getItem('bookings') || '[]');
@@ -174,17 +187,6 @@ const AdminDashboard = () => {
     );
   };
 
-  const updateCSSVariables = (settings) => {
-    const root = document.documentElement;
-    root.style.setProperty('--gradient-1', `linear-gradient(135deg, ${settings.primaryColor} 0%, ${settings.secondaryColor} 50%, ${settings.accentColor} 100%)`);
-    root.style.setProperty('--gradient-2', `linear-gradient(135deg, ${settings.primaryColor} 0%, ${settings.secondaryColor} 100%)`);
-    root.style.setProperty('--gradient-soft', `linear-gradient(135deg, ${settings.primaryColor}22 0%, ${settings.secondaryColor}22 100%)`);
-    root.style.setProperty('--green', settings.primaryColor);
-    root.style.setProperty('--green-hover', settings.primaryColor + 'dd');
-    root.style.setProperty('--green-dark', settings.primaryColor);
-    root.style.setProperty('--green-light', settings.secondaryColor);
-    root.style.setProperty('--green-pale', settings.accentColor + '22');
-  };
 
   const handleColorChange = (colorType, value) => {
     const newSettings = { ...siteSettings, [colorType]: value };

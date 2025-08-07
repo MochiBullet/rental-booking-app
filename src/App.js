@@ -22,6 +22,25 @@ function App() {
     if (savedUser) {
       setUser(JSON.parse(savedUser));
     }
+    
+    // サイト設定を読み込んでCSSに適用
+    const savedSettings = localStorage.getItem('siteSettings');
+    if (savedSettings) {
+      const settings = JSON.parse(savedSettings);
+      const root = document.documentElement;
+      root.style.setProperty('--gradient-1', `linear-gradient(135deg, ${settings.primaryColor} 0%, ${settings.secondaryColor} 50%, ${settings.accentColor} 100%)`);
+      root.style.setProperty('--gradient-2', `linear-gradient(135deg, ${settings.primaryColor} 0%, ${settings.secondaryColor} 100%)`);
+      root.style.setProperty('--gradient-soft', `linear-gradient(135deg, ${settings.primaryColor}22 0%, ${settings.secondaryColor}22 100%)`);
+      root.style.setProperty('--green', settings.primaryColor);
+      root.style.setProperty('--green-hover', settings.primaryColor + 'dd');
+      root.style.setProperty('--green-dark', settings.primaryColor);
+      root.style.setProperty('--green-light', settings.secondaryColor);
+      root.style.setProperty('--green-pale', settings.accentColor + '22');
+      
+      if (settings.siteName) {
+        document.title = settings.siteName;
+      }
+    }
   }, []);
 
   const handleLogoClick = () => {
