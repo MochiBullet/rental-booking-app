@@ -7,6 +7,7 @@ function HomePage() {
   const navigate = useNavigate();
   const [siteSettings, setSiteSettings] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [previousImageIndex, setPreviousImageIndex] = useState(-1);
   const [homeContent, setHomeContent] = useState({
     heroTitle: 'あなたの旅を、私たちがサポート',
     heroSubtitle: '安心・安全・快適なレンタルサービス',
@@ -60,10 +61,12 @@ function HomePage() {
     if (images.length <= 1) return;
 
     const interval = setInterval(() => {
-      setCurrentImageIndex((prevIndex) => 
-        (prevIndex + 1) % images.length
-      );
-    }, 5000); // 5秒ごとに切り替え
+      setPreviousImageIndex((prevIndex) => prevIndex);
+      setCurrentImageIndex((prevIndex) => {
+        setPreviousImageIndex(prevIndex);
+        return (prevIndex + 1) % images.length;
+      });
+    }, 4000); // 4秒ごとに切り替え
 
     return () => clearInterval(interval);
   }, [siteSettings]);
@@ -83,7 +86,10 @@ function HomePage() {
           {getBackgroundImages().map((image, index) => (
             <div
               key={index}
-              className={`background-image ${index === currentImageIndex ? 'active' : ''}`}
+              className={`background-image ${
+                index === currentImageIndex ? 'active' : 
+                index === previousImageIndex ? 'exit' : ''
+              }`}
               style={{
                 backgroundImage: `url(${image})`,
               }}
