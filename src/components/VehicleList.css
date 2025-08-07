@@ -3,7 +3,7 @@
 .vehicle-list-container {
   min-height: calc(100vh - 200px);
   padding: 3rem 2rem;
-  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  background: var(--gradient-soft);
 }
 
 .vehicle-list-header {
@@ -15,7 +15,7 @@
 .vehicle-list-header h1 {
   font-size: 3rem;
   font-weight: 800;
-  background: linear-gradient(135deg, #2e7d32 0%, #43a047 100%);
+  background: var(--gradient-2);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -23,7 +23,7 @@
 }
 
 .vehicle-list-header p {
-  color: #64748b;
+  color: var(--gray);
   font-size: 1.125rem;
   font-weight: 500;
 }
@@ -55,7 +55,7 @@
   position: relative;
   height: 220px;
   overflow: hidden;
-  background: linear-gradient(135deg, #43a047 0%, #66bb6a 100%);
+  background: var(--gradient-1);
 }
 
 .vehicle-image {
@@ -80,7 +80,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: #43a047;
+  color: var(--green);
   backdrop-filter: blur(10px);
 }
 
@@ -88,7 +88,7 @@
   position: absolute;
   top: 1rem;
   right: 1rem;
-  background: #10b981;
+  background: var(--green-light);
   color: white;
   padding: 0.5rem 1rem;
   border-radius: 50px;
@@ -145,7 +145,7 @@
 .price-amount {
   font-size: 1.75rem;
   font-weight: 800;
-  color: #43a047;
+  color: var(--green);
 }
 
 .price-period {
@@ -326,7 +326,7 @@
 }
 
 .plan-card.selected .plan-discount {
-  color: #43a047;
+  color: var(--green);
 }
 
 /* Date Inputs */
@@ -476,7 +476,7 @@
 
 .insurance-price {
   font-weight: 700;
-  color: #43a047;
+  color: var(--green);
 }
 
 /* Price Breakdown */
@@ -723,7 +723,7 @@
 }
 
 .price-only {
-  color: #43a047;
+  color: var(--green);
   font-size: 1.1rem;
   font-weight: 600;
   margin: 0;

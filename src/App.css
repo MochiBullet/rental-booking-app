@@ -2,30 +2,35 @@
 
 :root {
   
-  /* デフォルト値 - 管理者画面から動的に変更可能 */
-  --green: #43a047;
-  --green-hover: #43a047dd;
-  --green-dark: #43a047;
-  --green-light: #66bb6a;
-  --green-pale: #81c78422;
-  --dark-gray: #1b5e20;
-  --gray: #689f38;
-  --light-gray: #c5e1a5;
-  --extra-light-gray: #f1f8e9;
-  --white: #ffffff;
+  /* 人間工学的に最適化された緑色基調の配色パレット */
+  --green: #2e7d32;           /* メインブランドカラー（濃い緑） */
+  --green-hover: #1b5e20;     /* ホバー状態（さらに濃い緑） */
+  --green-dark: #1b5e20;      /* 重要テキスト（コントラスト十分） */
+  --green-light: #4caf50;     /* アクセントカラー（明るい緑） */
+  --green-pale: #e8f5e9;      /* 背景色（非常に薄い緑） */
+  --dark-gray: #263238;       /* プライマリーテキスト（高コントラスト） */
+  --gray: #546e7a;            /* セカンダリーテキスト */
+  --light-gray: #cfd8dc;      /* ボーダー・区切り線 */
+  --extra-light-gray: #fafafa; /* メイン背景（ほぼ白） */
+  --white: #ffffff;           /* 純白 */
+  
+  /* グラデーション用の色定義 */
+  --gradient-1: linear-gradient(135deg, #2e7d32 0%, #4caf50 100%);
+  --gradient-2: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%);
+  --gradient-soft: linear-gradient(135deg, #fafafa 0%, #e8f5e9 100%);
 }
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Comic Sans MS', 'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif;
+  font-family: 'Segoe UI', 'Roboto', 'Noto Sans JP', 'Arial', sans-serif;
 }
 
 body {
   background: var(--extra-light-gray);
   color: var(--dark-gray);
-  font-family: 'Comic Sans MS', 'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif;
+  font-family: 'Segoe UI', 'Roboto', 'Noto Sans JP', 'Arial', sans-serif;
   font-weight: 400;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -67,7 +72,7 @@ body {
 .logo {
   width: 40px;
   height: 40px;
-  background: #43a047;
+  background: var(--green);
   border-radius: 10px;
   display: flex;
   align-items: center;
@@ -80,7 +85,7 @@ body {
 .site-title {
   font-size: 24px;
   font-weight: 600;
-  color: #43a047;
+  color: var(--green);
   letter-spacing: -0.5px;
 }
 
@@ -99,7 +104,7 @@ body {
 
 .mypage-link {
   padding: 8px 20px;
-  background: #43a047;
+  background: var(--green);
   color: white;
   text-decoration: none;
   border-radius: 8px;
@@ -108,7 +113,7 @@ body {
 }
 
 .mypage-link:hover {
-  background: #388e3c;
+  background: var(--green-hover);
 }
 
 .welcome-text {

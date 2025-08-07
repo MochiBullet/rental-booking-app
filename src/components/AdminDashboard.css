@@ -9,7 +9,7 @@
 }
 
 .sync-btn {
-  background: #10b981;
+  background: var(--green-light);
   color: white;
   border: none;
   padding: 0.5rem 1rem;
@@ -23,7 +23,7 @@
 }
 
 .sync-btn:hover:not(:disabled) {
-  background: #059669;
+  background: var(--green);
 }
 
 .sync-btn:disabled {
@@ -39,14 +39,14 @@
 .admin-dashboard {
   display: flex;
   min-height: 100vh;
-  background: #f8f9fa;
-  font-family: "M PLUS Rounded 1c", "Nunito", "Comfortaa", -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  background: var(--extra-light-gray);
+  font-family: 'Segoe UI', 'Roboto', 'Noto Sans JP', 'Arial', sans-serif;
 }
 
 /* Sidebar */
 .admin-sidebar {
   width: 260px;
-  background: #667eea;
+  background: var(--green-dark);
   color: white;
   display: flex;
   flex-direction: column;
