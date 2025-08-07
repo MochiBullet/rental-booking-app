@@ -113,18 +113,30 @@ const AdminDashboard = () => {
       new Date(b.bookingDate).toDateString() === today
     ).length;
     
-    const activeBookingsCount = storedBookings.filter(b => 
-      b.status === 'active' || b.status === 'confirmed'
-    ).length;
+    // 予約ステータス別集計
+    const confirmedBookings = storedBookings.filter(b => b.status === 'confirmed').length;
+    const cancelledBookings = storedBookings.filter(b => b.status === 'cancelled').length;
+    const activeBookings = storedBookings.filter(b => b.status === 'active').length;
+    const completedBookings = storedBookings.filter(b => b.status === 'completed').length;
     
-    const totalRevenue = storedBookings.reduce((sum, b) => 
-      sum + (b.totalPrice || 0), 0
-    );
+    // 収益計算（キャンセル分を除外し、確定・完了分のみ）
+    const totalRevenue = storedBookings
+      .filter(b => b.status === 'confirmed' || b.status === 'completed')
+      .reduce((sum, b) => sum + (b.totalPrice || 0), 0);
+    
+    // キャンセル損失計算
+    const cancelledRevenue = storedBookings
+      .filter(b => b.status === 'cancelled')
+      .reduce((sum, b) => sum + (b.totalPrice || 0), 0);
     
     setStats({
       totalBookings: storedBookings.length,
-      activeBookings: activeBookingsCount,
+      confirmedBookings: confirmedBookings,
+      cancelledBookings: cancelledBookings,
+      activeBookings: activeBookings,
+      completedBookings: completedBookings,
       totalRevenue: totalRevenue,
+      cancelledRevenue: cancelledRevenue,
       totalVehicles: storedVehicles.length,
       totalUsers: storedUsers.length,
       todayBookings: todayBookingsCount
@@ -317,6 +329,28 @@ const AdminDashboard = () => {
     showNotification(`✅ 予約 #${booking?.id} を承認しました！お客様に通知されます。`, 'success');
   };
 
+  // 車両引き渡し確定ハンドラー
+  const handleCompleteHandover = (bookingId) => {
+    const booking = bookings.find(b => b.id === bookingId);
+    const today = new Date().toDateString();
+    const pickupDate = new Date(booking.pickupDate).toDateString();
+    
+    if (pickupDate !== today) {
+      showNotification('❌ 引き渡し確定は引き渡し当日のみ可能です。', 'error');
+      return;
+    }
+    
+    if (window.confirm('この予約の車両引き渡しを確定しますか？')) {
+      const updatedBookings = bookings.map(b => 
+        b.id === bookingId ? { ...b, status: 'completed', handoverDate: new Date().toISOString() } : b
+      );
+      setBookings(updatedBookings);
+      localStorage.setItem('bookings', JSON.stringify(updatedBookings));
+      loadDashboardData();
+      showNotification(`🏁 予約 #${booking?.id} の車両引き渡しを確定しました！`, 'success');
+    }
+  };
+
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('ja-JP', {
       style: 'currency',
@@ -410,30 +444,57 @@ const AdminDashboard = () => {
           {activeSection === 'overview' && (
             <div className="overview-section">
               <div className="stats-grid">
-                <div className="stat-card">
-                  <div className="stat-icon">📅</div>
-                  <div className="stat-details">
-                    <h3>Total Bookings</h3>
-                    <p className="stat-number">{stats.totalBookings}</p>
-                    <span className="stat-label">All Time</span>
-                  </div>
-                </div>
-                
-                <div className="stat-card">
+                <div className="stat-card confirmed">
                   <div className="stat-icon">✅</div>
                   <div className="stat-details">
-                    <h3>Active Bookings</h3>
-                    <p className="stat-number">{stats.activeBookings}</p>
-                    <span className="stat-label">Current</span>
+                    <h3>予約確定</h3>
+                    <p className="stat-number">{stats.confirmedBookings}</p>
+                    <span className="stat-label">Confirmed</span>
                   </div>
                 </div>
                 
-                <div className="stat-card">
+                <div className="stat-card cancelled">
+                  <div className="stat-icon">❌</div>
+                  <div className="stat-details">
+                    <h3>キャンセル</h3>
+                    <p className="stat-number">{stats.cancelledBookings}</p>
+                    <span className="stat-label">Cancelled</span>
+                  </div>
+                </div>
+                
+                <div className="stat-card active">
+                  <div className="stat-icon">🚀</div>
+                  <div className="stat-details">
+                    <h3>進行中</h3>
+                    <p className="stat-number">{stats.activeBookings}</p>
+                    <span className="stat-label">Active</span>
+                  </div>
+                </div>
+                
+                <div className="stat-card completed">
+                  <div className="stat-icon">🏁</div>
+                  <div className="stat-details">
+                    <h3>完了済み</h3>
+                    <p className="stat-number">{stats.completedBookings}</p>
+                    <span className="stat-label">Completed</span>
+                  </div>
+                </div>
+                
+                <div className="stat-card revenue">
                   <div className="stat-icon">💰</div>
                   <div className="stat-details">
-                    <h3>Total Revenue</h3>
+                    <h3>実収益</h3>
                     <p className="stat-number">{formatCurrency(stats.totalRevenue)}</p>
-                    <span className="stat-label">All Time</span>
+                    <span className="stat-label">確定・完了のみ</span>
+                  </div>
+                </div>
+                
+                <div className="stat-card cancelled-revenue">
+                  <div className="stat-icon">📉</div>
+                  <div className="stat-details">
+                    <h3>キャンセル損失</h3>
+                    <p className="stat-number">{formatCurrency(stats.cancelledRevenue)}</p>
+                    <span className="stat-label">Lost Revenue</span>
                   </div>
                 </div>
                 
@@ -477,9 +538,11 @@ const AdminDashboard = () => {
                         </p>
                       </div>
                       <span className={`activity-status status-${booking.status}`}>
-                        {booking.status === 'confirmed' ? 'Confirmed' : 
-                         booking.status === 'active' ? 'Active' : 
-                         booking.status === 'cancelled' ? 'Cancelled' : 'Pending'}
+                        {booking.status === 'confirmed' ? '確定' : 
+                         booking.status === 'active' ? 'アクティブ' : 
+                         booking.status === 'cancelled' ? 'キャンセル' : 
+                         booking.status === 'completed' ? '完了済み' :
+                         booking.status === 'pending' ? '保留中' : booking.status}
                       </span>
                     </div>
                   ))}
@@ -525,27 +588,38 @@ const AdminDashboard = () => {
                         <td>{formatCurrency(booking.totalPrice)}</td>
                         <td>
                           <span className={`status-badge status-${booking.status}`}>
-                            {booking.status === 'confirmed' ? 'Confirmed' : 
-                             booking.status === 'active' ? 'Active' : 
-                             booking.status === 'cancelled' ? 'Cancelled' : 'Pending'}
+                            {booking.status === 'confirmed' ? '確定' : 
+                             booking.status === 'active' ? 'アクティブ' : 
+                             booking.status === 'cancelled' ? 'キャンセル' : 
+                             booking.status === 'completed' ? '完了済み' :
+                             booking.status === 'pending' ? '保留中' : booking.status}
                           </span>
                         </td>
                         <td>
                           <div className="action-buttons">
-                            {booking.status !== 'confirmed' && (
+                            {booking.status === 'pending' && (
                               <button 
                                 className="action-btn confirm"
                                 onClick={() => handleConfirmBooking(booking.id)}
                               >
-                                Confirm
+                                承認
                               </button>
                             )}
-                            {booking.status !== 'cancelled' && (
+                            {booking.status === 'confirmed' && (
+                              <button 
+                                className="action-btn handover"
+                                onClick={() => handleCompleteHandover(booking.id)}
+                                title="引き渡し当日のみ実行可能"
+                              >
+                                引き渡し確定
+                              </button>
+                            )}
+                            {booking.status !== 'cancelled' && booking.status !== 'completed' && (
                               <button 
                                 className="action-btn cancel"
                                 onClick={() => handleCancelBooking(booking.id)}
                               >
-                                Cancel
+                                キャンセル
                               </button>
                             )}
                           </div>
