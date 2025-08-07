@@ -2,6 +2,13 @@
 
 React で作成した車とバイクのレンタル予約システムです。
 
+## 📚 ドキュメント構成
+
+- **[実装計画](docs/planning/IMPLEMENTATION_PLAN.md)** - 実稼働に向けた段階的計画
+- **[TODO一覧](docs/planning/TODO.md)** - 実装が必要な機能リスト
+- **[開発履歴](docs/development/CHANGELOG.md)** - これまでの開発記録
+- **[デプロイガイド](docs/deployment/)** - AWS/Vercel等へのデプロイ方法
+
 ## 機能
 
 - 🚗 車両一覧表示（車・バイク）
