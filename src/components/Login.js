@@ -16,17 +16,55 @@ function Login({ setUser }) {
     setLoading(true);
 
     setTimeout(() => {
+      // 管理者簡易ログインチェック
+      if (formData.email === 'admin' && formData.password === 'admin0123') {
+        const adminUser = {
+          id: 'admin-001',
+          name: '管理者',
+          email: 'admin@system.internal',
+          points: 0,
+          isAdmin: true,
+          memberNumber: 'ADMIN001',
+          createdAt: new Date().toISOString(),
+          // 管理者用の追加情報
+          role: 'administrator',
+          permissions: ['all']
+        };
+        
+        localStorage.setItem('currentUser', JSON.stringify(adminUser));
+        localStorage.setItem('adminUser', 'true');
+        setUser(adminUser);
+        setLoading(false);
+        navigate('/admin');
+        return;
+      }
+
       // Check if user exists in localStorage
       const users = JSON.parse(localStorage.getItem('users') || '[]');
       const existingUser = users.find(user => user.email === formData.email);
       
       if (existingUser) {
+        // パスワードチェック（簡易版）
+        if (existingUser.password && existingUser.password !== formData.password) {
+          setError('メールアドレスまたはパスワードが正しくありません。');
+          setLoading(false);
+          return;
+        }
+        
         // Use existing user data
         localStorage.setItem('currentUser', JSON.stringify(existingUser));
         setUser(existingUser);
         setLoading(false);
         navigate('/mypage');
       } else {
+        // バリデーション追加（管理者以外は正規のメールアドレスが必要）
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(formData.email)) {
+          setError('正しいメールアドレスを入力してください。');
+          setLoading(false);
+          return;
+        }
+        
         // Create simple user for demo (backward compatibility)
         const userData = {
           id: Date.now(),
@@ -59,12 +97,12 @@ function Login({ setUser }) {
           <div style={{ marginBottom: '1.5rem' }}>
             <label htmlFor="email" style={{ display: 'block', marginBottom: '0.5rem', color: '#333', fontWeight: '500' }}>メールアドレス</label>
             <input
-              type="email"
+              type="text"
               id="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder="example@email.com"
+              placeholder="example@email.com または admin"
               required
               style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '6px', fontSize: '1rem' }}
             />
