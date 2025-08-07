@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './HomePage.css';
+import { siteSettingsManager } from '../data/siteSettings';
 
 function HomePage() {
   const navigate = useNavigate();
+  const [siteSettings, setSiteSettings] = useState(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [homeContent, setHomeContent] = useState({
     heroTitle: 'あなたの旅を、私たちがサポート',
     heroSubtitle: '安心・安全・快適なレンタルサービス',
@@ -25,18 +28,88 @@ function HomePage() {
     ]
   });
 
+  // デフォルト背景画像（美しいレンタカー関連の画像URL）
+  const defaultImages = [
+    'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=1920&q=80', // 美しい車の風景
+    'https://images.unsplash.com/photo-1542282088-fe8426682b8f?w=1920&q=80', // モダンな車
+    'https://images.unsplash.com/photo-1568844293986-8d0400bd4f1b?w=1920&q=80', // 高級車
+    'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=1920&q=80', // バイク
+  ];
+
   useEffect(() => {
+    // サイト設定を読み込み
+    setSiteSettings(siteSettingsManager.getSettings());
+    
     const savedContent = localStorage.getItem('homeContent');
     if (savedContent) {
       setHomeContent(JSON.parse(savedContent));
     }
+
+    // カスタムイベントリスナーを追加（管理者画面からの更新を受け取る）
+    const handleSettingsUpdate = () => {
+      setSiteSettings(siteSettingsManager.getSettings());
+    };
+    
+    window.addEventListener('siteSettingsUpdate', handleSettingsUpdate);
+    return () => window.removeEventListener('siteSettingsUpdate', handleSettingsUpdate);
   }, []);
+
+  // 背景画像スライダーのロジック
+  useEffect(() => {
+    const images = getBackgroundImages();
+    if (images.length <= 1) return;
+
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => 
+        (prevIndex + 1) % images.length
+      );
+    }, 5000); // 5秒ごとに切り替え
+
+    return () => clearInterval(interval);
+  }, [siteSettings]);
+
+  const getBackgroundImages = () => {
+    if (siteSettings?.hero?.backgroundImages?.length > 0 && !siteSettings.hero.useDefaultImages) {
+      return siteSettings.hero.backgroundImages;
+    }
+    return defaultImages;
+  };
 
   return (
     <div className="home-page">
       <div className="hero-section">
-        <h2 className="hero-title">{homeContent.heroTitle}</h2>
-        <p className="hero-subtitle">{homeContent.heroSubtitle}</p>
+        {/* 背景画像スライダー */}
+        <div className="background-slider">
+          {getBackgroundImages().map((image, index) => (
+            <div
+              key={index}
+              className={`background-image ${index === currentImageIndex ? 'active' : ''}`}
+              style={{
+                backgroundImage: `url(${image})`,
+              }}
+            />
+          ))}
+        </div>
+        
+        {/* オーバーレイ */}
+        <div className="hero-overlay" />
+        
+        {/* コンテンツ */}
+        <div className="hero-content">
+          <h2 className="hero-title">{homeContent.heroTitle}</h2>
+          <p className="hero-subtitle">{homeContent.heroSubtitle}</p>
+        </div>
+        
+        {/* スライダーインジケーター */}
+        <div className="slider-indicators">
+          {getBackgroundImages().map((_, index) => (
+            <button
+              key={index}
+              className={`indicator ${index === currentImageIndex ? 'active' : ''}`}
+              onClick={() => setCurrentImageIndex(index)}
+            />
+          ))}
+        </div>
       </div>
 
       <div className="selection-container">

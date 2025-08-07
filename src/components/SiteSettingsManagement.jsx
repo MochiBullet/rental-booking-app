@@ -158,6 +158,104 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
     }
   };
 
+  // ヒーロー設定の更新
+  const updateHeroSettings = (field, value) => {
+    setSettings(prev => ({
+      ...prev,
+      hero: {
+        ...prev.hero,
+        [field]: value
+      }
+    }));
+  };
+
+  // ヒーロー背景画像のアップロード処理
+  const handleHeroImageUpload = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // ファイルサイズチェック（最大5MB）
+    if (file.size > 5 * 1024 * 1024) {
+      alert('ファイルサイズは5MB以下にしてください。');
+      return;
+    }
+
+    // 画像ファイルかチェック
+    if (!file.type.startsWith('image/')) {
+      alert('画像ファイルを選択してください。');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const base64Data = e.target.result;
+      const currentImages = settings.hero?.backgroundImages || [];
+      const newImages = [...currentImages, base64Data];
+      
+      updateHeroSettings('backgroundImages', newImages);
+      updateHeroSettings('useDefaultImages', false);
+      
+      // リアルタイム更新の実行
+      if (onSettingsUpdate) {
+        const updatedSettings = {
+          ...settings,
+          hero: {
+            ...settings.hero,
+            backgroundImages: newImages,
+            useDefaultImages: false
+          }
+        };
+        onSettingsUpdate(updatedSettings);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // ヒーロー背景画像を削除
+  const removeHeroImage = (indexToRemove) => {
+    const currentImages = settings.hero?.backgroundImages || [];
+    const newImages = currentImages.filter((_, index) => index !== indexToRemove);
+    
+    updateHeroSettings('backgroundImages', newImages);
+    
+    // 画像がなくなった場合はデフォルトに戻す
+    if (newImages.length === 0) {
+      updateHeroSettings('useDefaultImages', true);
+    }
+    
+    // リアルタイム更新の実行
+    if (onSettingsUpdate) {
+      const updatedSettings = {
+        ...settings,
+        hero: {
+          ...settings.hero,
+          backgroundImages: newImages,
+          useDefaultImages: newImages.length === 0
+        }
+      };
+      onSettingsUpdate(updatedSettings);
+    }
+  };
+
+  // デフォルト画像に戻す
+  const resetHeroToDefault = () => {
+    updateHeroSettings('backgroundImages', []);
+    updateHeroSettings('useDefaultImages', true);
+    
+    // リアルタイム更新の実行
+    if (onSettingsUpdate) {
+      const updatedSettings = {
+        ...settings,
+        hero: {
+          ...settings.hero,
+          backgroundImages: [],
+          useDefaultImages: true
+        }
+      };
+      onSettingsUpdate(updatedSettings);
+    }
+  };
+
   return (
     <div className="site-settings-management">
       <div className="settings-header">
@@ -175,6 +273,7 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
       <div className="settings-tabs">
         {[
           { key: 'branding', label: '🎨 ブランディング' },
+          { key: 'hero-images', label: '🏞️ ヒーロー画像' },
           { key: 'hero', label: 'ヒーローセクション' },
           { key: 'features', label: '特徴・機能' },
           { key: 'contact', label: 'お問い合わせ情報' },
@@ -270,6 +369,80 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
                     • 推奨サイズ: 40x40px 以上<br/>
                     • 対応形式: PNG, JPG, GIF<br/>
                     • 最大サイズ: 2MB
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeSection === 'hero-images' && (
+          <div className="section">
+            <h3>🏞️ ヒーロー背景画像管理</h3>
+            
+            <div className="form-group">
+              <label>背景画像設定</label>
+              <div className="hero-image-management">
+                <div className="current-images">
+                  <h4>現在の背景画像</h4>
+                  <div className="image-grid">
+                    {settings.hero?.backgroundImages?.map((image, index) => (
+                      <div key={index} className="hero-image-item">
+                        <img 
+                          src={image} 
+                          alt={`背景画像 ${index + 1}`}
+                          style={{ 
+                            width: '150px', 
+                            height: '100px', 
+                            objectFit: 'cover',
+                            borderRadius: '8px'
+                          }}
+                        />
+                        <button 
+                          type="button" 
+                          onClick={() => removeHeroImage(index)}
+                          className="remove-image-button"
+                        >
+                          ❌
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {(!settings.hero?.backgroundImages?.length || settings.hero?.useDefaultImages) && (
+                    <p className="default-images-note">
+                      現在はデフォルト画像を使用中（美しいレンタカー画像）
+                    </p>
+                  )}
+                </div>
+
+                <div className="hero-upload-controls">
+                  <input
+                    type="file"
+                    id="heroImageUpload"
+                    accept="image/*"
+                    onChange={handleHeroImageUpload}
+                    style={{ display: 'none' }}
+                  />
+                  <div className="hero-buttons">
+                    <label htmlFor="heroImageUpload" className="upload-button">
+                      📷 背景画像を追加
+                    </label>
+                    {settings.hero?.backgroundImages?.length > 0 && (
+                      <button 
+                        type="button" 
+                        onClick={resetHeroToDefault}
+                        className="reset-icon-button"
+                      >
+                        🔄 デフォルト画像に戻す
+                      </button>
+                    )}
+                  </div>
+                  <p className="upload-info">
+                    • 推奨サイズ: 1920x1080px 以上<br/>
+                    • 対応形式: PNG, JPG, WEBP<br/>
+                    • 最大サイズ: 5MB<br/>
+                    • 複数枚追加可能（自動でスライダー表示）
                   </p>
                 </div>
               </div>

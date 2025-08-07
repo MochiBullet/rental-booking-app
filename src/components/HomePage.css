@@ -6,12 +6,66 @@
 }
 
 .hero-section {
-  background: var(--gradient-1);
-  color: white;
-  padding: 80px 20px;
-  text-align: center;
   position: relative;
+  height: 80vh;
+  min-height: 600px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
   overflow: hidden;
+}
+
+/* 背景スライダー */
+.background-slider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.background-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity 2s ease-in-out;
+}
+
+.background-image.active {
+  opacity: 1;
+}
+
+/* オーバーレイ */
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    rgba(46, 125, 50, 0.8) 0%,
+    rgba(76, 175, 80, 0.7) 50%,
+    rgba(129, 199, 132, 0.6) 100%
+  );
+  z-index: 2;
+}
+
+/* ヒーローコンテンツ */
+.hero-content {
+  position: relative;
+  z-index: 3;
+  color: white;
+  max-width: 800px;
+  padding: 0 20px;
 }
 
 .hero-section::before {
@@ -32,20 +86,66 @@
 }
 
 .hero-title {
-  font-size: 2.5rem;
-  margin: 0;
+  font-size: 3rem;
+  margin: 0 0 20px 0;
   font-weight: 700;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-  position: relative;
-  z-index: 1;
+  text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+  line-height: 1.2;
 }
 
 .hero-subtitle {
-  font-size: 1.2rem;
-  margin-top: 10px;
+  font-size: 1.4rem;
+  margin: 0;
   opacity: 0.95;
-  position: relative;
-  z-index: 1;
+  text-shadow: 1px 1px 4px rgba(0,0,0,0.5);
+  line-height: 1.4;
+}
+
+/* スライダーインジケーター */
+.slider-indicators {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 12px;
+  z-index: 4;
+}
+
+.indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.indicator.active {
+  background: white;
+  border-color: white;
+  transform: scale(1.2);
+}
+
+.indicator:hover {
+  border-color: rgba(255, 255, 255, 0.8);
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  .hero-section {
+    height: 70vh;
+    min-height: 500px;
+  }
+  
+  .hero-title {
+    font-size: 2.2rem;
+  }
+  
+  .hero-subtitle {
+    font-size: 1.1rem;
+  }
 }
 
 .selection-container {
