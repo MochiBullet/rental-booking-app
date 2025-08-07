@@ -49,7 +49,14 @@ const AdminDashboard = () => {
   const loadSiteSettings = () => {
     const savedSettings = localStorage.getItem('siteSettings');
     if (savedSettings) {
-      setSiteSettings(JSON.parse(savedSettings));
+      const settings = JSON.parse(savedSettings);
+      setSiteSettings(settings);
+      // 保存された設定をCSSに適用
+      updateCSSVariables(settings);
+      // サイト名も適用
+      if (settings.siteName) {
+        document.title = settings.siteName;
+      }
     }
   };
 
@@ -90,9 +97,39 @@ const AdminDashboard = () => {
     navigate('/');
   };
 
+  const showNotification = (message, type = 'success') => {
+    const notification = document.createElement('div');
+    const colors = {
+      success: `linear-gradient(135deg, ${siteSettings.primaryColor} 0%, ${siteSettings.secondaryColor} 100%)`,
+      error: 'linear-gradient(135deg, #d63031 0%, #e84393 100%)',
+      info: 'linear-gradient(135deg, #0984e3 0%, #74b9ff 100%)'
+    };
+    
+    notification.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: ${colors[type]};
+      color: white;
+      padding: 1rem 2rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      z-index: 10000;
+      animation: slideIn 0.3s ease;
+      max-width: 300px;
+    `;
+    notification.innerHTML = message;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+      notification.style.animation = 'slideIn 0.3s ease reverse';
+      setTimeout(() => notification.remove(), 300);
+    }, 3000);
+  };
+
   const handleAddVehicle = () => {
     if (!newVehicle.name || !newVehicle.price) {
-      alert('Vehicle name and price are required');
+      showNotification('❌ 車両名と価格は必須項目です', 'error');
       return;
     }
     
@@ -118,11 +155,13 @@ const AdminDashboard = () => {
     });
     setShowAddVehicleModal(false);
     loadDashboardData();
+    
+    showNotification(`✅ ${vehicle.name}が正常に追加されました`);
   };
 
   const handleEditVehicle = () => {
     if (!selectedVehicle.name || !selectedVehicle.price) {
-      alert('Vehicle name and price are required');
+      showNotification('❌ 車両名と価格は必須項目です', 'error');
       return;
     }
     
@@ -133,62 +172,152 @@ const AdminDashboard = () => {
     setVehicles(updatedVehicles);
     localStorage.setItem('vehicles', JSON.stringify(updatedVehicles));
     setShowEditVehicleModal(false);
+    const vehicleName = selectedVehicle.name;
     setSelectedVehicle(null);
     loadDashboardData();
+    
+    showNotification(`✅ ${vehicleName}の情報が更新されました`);
   };
 
   const handleDeleteVehicle = (vehicleId) => {
     if (window.confirm('Delete this vehicle?')) {
+      const vehicle = vehicles.find(v => v.id === vehicleId);
       const updatedVehicles = vehicles.filter(v => v.id !== vehicleId);
       setVehicles(updatedVehicles);
       localStorage.setItem('vehicles', JSON.stringify(updatedVehicles));
       loadDashboardData();
+      showNotification(`車両「${vehicle?.name}」を削除しました`, 'success');
     }
   };
 
   const handleToggleVehicleAvailability = (vehicleId) => {
+    const vehicle = vehicles.find(v => v.id === vehicleId);
     const updatedVehicles = vehicles.map(v => 
       v.id === vehicleId ? { ...v, available: !v.available } : v
     );
     setVehicles(updatedVehicles);
     localStorage.setItem('vehicles', JSON.stringify(updatedVehicles));
     loadDashboardData();
+    showNotification(
+      `車両「${vehicle?.name}」を${!vehicle?.available ? '有効' : '無効'}にしました`, 
+      'success'
+    );
+  };
+
+  const updateCSSVariables = (settings) => {
+    const root = document.documentElement;
+    root.style.setProperty('--gradient-1', `linear-gradient(135deg, ${settings.primaryColor} 0%, ${settings.secondaryColor} 50%, ${settings.accentColor} 100%)`);
+    root.style.setProperty('--gradient-2', `linear-gradient(135deg, ${settings.primaryColor} 0%, ${settings.secondaryColor} 100%)`);
+    root.style.setProperty('--gradient-soft', `linear-gradient(135deg, ${settings.primaryColor}22 0%, ${settings.secondaryColor}22 100%)`);
+    root.style.setProperty('--green', settings.primaryColor);
+    root.style.setProperty('--green-hover', settings.primaryColor + 'dd');
+    root.style.setProperty('--green-dark', settings.primaryColor);
+    root.style.setProperty('--green-light', settings.secondaryColor);
+    root.style.setProperty('--green-pale', settings.accentColor + '22');
+  };
+
+  const handleColorChange = (colorType, value) => {
+    const newSettings = { ...siteSettings, [colorType]: value };
+    setSiteSettings(newSettings);
+    // リアルタイムでCSSを更新
+    updateCSSVariables(newSettings);
+  };
+
+  const handlePresetChange = (preset) => {
+    setSiteSettings(preset);
+    // リアルタイムでCSSを更新
+    updateCSSVariables(preset);
+  };
+
+  // 通知システム
+  const showNotification = (message, type = 'success') => {
+    const notification = document.createElement('div');
+    const icons = {
+      success: '✅',
+      error: '❌',
+      info: 'ℹ️',
+      warning: '⚠️'
+    };
+    
+    const colors = {
+      success: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+      error: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+      info: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+      warning: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
+    };
+
+    notification.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: ${colors[type] || colors.success};
+      color: white;
+      padding: 1rem 2rem;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      z-index: 10000;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      transform: translateX(400px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      backdrop-filter: blur(10px);
+    `;
+    
+    notification.innerHTML = `${icons[type] || icons.success} ${message}`;
+    document.body.appendChild(notification);
+    
+    // アニメーション開始
+    setTimeout(() => {
+      notification.style.transform = 'translateX(0)';
+      notification.style.opacity = '1';
+    }, 100);
+    
+    // 自動削除
+    setTimeout(() => {
+      notification.style.transform = 'translateX(400px)';
+      notification.style.opacity = '0';
+      setTimeout(() => notification.remove(), 300);
+    }, 3000);
   };
 
   const handleSaveDesignSettings = () => {
     localStorage.setItem('siteSettings', JSON.stringify(siteSettings));
+    updateCSSVariables(siteSettings);
     
-    // Update CSS variables dynamically
-    const root = document.documentElement;
-    root.style.setProperty('--gradient-1', `linear-gradient(135deg, ${siteSettings.primaryColor} 0%, ${siteSettings.secondaryColor} 50%, ${siteSettings.accentColor} 100%)`);
-    root.style.setProperty('--gradient-2', `linear-gradient(135deg, ${siteSettings.primaryColor} 0%, ${siteSettings.secondaryColor} 100%)`);
-    root.style.setProperty('--green', siteSettings.primaryColor);
-    root.style.setProperty('--green-hover', siteSettings.primaryColor + 'dd');
-    root.style.setProperty('--green-dark', siteSettings.primaryColor);
-    root.style.setProperty('--green-light', siteSettings.secondaryColor);
+    // サイト名も更新
+    if (siteSettings.siteName) {
+      document.title = siteSettings.siteName;
+    }
     
     setShowDesignModal(false);
-    alert('デザイン設定が保存されました！');
+    showNotification('デザイン設定が保存され、リアルタイムで適用されました！', 'success');
   };
 
   const handleCancelBooking = (bookingId) => {
     if (window.confirm('Cancel this booking?')) {
+      const booking = bookings.find(b => b.id === bookingId);
       const updatedBookings = bookings.map(b => 
         b.id === bookingId ? { ...b, status: 'cancelled' } : b
       );
       setBookings(updatedBookings);
       localStorage.setItem('bookings', JSON.stringify(updatedBookings));
       loadDashboardData();
+      showNotification(`予約 #${booking?.id} をキャンセルしました`, 'info');
     }
   };
 
   const handleConfirmBooking = (bookingId) => {
+    const booking = bookings.find(b => b.id === bookingId);
     const updatedBookings = bookings.map(b => 
       b.id === bookingId ? { ...b, status: 'confirmed' } : b
     );
     setBookings(updatedBookings);
     localStorage.setItem('bookings', JSON.stringify(updatedBookings));
     loadDashboardData();
+    showNotification(`予約 #${booking?.id} を承認しました`, 'success');
   };
 
   const formatCurrency = (amount) => {
@@ -878,13 +1007,13 @@ const AdminDashboard = () => {
                       <input 
                         type="color"
                         value={siteSettings.primaryColor}
-                        onChange={(e) => setSiteSettings({...siteSettings, primaryColor: e.target.value})}
+                        onChange={(e) => handleColorChange('primaryColor', e.target.value)}
                         className="color-picker"
                       />
                       <input 
                         type="text"
                         value={siteSettings.primaryColor}
-                        onChange={(e) => setSiteSettings({...siteSettings, primaryColor: e.target.value})}
+                        onChange={(e) => handleColorChange('primaryColor', e.target.value)}
                         className="color-text"
                       />
                     </div>
@@ -896,13 +1025,13 @@ const AdminDashboard = () => {
                       <input 
                         type="color"
                         value={siteSettings.secondaryColor}
-                        onChange={(e) => setSiteSettings({...siteSettings, secondaryColor: e.target.value})}
+                        onChange={(e) => handleColorChange('secondaryColor', e.target.value)}
                         className="color-picker"
                       />
                       <input 
                         type="text"
                         value={siteSettings.secondaryColor}
-                        onChange={(e) => setSiteSettings({...siteSettings, secondaryColor: e.target.value})}
+                        onChange={(e) => handleColorChange('secondaryColor', e.target.value)}
                         className="color-text"
                       />
                     </div>
@@ -914,13 +1043,13 @@ const AdminDashboard = () => {
                       <input 
                         type="color"
                         value={siteSettings.accentColor}
-                        onChange={(e) => setSiteSettings({...siteSettings, accentColor: e.target.value})}
+                        onChange={(e) => handleColorChange('accentColor', e.target.value)}
                         className="color-picker"
                       />
                       <input 
                         type="text"
                         value={siteSettings.accentColor}
-                        onChange={(e) => setSiteSettings({...siteSettings, accentColor: e.target.value})}
+                        onChange={(e) => handleColorChange('accentColor', e.target.value)}
                         className="color-text"
                       />
                     </div>
@@ -933,7 +1062,7 @@ const AdminDashboard = () => {
                 <div className="theme-presets">
                   <button 
                     className="preset-btn green-theme"
-                    onClick={() => setSiteSettings({
+                    onClick={() => handlePresetChange({
                       ...siteSettings,
                       primaryColor: '#43a047',
                       secondaryColor: '#66bb6a',
@@ -951,7 +1080,7 @@ const AdminDashboard = () => {
                   
                   <button 
                     className="preset-btn blue-theme"
-                    onClick={() => setSiteSettings({
+                    onClick={() => handlePresetChange({
                       ...siteSettings,
                       primaryColor: '#1976d2',
                       secondaryColor: '#42a5f5',
@@ -969,7 +1098,7 @@ const AdminDashboard = () => {
                   
                   <button 
                     className="preset-btn purple-theme"
-                    onClick={() => setSiteSettings({
+                    onClick={() => handlePresetChange({
                       ...siteSettings,
                       primaryColor: '#7b1fa2',
                       secondaryColor: '#ab47bc',
@@ -987,7 +1116,7 @@ const AdminDashboard = () => {
                   
                   <button 
                     className="preset-btn orange-theme"
-                    onClick={() => setSiteSettings({
+                    onClick={() => handlePresetChange({
                       ...siteSettings,
                       primaryColor: '#f57c00',
                       secondaryColor: '#ff9800',
