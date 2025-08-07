@@ -1,5 +1,10 @@
 // サイト設定データ
 export const initialSiteSettings = {
+  branding: {
+    siteName: "RentalEasy",
+    siteIcon: null, // カスタムアイコン（Base64形式）null = デフォルトロゴ
+    siteIconType: 'default' // 'default' | 'custom'
+  },
   hero: {
     title: "車・バイクレンタル RentalEasy",
     subtitle: "お手軽価格で快適な移動体験を - AWS CDK自動デプロイ対応",

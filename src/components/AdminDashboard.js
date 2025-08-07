@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './AdminDashboard.css';
 import dataSyncService from '../services/dataSync';
+import SiteSettingsManagement from './SiteSettingsManagement';
 
-const AdminDashboard = () => {
+const AdminDashboard = ({ onSettingsUpdate }) => {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('overview');
   const [detailsType, setDetailsType] = useState(null);
@@ -1308,94 +1309,7 @@ const AdminDashboard = () => {
           )}
           
           {activeSection === 'settings' && (
-            <div className="settings-section">
-              <div className="settings-grid">
-                <div className="settings-card">
-                  <h3>🎨 サイトデザイン設定</h3>
-                  <p>サイト全体のカラーテーマとデザインをカスタマイズできます。</p>
-                  <button 
-                    className="design-btn"
-                    onClick={() => setShowDesignModal(true)}
-                  >
-                    デザインを変更
-                  </button>
-                </div>
-                
-                <div className="settings-card">
-                  <h3>⚙️ サイト基本設定</h3>
-                  <div className="setting-item">
-                    <label>サイト名</label>
-                    <input 
-                      type="text"
-                      value={siteSettings.siteName}
-                      onChange={(e) => setSiteSettings({...siteSettings, siteName: e.target.value})}
-                    />
-                  </div>
-                  <div className="setting-item">
-                    <label>現在のテーマ</label>
-                    <select 
-                      value={siteSettings.theme}
-                      onChange={(e) => setSiteSettings({...siteSettings, theme: e.target.value})}
-                    >
-                      <option value="green">Green (現在)</option>
-                      <option value="blue">Blue</option>
-                      <option value="purple">Purple</option>
-                      <option value="orange">Orange</option>
-                    </select>
-                  </div>
-                  <button className="save-settings-btn" onClick={handleSaveDesignSettings}>
-                    設定を保存
-                  </button>
-                </div>
-                
-                <div className="settings-card">
-                  <h3>🚗 車両管理設定</h3>
-                  <div className="setting-item">
-                    <label>デフォルト価格 (円/日)</label>
-                    <input type="number" placeholder="8000" />
-                  </div>
-                  <div className="setting-item">
-                    <label>在庫アラート</label>
-                    <input type="number" placeholder="5" />
-                    <small>この台数以下になるとアラート表示</small>
-                  </div>
-                </div>
-                
-                <div className="settings-card">
-                  <h3>📊 分析設定</h3>
-                  <div className="setting-item">
-                    <label>レポート送信</label>
-                    <div className="checkbox-group">
-                      <label><input type="checkbox" /> 日次レポート</label>
-                      <label><input type="checkbox" /> 週次レポート</label>
-                      <label><input type="checkbox" /> 月次レポート</label>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="settings-card">
-                  <h3>💳 ポイント設定</h3>
-                  <div className="setting-item">
-                    <label>ポイント還元率 (%)</label>
-                    <input type="number" defaultValue="5" min="0" max="10" />
-                  </div>
-                  <div className="setting-item">
-                    <label>新規登録ボーナス</label>
-                    <input type="number" defaultValue="1000" />
-                    <small>ポイント</small>
-                  </div>
-                </div>
-                
-                <div className="settings-card">
-                  <h3>🔒 システム設定</h3>
-                  <div className="setting-actions">
-                    <button className="danger-btn">データベースリセット</button>
-                    <button className="export-btn">データエクスポート</button>
-                    <button className="backup-btn">バックアップ作成</button>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <SiteSettingsManagement onSettingsUpdate={onSettingsUpdate} />
           )}
           
           {activeSection === 'content' && (

@@ -21,6 +21,7 @@ function AppContent() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [logoClickCount, setLogoClickCount] = useState(0);
   const [logoClickTimer, setLogoClickTimer] = useState(null);
+  const [siteSettings, setSiteSettings] = useState(null);
   const location = useLocation();
 
   useEffect(() => {
@@ -36,21 +37,27 @@ function AppContent() {
     }
     
     // サイト設定を読み込んでCSSに適用
-    const savedSettings = localStorage.getItem('siteSettings');
+    const savedSettings = localStorage.getItem('rentalEasySiteSettings');
     if (savedSettings) {
       const settings = JSON.parse(savedSettings);
+      setSiteSettings(settings); // 状態に保存
       const root = document.documentElement;
-      root.style.setProperty('--gradient-1', `linear-gradient(135deg, ${settings.primaryColor} 0%, ${settings.secondaryColor} 50%, ${settings.accentColor} 100%)`);
-      root.style.setProperty('--gradient-2', `linear-gradient(135deg, ${settings.primaryColor} 0%, ${settings.secondaryColor} 100%)`);
-      root.style.setProperty('--gradient-soft', `linear-gradient(135deg, ${settings.primaryColor}22 0%, ${settings.secondaryColor}22 100%)`);
-      root.style.setProperty('--green', settings.primaryColor);
-      root.style.setProperty('--green-hover', settings.primaryColor + 'dd');
-      root.style.setProperty('--green-dark', settings.primaryColor);
-      root.style.setProperty('--green-light', settings.secondaryColor);
-      root.style.setProperty('--green-pale', settings.accentColor + '22');
       
-      if (settings.siteName) {
-        document.title = settings.siteName;
+      // カラー設定がある場合は適用（後方互換性）
+      if (settings.primaryColor) {
+        root.style.setProperty('--gradient-1', `linear-gradient(135deg, ${settings.primaryColor} 0%, ${settings.secondaryColor} 50%, ${settings.accentColor} 100%)`);
+        root.style.setProperty('--gradient-2', `linear-gradient(135deg, ${settings.primaryColor} 0%, ${settings.secondaryColor} 100%)`);
+        root.style.setProperty('--gradient-soft', `linear-gradient(135deg, ${settings.primaryColor}22 0%, ${settings.secondaryColor}22 100%)`);
+        root.style.setProperty('--green', settings.primaryColor);
+        root.style.setProperty('--green-hover', settings.primaryColor + 'dd');
+        root.style.setProperty('--green-dark', settings.primaryColor);
+        root.style.setProperty('--green-light', settings.secondaryColor);
+        root.style.setProperty('--green-pale', settings.accentColor + '22');
+      }
+      
+      // ブランディング設定の適用
+      if (settings.branding?.siteName) {
+        document.title = settings.branding.siteName;
       }
     }
   }, []);
@@ -81,13 +88,46 @@ function AppContent() {
     localStorage.removeItem('adminUser');
   };
 
+  // サイト設定更新の処理
+  const handleSiteSettingsUpdate = (newSettings) => {
+    setSiteSettings(newSettings);
+    
+    // リアルタイムでタイトル更新
+    if (newSettings.branding?.siteName) {
+      document.title = newSettings.branding.siteName;
+    }
+    
+    // localStorageにも保存（既にSiteSettingsManagementで保存済み）
+    // カスタムイベントを発生させて他のコンポーネントに通知
+    window.dispatchEvent(new CustomEvent('siteSettingsUpdate', { 
+      detail: newSettings 
+    }));
+  };
+
   return (
     <div className="App">
         <header className="main-header">
           <div className="header-container">
             <Link to="/" className="logo-section" onClick={handleLogoClick} style={{cursor: 'pointer', textDecoration: 'none', color: 'inherit'}}>
-              <div className="logo">MB</div>
-              <h1 className="site-title">M's BASE Rental</h1>
+              <div className="logo">
+                {siteSettings?.branding?.siteIconType === 'custom' && siteSettings?.branding?.siteIcon ? (
+                  <img 
+                    src={siteSettings.branding.siteIcon} 
+                    alt="サイトアイコン" 
+                    style={{ 
+                      width: '40px', 
+                      height: '40px', 
+                      borderRadius: '10px',
+                      objectFit: 'cover'
+                    }}
+                  />
+                ) : (
+                  'MB'
+                )}
+              </div>
+              <h1 className="site-title">
+                {siteSettings?.branding?.siteName || 'M\'s BASE Rental'}
+              </h1>
             </Link>
             
             <nav className="header-nav">
@@ -120,7 +160,7 @@ function AppContent() {
           <Route path="/complete-registration/:token" element={<CompleteRegistration />} />
           <Route path="/mypage" element={<MyPage user={user} setUser={setUser} />} />
           <Route path="/admin-login" element={<AdminLogin setIsAdmin={setIsAdmin} />} />
-          <Route path="/admin" element={isAdmin ? <AdminDashboard /> : <AdminLogin setIsAdmin={setIsAdmin} />} />
+          <Route path="/admin" element={isAdmin ? <AdminDashboard onSettingsUpdate={handleSiteSettingsUpdate} /> : <AdminLogin setIsAdmin={setIsAdmin} />} />
           <Route path="/contact" element={<ContactForm />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />

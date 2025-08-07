@@ -3,7 +3,7 @@ import { siteSettingsManager, initialSiteSettings } from '../data/siteSettings';
 
 const SiteSettingsManagement = ({ onSettingsUpdate }) => {
   const [settings, setSettings] = useState(initialSiteSettings);
-  const [activeSection, setActiveSection] = useState('hero');
+  const [activeSection, setActiveSection] = useState('branding');
 
   useEffect(() => {
     setSettings(siteSettingsManager.getSettings());
@@ -89,6 +89,75 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
     }));
   };
 
+  // ブランディング設定の更新
+  const updateBrandingSettings = (field, value) => {
+    setSettings(prev => ({
+      ...prev,
+      branding: {
+        ...prev.branding,
+        [field]: value
+      }
+    }));
+  };
+
+  // アイコンファイルのアップロード処理
+  const handleIconUpload = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // ファイルサイズチェック（最大2MB）
+    if (file.size > 2 * 1024 * 1024) {
+      alert('ファイルサイズは2MB以下にしてください。');
+      return;
+    }
+
+    // 画像ファイルかチェック
+    if (!file.type.startsWith('image/')) {
+      alert('画像ファイルを選択してください。');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const base64Data = e.target.result;
+      updateBrandingSettings('siteIcon', base64Data);
+      updateBrandingSettings('siteIconType', 'custom');
+      
+      // リアルタイム更新の実行
+      if (onSettingsUpdate) {
+        const updatedSettings = {
+          ...settings,
+          branding: {
+            ...settings.branding,
+            siteIcon: base64Data,
+            siteIconType: 'custom'
+          }
+        };
+        onSettingsUpdate(updatedSettings);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // アイコンをデフォルトに戻す
+  const resetIconToDefault = () => {
+    updateBrandingSettings('siteIcon', null);
+    updateBrandingSettings('siteIconType', 'default');
+    
+    // リアルタイム更新の実行
+    if (onSettingsUpdate) {
+      const updatedSettings = {
+        ...settings,
+        branding: {
+          ...settings.branding,
+          siteIcon: null,
+          siteIconType: 'default'
+        }
+      };
+      onSettingsUpdate(updatedSettings);
+    }
+  };
+
   return (
     <div className="site-settings-management">
       <div className="settings-header">
@@ -105,6 +174,7 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
 
       <div className="settings-tabs">
         {[
+          { key: 'branding', label: '🎨 ブランディング' },
           { key: 'hero', label: 'ヒーローセクション' },
           { key: 'features', label: '特徴・機能' },
           { key: 'contact', label: 'お問い合わせ情報' },
@@ -123,6 +193,90 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
       </div>
 
       <div className="settings-content">
+        {activeSection === 'branding' && (
+          <div className="section">
+            <h3>🎨 ブランディング設定</h3>
+            
+            <div className="form-group">
+              <label>サイト名</label>
+              <input
+                type="text"
+                value={settings.branding?.siteName || 'RentalEasy'}
+                onChange={(e) => updateBrandingSettings('siteName', e.target.value)}
+                placeholder="RentalEasy"
+              />
+            </div>
+
+            <div className="form-group">
+              <label>サイトアイコン</label>
+              <div className="icon-management">
+                <div className="current-icon-preview">
+                  <h4>現在のアイコン</h4>
+                  <div className="icon-preview">
+                    {settings.branding?.siteIconType === 'custom' && settings.branding?.siteIcon ? (
+                      <img 
+                        src={settings.branding.siteIcon} 
+                        alt="カスタムアイコン" 
+                        style={{ width: '40px', height: '40px', borderRadius: '8px' }}
+                      />
+                    ) : (
+                      <div 
+                        className="default-icon"
+                        style={{ 
+                          width: '40px', 
+                          height: '40px', 
+                          background: 'var(--green)', 
+                          borderRadius: '8px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: 'white',
+                          fontWeight: 'bold',
+                          fontSize: '18px'
+                        }}
+                      >
+                        MB
+                      </div>
+                    )}
+                    <span style={{ marginLeft: '10px' }}>
+                      {settings.branding?.siteIconType === 'custom' ? 'カスタムアイコン' : 'デフォルトロゴ'}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="icon-upload-controls">
+                  <input
+                    type="file"
+                    id="iconUpload"
+                    accept="image/*"
+                    onChange={handleIconUpload}
+                    style={{ display: 'none' }}
+                  />
+                  <div className="icon-buttons">
+                    <label htmlFor="iconUpload" className="upload-button">
+                      📷 アイコンをアップロード
+                    </label>
+                    {settings.branding?.siteIconType === 'custom' && (
+                      <button 
+                        type="button" 
+                        onClick={resetIconToDefault}
+                        className="reset-icon-button"
+                      >
+                        🔄 デフォルトに戻す
+                      </button>
+                    )}
+                  </div>
+                  <p className="upload-info">
+                    • 推奨サイズ: 40x40px 以上<br/>
+                    • 対応形式: PNG, JPG, GIF<br/>
+                    • 最大サイズ: 2MB
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {activeSection === 'hero' && (
           <div className="section">
             <h3>ヒーローセクション設定</h3>
