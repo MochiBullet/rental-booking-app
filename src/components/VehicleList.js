@@ -5,9 +5,6 @@ import './VehicleList.css';
 const VehicleList = ({ user }) => {
   const { type } = useParams();
   const [vehicles, setVehicles] = useState([]);
-  
-  // デバッグ用
-  console.log('VehicleList user:', user);
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState(false);
@@ -312,23 +309,20 @@ const VehicleList = ({ user }) => {
                   <span className="price-amount">{formatCurrency(vehicle.price)}</span>
                   <span className="price-period">/ 日</span>
                 </div>
-                {(() => {
-                  console.log('Rendering button section, user:', user);
-                  return user ? (
-                    <button 
-                      className="modern-book-btn"
-                      onClick={() => handleBookVehicle(vehicle)}
-                      disabled={!vehicle.available}
-                    >
-                      予約する
-                    </button>
-                  ) : (
-                    <div className="member-only-notice">
-                      <p className="login-required">ログインが必要です</p>
-                      <p className="price-only">料金: {formatCurrency(vehicle.price)} / 日</p>
-                    </div>
-                  );
-                })()}
+                {user ? (
+                  <button 
+                    className="modern-book-btn"
+                    onClick={() => handleBookVehicle(vehicle)}
+                    disabled={!vehicle.available}
+                  >
+                    予約する
+                  </button>
+                ) : (
+                  <div className="member-only-notice">
+                    <p className="login-required">ログインが必要です</p>
+                    <p className="price-only">料金: {formatCurrency(vehicle.price)} / 日</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>

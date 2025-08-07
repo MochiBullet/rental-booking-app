@@ -23,11 +23,8 @@ function AppContent() {
 
   useEffect(() => {
     const savedUser = localStorage.getItem('currentUser');
-    console.log('App.js savedUser:', savedUser);
     if (savedUser) {
-      const parsedUser = JSON.parse(savedUser);
-      console.log('App.js parsed user:', parsedUser);
-      setUser(parsedUser);
+      setUser(JSON.parse(savedUser));
     }
     
     // 管理者ログイン状態を復元
