@@ -47,6 +47,19 @@ const CompleteRegistration = () => {
   });
 
   const [errors, setErrors] = useState({});
+  // 会員番号生成関数
+  const generateMemberNumber = (licenseNumber, registrationDate = new Date()) => {
+    if (!licenseNumber || licenseNumber.length < 4) {
+      return null;
+    }
+    
+    const year = registrationDate.getFullYear();
+    const month = String(registrationDate.getMonth() + 1).padStart(2, '0');
+    const lastFourDigits = licenseNumber.slice(-4);
+    
+    return `${year}${month}${lastFourDigits}`;
+  };
+
   const [uploadedImages, setUploadedImages] = useState({
     front: null,
     back: null
@@ -224,6 +237,9 @@ const CompleteRegistration = () => {
     // Simulate API call
     setTimeout(() => {
       // Create user account
+      const now = new Date();
+      const memberNumber = generateMemberNumber(formData.licenseNumber, now);
+      
       const newUser = {
         id: Date.now(),
         email: formData.email,
@@ -232,6 +248,7 @@ const CompleteRegistration = () => {
         phone: formData.phone,
         birthDate: formData.birthDate,
         gender: formData.gender,
+        memberNumber: memberNumber,
         address: {
           postalCode: formData.postalCode,
           prefecture: formData.prefecture,

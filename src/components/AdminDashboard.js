@@ -117,9 +117,28 @@ const AdminDashboard = () => {
     const storedVehicles = JSON.parse(localStorage.getItem('vehicles') || '[]');
     const storedUsers = JSON.parse(localStorage.getItem('users') || '[]');
     
+    // 既存ユーザーの会員番号を一括生成（未設定の場合のみ）
+    let usersUpdated = false;
+    const updatedUsers = storedUsers.map(user => {
+      if (!user.memberNumber && user.licenseNumber && user.licenseNumber.length >= 4) {
+        const registrationDate = user.createdAt ? new Date(user.createdAt) : new Date();
+        const memberNumber = generateMemberNumber(user.licenseNumber, registrationDate);
+        usersUpdated = true;
+        return { ...user, memberNumber };
+      }
+      return user;
+    });
+    
+    // 更新があった場合はlocalStorageに保存
+    if (usersUpdated) {
+      localStorage.setItem('users', JSON.stringify(updatedUsers));
+      setUsers(updatedUsers);
+    } else {
+      setUsers(storedUsers);
+    }
+    
     setBookings(storedBookings);
     setVehicles(storedVehicles);
-    setUsers(storedUsers);
     
     const today = new Date().toDateString();
     const todayBookingsCount = storedBookings.filter(b => 
@@ -438,6 +457,19 @@ const AdminDashboard = () => {
     setMonthlyStats({ type, months });
   };
 
+  // 会員番号生成関数
+  const generateMemberNumber = (licenseNumber, registrationDate = new Date()) => {
+    if (!licenseNumber || licenseNumber.length < 4) {
+      return null; // 免許証番号が不十分な場合はnullを返す
+    }
+    
+    const year = registrationDate.getFullYear();
+    const month = String(registrationDate.getMonth() + 1).padStart(2, '0');
+    const lastFourDigits = licenseNumber.slice(-4);
+    
+    return `${year}${month}${lastFourDigits}`;
+  };
+
   // ユーザー管理ハンドラー
   const handleAddUser = () => {
     if (!newUser.name || !newUser.email) {
@@ -452,11 +484,15 @@ const AdminDashboard = () => {
       return;
     }
     
+    const now = new Date();
+    const memberNumber = generateMemberNumber(newUser.licenseNumber, now);
+    
     const user = {
       id: Date.now(),
       ...newUser,
+      memberNumber: memberNumber,
       points: parseInt(newUser.points) || 0,
-      createdAt: new Date().toISOString(),
+      createdAt: now.toISOString(),
       isActive: true
     };
     
@@ -491,8 +527,17 @@ const AdminDashboard = () => {
       return;
     }
     
+    // 免許証番号が変更された場合は会員番号を再生成
+    const originalUser = users.find(u => u.id === selectedUser.id);
+    let updatedUser = { ...selectedUser, points: parseInt(selectedUser.points) || 0 };
+    
+    if (originalUser.licenseNumber !== selectedUser.licenseNumber) {
+      const registrationDate = originalUser.createdAt ? new Date(originalUser.createdAt) : new Date();
+      updatedUser.memberNumber = generateMemberNumber(selectedUser.licenseNumber, registrationDate);
+    }
+    
     const updatedUsers = users.map(u => 
-      u.id === selectedUser.id ? { ...selectedUser, points: parseInt(selectedUser.points) || 0 } : u
+      u.id === selectedUser.id ? updatedUser : u
     );
     
     setUsers(updatedUsers);
@@ -522,6 +567,7 @@ const AdminDashboard = () => {
     const totalSpent = userBookings.reduce((sum, b) => sum + (b.totalPrice || 0), 0);
     
     alert(`ユーザー詳細情報:
+会員番号: ${user.memberNumber || '未設定'}
 氏名: ${user.name}
 メール: ${user.email}
 電話: ${user.phone || 'なし'}
@@ -927,7 +973,7 @@ const AdminDashboard = () => {
                   <table>
                     <thead>
                       <tr>
-                        <th>顧客ID</th>
+                        <th>会員番号</th>
                         <th>氏名</th>
                         <th>メールアドレス</th>
                         <th>電話番号</th>
@@ -947,7 +993,11 @@ const AdminDashboard = () => {
                         
                         return (
                           <tr key={user.id}>
-                            <td>#{String(user.id).slice(-6)}</td>
+                            <td>
+                              <span className="member-number">
+                                {user.memberNumber || '未設定'}
+                              </span>
+                            </td>
                             <td>
                               <div className="user-info">
                                 <div className="user-avatar">

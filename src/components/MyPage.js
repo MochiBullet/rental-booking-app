@@ -417,6 +417,10 @@ const MyPage = ({ user, setUser }) => {
                 <h3>基本情報</h3>
                 <div className="profile-grid">
                   <div className="profile-field">
+                    <label>会員番号</label>
+                    <span className="member-number">{user.memberNumber || '未設定'}</span>
+                  </div>
+                  <div className="profile-field">
                     <label>お名前</label>
                     <span>{user.name}</span>
                   </div>

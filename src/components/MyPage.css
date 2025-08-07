@@ -710,3 +710,15 @@
     gap: 1rem;
   }
 }
+
+/* Member Number Styling */
+.member-number {
+  font-family: monospace;
+  font-weight: 600;
+  color: #43a047;
+  background: rgba(67, 160, 71, 0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+}

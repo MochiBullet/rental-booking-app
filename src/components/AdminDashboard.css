@@ -1469,6 +1469,18 @@
   background: #c62828;
 }
 
+/* Member Number Styling */
+.member-number {
+  font-family: monospace;
+  font-weight: 600;
+  color: #667eea;
+  background: rgba(102, 126, 234, 0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+}
+
 .action-btn:hover {
   transform: scale(1.1);
 }
