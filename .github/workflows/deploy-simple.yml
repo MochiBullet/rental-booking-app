@@ -38,8 +38,20 @@ jobs:
       run: |
         BUCKET_NAME="${{ secrets.S3_BUCKET_NAME }}"
         
+        # If no bucket name provided, create a unique one
+        if [ -z "$BUCKET_NAME" ]; then
+          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+          BUCKET_NAME="msbase-rental-$ACCOUNT_ID"
+          echo "Generated bucket name: $BUCKET_NAME"
+        fi
+        
         # Create bucket if it doesn't exist
-        aws s3 ls "s3://$BUCKET_NAME" 2>/dev/null || aws s3 mb "s3://$BUCKET_NAME" --region ap-southeast-2
+        if ! aws s3 ls "s3://$BUCKET_NAME" >/dev/null 2>&1; then
+          echo "Creating bucket: $BUCKET_NAME"
+          aws s3 mb "s3://$BUCKET_NAME" --region ap-southeast-2
+        else
+          echo "Bucket exists: $BUCKET_NAME"
+        fi
         
         # Enable static website hosting
         aws s3 website "s3://$BUCKET_NAME" --index-document index.html --error-document index.html
@@ -73,25 +85,30 @@ jobs:
     
     - name: Deploy to S3
       run: |
-        aws s3 sync build/ s3://${{ secrets.S3_BUCKET_NAME }}/ \
-          --delete \
-          --region ap-southeast-2 \
-          --cache-control "public, max-age=31536000" \
-          --exclude "*.html" \
-          --exclude "service-worker.js" \
-          --exclude "manifest.json"
+        BUCKET_NAME="${{ secrets.S3_BUCKET_NAME }}"
+        if [ -z "$BUCKET_NAME" ]; then
+          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+          BUCKET_NAME="msbase-rental-$ACCOUNT_ID"
+        fi
         
-        # Upload HTML files with no-cache
-        aws s3 sync build/ s3://${{ secrets.S3_BUCKET_NAME }}/ \
-          --region ap-southeast-2 \
-          --cache-control "no-cache" \
-          --include "*.html" \
-          --include "service-worker.js" \
-          --include "manifest.json"
+        echo "Deploying to bucket: $BUCKET_NAME"
+        
+        # Upload all files
+        aws s3 sync build/ s3://$BUCKET_NAME/ \
+          --delete \
+          --region ap-southeast-2
     
     - name: Show results
       run: |
         BUCKET_NAME="${{ secrets.S3_BUCKET_NAME }}"
+        if [ -z "$BUCKET_NAME" ]; then
+          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+          BUCKET_NAME="msbase-rental-$ACCOUNT_ID"
+        fi
+        
         echo "✅ Deployment completed successfully!"
         echo "🌐 Website URL: http://$BUCKET_NAME.s3-website-ap-southeast-2.amazonaws.com"
         echo "🔍 Check deployment: https://github.com/${{ github.repository }}/actions"
+        echo ""
+        echo "📋 Add this to GitHub Secrets if not set:"
+        echo "S3_BUCKET_NAME = $BUCKET_NAME"
