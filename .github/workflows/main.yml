@@ -1,8 +1,8 @@
-name: Deploy to AWS S3
+name: Deploy to AWS S3 (DISABLED)
 
 on:
-  push:
-    branches: [ master, main ]
+  # push:
+  #   branches: [ master, main ]
   workflow_dispatch:
 
 jobs:
@@ -46,7 +46,7 @@ jobs:
     
     - name: Set bucket policy for public access
       run: |
-        cat > bucket-policy.json << EOF
+        cat > bucket-policy.json << 'EOF'
         {
           "Version": "2012-10-17",
           "Statement": [
@@ -55,7 +55,7 @@ jobs:
               "Effect": "Allow",
               "Principal": "*",
               "Action": "s3:GetObject",
-              "Resource": "arn:aws:s3:::\${{ secrets.S3_BUCKET_NAME }}/*"
+              "Resource": "arn:aws:s3:::${{ secrets.S3_BUCKET_NAME }}/*"
             }
           ]
         }
