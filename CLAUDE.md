@@ -13,8 +13,12 @@
 
 ## 重要なアクセス情報
 
+### 本番サイトURL
+- **S3直接URL**: https://rental-booking-app-bucket.s3-website-ap-southeast-2.amazonaws.com
+- **独自ドメイン**: https://ms-base-rental.com (転送設定済み)
+
 ### 管理者画面へのアクセス
-1. ロゴ（GR）を**10回クリック**
+1. ロゴ（MB）を**10回クリック**
 2. 管理者ログイン画面が表示される
 3. ログイン情報:
    - Username: `admin`
@@ -519,7 +523,8 @@ const showNotification = (message, type = 'success') => {
 
 ## 連絡先・リソース
 - GitHub: https://github.com/MochiBullet/rental-booking-app
-- AWS S3: rental-booking-app-bucket.s3-website-ap-southeast-2.amazonaws.com
+- AWS S3: https://rental-booking-app-bucket.s3-website-ap-southeast-2.amazonaws.com
+- 独自ドメイン: https://ms-base-rental.com
 
 ---
 
