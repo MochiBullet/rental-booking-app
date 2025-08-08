@@ -9,7 +9,7 @@ const app = new cdk.App();
 // Get environment from context
 const environment = app.node.tryGetContext('environment') || 'production';
 const accountId = process.env.CDK_DEFAULT_ACCOUNT || app.node.tryGetContext('accountId');
-const region = process.env.CDK_DEFAULT_REGION || app.node.tryGetContext('region') || 'ap-northeast-1';
+const region = process.env.CDK_DEFAULT_REGION || app.node.tryGetContext('region') || 'ap-southeast-2';
 
 const env = {
   account: accountId,

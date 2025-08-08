@@ -16,7 +16,7 @@ if %errorlevel% neq 0 (
 
 REM Get AWS account information
 for /f "tokens=*" %%i in ('aws sts get-caller-identity --query Account --output text') do set ACCOUNT_ID=%%i
-if "%AWS_REGION%"=="" set AWS_REGION=ap-northeast-1
+if "%AWS_REGION%"=="" set AWS_REGION=ap-southeast-2
 if "%1"=="" (set ENVIRONMENT=production) else (set ENVIRONMENT=%1)
 
 echo AWS Account: %ACCOUNT_ID%
