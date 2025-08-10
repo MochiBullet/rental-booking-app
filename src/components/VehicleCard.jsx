@@ -9,14 +9,20 @@ const VehicleCard = ({ vehicle, onSelect }) => {
     }).format(price);
   };
 
+  // DynamoDBのデータ構造に対応
+  const isAvailable = vehicle.isAvailable !== undefined ? vehicle.isAvailable : vehicle.available;
+  const vehicleImage = vehicle.images && vehicle.images.length > 0 ? vehicle.images[0] : vehicle.image || '/placeholder-vehicle.jpg';
+  const dailyPrice = vehicle.pricePerDay || vehicle.price || 0;
+  const hourlyPrice = vehicle.pricePerHour || Math.round(dailyPrice / 8);
+
   return (
-    <div className={`vehicle-card ${!vehicle.available ? 'unavailable' : ''}`}>
+    <div className={`vehicle-card ${!isAvailable ? 'unavailable' : ''}`}>
       <div className="vehicle-image">
-        <img src={vehicle.image} alt={vehicle.name} />
+        <img src={vehicleImage} alt={vehicle.name} />
         <div className="vehicle-type-badge">
-          {vehicle.type === 'car' ? '🚗' : '🏍️'}
+          {(vehicle.vehicleType || vehicle.type) === 'car' ? '🚗' : '🏍️'}
         </div>
-        {!vehicle.available && (
+        {!isAvailable && (
           <div className="unavailable-overlay">
             <span>貸出中</span>
           </div>
@@ -31,33 +37,34 @@ const VehicleCard = ({ vehicle, onSelect }) => {
         <div className="specifications">
           <div className="spec-item">
             <span className="spec-label">定員:</span>
-            <span>{vehicle.specifications.seats}名</span>
+            <span>{vehicle.capacity || vehicle.specifications?.seats || 1}名</span>
           </div>
           <div className="spec-item">
             <span className="spec-label">排気量:</span>
-            <span>{vehicle.specifications.cc}cc</span>
+            <span>{vehicle.engineSize || vehicle.specifications?.cc || 0}cc</span>
           </div>
           <div className="spec-item">
             <span className="spec-label">燃料:</span>
-            <span>{vehicle.specifications.fuelType}</span>
+            <span>{vehicle.fuelType || vehicle.specifications?.fuelType || 'ガソリン'}</span>
           </div>
           <div className="spec-item">
             <span className="spec-label">ミッション:</span>
-            <span>{vehicle.specifications.transmission}</span>
+            <span>{vehicle.transmission || vehicle.specifications?.transmission || 'AT'}</span>
           </div>
         </div>
         
         <div className="vehicle-footer">
           <div className="price">
             <span className="price-label">1日あたり</span>
-            <span className="price-amount">{formatPrice(vehicle.price)}</span>
+            <span className="price-amount">{formatPrice(dailyPrice)}</span>
+            <span className="price-hourly">時間 {formatPrice(hourlyPrice)}</span>
           </div>
           <button 
             className="select-button"
             onClick={onSelect}
-            disabled={!vehicle.available}
+            disabled={!isAvailable}
           >
-            {vehicle.available ? '予約する' : '貸出中'}
+            {isAvailable ? '予約する' : '貸出中'}
           </button>
         </div>
       </div>

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
 import './App.css';
 import HomePage from './components/HomePage';
-import VehicleList from './components/VehicleList';
+import VehicleListPage from './components/VehicleListPage';
 import Login from './components/Login';
 import Register from './components/Register';
 import EmailRegistration from './components/EmailRegistration';
@@ -158,7 +158,7 @@ function AppContent() {
 
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/vehicles/:type" element={<VehicleList user={user} />} />
+          <Route path="/vehicles/:type" element={<VehicleListPage user={user} />} />
           <Route path="/login" element={<Login setUser={setUser} />} />
           <Route path="/register" element={<EmailRegistration />} />
           <Route path="/complete-registration/:token" element={<CompleteRegistration />} />

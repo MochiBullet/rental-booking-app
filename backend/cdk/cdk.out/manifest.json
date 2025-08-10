@@ -1,0 +1,551 @@
+{
+  "version": "36.0.0",
+  "artifacts": {
+    "RentalBookingBackendStack.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "RentalBookingBackendStack.assets.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "RentalBookingBackendStack": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://276291855506/ap-southeast-2",
+      "properties": {
+        "templateFile": "RentalBookingBackendStack.template.json",
+        "terminationProtection": false,
+        "validateOnSynth": false,
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::276291855506:role/cdk-hnb659fds-deploy-role-276291855506-ap-southeast-2",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::276291855506:role/cdk-hnb659fds-cfn-exec-role-276291855506-ap-southeast-2",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-276291855506-ap-southeast-2/2b1e1fb57afa9097a645f97e3310774fb06a712c2069285b00cd66ea8133abde.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
+        "additionalDependencies": [
+          "RentalBookingBackendStack.assets"
+        ],
+        "lookupRole": {
+          "arn": "arn:${AWS::Partition}:iam::276291855506:role/cdk-hnb659fds-lookup-role-276291855506-ap-southeast-2",
+          "requiresBootstrapStackVersion": 8,
+          "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+        }
+      },
+      "dependencies": [
+        "RentalBookingBackendStack.assets"
+      ],
+      "metadata": {
+        "/RentalBookingBackendStack/MembersTable": [
+          {
+            "type": "aws:cdk:hasPhysicalName",
+            "data": {
+              "Ref": "MembersTableF1AE6D26"
+            }
+          }
+        ],
+        "/RentalBookingBackendStack/MembersTable/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MembersTableF1AE6D26"
+          }
+        ],
+        "/RentalBookingBackendStack/VehiclesTable": [
+          {
+            "type": "aws:cdk:hasPhysicalName",
+            "data": {
+              "Ref": "VehiclesTable2BED75CE"
+            }
+          }
+        ],
+        "/RentalBookingBackendStack/VehiclesTable/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "VehiclesTable2BED75CE"
+          }
+        ],
+        "/RentalBookingBackendStack/ReservationsTable": [
+          {
+            "type": "aws:cdk:hasPhysicalName",
+            "data": {
+              "Ref": "ReservationsTableD1629A9C"
+            }
+          }
+        ],
+        "/RentalBookingBackendStack/ReservationsTable/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReservationsTableD1629A9C"
+          }
+        ],
+        "/RentalBookingBackendStack/CommonLayer/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CommonLayer306767A0"
+          }
+        ],
+        "/RentalBookingBackendStack/LambdaExecutionRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LambdaExecutionRoleD5C26073"
+          }
+        ],
+        "/RentalBookingBackendStack/LambdaExecutionRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LambdaExecutionRoleDefaultPolicy6D69732F"
+          }
+        ],
+        "/RentalBookingBackendStack/MembersFunction/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MembersFunction15E7FAB7"
+          }
+        ],
+        "/RentalBookingBackendStack/VehiclesFunction/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "VehiclesFunctionC306A209"
+          }
+        ],
+        "/RentalBookingBackendStack/ReservationsFunction/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReservationsFunction25614E70"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPI32714135"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/CloudWatchRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPICloudWatchRole4CA4C269"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Account": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPIAccountF53784EB"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Deployment/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPIDeploymentA832F613c5c2bd0efe9cab7afccfef435873cd47"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/DeploymentStage.prod/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPIDeploymentStageprod7D02C3A4"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Endpoint": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPIEndpointEABA751E"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPIOPTIONS98700277"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/members/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPImembers2543A15A"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/members/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPImembersOPTIONS3A682210"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/members/GET/ApiPermission.RentalBookingBackendStackRentalBookingAPI4D7EF860.GET..members": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPImembersGETApiPermissionRentalBookingBackendStackRentalBookingAPI4D7EF860GETmembers2F3FF51B"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/members/GET/ApiPermission.Test.RentalBookingBackendStackRentalBookingAPI4D7EF860.GET..members": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPImembersGETApiPermissionTestRentalBookingBackendStackRentalBookingAPI4D7EF860GETmembers9E649943"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/members/GET/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPImembersGET6601D4CA"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/members/POST/ApiPermission.RentalBookingBackendStackRentalBookingAPI4D7EF860.POST..members": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPImembersPOSTApiPermissionRentalBookingBackendStackRentalBookingAPI4D7EF860POSTmembers5A0F8C41"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/members/POST/ApiPermission.Test.RentalBookingBackendStackRentalBookingAPI4D7EF860.POST..members": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPImembersPOSTApiPermissionTestRentalBookingBackendStackRentalBookingAPI4D7EF860POSTmembers92DA8DBA"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/members/POST/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPImembersPOST60A6CE24"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/members/{memberId}/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPImembersmemberIdA46817CC"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/members/{memberId}/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPImembersmemberIdOPTIONS0827271C"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/members/{memberId}/GET/ApiPermission.RentalBookingBackendStackRentalBookingAPI4D7EF860.GET..members.{memberId}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPImembersmemberIdGETApiPermissionRentalBookingBackendStackRentalBookingAPI4D7EF860GETmembersmemberId18E0BA81"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/members/{memberId}/GET/ApiPermission.Test.RentalBookingBackendStackRentalBookingAPI4D7EF860.GET..members.{memberId}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPImembersmemberIdGETApiPermissionTestRentalBookingBackendStackRentalBookingAPI4D7EF860GETmembersmemberIdD7C77BA6"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/members/{memberId}/GET/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPImembersmemberIdGET0F1F39C3"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/members/{memberId}/PUT/ApiPermission.RentalBookingBackendStackRentalBookingAPI4D7EF860.PUT..members.{memberId}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPImembersmemberIdPUTApiPermissionRentalBookingBackendStackRentalBookingAPI4D7EF860PUTmembersmemberId04FD9597"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/members/{memberId}/PUT/ApiPermission.Test.RentalBookingBackendStackRentalBookingAPI4D7EF860.PUT..members.{memberId}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPImembersmemberIdPUTApiPermissionTestRentalBookingBackendStackRentalBookingAPI4D7EF860PUTmembersmemberId08B17EC6"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/members/{memberId}/PUT/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPImembersmemberIdPUT55D5E9F1"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/members/{memberId}/DELETE/ApiPermission.RentalBookingBackendStackRentalBookingAPI4D7EF860.DELETE..members.{memberId}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPImembersmemberIdDELETEApiPermissionRentalBookingBackendStackRentalBookingAPI4D7EF860DELETEmembersmemberId44BCA95A"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/members/{memberId}/DELETE/ApiPermission.Test.RentalBookingBackendStackRentalBookingAPI4D7EF860.DELETE..members.{memberId}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPImembersmemberIdDELETEApiPermissionTestRentalBookingBackendStackRentalBookingAPI4D7EF860DELETEmembersmemberId2A34F8FF"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/members/{memberId}/DELETE/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPImembersmemberIdDELETE47E6A6B5"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/vehicles/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPIvehicles0CF41086"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/vehicles/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPIvehiclesOPTIONS9B15B1AA"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/vehicles/GET/ApiPermission.RentalBookingBackendStackRentalBookingAPI4D7EF860.GET..vehicles": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPIvehiclesGETApiPermissionRentalBookingBackendStackRentalBookingAPI4D7EF860GETvehicles2BE90593"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/vehicles/GET/ApiPermission.Test.RentalBookingBackendStackRentalBookingAPI4D7EF860.GET..vehicles": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPIvehiclesGETApiPermissionTestRentalBookingBackendStackRentalBookingAPI4D7EF860GETvehicles8F96753A"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/vehicles/GET/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPIvehiclesGETD273A076"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/vehicles/POST/ApiPermission.RentalBookingBackendStackRentalBookingAPI4D7EF860.POST..vehicles": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPIvehiclesPOSTApiPermissionRentalBookingBackendStackRentalBookingAPI4D7EF860POSTvehicles93E880B7"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/vehicles/POST/ApiPermission.Test.RentalBookingBackendStackRentalBookingAPI4D7EF860.POST..vehicles": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPIvehiclesPOSTApiPermissionTestRentalBookingBackendStackRentalBookingAPI4D7EF860POSTvehiclesC302A036"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/vehicles/POST/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPIvehiclesPOST1FE31700"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/vehicles/{vehicleId}/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPIvehiclesvehicleId00F5E6D4"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/vehicles/{vehicleId}/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPIvehiclesvehicleIdOPTIONSB161C689"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/vehicles/{vehicleId}/GET/ApiPermission.RentalBookingBackendStackRentalBookingAPI4D7EF860.GET..vehicles.{vehicleId}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPIvehiclesvehicleIdGETApiPermissionRentalBookingBackendStackRentalBookingAPI4D7EF860GETvehiclesvehicleIdD0423570"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/vehicles/{vehicleId}/GET/ApiPermission.Test.RentalBookingBackendStackRentalBookingAPI4D7EF860.GET..vehicles.{vehicleId}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPIvehiclesvehicleIdGETApiPermissionTestRentalBookingBackendStackRentalBookingAPI4D7EF860GETvehiclesvehicleIdE3171AC8"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/vehicles/{vehicleId}/GET/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPIvehiclesvehicleIdGET45379B43"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/vehicles/{vehicleId}/PUT/ApiPermission.RentalBookingBackendStackRentalBookingAPI4D7EF860.PUT..vehicles.{vehicleId}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPIvehiclesvehicleIdPUTApiPermissionRentalBookingBackendStackRentalBookingAPI4D7EF860PUTvehiclesvehicleId6171DBCD"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/vehicles/{vehicleId}/PUT/ApiPermission.Test.RentalBookingBackendStackRentalBookingAPI4D7EF860.PUT..vehicles.{vehicleId}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPIvehiclesvehicleIdPUTApiPermissionTestRentalBookingBackendStackRentalBookingAPI4D7EF860PUTvehiclesvehicleId5C3BEF15"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/vehicles/{vehicleId}/PUT/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPIvehiclesvehicleIdPUTF5FDB26B"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/vehicles/{vehicleId}/DELETE/ApiPermission.RentalBookingBackendStackRentalBookingAPI4D7EF860.DELETE..vehicles.{vehicleId}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPIvehiclesvehicleIdDELETEApiPermissionRentalBookingBackendStackRentalBookingAPI4D7EF860DELETEvehiclesvehicleIdEBAD8BD6"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/vehicles/{vehicleId}/DELETE/ApiPermission.Test.RentalBookingBackendStackRentalBookingAPI4D7EF860.DELETE..vehicles.{vehicleId}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPIvehiclesvehicleIdDELETEApiPermissionTestRentalBookingBackendStackRentalBookingAPI4D7EF860DELETEvehiclesvehicleIdB64030D7"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/vehicles/{vehicleId}/DELETE/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPIvehiclesvehicleIdDELETECFBFAE45"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/reservations/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPIreservationsAC1D7383"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/reservations/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPIreservationsOPTIONSABB10E9E"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/reservations/GET/ApiPermission.RentalBookingBackendStackRentalBookingAPI4D7EF860.GET..reservations": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPIreservationsGETApiPermissionRentalBookingBackendStackRentalBookingAPI4D7EF860GETreservationsF13EC4B7"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/reservations/GET/ApiPermission.Test.RentalBookingBackendStackRentalBookingAPI4D7EF860.GET..reservations": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPIreservationsGETApiPermissionTestRentalBookingBackendStackRentalBookingAPI4D7EF860GETreservationsEC9007BA"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/reservations/GET/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPIreservationsGET267420B1"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/reservations/POST/ApiPermission.RentalBookingBackendStackRentalBookingAPI4D7EF860.POST..reservations": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPIreservationsPOSTApiPermissionRentalBookingBackendStackRentalBookingAPI4D7EF860POSTreservations997BD967"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/reservations/POST/ApiPermission.Test.RentalBookingBackendStackRentalBookingAPI4D7EF860.POST..reservations": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPIreservationsPOSTApiPermissionTestRentalBookingBackendStackRentalBookingAPI4D7EF860POSTreservations6DBFAF54"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/reservations/POST/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPIreservationsPOSTEF4C0C29"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/reservations/{id}/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPIreservationsid2F6FFDAC"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/reservations/{id}/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPIreservationsidOPTIONS5D458AC8"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/reservations/{id}/GET/ApiPermission.RentalBookingBackendStackRentalBookingAPI4D7EF860.GET..reservations.{id}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPIreservationsidGETApiPermissionRentalBookingBackendStackRentalBookingAPI4D7EF860GETreservationsid95A408A4"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/reservations/{id}/GET/ApiPermission.Test.RentalBookingBackendStackRentalBookingAPI4D7EF860.GET..reservations.{id}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPIreservationsidGETApiPermissionTestRentalBookingBackendStackRentalBookingAPI4D7EF860GETreservationsidDDCC3816"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/reservations/{id}/GET/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPIreservationsidGET5A7C7843"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/reservations/{id}/PUT/ApiPermission.RentalBookingBackendStackRentalBookingAPI4D7EF860.PUT..reservations.{id}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPIreservationsidPUTApiPermissionRentalBookingBackendStackRentalBookingAPI4D7EF860PUTreservationsid03A29170"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/reservations/{id}/PUT/ApiPermission.Test.RentalBookingBackendStackRentalBookingAPI4D7EF860.PUT..reservations.{id}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPIreservationsidPUTApiPermissionTestRentalBookingBackendStackRentalBookingAPI4D7EF860PUTreservationsid20CF3920"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/reservations/{id}/PUT/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPIreservationsidPUT0DC272A0"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/reservations/{id}/DELETE/ApiPermission.RentalBookingBackendStackRentalBookingAPI4D7EF860.DELETE..reservations.{id}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPIreservationsidDELETEApiPermissionRentalBookingBackendStackRentalBookingAPI4D7EF860DELETEreservationsid3F672382"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/reservations/{id}/DELETE/ApiPermission.Test.RentalBookingBackendStackRentalBookingAPI4D7EF860.DELETE..reservations.{id}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPIreservationsidDELETEApiPermissionTestRentalBookingBackendStackRentalBookingAPI4D7EF860DELETEreservationsid7401152C"
+          }
+        ],
+        "/RentalBookingBackendStack/RentalBookingAPI/Default/reservations/{id}/DELETE/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RentalBookingAPIreservationsidDELETE588752B5"
+          }
+        ],
+        "/RentalBookingBackendStack/APIEndpoint": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "APIEndpoint"
+          }
+        ],
+        "/RentalBookingBackendStack/MembersTableName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MembersTableName"
+          }
+        ],
+        "/RentalBookingBackendStack/VehiclesTableName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "VehiclesTableName"
+          }
+        ],
+        "/RentalBookingBackendStack/ReservationsTableName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ReservationsTableName"
+          }
+        ],
+        "/RentalBookingBackendStack/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/RentalBookingBackendStack/BootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BootstrapVersion"
+          }
+        ],
+        "/RentalBookingBackendStack/CheckBootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CheckBootstrapVersion"
+          }
+        ]
+      },
+      "displayName": "RentalBookingBackendStack"
+    },
+    "Tree": {
+      "type": "cdk:tree",
+      "properties": {
+        "file": "tree.json"
+      }
+    }
+  }
+}

@@ -7,17 +7,17 @@ const VehicleList = ({ vehicles, onVehicleSelect, initialFilter = 'all' }) => {
 
   const filteredVehicles = vehicles.filter(vehicle => {
     if (filterType === 'all') return true;
-    return vehicle.type === filterType;
+    return vehicle.vehicleType === filterType;
   });
 
   const sortedVehicles = [...filteredVehicles].sort((a, b) => {
     switch (sortBy) {
       case 'price':
-        return a.price - b.price;
+        return (a.pricePerDay || 0) - (b.pricePerDay || 0);
       case 'name':
-        return a.name.localeCompare(b.name, 'ja');
+        return (a.name || '').localeCompare(b.name || '', 'ja');
       case 'category':
-        return a.category.localeCompare(b.category, 'ja');
+        return (a.category || '').localeCompare(b.category || '', 'ja');
       default:
         return 0;
     }
@@ -56,7 +56,7 @@ const VehicleList = ({ vehicles, onVehicleSelect, initialFilter = 'all' }) => {
       <div className="vehicle-grid">
         {sortedVehicles.map(vehicle => (
           <VehicleCard 
-            key={vehicle.id} 
+            key={vehicle.vehicleId || vehicle.id} 
             vehicle={vehicle} 
             onSelect={() => onVehicleSelect(vehicle)}
           />

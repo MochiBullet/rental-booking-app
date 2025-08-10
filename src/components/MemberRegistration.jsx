@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { memberUtils } from '../data/memberData';
+import { memberAPI } from '../services/api';
 
 const MemberRegistration = ({ onRegister, onCancel }) => {
   const [formData, setFormData] = useState({
@@ -10,6 +10,7 @@ const MemberRegistration = ({ onRegister, onCancel }) => {
   });
   
   const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -35,7 +36,7 @@ const MemberRegistration = ({ onRegister, onCancel }) => {
     // メールアドレスチェック
     if (!formData.email.trim()) {
       newErrors.email = 'メールアドレスを入力してください';
-    } else if (!memberUtils.validateEmail(formData.email)) {
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = '有効なメールアドレスを入力してください';
     }
     
@@ -56,24 +57,36 @@ const MemberRegistration = ({ onRegister, onCancel }) => {
   };
 
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (validateForm()) {
-      // 会員番号生成: 西暦+月+免許証番号下4桁
-      const now = new Date();
-      const year = now.getFullYear();
-      const month = String(now.getMonth() + 1).padStart(2, '0');
-      const memberId = `${year}${month}${formData.licenseLastFour}`;
-      
+    if (!validateForm()) {
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      setErrors({});
+
       const memberData = {
-        memberId: memberId,
         email: formData.email,
-        licenseLastFour: formData.licenseLastFour,
-        registrationDate: now.toISOString()
+        licenseLastFour: formData.licenseLastFour
       };
       
-      onRegister(memberData);
+      const result = await memberAPI.create(memberData);
+      
+      if (result && result.member) {
+        onRegister(result.member);
+      } else {
+        throw new Error('登録処理に失敗しました');
+      }
+    } catch (error) {
+      console.error('会員登録エラー:', error);
+      setErrors({
+        submit: error.message || '会員登録に失敗しました。しばらくしてから再度お試しください。'
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -143,6 +156,12 @@ const MemberRegistration = ({ onRegister, onCancel }) => {
           </label>
           {errors.termsAccepted && <span className="error-message">{errors.termsAccepted}</span>}
         </div>
+        
+        {errors.submit && (
+          <div className="error-message submit-error">
+            {errors.submit}
+          </div>
+        )}
       </div>
     );
   };
@@ -161,8 +180,12 @@ const MemberRegistration = ({ onRegister, onCancel }) => {
             <button type="button" onClick={onCancel} className="cancel-button">
               キャンセル
             </button>
-            <button type="submit" className="submit-button">
-              登録
+            <button 
+              type="submit" 
+              className="submit-button"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? '登録中...' : '登録'}
             </button>
           </div>
         </form>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { memberUtils } from '../data/memberData';
+import { reservationAPI } from '../services/api';
 
 const ReservationForm = ({ vehicle, currentMember, isMemberLoggedIn, onSubmit, onCancel }) => {
   const [formData, setFormData] = useState({
@@ -16,6 +16,7 @@ const ReservationForm = ({ vehicle, currentMember, isMemberLoggedIn, onSubmit, o
   });
   const [totalPrice, setTotalPrice] = useState(0);
   const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // 日数計算用の共通関数
   const getDays = () => {
@@ -31,7 +32,9 @@ const ReservationForm = ({ vehicle, currentMember, isMemberLoggedIn, onSubmit, o
   useEffect(() => {
     const days = getDays();
     if (days > 0) {
-      let basePrice = vehicle.price * days;
+      // DynamoDBのデータ構造に対応
+      const dailyPrice = vehicle.pricePerDay || vehicle.price || 0;
+      let basePrice = dailyPrice * days;
       let discount = 0;
       
       // Apply discount based on rental plan
@@ -45,7 +48,9 @@ const ReservationForm = ({ vehicle, currentMember, isMemberLoggedIn, onSubmit, o
       
       let insurancePrice = 0;
       if (formData.includeInsurance) {
-        insurancePrice = vehicle.insurance.dailyRate * days;
+        // 保険料は基本料金の10%とする（DynamoDBにinsuranceデータがない場合）
+        const insuranceRate = vehicle.insurance?.dailyRate || (dailyPrice * 0.1);
+        insurancePrice = insuranceRate * days;
         // Apply discount to insurance as well
         if (formData.rentalPlan === 'weekly' && days >= 7) {
           insurancePrice = insurancePrice * 0.85; // 15% discount
@@ -58,7 +63,7 @@ const ReservationForm = ({ vehicle, currentMember, isMemberLoggedIn, onSubmit, o
     } else {
       setTotalPrice(0);
     }
-  }, [formData.startDate, formData.endDate, formData.includeInsurance, formData.rentalPlan, vehicle.price, vehicle.insurance.dailyRate]);
+  }, [formData.startDate, formData.endDate, formData.includeInsurance, formData.rentalPlan, vehicle]);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -121,18 +126,47 @@ const ReservationForm = ({ vehicle, currentMember, isMemberLoggedIn, onSubmit, o
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (validateForm()) {
+    if (!validateForm()) {
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      setErrors({});
+
+      // APIに送信するデータ形式に変換
       const reservationData = {
-        ...formData,
-        vehicleId: vehicle.id,
-        vehicleName: vehicle.name,
-        totalPrice: totalPrice,
-        vehicle: vehicle
+        memberId: currentMember?.memberId || currentMember?.id,
+        vehicleId: vehicle.vehicleId || vehicle.id,
+        startDate: new Date(formData.startDate).toISOString(),
+        endDate: new Date(formData.endDate).toISOString(),
+        rentalType: formData.rentalPlan === 'daily' ? 'daily' : 'hourly',
+        notes: formData.notes,
+        customerName: formData.customerName,
+        customerEmail: formData.customerEmail,
+        customerPhone: formData.customerPhone,
+        includeInsurance: formData.includeInsurance,
+        passengerCount: formData.passengerCount,
+        additionalDrivers: formData.additionalDrivers
       };
-      onSubmit(reservationData);
+      
+      const result = await reservationAPI.create(reservationData);
+      
+      if (result && result.reservation) {
+        onSubmit(result.reservation);
+      } else {
+        throw new Error('予約処理に失敗しました');
+      }
+    } catch (error) {
+      console.error('予約作成エラー:', error);
+      setErrors({
+        submit: error.message || '予約の作成に失敗しました。しばらくしてから再度お試しください。'
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -225,7 +259,11 @@ const ReservationForm = ({ vehicle, currentMember, isMemberLoggedIn, onSubmit, o
       };
     }
 
-    if (memberUtils.isLicenseExpired(license.expiryDate)) {
+    // 簡易的な期限チェック（memberUtilsが無いため）
+    const expiryDate = new Date(license.expiryDate);
+    const today = new Date();
+    
+    if (expiryDate < today) {
       return {
         canReserve: false,
         type: 'expired',
@@ -233,7 +271,9 @@ const ReservationForm = ({ vehicle, currentMember, isMemberLoggedIn, onSubmit, o
       };
     }
 
-    const daysUntilExpiry = memberUtils.getDaysUntilExpiry(license.expiryDate);
+    const diffTime = expiryDate - today;
+    const daysUntilExpiry = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
     if (daysUntilExpiry <= 30) {
       return {
         canReserve: true,
@@ -295,7 +335,7 @@ const ReservationForm = ({ vehicle, currentMember, isMemberLoggedIn, onSubmit, o
           <div className="vehicle-details">
             <h4>{vehicle.name}</h4>
             <p>{vehicle.category}</p>
-            <p className="daily-price">1日あたり: {formatPrice(vehicle.price)}</p>
+            <p className="daily-price">1日あたり: {formatPrice(vehicle.pricePerDay || vehicle.price || 0)}</p>
           </div>
         </div>
       </div>
@@ -586,8 +626,8 @@ const ReservationForm = ({ vehicle, currentMember, isMemberLoggedIn, onSubmit, o
             </label>
             <div className="insurance-info">
               <h4>デイリー保険</h4>
-              <p>{vehicle.insurance.description}</p>
-              <p className="insurance-price">{formatPrice(vehicle.insurance.dailyRate)}/日</p>
+              <p>{vehicle.insurance?.description || '事故・盗難時の補償保険'}</p>
+              <p className="insurance-price">{formatPrice(vehicle.insurance?.dailyRate || ((vehicle.pricePerDay || vehicle.price || 0) * 0.1))}/日</p>
             </div>
           </div>
         </div>
@@ -596,12 +636,12 @@ const ReservationForm = ({ vehicle, currentMember, isMemberLoggedIn, onSubmit, o
           <div className="price-breakdown">
             <div className="price-item">
               <span>基本料金:</span>
-              <span>{formatPrice(vehicle.price)} / 日</span>
+              <span>{formatPrice(vehicle.pricePerDay || vehicle.price || 0)} / 日</span>
             </div>
             {formData.includeInsurance && (
               <div className="price-item">
                 <span>デイリー保険:</span>
-                <span>{formatPrice(vehicle.insurance.dailyRate)} / 日</span>
+                <span>{formatPrice(vehicle.insurance?.dailyRate || ((vehicle.pricePerDay || vehicle.price || 0) * 0.1))} / 日</span>
               </div>
             )}
             {(!formData.startDate || !formData.endDate) && (
@@ -617,12 +657,12 @@ const ReservationForm = ({ vehicle, currentMember, isMemberLoggedIn, onSubmit, o
                 </div>
                 <div className="price-item subtotal">
                   <span>車両料金小計:</span>
-                  <span>{formatPrice(vehicle.price * getDays())}</span>
+                  <span>{formatPrice((vehicle.pricePerDay || vehicle.price || 0) * getDays())}</span>
                 </div>
                 {formData.includeInsurance && (
                   <div className="price-item subtotal">
                     <span>保険料小計:</span>
-                    <span>{formatPrice(vehicle.insurance.dailyRate * getDays())}</span>
+                    <span>{formatPrice((vehicle.insurance?.dailyRate || ((vehicle.pricePerDay || vehicle.price || 0) * 0.1)) * getDays())}</span>
                   </div>
                 )}
                 <div className="price-item total">
@@ -634,16 +674,22 @@ const ReservationForm = ({ vehicle, currentMember, isMemberLoggedIn, onSubmit, o
           </div>
         </div>
 
+        {errors.submit && (
+          <div className="error-message submit-error">
+            {errors.submit}
+          </div>
+        )}
+
         <div className="form-actions">
           <button type="button" className="cancel-button" onClick={onCancel}>
             キャンセル
           </button>
           <button 
             type="submit" 
-            className={`submit-button ${!licenseStatus.canReserve ? 'disabled' : ''}`}
-            disabled={!licenseStatus.canReserve}
+            className={`submit-button ${!licenseStatus.canReserve || isSubmitting ? 'disabled' : ''}`}
+            disabled={!licenseStatus.canReserve || isSubmitting}
           >
-            {!licenseStatus.canReserve ? '予約不可' : '予約を確定する'}
+            {isSubmitting ? '予約処理中...' : (!licenseStatus.canReserve ? '予約不可' : '予約を確定する')}
           </button>
         </div>
       </form>

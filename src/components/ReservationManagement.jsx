@@ -1,16 +1,50 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { reservationAPI, vehicleAPI, memberAPI } from '../services/api';
 
-const ReservationManagement = ({ reservations, vehicles, members, onReservationUpdate }) => {
+const ReservationManagement = ({ onReservationUpdate }) => {
   const [selectedReservation, setSelectedReservation] = useState(null);
   const [filterStatus, setFilterStatus] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [reservations, setReservations] = useState([]);
+  const [vehicles, setVehicles] = useState([]);
+  const [members, setMembers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const statusOptions = [
     { value: 'all', label: 'すべて' },
+    { value: 'pending', label: '保留中' },
     { value: 'confirmed', label: '確定' },
-    { value: 'cancelled', label: 'キャンセル' },
-    { value: 'completed', label: '完了' }
+    { value: 'active', label: '利用中' },
+    { value: 'completed', label: '完了' },
+    { value: 'cancelled', label: 'キャンセル' }
   ];
+
+  useEffect(() => {
+    fetchAllData();
+  }, []);
+
+  const fetchAllData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const [reservationsData, vehiclesData, membersData] = await Promise.all([
+        reservationAPI.getAll(),
+        vehicleAPI.getAll(),
+        memberAPI.getAll()
+      ]);
+      
+      setReservations(reservationsData);
+      setVehicles(vehiclesData);
+      setMembers(membersData);
+    } catch (err) {
+      console.error('データ取得エラー:', err);
+      setError('データの読み込みに失敗しました。');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredReservations = reservations.filter(reservation => {
     // ステータスフィルター
@@ -23,8 +57,8 @@ const ReservationManagement = ({ reservations, vehicles, members, onReservationU
         reservation.customerName,
         reservation.customerEmail,
         reservation.customerPhone,
-        reservation.id?.toString(),
-        vehicles.find(v => v.id === reservation.vehicleId)?.name
+        reservation.reservationId?.toString(),
+        reservation.vehicleName
       ].filter(field => field);
       
       return searchFields.some(field => 
@@ -35,30 +69,52 @@ const ReservationManagement = ({ reservations, vehicles, members, onReservationU
     return true;
   });
 
-  const handleStatusChange = (reservationId, newStatus) => {
+  const handleStatusChange = async (reservationId, newStatus) => {
     if (window.confirm(`予約ステータスを「${getStatusLabel(newStatus)}」に変更しますか？`)) {
-      onReservationUpdate({
-        id: reservationId,
-        status: newStatus,
-        updatedAt: new Date()
-      });
+      try {
+        await reservationAPI.update(reservationId, { status: newStatus });
+        
+        // ローカル状態を更新
+        setReservations(prev => 
+          prev.map(r => 
+            r.reservationId === reservationId 
+              ? { ...r, status: newStatus, updatedAt: new Date().toISOString() }
+              : r
+          )
+        );
+        
+        if (onReservationUpdate) {
+          onReservationUpdate({
+            id: reservationId,
+            status: newStatus,
+            updatedAt: new Date()
+          });
+        }
+      } catch (error) {
+        console.error('ステータス更新エラー:', error);
+        alert('ステータスの更新に失敗しました。');
+      }
     }
   };
 
   const getStatusLabel = (status) => {
     const statusMap = {
+      pending: '保留中',
       confirmed: '確定',
-      cancelled: 'キャンセル',
-      completed: '完了'
+      active: '利用中', 
+      completed: '完了',
+      cancelled: 'キャンセル'
     };
     return statusMap[status] || status;
   };
 
   const getStatusColor = (status) => {
     const colorMap = {
+      pending: '#ffc107',
       confirmed: '#28a745',
-      cancelled: '#dc3545',
-      completed: '#6c757d'
+      active: '#007bff',
+      completed: '#6c757d',
+      cancelled: '#dc3545'
     };
     return colorMap[status] || '#ff9a9e';
   };
@@ -95,6 +151,36 @@ const ReservationManagement = ({ reservations, vehicles, members, onReservationU
     const diffTime = Math.abs(end - start);
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
   };
+
+  if (loading) {
+    return (
+      <div className="reservation-management">
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p>予約データを読み込んでいます...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="reservation-management">
+        <div className="error-container">
+          <div className="error-message">
+            <h3>エラーが発生しました</h3>
+            <p>{error}</p>
+            <button 
+              className="retry-button"
+              onClick={fetchAllData}
+            >
+              再読み込み
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="reservation-management">
@@ -140,9 +226,9 @@ const ReservationManagement = ({ reservations, vehicles, members, onReservationU
         ) : (
           <div className="reservations-grid">
             {filteredReservations.map(reservation => (
-              <div key={reservation.id} className="reservation-admin-card">
+              <div key={reservation.reservationId} className="reservation-admin-card">
                 <div className="reservation-header">
-                  <div className="reservation-id">予約ID: {reservation.id}</div>
+                  <div className="reservation-id">予約ID: {reservation.reservationId}</div>
                   <div 
                     className="reservation-status"
                     style={{ backgroundColor: getStatusColor(reservation.status) }}
@@ -154,16 +240,18 @@ const ReservationManagement = ({ reservations, vehicles, members, onReservationU
                 <div className="reservation-details">
                   <div className="customer-info">
                     <h4>👤 お客様情報</h4>
-                    <p><strong>名前:</strong> {reservation.customerName}</p>
+                    <p><strong>名前:</strong> {reservation.customerName || 'N/A'}</p>
                     <p><strong>メール:</strong> 
-                      <a href={`mailto:${reservation.customerEmail}`}>
-                        {reservation.customerEmail}
+                      <a href={`mailto:${reservation.memberEmail || reservation.customerEmail}`}>
+                        {reservation.memberEmail || reservation.customerEmail}
                       </a>
                     </p>
                     <p><strong>電話:</strong> 
-                      <a href={`tel:${reservation.customerPhone}`}>
-                        {reservation.customerPhone}
-                      </a>
+                      {reservation.customerPhone ? (
+                        <a href={`tel:${reservation.customerPhone}`}>
+                          {reservation.customerPhone}
+                        </a>
+                      ) : 'N/A'}
                     </p>
                   </div>
 
@@ -172,6 +260,7 @@ const ReservationManagement = ({ reservations, vehicles, members, onReservationU
                     <p><strong>車両:</strong> {reservation.vehicleName}</p>
                     <p><strong>期間:</strong> {formatDateOnly(reservation.startDate)} ～ {formatDateOnly(reservation.endDate)}</p>
                     <p><strong>日数:</strong> {calculateDays(reservation.startDate, reservation.endDate)}日</p>
+                    <p><strong>レンタル種別:</strong> {reservation.rentalType === 'daily' ? '日毎' : '時間毎'}</p>
                     <p><strong>保険:</strong> {reservation.includeInsurance ? '加入' : '未加入'}</p>
                   </div>
 
@@ -198,23 +287,32 @@ const ReservationManagement = ({ reservations, vehicles, members, onReservationU
                 <div className="reservation-actions">
                   <button
                     onClick={() => setSelectedReservation(
-                      selectedReservation === reservation.id ? null : reservation.id
+                      selectedReservation === reservation.reservationId ? null : reservation.reservationId
                     )}
                     className="details-button"
                   >
-                    {selectedReservation === reservation.id ? '詳細を閉じる' : '詳細を見る'}
+                    {selectedReservation === reservation.reservationId ? '詳細を閉じる' : '詳細を見る'}
                   </button>
+                  
+                  {reservation.status === 'pending' && (
+                    <button
+                      onClick={() => handleStatusChange(reservation.reservationId, 'confirmed')}
+                      className="confirm-button"
+                    >
+                      確定する
+                    </button>
+                  )}
                   
                   {reservation.status === 'confirmed' && (
                     <>
                       <button
-                        onClick={() => handleStatusChange(reservation.id, 'completed')}
-                        className="complete-button"
+                        onClick={() => handleStatusChange(reservation.reservationId, 'active')}
+                        className="active-button"
                       >
-                        完了にする
+                        利用開始
                       </button>
                       <button
-                        onClick={() => handleStatusChange(reservation.id, 'cancelled')}
+                        onClick={() => handleStatusChange(reservation.reservationId, 'cancelled')}
                         className="cancel-button"
                       >
                         キャンセル
@@ -222,9 +320,18 @@ const ReservationManagement = ({ reservations, vehicles, members, onReservationU
                     </>
                   )}
                   
+                  {reservation.status === 'active' && (
+                    <button
+                      onClick={() => handleStatusChange(reservation.reservationId, 'completed')}
+                      className="complete-button"
+                    >
+                      完了にする
+                    </button>
+                  )}
+                  
                   {reservation.status === 'cancelled' && (
                     <button
-                      onClick={() => handleStatusChange(reservation.id, 'confirmed')}
+                      onClick={() => handleStatusChange(reservation.reservationId, 'confirmed')}
                       className="restore-button"
                     >
                       確定に戻す
@@ -232,30 +339,28 @@ const ReservationManagement = ({ reservations, vehicles, members, onReservationU
                   )}
                 </div>
 
-                {selectedReservation === reservation.id && (
+                {selectedReservation === reservation.reservationId && (
                   <div className="reservation-extended-details">
                     <h4>📋 詳細情報</h4>
                     <div className="details-grid">
                       <div className="detail-section">
-                        <h5>車両詳細</h5>
-                        {reservation.vehicle && (
-                          <>
-                            <p>カテゴリ: {reservation.vehicle.category}</p>
-                            <p>基本料金: {formatPrice(reservation.vehicle.price)}/日</p>
-                            <p>保険料: {formatPrice(reservation.vehicle.insurance.dailyRate)}/日</p>
-                            <p>定員: {reservation.vehicle.specifications.seats}人</p>
-                            <p>トランスミッション: {reservation.vehicle.specifications.transmission}</p>
-                          </>
+                        <h5>メンバー詳細</h5>
+                        <p>メンバーID: {reservation.memberId}</p>
+                        <p>メール: {reservation.memberEmail}</p>
+                      </div>
+                      
+                      <div className="detail-section">
+                        <h5>予約詳細</h5>
+                        <p>車両ID: {reservation.vehicleId}</p>
+                        <p>予約作成: {formatDate(reservation.createdAt)}</p>
+                        {reservation.updatedAt && reservation.updatedAt !== reservation.createdAt && (
+                          <p>最終更新: {formatDate(reservation.updatedAt)}</p>
                         )}
                       </div>
                       
                       <div className="detail-section">
-                        <h5>料金内訳</h5>
-                        <p>基本料金: {formatPrice(reservation.vehicle?.price * calculateDays(reservation.startDate, reservation.endDate))}</p>
-                        {reservation.includeInsurance && (
-                          <p>保険料: {formatPrice(reservation.vehicle?.insurance.dailyRate * calculateDays(reservation.startDate, reservation.endDate))}</p>
-                        )}
-                        <p><strong>合計: {formatPrice(reservation.totalPrice)}</strong></p>
+                        <h5>料金詳細</h5>
+                        <p><strong>合計金額: {formatPrice(reservation.totalPrice)}</strong></p>
                       </div>
                     </div>
                   </div>
