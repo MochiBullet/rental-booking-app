@@ -3,7 +3,7 @@
 このファイルはClaude Code (claude.ai/code)がこのリポジトリのコードを操作する際のガイダンスを提供します。
 
 ## プロジェクト概要
-レンタルブッキングアプリ (RentalEasy/GreenRide) - 車両レンタルサービスのWebアプリケーション
+レンタルブッキングアプリ (M's BASE Rental) - 車両レンタルサービスのWebアプリケーション
 
 ## 技術スタック
 - **フロントエンド**: React.js, React Router
