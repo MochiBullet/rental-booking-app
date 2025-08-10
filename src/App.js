@@ -4,7 +4,6 @@ import './App.css';
 import HomePage from './components/HomePage';
 import VehicleListPage from './components/VehicleListPage';
 import Login from './components/Login';
-import Register from './components/Register';
 import EmailRegistration from './components/EmailRegistration';
 import CompleteRegistration from './components/CompleteRegistration';
 import MyPage from './components/MyPage';
