@@ -32,7 +32,7 @@ function HomePage() {
   const defaultImages = [
     'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=1920&q=80', // 美しい車の風景
     'https://images.unsplash.com/photo-1542282088-fe8426682b8f?w=1920&q=80', // モダンな車
-    'https://images.unsplash.com/photo-1568844293986-8d0400bd4f1b?w=1920&q=80', // 高級車
+    'https://images.unsplash.com/photo-1517153295259-74eb0b416cee?w=1920&q=80', // 高級車（更新）
     'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=1920&q=80', // バイク
   ];
 
