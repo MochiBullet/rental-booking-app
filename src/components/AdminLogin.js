@@ -12,7 +12,7 @@ const AdminLogin = ({ setIsAdmin, onSuccess }) => {
     setIsLogging(true);
     
     // Simple admin authentication (in production, this should be handled by a backend)
-    if (username === 'admin' && password === 'admin123') {
+    if (username === '09091897878' && password === 'Msbase7031') {
       try {
         setIsAdmin(true);
         localStorage.setItem('adminUser', 'true');
