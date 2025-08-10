@@ -7,6 +7,28 @@ import SiteSettingsManagement from './SiteSettingsManagement';
 const AdminDashboard = ({ onSettingsUpdate }) => {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('overview');
+  
+  // 管理者の活動時刻を定期的に更新（ログイン状態維持のため）
+  useEffect(() => {
+    const updateAdminActivity = () => {
+      const adminInfo = localStorage.getItem('adminInfo');
+      if (adminInfo) {
+        const info = JSON.parse(adminInfo);
+        info.lastActivity = Date.now();
+        localStorage.setItem('adminInfo', JSON.stringify(info));
+        localStorage.setItem('adminLoginTime', Date.now().toString());
+      }
+    };
+    
+    // 初回実行
+    updateAdminActivity();
+    
+    // 5分ごとに活動時刻を更新
+    const activityInterval = setInterval(updateAdminActivity, 5 * 60 * 1000);
+    
+    // クリーンアップ
+    return () => clearInterval(activityInterval);
+  }, []);
   const [detailsType, setDetailsType] = useState(null);
   const [monthlyStats, setMonthlyStats] = useState({});
   const [showAddUserModal, setShowAddUserModal] = useState(false);

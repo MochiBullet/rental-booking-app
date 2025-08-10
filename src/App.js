@@ -31,11 +31,46 @@ function AppContent() {
       setUser(JSON.parse(savedUser));
     }
     
-    // 管理者ログイン状態を復元
-    const adminUser = localStorage.getItem('adminUser');
-    if (adminUser === 'true') {
-      setIsAdmin(true);
-    }
+    // 管理者ログイン状態を復元（より確実な維持）
+    const checkAdminLogin = () => {
+      const adminUser = localStorage.getItem('adminUser');
+      const adminSession = sessionStorage.getItem('adminSession');
+      const adminTimestamp = localStorage.getItem('adminLoginTime');
+      
+      // 複数の保存場所をチェック
+      if (adminUser === 'true' || adminSession === 'true') {
+        // ログイン時刻をチェック（7日間有効）
+        if (adminTimestamp) {
+          const loginTime = parseInt(adminTimestamp);
+          const currentTime = Date.now();
+          const sevenDays = 7 * 24 * 60 * 60 * 1000; // 7日間のミリ秒
+          
+          if (currentTime - loginTime < sevenDays) {
+            setIsAdmin(true);
+            console.log('✅ 管理者ログイン状態を復元しました');
+            
+            // ログイン時刻を更新（アクティブな場合）
+            localStorage.setItem('adminLoginTime', currentTime.toString());
+            return true;
+          } else {
+            // 期限切れの場合はクリア
+            localStorage.removeItem('adminUser');
+            localStorage.removeItem('adminLoginTime');
+            sessionStorage.removeItem('adminSession');
+            console.log('⏰ 管理者ログインが期限切れです');
+          }
+        } else {
+          // タイムスタンプがない場合は新たに設定
+          localStorage.setItem('adminLoginTime', Date.now().toString());
+          setIsAdmin(true);
+          console.log('✅ 管理者ログイン状態を復元しました（新規タイムスタンプ設定）');
+          return true;
+        }
+      }
+      return false;
+    };
+    
+    checkAdminLogin();
     
     // グローバルサイト設定を読み込んでCSSに適用
     const globalSettings = getGlobalSettings();
@@ -103,8 +138,15 @@ function AppContent() {
   const handleLogout = () => {
     setUser(null);
     setIsAdmin(false);
+    
+    // すべての管理者関連データを削除
     localStorage.removeItem('currentUser');
     localStorage.removeItem('adminUser');
+    localStorage.removeItem('adminLoginTime');
+    localStorage.removeItem('adminInfo');
+    sessionStorage.removeItem('adminSession');
+    
+    console.log('🚪 ログアウトしました（全ての認証データを削除）');
   };
 
   // サイト設定更新の処理

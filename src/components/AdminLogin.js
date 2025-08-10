@@ -21,7 +21,21 @@ const AdminLogin = ({ setIsAdmin, onSuccess }) => {
       console.log('認証成功！管理画面に移動します');
       try {
         setIsAdmin(true);
+        
+        // 複数の場所にログイン状態を保存（確実な維持のため）
         localStorage.setItem('adminUser', 'true');
+        sessionStorage.setItem('adminSession', 'true');
+        localStorage.setItem('adminLoginTime', Date.now().toString());
+        
+        // 管理者情報もlocalStorageに保存
+        const adminInfo = {
+          username: 'admin',
+          loginTime: Date.now(),
+          lastActivity: Date.now()
+        };
+        localStorage.setItem('adminInfo', JSON.stringify(adminInfo));
+        
+        console.log('💾 管理者ログイン状態を永続化しました');
         
         // React Router を使ってナビゲート
         navigate('/admin');
