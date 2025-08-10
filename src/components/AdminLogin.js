@@ -70,11 +70,6 @@ const AdminLogin = ({ setIsAdmin, onSuccess }) => {
           </button>
         </form>
         
-        <div className="admin-hint">
-          <p>Default credentials:</p>
-          <p>Username: <strong>admin</strong></p>
-          <p>Password: <strong>admin123</strong></p>
-        </div>
         
         <button 
           className="back-btn"
