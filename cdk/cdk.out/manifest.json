@@ -1,0 +1,275 @@
+{
+  "version": "36.0.0",
+  "artifacts": {
+    "RentalBookingWebStack-production.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "RentalBookingWebStack-production.assets.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "RentalBookingWebStack-production": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://276291855506/ap-southeast-2",
+      "properties": {
+        "templateFile": "RentalBookingWebStack-production.template.json",
+        "terminationProtection": false,
+        "tags": {
+          "Environment": "production",
+          "ManagedBy": "CDK",
+          "Project": "RentalBookingApp"
+        },
+        "validateOnSynth": false,
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::276291855506:role/cdk-hnb659fds-deploy-role-276291855506-ap-southeast-2",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::276291855506:role/cdk-hnb659fds-cfn-exec-role-276291855506-ap-southeast-2",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-276291855506-ap-southeast-2/6e56fce35e5cd61abb981fdf0da616a7eeb7ce5ecad9c97d0035f686d7b370ec.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
+        "additionalDependencies": [
+          "RentalBookingWebStack-production.assets"
+        ],
+        "lookupRole": {
+          "arn": "arn:${AWS::Partition}:iam::276291855506:role/cdk-hnb659fds-lookup-role-276291855506-ap-southeast-2",
+          "requiresBootstrapStackVersion": 8,
+          "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+        }
+      },
+      "dependencies": [
+        "RentalBookingWebStack-production.assets"
+      ],
+      "metadata": {
+        "/RentalBookingWebStack-production": [
+          {
+            "type": "aws:cdk:stack-tags",
+            "data": [
+              {
+                "Key": "Environment",
+                "Value": "production"
+              },
+              {
+                "Key": "ManagedBy",
+                "Value": "CDK"
+              },
+              {
+                "Key": "Project",
+                "Value": "RentalBookingApp"
+              }
+            ]
+          }
+        ],
+        "/RentalBookingWebStack-production/WebsiteBucket/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "WebsiteBucket75C24D94"
+          }
+        ],
+        "/RentalBookingWebStack-production/WebsiteBucket/Policy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "WebsiteBucketPolicyE10E3262"
+          }
+        ],
+        "/RentalBookingWebStack-production/WebsiteBucket/AutoDeleteObjectsCustomResource/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "WebsiteBucketAutoDeleteObjectsCustomResource8750E461"
+          }
+        ],
+        "/RentalBookingWebStack-production/Custom::S3AutoDeleteObjectsCustomResourceProvider/Role": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092"
+          }
+        ],
+        "/RentalBookingWebStack-production/Custom::S3AutoDeleteObjectsCustomResourceProvider/Handler": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F"
+          }
+        ],
+        "/RentalBookingWebStack-production/OAI/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "OAIE1EFC67F"
+          }
+        ],
+        "/RentalBookingWebStack-production/Distribution/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "Distribution830FAC52"
+          }
+        ],
+        "/RentalBookingWebStack-production/WebsiteURL": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "WebsiteURL"
+          }
+        ],
+        "/RentalBookingWebStack-production/S3BucketName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "S3BucketName"
+          }
+        ],
+        "/RentalBookingWebStack-production/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/RentalBookingWebStack-production/Exports/Output{\"Ref\":\"WebsiteBucket75C24D94\"}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExportsOutputRefWebsiteBucket75C24D94B5689ED3"
+          }
+        ],
+        "/RentalBookingWebStack-production/Exports/Output{\"Ref\":\"Distribution830FAC52\"}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExportsOutputRefDistribution830FAC524DF81588"
+          }
+        ],
+        "/RentalBookingWebStack-production/BootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BootstrapVersion"
+          }
+        ],
+        "/RentalBookingWebStack-production/CheckBootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CheckBootstrapVersion"
+          }
+        ]
+      },
+      "displayName": "RentalBookingWebStack-production"
+    },
+    "RentalBookingCICDStack-production.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "RentalBookingCICDStack-production.assets.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "RentalBookingCICDStack-production": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://276291855506/ap-southeast-2",
+      "properties": {
+        "templateFile": "RentalBookingCICDStack-production.template.json",
+        "terminationProtection": false,
+        "tags": {
+          "Environment": "production",
+          "ManagedBy": "CDK",
+          "Project": "RentalBookingApp",
+          "Purpose": "CI/CD"
+        },
+        "validateOnSynth": false,
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::276291855506:role/cdk-hnb659fds-deploy-role-276291855506-ap-southeast-2",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::276291855506:role/cdk-hnb659fds-cfn-exec-role-276291855506-ap-southeast-2",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-276291855506-ap-southeast-2/c63d095e110617542e78031933165175856f9649fd024af8707afcabf48e98aa.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
+        "additionalDependencies": [
+          "RentalBookingCICDStack-production.assets"
+        ],
+        "lookupRole": {
+          "arn": "arn:${AWS::Partition}:iam::276291855506:role/cdk-hnb659fds-lookup-role-276291855506-ap-southeast-2",
+          "requiresBootstrapStackVersion": 8,
+          "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+        }
+      },
+      "dependencies": [
+        "RentalBookingWebStack-production",
+        "RentalBookingCICDStack-production.assets"
+      ],
+      "metadata": {
+        "/RentalBookingCICDStack-production": [
+          {
+            "type": "aws:cdk:stack-tags",
+            "data": [
+              {
+                "Key": "Environment",
+                "Value": "production"
+              },
+              {
+                "Key": "ManagedBy",
+                "Value": "CDK"
+              },
+              {
+                "Key": "Project",
+                "Value": "RentalBookingApp"
+              },
+              {
+                "Key": "Purpose",
+                "Value": "CI/CD"
+              }
+            ]
+          }
+        ],
+        "/RentalBookingCICDStack-production/GitHubProvider/Resource/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "GitHubProviderDD1D07DF"
+          }
+        ],
+        "/RentalBookingCICDStack-production/Custom::AWSCDKOpenIdConnectProviderCustomResourceProvider/Role": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomAWSCDKOpenIdConnectProviderCustomResourceProviderRole517FED65"
+          }
+        ],
+        "/RentalBookingCICDStack-production/Custom::AWSCDKOpenIdConnectProviderCustomResourceProvider/Handler": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomAWSCDKOpenIdConnectProviderCustomResourceProviderHandlerF2C543E0"
+          }
+        ],
+        "/RentalBookingCICDStack-production/GitHubActionsRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "GitHubActionsRole4F1BBA26"
+          }
+        ],
+        "/RentalBookingCICDStack-production/GitHubActionsRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "GitHubActionsRoleDefaultPolicy69DA0189"
+          }
+        ],
+        "/RentalBookingCICDStack-production/GitHubActionsRoleArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "GitHubActionsRoleArn"
+          }
+        ],
+        "/RentalBookingCICDStack-production/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/RentalBookingCICDStack-production/BootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BootstrapVersion"
+          }
+        ],
+        "/RentalBookingCICDStack-production/CheckBootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CheckBootstrapVersion"
+          }
+        ]
+      },
+      "displayName": "RentalBookingCICDStack-production"
+    },
+    "Tree": {
+      "type": "cdk:tree",
+      "properties": {
+        "file": "tree.json"
+      }
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "version": "36.0.0",
+  "files": {
+    "350497850828a0108f064a8cb783dd16d04637d20593411e21cc5b4f9e485cd6": {
+      "source": {
+        "path": "asset.350497850828a0108f064a8cb783dd16d04637d20593411e21cc5b4f9e485cd6",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "276291855506-ap-southeast-2": {
+          "bucketName": "cdk-hnb659fds-assets-276291855506-ap-southeast-2",
+          "objectKey": "350497850828a0108f064a8cb783dd16d04637d20593411e21cc5b4f9e485cd6.zip",
+          "region": "ap-southeast-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::276291855506:role/cdk-hnb659fds-file-publishing-role-276291855506-ap-southeast-2"
+        }
+      }
+    },
+    "c63d095e110617542e78031933165175856f9649fd024af8707afcabf48e98aa": {
+      "source": {
+        "path": "RentalBookingCICDStack-production.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "276291855506-ap-southeast-2": {
+          "bucketName": "cdk-hnb659fds-assets-276291855506-ap-southeast-2",
+          "objectKey": "c63d095e110617542e78031933165175856f9649fd024af8707afcabf48e98aa.json",
+          "region": "ap-southeast-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::276291855506:role/cdk-hnb659fds-file-publishing-role-276291855506-ap-southeast-2"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}
