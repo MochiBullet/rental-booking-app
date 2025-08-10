@@ -109,21 +109,27 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
     const file = event.target.files[0];
     if (!file) return;
 
+    console.log('📷 アイコンアップロード開始:', file.name, 'サイズ:', file.size);
+
     // ファイルサイズチェック（最大2MB）
     if (file.size > 2 * 1024 * 1024) {
       alert('ファイルサイズは2MB以下にしてください。');
+      console.log('❌ ファイルサイズエラー:', file.size);
       return;
     }
 
     // 画像ファイルかチェック
     if (!file.type.startsWith('image/')) {
       alert('画像ファイルを選択してください。');
+      console.log('❌ ファイル形式エラー:', file.type);
       return;
     }
 
     const reader = new FileReader();
     reader.onload = (e) => {
       const base64Data = e.target.result;
+      console.log('✅ Base64変換完了、データ長:', base64Data.length);
+      
       updateBrandingSettings('siteIcon', base64Data);
       updateBrandingSettings('siteIconType', 'custom');
       
@@ -137,7 +143,10 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
             siteIconType: 'custom'
           }
         };
+        console.log('🔄 リアルタイム更新を実行:', updatedSettings.branding.siteIconType);
         onSettingsUpdate(updatedSettings);
+      } else {
+        console.log('❌ onSettingsUpdate が存在しません');
       }
     };
     reader.readAsDataURL(file);

@@ -90,11 +90,18 @@ function AppContent() {
 
   // サイト設定更新の処理
   const handleSiteSettingsUpdate = (newSettings) => {
+    console.log('🎨 サイト設定がリアルタイム更新されました:', newSettings);
     setSiteSettings(newSettings);
     
     // リアルタイムでタイトル更新
     if (newSettings.branding?.siteName) {
       document.title = newSettings.branding.siteName;
+      console.log('📝 サイトタイトル更新:', newSettings.branding.siteName);
+    }
+    
+    // アイコン更新ログ
+    if (newSettings.branding?.siteIcon) {
+      console.log('🖼️ カスタムアイコンが更新されました');
     }
     
     // localStorageにも保存（既にSiteSettingsManagementで保存済み）

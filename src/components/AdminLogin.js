@@ -14,8 +14,11 @@ const AdminLogin = ({ setIsAdmin, onSuccess }) => {
     e.preventDefault();
     setIsLogging(true);
     
+    console.log('入力された認証情報:', { username, password });
+    
     // Simple admin authentication (in production, this should be handled by a backend)
     if (username === 'admin' && password === 'msbase7032') {
+      console.log('認証成功！管理画面に移動します');
       try {
         setIsAdmin(true);
         localStorage.setItem('adminUser', 'true');
@@ -26,6 +29,7 @@ const AdminLogin = ({ setIsAdmin, onSuccess }) => {
         console.error('Failed to set admin status:', error);
       }
     } else {
+      console.log('認証失敗:', { username, password, expected: { username: 'admin', password: 'msbase7032' } });
       setError('Invalid username or password');
       setTimeout(() => setError(''), 3000);
     }
