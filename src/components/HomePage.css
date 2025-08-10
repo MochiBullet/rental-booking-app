@@ -90,9 +90,7 @@
   margin-bottom: 1.5rem;
   letter-spacing: -0.02em;
   line-height: 1.1;
-  background: linear-gradient(135deg, #ffffff 0%, #E8F5E8 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #ffffff;
   background-clip: text;
   animation: fadeInUp 1s ease-out;
   text-shadow: 0 4px 20px rgba(76, 175, 80, 0.3);
@@ -102,6 +100,7 @@
   font-size: 1.5rem;
   font-weight: 300;
   margin-bottom: 2rem;
+  color: #ffffff;
   opacity: 0.95;
   line-height: 1.6;
   animation: fadeInUp 1s ease-out 0.3s both;
