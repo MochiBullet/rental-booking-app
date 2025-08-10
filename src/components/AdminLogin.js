@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './AdminLogin.css';
 
 const AdminLogin = ({ setIsAdmin, onSuccess }) => {
+  const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -18,9 +20,8 @@ const AdminLogin = ({ setIsAdmin, onSuccess }) => {
         setIsAdmin(true);
         localStorage.setItem('adminUser', 'true');
         
-        if (onSuccess) {
-          onSuccess();
-        }
+        // React Router を使ってナビゲート
+        navigate('/admin');
       } catch (error) {
         console.error('Failed to set admin status:', error);
       }
@@ -99,7 +100,7 @@ const AdminLogin = ({ setIsAdmin, onSuccess }) => {
         
         <button 
           className="back-btn"
-          onClick={() => window.location.href = '/'}
+          onClick={() => navigate('/')}
         >
           ← Back to Home
         </button>
