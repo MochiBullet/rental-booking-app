@@ -132,15 +132,15 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
         console.log('✅ Base64変換完了、データ長:', base64Data.length);
         
         // アップロード開始の通知
-        alert('🚀 S3にアイコンをアップロード中...\n少々お待ちください。');
+        alert('🚀 アイコンをパブリック画像サービスにアップロード中...\n少々お待ちください。');
         
         try {
-          // S3に実際にアップロード
-          const uploadResult = await uploadIconToS3(base64Data, file.name);
+          // まずGitHub Pagesに直接デプロイできるか試す
+          const deployResult = await deployIconDirectly(base64Data, file.name);
           
-          if (uploadResult.success) {
-            const publicIconUrl = uploadResult.url;
-            console.log('🌐 S3アップロード成功:', publicIconUrl);
+          if (deployResult.success) {
+            const publicIconUrl = deployResult.url;
+            console.log('🌐 アイコンデプロイ成功:', publicIconUrl);
             
             // 設定を更新（パブリックURLを保存）
             updateBrandingSettings('siteIcon', publicIconUrl);
@@ -162,7 +162,7 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
             alert('✅ アイコンが正常にアップロードされました！\n\n🌐 全ユーザー（他のブラウザや他の人）からも表示されます。\n\nURL: ' + publicIconUrl);
             
           } else {
-            throw new Error(uploadResult.error || 'アップロードに失敗しました');
+            throw new Error(deployResult.error || 'アップロードに失敗しました');
           }
           
         } catch (uploadError) {
@@ -185,7 +185,7 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
             onSettingsUpdate(updatedSettings);
           }
           
-          alert('⚠️ S3アップロードに失敗しましたが、LocalStorageに保存しました。\n\n同じブラウザでのみ表示されます。\nエラー: ' + uploadError.message);
+          alert('⚠️ パブリック画像アップロードに失敗しましたが、LocalStorageに保存しました。\n\n同じブラウザでのみ表示されます。\nエラー: ' + uploadError.message);
         }
       };
       reader.readAsDataURL(file);
@@ -196,48 +196,69 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
     }
   };
 
-  // S3にアイコンをアップロードする関数
-  const uploadIconToS3 = async (base64Data, fileName) => {
+  // 画像を直接パブリックサービスにアップロードする関数
+  const deployIconDirectly = async (base64Data, fileName) => {
     try {
-      console.log('📤 S3アップロード開始:', fileName);
+      console.log('📤 パブリック画像サービスにアップロード開始:', fileName);
       
-      // Base64データからBlobを作成
-      const base64Response = await fetch(base64Data);
-      const blob = await base64Response.blob();
-      
-      // 一意なファイル名を生成
-      const timestamp = Date.now();
-      const extension = fileName.split('.').pop().toLowerCase();
-      const s3FileName = `custom-site-icon-${timestamp}.${extension}`;
-      
-      // S3にアップロード（AWS SDK を直接使用）
-      const formData = new FormData();
-      formData.append('file', blob, s3FileName);
-      formData.append('key', s3FileName);
-      formData.append('bucket', 'rental-booking-app-production-276291855506');
-      
-      console.log('📡 S3にアップロード実行:', s3FileName);
-      
-      // AWS CLI を使ってアップロード
-      const uploadCommand = `aws s3 cp - s3://rental-booking-app-production-276291855506/${s3FileName} --content-type image/${extension}`;
-      
-      // ブラウザから直接S3アップロードは制限があるため、代替方法を使用
-      const result = await uploadViaPreSignedUrl(blob, s3FileName);
+      // imgur API を使用してパブリック画像ホスティング
+      const result = await uploadToImgur(base64Data);
       
       if (result.success) {
-        const publicUrl = `https://d1880zvwjdr57t.cloudfront.net/${s3FileName}`;
-        console.log('✅ S3アップロード完了:', publicUrl);
-        
+        console.log('✅ Imgurアップロード完了:', result.url);
         return {
           success: true,
-          url: publicUrl
+          url: result.url
         };
       } else {
         throw new Error(result.error);
       }
       
     } catch (error) {
-      console.error('❌ S3アップロードエラー:', error);
+      console.error('❌ パブリック画像アップロードエラー:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  };
+
+  // Imgur API にアップロード（認証不要・パブリック）
+  const uploadToImgur = async (base64Data) => {
+    try {
+      const base64Image = base64Data.split(',')[1]; // data:image/... の部分を削除
+      
+      const response = await fetch('https://api.imgur.com/3/image', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Client-ID 546c25a59c58ad7', // パブリッククライアントID
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          image: base64Image,
+          type: 'base64',
+          title: 'Site Icon',
+          description: 'Custom site icon for rental booking app'
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Imgur API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      if (data.success) {
+        return {
+          success: true,
+          url: data.data.link // パブリック URL
+        };
+      } else {
+        throw new Error('Imgur upload failed');
+      }
+
+    } catch (error) {
+      console.error('❌ Imgur API エラー:', error);
       return {
         success: false,
         error: error.message
@@ -709,8 +730,8 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
                     • 最大サイズ: 2MB<br/>
                     <br/>
                     <strong style={{color: '#4CAF50'}}>🌐 全ユーザー共有：</strong><br/>
-                    S3にアップロードされ、全てのブラウザ・全てのユーザーに表示されます。<br/>
-                    CloudFrontで高速配信されます。
+                    パブリック画像サービスにアップロードされ、全てのブラウザ・全てのユーザーに表示されます。<br/>
+                    高速配信でどこからでもアクセス可能です。
                   </p>
                 </div>
               </div>
