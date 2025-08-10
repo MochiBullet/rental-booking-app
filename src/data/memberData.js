@@ -3,48 +3,10 @@
 export const initialMembers = [
   {
     id: 1,
+    memberId: "2025081234", // 西暦+月+免許証番号下4桁
     email: "test@example.com",
-    password: "password123", // 実際のアプリでは暗号化が必要
-    profile: {
-      name: "テストユーザー",
-      nameKana: "テストユーザー",
-      phone: "090-1234-5678",
-      birthDate: "1990-01-01",
-      address: {
-        zipCode: "100-0001",
-        prefecture: "東京都",
-        city: "千代田区",
-        street: "丸の内1-1-1"
-      },
-      emergencyContact: {
-        name: "緊急連絡先",
-        phone: "090-9876-5432",
-        relationship: "家族"
-      },
-      driverLicense: {
-        number: "123456789012",
-        expiryDate: "2029-12-31",
-        frontImage: null, // Base64 or file URL
-        backImage: null,  // Base64 or file URL
-        verificationStatus: "pending" // pending, approved, rejected
-      }
-    },
-    preferences: {
-      newsletterSubscription: true,
-      smsNotification: false
-    },
-    membershipInfo: {
-      memberNumber: "M000001",
-      joinDate: "2024-01-01",
-      membershipType: "regular", // regular, premium
-      points: 1500,
-      inviteCode: "TEST001",
-      invitedBy: null,
-      invitedUsers: []
-    },
-    reservationHistory: [],
-    createdAt: new Date("2024-01-01"),
-    updatedAt: new Date("2024-01-01"),
+    licenseLastFour: "1234",
+    registrationDate: new Date("2025-08-01").toISOString(),
     isActive: true
   }
 ];
