@@ -148,7 +148,7 @@ function AppContent() {
               ) : (
                 <div className="auth-buttons">
                   <Link to="/login" className="login-btn">ログイン</Link>
-                  <Link to="/register" className="register-btn">会員登録</Link>
+                  <Link to="/register" className="register-btn">新規登録</Link>
                 </div>
               )}
             </nav>

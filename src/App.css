@@ -317,6 +317,9 @@ body {
   .register-btn {
     padding: 8px 16px;
     font-size: 12px;
+    width: 90px;
+    height: 36px;
+    min-width: 90px;
   }
   
   .footer-links {
@@ -380,7 +383,9 @@ body {
   .register-btn {
     padding: 6px 12px;
     font-size: 11px;
-    min-width: 70px;
+    width: 80px;
+    height: 32px;
+    min-width: 80px;
   }
 }
 
@@ -424,7 +429,9 @@ body {
   .register-btn {
     padding: 5px 10px;
     font-size: 10px;
-    min-width: 60px;
+    width: 70px;
+    height: 28px;
+    min-width: 70px;
   }
 }
 
