@@ -15,6 +15,7 @@ import PrivacyPolicy from './components/PrivacyPolicy';
 import ForgotPassword from './components/ForgotPassword';
 import ResetPassword from './components/ResetPassword';
 import AnnouncementDetail from './components/AnnouncementDetail';
+import { getGlobalSettings, updateGlobalSettings } from './data/globalSettings';
 
 function AppContent() {
   const [user, setUser] = useState(null);
@@ -36,29 +37,47 @@ function AppContent() {
       setIsAdmin(true);
     }
     
-    // サイト設定を読み込んでCSSに適用
+    // グローバルサイト設定を読み込んでCSSに適用
+    const globalSettings = getGlobalSettings();
     const savedSettings = localStorage.getItem('rentalEasySiteSettings');
+    
+    // グローバル設定を基準にしたマージ設定
+    let settings = globalSettings;
     if (savedSettings) {
-      const settings = JSON.parse(savedSettings);
-      setSiteSettings(settings); // 状態に保存
-      const root = document.documentElement;
+      const localSettings = JSON.parse(savedSettings);
+      settings = { ...globalSettings, ...localSettings };
+    }
+    
+    console.log('🌐 適用されるサイト設定:', settings);
+    setSiteSettings(settings); // 状態に保存
+    
+    const root = document.documentElement;
+    
+    // カラー設定がある場合は適用
+    if (settings.theme?.primaryColor || settings.primaryColor) {
+      const primaryColor = settings.theme?.primaryColor || settings.primaryColor;
+      const secondaryColor = settings.theme?.secondaryColor || settings.secondaryColor;
+      const accentColor = settings.theme?.accentColor || settings.accentColor;
       
-      // カラー設定がある場合は適用（後方互換性）
-      if (settings.primaryColor) {
-        root.style.setProperty('--gradient-1', `linear-gradient(135deg, ${settings.primaryColor} 0%, ${settings.secondaryColor} 50%, ${settings.accentColor} 100%)`);
-        root.style.setProperty('--gradient-2', `linear-gradient(135deg, ${settings.primaryColor} 0%, ${settings.secondaryColor} 100%)`);
-        root.style.setProperty('--gradient-soft', `linear-gradient(135deg, ${settings.primaryColor}22 0%, ${settings.secondaryColor}22 100%)`);
-        root.style.setProperty('--green', settings.primaryColor);
-        root.style.setProperty('--green-hover', settings.primaryColor + 'dd');
-        root.style.setProperty('--green-dark', settings.primaryColor);
-        root.style.setProperty('--green-light', settings.secondaryColor);
-        root.style.setProperty('--green-pale', settings.accentColor + '22');
-      }
-      
-      // ブランディング設定の適用
-      if (settings.branding?.siteName) {
-        document.title = settings.branding.siteName;
-      }
+      root.style.setProperty('--gradient-1', `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 50%, ${accentColor} 100%)`);
+      root.style.setProperty('--gradient-2', `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%)`);
+      root.style.setProperty('--gradient-soft', `linear-gradient(135deg, ${primaryColor}22 0%, ${secondaryColor}22 100%)`);
+      root.style.setProperty('--green', primaryColor);
+      root.style.setProperty('--green-hover', primaryColor + 'dd');
+      root.style.setProperty('--green-dark', primaryColor);
+      root.style.setProperty('--green-light', secondaryColor);
+      root.style.setProperty('--green-pale', accentColor + '22');
+    }
+    
+    // ブランディング設定の適用
+    if (settings.branding?.siteName) {
+      document.title = settings.branding.siteName;
+      console.log('📝 サイトタイトル適用:', settings.branding.siteName);
+    }
+    
+    // カスタムアイコン設定の適用
+    if (settings.branding?.siteIcon) {
+      console.log('🖼️ カスタムアイコン適用:', settings.branding.siteIcon);
     }
   }, []);
 
@@ -93,6 +112,9 @@ function AppContent() {
     console.log('🎨 サイト設定がリアルタイム更新されました:', newSettings);
     setSiteSettings(newSettings);
     
+    // グローバル設定として保存（全ユーザーに適用）
+    updateGlobalSettings(newSettings);
+    
     // リアルタイムでタイトル更新
     if (newSettings.branding?.siteName) {
       document.title = newSettings.branding.siteName;
@@ -101,7 +123,7 @@ function AppContent() {
     
     // アイコン更新ログ
     if (newSettings.branding?.siteIcon) {
-      console.log('🖼️ カスタムアイコンが更新されました');
+      console.log('🖼️ カスタムアイコンが更新されました - 全ユーザーに適用');
     }
     
     // localStorageにも保存（既にSiteSettingsManagementで保存済み）
