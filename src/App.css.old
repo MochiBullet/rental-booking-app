@@ -1,0 +1,455 @@
+/* Instagram-inspired Modern Design System */
+
+:root {
+  
+  /* 人間工学的に最適化された緑色基調の配色パレット */
+  --green: #2e7d32;           /* メインブランドカラー（濃い緑） */
+  --green-hover: #1b5e20;     /* ホバー状態（さらに濃い緑） */
+  --green-dark: #1b5e20;      /* 重要テキスト（コントラスト十分） */
+  --green-light: #4caf50;     /* アクセントカラー（明るい緑） */
+  --green-pale: #e8f5e9;      /* 背景色（非常に薄い緑） */
+  --dark-gray: #263238;       /* プライマリーテキスト（高コントラスト） */
+  --gray: #546e7a;            /* セカンダリーテキスト */
+  --light-gray: #cfd8dc;      /* ボーダー・区切り線 */
+  --extra-light-gray: #fafafa; /* メイン背景（ほぼ白） */
+  --white: #ffffff;           /* 純白 */
+  
+  /* グラデーション用の色定義 */
+  --gradient-1: linear-gradient(135deg, #2e7d32 0%, #4caf50 100%);
+  --gradient-2: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%);
+  --gradient-soft: linear-gradient(135deg, #fafafa 0%, #e8f5e9 100%);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', 'Roboto', 'Noto Sans JP', 'Arial', sans-serif;
+}
+
+body {
+  background: var(--extra-light-gray);
+  color: var(--dark-gray);
+  font-family: 'Segoe UI', 'Roboto', 'Noto Sans JP', 'Arial', sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.App {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Modern Header */
+.main-header {
+  background: var(--green);
+  border-bottom: 1px solid var(--green-dark);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.header-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+  background: var(--green);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.site-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: white;
+  letter-spacing: -0.5px;
+}
+
+/* Navigation with Better Button Spacing */
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: nowrap;
+  min-width: 0;
+}
+
+.mypage-link {
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.mypage-link:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-1px);
+}
+
+.welcome-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.2;
+  color: white;
+  flex-shrink: 1;
+  min-width: 0;
+  max-width: 150px;
+}
+
+.welcome-text .greeting {
+  font-size: 10px;
+  opacity: 0.9;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.welcome-text .username {
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.logout-btn {
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.logout-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-1px);
+}
+
+/* Auth Buttons with Better Spacing and Style */
+.auth-buttons {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.login-btn, .register-btn {
+  padding: 12px 24px;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 110px;
+  width: 110px;
+  height: 44px;
+  text-align: center;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-sizing: border-box;
+}
+
+.login-btn:hover, .register-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-1px);
+}
+
+/* Main Footer */
+.main-footer {
+  background: var(--white);
+  border-top: 1px solid var(--light-gray);
+  margin-top: auto;
+  padding: 32px 0;
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  text-align: center;
+}
+
+.footer-container p {
+  color: var(--gray);
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.footer-links a {
+  color: var(--gray);
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.2s;
+}
+
+.footer-links a:hover {
+  color: var(--dark-gray);
+}
+
+/* Responsive Design */
+
+/* タブレット・小さいデスクトップ (768px - 1024px) */
+@media (max-width: 1024px) {
+  .header-container {
+    padding: 14px 20px;
+  }
+  
+  .user-menu {
+    gap: 12px;
+  }
+  
+  .mypage-link,
+  .logout-btn {
+    padding: 7px 14px;
+    font-size: 12px;
+  }
+  
+  .welcome-text {
+    max-width: 120px;
+  }
+  
+  .welcome-text .greeting {
+    font-size: 9px;
+  }
+  
+  .welcome-text .username {
+    font-size: 12px;
+  }
+}
+
+/* タブレット (768px以下) */
+@media (max-width: 768px) {
+  .header-container {
+    padding: 12px 16px;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+  }
+  
+  .site-title {
+    font-size: 18px;
+  }
+  
+  .user-menu {
+    gap: 10px;
+  }
+  
+  .mypage-link,
+  .logout-btn {
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+  
+  .welcome-text {
+    max-width: 100px;
+  }
+  
+  .welcome-text .greeting {
+    font-size: 8px;
+  }
+  
+  .welcome-text .username {
+    font-size: 11px;
+  }
+  
+  .auth-buttons {
+    gap: 10px;
+  }
+  
+  .login-btn,
+  .register-btn {
+    padding: 8px 16px;
+    font-size: 12px;
+    width: 90px;
+    height: 36px;
+    min-width: 90px;
+  }
+  
+  .footer-links {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+/* スマートフォン (480px以下) */
+@media (max-width: 480px) {
+  .header-container {
+    padding: 10px 12px;
+  }
+  
+  .logo-section {
+    gap: 8px;
+  }
+  
+  .logo {
+    width: 35px;
+    height: 35px;
+    font-size: 16px;
+  }
+  
+  .site-title {
+    font-size: 16px;
+  }
+  
+  .user-menu {
+    gap: 8px;
+  }
+  
+  .mypage-link {
+    padding: 5px 10px;
+    font-size: 10px;
+  }
+  
+  .logout-btn {
+    padding: 5px 10px;
+    font-size: 10px;
+  }
+  
+  .welcome-text {
+    max-width: 80px;
+    align-items: center;
+  }
+  
+  .welcome-text .greeting {
+    font-size: 7px;
+  }
+  
+  .welcome-text .username {
+    font-size: 10px;
+  }
+  
+  .auth-buttons {
+    gap: 8px;
+  }
+  
+  .login-btn,
+  .register-btn {
+    padding: 6px 12px;
+    font-size: 11px;
+    width: 80px;
+    height: 32px;
+    min-width: 80px;
+  }
+}
+
+/* 極小画面 (360px以下) */
+@media (max-width: 360px) {
+  .header-container {
+    padding: 8px 10px;
+  }
+  
+  .site-title {
+    font-size: 14px;
+  }
+  
+  .user-menu {
+    gap: 6px;
+  }
+  
+  .mypage-link,
+  .logout-btn {
+    padding: 4px 8px;
+    font-size: 9px;
+  }
+  
+  .welcome-text {
+    max-width: 70px;
+  }
+  
+  .welcome-text .greeting {
+    font-size: 6px;
+  }
+  
+  .welcome-text .username {
+    font-size: 9px;
+  }
+  
+  .auth-buttons {
+    gap: 6px;
+  }
+  
+  .login-btn,
+  .register-btn {
+    padding: 5px 10px;
+    font-size: 10px;
+    width: 70px;
+    height: 28px;
+    min-width: 70px;
+  }
+}
+
+/* Admin Mode Indicator */
+.admin-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 20px;
+}
+
+.admin-badge {
+  background: #667eea;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
