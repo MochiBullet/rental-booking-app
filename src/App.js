@@ -115,9 +115,9 @@ function AppContent() {
                     src={siteSettings.branding.siteIcon} 
                     alt="サイトアイコン" 
                     style={{ 
-                      width: '40px', 
-                      height: '40px', 
-                      borderRadius: '10px',
+                      width: '60px', 
+                      height: '60px', 
+                      borderRadius: '12px',
                       objectFit: 'cover'
                     }}
                   />
