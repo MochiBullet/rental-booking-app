@@ -132,36 +132,29 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
         const base64Data = e.target.result;
         console.log('✅ Base64変換完了、データ長:', base64Data.length);
         
-        // GitHub API を使ってファイルをアップロード
-        const uploadResult = await uploadIconToGitHub(base64Data, file.name);
+        // Base64データをそのまま保存（全ユーザー共有）
+        const customIconData = base64Data;
         
-        if (uploadResult.success) {
-          const customIconUrl = uploadResult.url;
-          
-          // 設定を更新
-          updateBrandingSettings('siteIcon', customIconUrl);
-          updateBrandingSettings('siteIconType', 'custom');
-          
-          console.log('🔄 カスタムアイコンURL設定:', customIconUrl);
-          
-          // リアルタイム更新の実行
-          if (onSettingsUpdate) {
-            const updatedSettings = {
-              ...settings,
-              branding: {
-                ...settings.branding,
-                siteIcon: customIconUrl,
-                siteIconType: 'custom'
-              }
-            };
-            onSettingsUpdate(updatedSettings);
-          }
-          
-          alert('✅ アイコンが正常にアップロードされました。全ユーザーに反映されます。');
-        } else {
-          console.error('❌ アップロード失敗:', uploadResult.error);
-          alert('❌ アイコンのアップロードに失敗しました。しばらく後でお試しください。');
+        // 設定を更新（Base64データを直接保存）
+        updateBrandingSettings('siteIcon', customIconData);
+        updateBrandingSettings('siteIconType', 'custom');
+        
+        console.log('🔄 カスタムアイコンBase64データ設定完了');
+        
+        // リアルタイム更新の実行
+        if (onSettingsUpdate) {
+          const updatedSettings = {
+            ...settings,
+            branding: {
+              ...settings.branding,
+              siteIcon: customIconData,
+              siteIconType: 'custom'
+            }
+          };
+          onSettingsUpdate(updatedSettings);
         }
+        
+        alert('✅ アイコンがアップロードされました。\n\n⚠️ 現在はLocalStorage保存のため、同じブラウザでのみ表示されます。\n全ユーザーに反映するには、サーバー側の実装が必要です。');
       };
       reader.readAsDataURL(file);
       
@@ -171,40 +164,6 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
     }
   };
 
-  // GitHub API を使ってアイコンをアップロード
-  const uploadIconToGitHub = async (base64Data, fileName) => {
-    try {
-      const extension = fileName.split('.').pop().toLowerCase();
-      const targetFileName = `custom-site-icon.${extension}`;
-      
-      // Base64からBlobに変換
-      const byteCharacters = atob(base64Data.split(',')[1]);
-      const byteNumbers = new Array(byteCharacters.length);
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-      }
-      const byteArray = new Uint8Array(byteNumbers);
-      
-      // public フォルダにアップロードする想定のURL
-      const publicUrl = `/${targetFileName}?v=${Date.now()}`;
-      
-      console.log('🌐 アイコンファイル設定完了:', publicUrl);
-      
-      // 実際のファイルアップロードは省略し、URLのみ設定
-      // 本来はここでS3やGitHub APIにアップロード
-      
-      return {
-        success: true,
-        url: publicUrl
-      };
-      
-    } catch (error) {
-      return {
-        success: false,
-        error: error.message
-      };
-    }
-  };
 
   // アイコンをデフォルトに戻す
   const resetIconToDefault = () => {
@@ -607,7 +566,11 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
                   <p className="upload-info">
                     • 推奨サイズ: 40x40px 以上<br/>
                     • 対応形式: PNG, JPG, GIF<br/>
-                    • 最大サイズ: 2MB
+                    • 最大サイズ: 2MB<br/>
+                    <br/>
+                    <strong style={{color: '#ff9800'}}>⚠️ 制限事項：</strong><br/>
+                    現在はLocalStorage保存のため、同じブラウザでのみ表示されます。<br/>
+                    全ユーザーに反映するには、サーバー側の実装が必要です。
                   </p>
                 </div>
               </div>
