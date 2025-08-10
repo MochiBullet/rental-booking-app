@@ -6,6 +6,7 @@ const AdminLogin = ({ setIsAdmin, onSuccess }) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLogging, setIsLogging] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -55,14 +56,33 @@ const AdminLogin = ({ setIsAdmin, onSuccess }) => {
           
           <div className="form-group">
             <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter admin password"
-              required
-            />
+            <div style={{ position: 'relative' }}>
+              <input
+                type={showPassword ? "text" : "password"}
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter admin password"
+                required
+                style={{ paddingRight: '40px' }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: 'absolute',
+                  right: '10px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: '18px'
+                }}
+              >
+                {showPassword ? '👁️' : '🙈'}
+              </button>
+            </div>
           </div>
           
           <button type="submit" className="admin-login-btn" disabled={isLogging}>
@@ -70,6 +90,12 @@ const AdminLogin = ({ setIsAdmin, onSuccess }) => {
           </button>
         </form>
         
+        
+        <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#f0f0f0', borderRadius: '8px', textAlign: 'center', fontSize: '14px', fontFamily: 'monospace' }}>
+          <strong>管理者ログイン情報:</strong><br />
+          ID: admin<br />
+          Password: msbase7032
+        </div>
         
         <button 
           className="back-btn"
