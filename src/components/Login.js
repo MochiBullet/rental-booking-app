@@ -4,7 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 function Login({ setUser }) {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    email: '',
+    memberId: '',
     password: ''
   });
   const [error, setError] = useState('');
@@ -15,34 +15,15 @@ function Login({ setUser }) {
     setError('');
     setLoading(true);
 
-    setTimeout(() => {
-      // テストユーザーログインチェック
-      if (formData.email === 'admin' && formData.password === 'admin0123') {
+    try {
+      // テストユーザーログインチェック（管理者用）
+      if (formData.memberId === 'admin' && formData.password === 'admin0123') {
         const testUser = {
-          id: 'test-001',
-          name: 'テストユーザー',
-          email: 'admin@test.local',
-          points: 2500,
-          memberNumber: 'TEST001',
-          createdAt: new Date().toISOString(),
-          // テストユーザー用の追加情報
-          phone: '090-1234-5678',
-          birthDate: '1985-06-15',
-          gender: 'male',
-          address: {
-            postalCode: '1000001',
-            prefecture: '東京都',
-            city: '千代田区',
-            address: '千代田',
-            building: 'テストマンション 101号室'
-          },
-          license: {
-            number: '123456789012',
-            types: ['regular', 'motorcycle'],
-            issueDate: '2020-04-01',
-            expiryDate: '2027-04-01',
-            color: 'gold'
-          }
+          id: 'admin',
+          name: 'テスト管理者',
+          points: 9999,
+          registeredAt: new Date().toISOString(),
+          status: 'admin'
         };
         
         localStorage.setItem('currentUser', JSON.stringify(testUser));
@@ -52,47 +33,52 @@ function Login({ setUser }) {
         return;
       }
 
-      // Check if user exists in localStorage
-      const users = JSON.parse(localStorage.getItem('users') || '[]');
-      const existingUser = users.find(user => user.email === formData.email);
+      // まずローカルストレージをチェック（デモ用）
+      const members = JSON.parse(localStorage.getItem('members') || '[]');
+      const localMember = members.find(member => member.id === formData.memberId);
       
-      if (existingUser) {
-        // パスワードチェック（簡易版）
-        if (existingUser.password && existingUser.password !== formData.password) {
-          setError('メールアドレスまたはパスワードが正しくありません。');
+      if (localMember) {
+        // ローカルでのパスワードチェック（平文比較）
+        if (localMember.password === formData.password) {
+          localStorage.setItem('currentUser', JSON.stringify(localMember));
+          setUser(localMember);
+          setLoading(false);
+          navigate('/mypage');
+          return;
+        } else {
+          setError('会員IDまたはパスワードが正しくありません。');
           setLoading(false);
           return;
         }
-        
-        // Use existing user data
-        localStorage.setItem('currentUser', JSON.stringify(existingUser));
-        setUser(existingUser);
-        setLoading(false);
+      }
+
+      // バックエンドAPIを呼び出し
+      const response = await fetch('https://9v7h3mj14g.execute-api.ap-southeast-2.amazonaws.com/prod/members/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: formData.memberId,
+          password: formData.password
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem('currentUser', JSON.stringify(data.member));
+        setUser(data.member);
         navigate('/mypage');
       } else {
-        // バリデーション追加（管理者以外は正規のメールアドレスが必要）
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(formData.email)) {
-          setError('正しいメールアドレスを入力してください。');
-          setLoading(false);
-          return;
-        }
-        
-        // Create simple user for demo (backward compatibility)
-        const userData = {
-          id: Date.now(),
-          name: formData.email.split('@')[0],
-          email: formData.email,
-          points: 0,
-          createdAt: new Date().toISOString()
-        };
-        
-        localStorage.setItem('currentUser', JSON.stringify(userData));
-        setUser(userData);
-        setLoading(false);
-        navigate('/');
+        const errorData = await response.json();
+        setError(errorData.message || 'ログインに失敗しました。');
       }
-    }, 1000);
+    } catch (error) {
+      console.error('Login error:', error);
+      setError('ネットワークエラーが発生しました。もう一度お試しください。');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleChange = (e) => {
@@ -108,17 +94,20 @@ function Login({ setUser }) {
         <h2 style={{ textAlign: 'center', color: '#2d7a2d', marginBottom: '1.5rem' }}>ログイン</h2>
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: '1.5rem' }}>
-            <label htmlFor="email" style={{ display: 'block', marginBottom: '0.5rem', color: '#333', fontWeight: '500' }}>メールアドレス</label>
+            <label htmlFor="memberId" style={{ display: 'block', marginBottom: '0.5rem', color: '#333', fontWeight: '500' }}>会員ID</label>
             <input
               type="text"
-              id="email"
-              name="email"
-              value={formData.email}
+              id="memberId"
+              name="memberId"
+              value={formData.memberId}
               onChange={handleChange}
-              placeholder="example@email.com または admin"
+              placeholder="例: 2025081234 または admin"
               required
               style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '6px', fontSize: '1rem' }}
             />
+            <div style={{ fontSize: '0.8rem', color: '#666', marginTop: '0.25rem' }}>
+              会員ID形式: 西暦 + 月 + 免許証番号下4桁
+            </div>
           </div>
           
           <div style={{ marginBottom: '1.5rem' }}>

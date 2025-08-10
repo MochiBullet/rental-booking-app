@@ -276,6 +276,14 @@
               "version": "2.118.0"
             }
           },
+          "DomainCert": {
+            "id": "DomainCert",
+            "path": "RentalBookingWebStack-production/DomainCert",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.Resource",
+              "version": "2.118.0"
+            }
+          },
           "Distribution": {
             "id": "Distribution",
             "path": "RentalBookingWebStack-production/Distribution",
@@ -335,6 +343,9 @@
                         "compress": true,
                         "viewerProtocolPolicy": "redirect-to-https"
                       },
+                      "aliases": [
+                        "ms-base-rental.com"
+                      ],
                       "comment": "Rental Booking App Distribution - production",
                       "customErrorResponses": [
                         {
@@ -353,7 +364,12 @@
                       "defaultRootObject": "index.html",
                       "httpVersion": "http2",
                       "ipv6Enabled": true,
-                      "priceClass": "PriceClass_100"
+                      "priceClass": "PriceClass_100",
+                      "viewerCertificate": {
+                        "acmCertificateArn": "arn:aws:acm:us-east-1:276291855506:certificate/6e60b6cf-d4de-4afe-88d3-83c23ff90721",
+                        "minimumProtocolVersion": "TLSv1.2_2021",
+                        "sslSupportMethod": "sni-only"
+                      }
                     },
                     "tags": [
                       {

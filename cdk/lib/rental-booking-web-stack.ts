@@ -43,6 +43,12 @@ export class RentalBookingWebStack extends cdk.Stack {
     // Grant CloudFront access to S3 bucket
     websiteBucket.grantRead(originAccessIdentity);
 
+    // Import existing certificate for ms-base-rental.com
+    const certificate = cdk.aws_certificatemanager.Certificate.fromCertificateArn(
+      this, 'DomainCert',
+      'arn:aws:acm:us-east-1:276291855506:certificate/6e60b6cf-d4de-4afe-88d3-83c23ff90721'
+    );
+
     // CloudFront distribution
     const distribution = new cloudfront.Distribution(this, 'Distribution', {
       defaultBehavior: {
@@ -55,6 +61,8 @@ export class RentalBookingWebStack extends cdk.Stack {
         compress: true
       },
       defaultRootObject: 'index.html',
+      domainNames: ['ms-base-rental.com'],
+      certificate: certificate,
       errorResponses: [
         {
           httpStatus: 403,
