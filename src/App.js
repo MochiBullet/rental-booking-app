@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import './App.css';
 import HomePage from './components/HomePage';
 import VehicleListPage from './components/VehicleListPage';
@@ -162,8 +162,8 @@ function AppContent() {
           <Route path="/register" element={<EmailRegistration />} />
           <Route path="/complete-registration/:token" element={<CompleteRegistration />} />
           <Route path="/mypage" element={<MyPage user={user} setUser={setUser} />} />
-          <Route path="/admin-login" element={<AdminLogin setIsAdmin={setIsAdmin} />} />
-          <Route path="/admin" element={isAdmin ? <AdminDashboard onSettingsUpdate={handleSiteSettingsUpdate} /> : <AdminLogin setIsAdmin={setIsAdmin} />} />
+          <Route path="/admin-login" element={<AdminLogin setIsAdmin={setIsAdmin} onSuccess={() => window.location.href = '/admin'} />} />
+          <Route path="/admin" element={isAdmin ? <AdminDashboard onSettingsUpdate={handleSiteSettingsUpdate} /> : <Navigate to="/admin-login" />} />
           <Route path="/contact" element={<ContactForm />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />

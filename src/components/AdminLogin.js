@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import './AdminLogin.css';
-import dataSyncService from '../services/dataSync';
 
-const AdminLogin = ({ setIsAdmin }) => {
+const AdminLogin = ({ setIsAdmin, onSuccess }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLogging, setIsLogging] = useState(false);
-  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,14 +17,11 @@ const AdminLogin = ({ setIsAdmin }) => {
         setIsAdmin(true);
         localStorage.setItem('adminUser', 'true');
         
-        // Sync all admin data from cloud when logging in
-        await dataSyncService.syncAllAdminData();
-        
-        navigate('/admin');
+        if (onSuccess) {
+          onSuccess();
+        }
       } catch (error) {
-        console.error('Failed to sync data during login:', error);
-        // Still proceed to admin panel even if sync fails
-        navigate('/admin');
+        console.error('Failed to set admin status:', error);
       }
     } else {
       setError('Invalid username or password');
@@ -84,9 +78,9 @@ const AdminLogin = ({ setIsAdmin }) => {
         
         <button 
           className="back-btn"
-          onClick={() => navigate('/')}
+          onClick={() => window.location.href = '/'}
         >
-          � Back to Home
+          ← Back to Home
         </button>
       </div>
     </div>
