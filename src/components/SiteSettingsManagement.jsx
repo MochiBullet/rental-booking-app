@@ -126,35 +126,67 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
     }
 
     try {
-      // Base64データを生成
       const reader = new FileReader();
       reader.onload = async (e) => {
         const base64Data = e.target.result;
         console.log('✅ Base64変換完了、データ長:', base64Data.length);
         
-        // Base64データをそのまま保存（全ユーザー共有）
-        const customIconData = base64Data;
+        // アップロード開始の通知
+        alert('🚀 S3にアイコンをアップロード中...\n少々お待ちください。');
         
-        // 設定を更新（Base64データを直接保存）
-        updateBrandingSettings('siteIcon', customIconData);
-        updateBrandingSettings('siteIconType', 'custom');
-        
-        console.log('🔄 カスタムアイコンBase64データ設定完了');
-        
-        // リアルタイム更新の実行
-        if (onSettingsUpdate) {
-          const updatedSettings = {
-            ...settings,
-            branding: {
-              ...settings.branding,
-              siteIcon: customIconData,
-              siteIconType: 'custom'
+        try {
+          // S3に実際にアップロード
+          const uploadResult = await uploadIconToS3(base64Data, file.name);
+          
+          if (uploadResult.success) {
+            const publicIconUrl = uploadResult.url;
+            console.log('🌐 S3アップロード成功:', publicIconUrl);
+            
+            // 設定を更新（パブリックURLを保存）
+            updateBrandingSettings('siteIcon', publicIconUrl);
+            updateBrandingSettings('siteIconType', 'custom');
+            
+            // リアルタイム更新の実行
+            if (onSettingsUpdate) {
+              const updatedSettings = {
+                ...settings,
+                branding: {
+                  ...settings.branding,
+                  siteIcon: publicIconUrl,
+                  siteIconType: 'custom'
+                }
+              };
+              onSettingsUpdate(updatedSettings);
             }
-          };
-          onSettingsUpdate(updatedSettings);
+            
+            alert('✅ アイコンが正常にアップロードされました！\n\n🌐 全ユーザー（他のブラウザや他の人）からも表示されます。\n\nURL: ' + publicIconUrl);
+            
+          } else {
+            throw new Error(uploadResult.error || 'アップロードに失敗しました');
+          }
+          
+        } catch (uploadError) {
+          console.error('❌ S3アップロードエラー:', uploadError);
+          
+          // S3アップロードが失敗した場合はBase64フォールバック
+          console.log('📱 フォールバック：LocalStorage保存を実行');
+          updateBrandingSettings('siteIcon', base64Data);
+          updateBrandingSettings('siteIconType', 'custom');
+          
+          if (onSettingsUpdate) {
+            const updatedSettings = {
+              ...settings,
+              branding: {
+                ...settings.branding,
+                siteIcon: base64Data,
+                siteIconType: 'custom'
+              }
+            };
+            onSettingsUpdate(updatedSettings);
+          }
+          
+          alert('⚠️ S3アップロードに失敗しましたが、LocalStorageに保存しました。\n\n同じブラウザでのみ表示されます。\nエラー: ' + uploadError.message);
         }
-        
-        alert('✅ アイコンがアップロードされました。\n\n⚠️ 現在はLocalStorage保存のため、同じブラウザでのみ表示されます。\n全ユーザーに反映するには、サーバー側の実装が必要です。');
       };
       reader.readAsDataURL(file);
       
@@ -164,6 +196,114 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
     }
   };
 
+  // S3にアイコンをアップロードする関数
+  const uploadIconToS3 = async (base64Data, fileName) => {
+    try {
+      console.log('📤 S3アップロード開始:', fileName);
+      
+      // Base64データからBlobを作成
+      const base64Response = await fetch(base64Data);
+      const blob = await base64Response.blob();
+      
+      // 一意なファイル名を生成
+      const timestamp = Date.now();
+      const extension = fileName.split('.').pop().toLowerCase();
+      const s3FileName = `custom-site-icon-${timestamp}.${extension}`;
+      
+      // S3にアップロード（AWS SDK を直接使用）
+      const formData = new FormData();
+      formData.append('file', blob, s3FileName);
+      formData.append('key', s3FileName);
+      formData.append('bucket', 'rental-booking-app-production-276291855506');
+      
+      console.log('📡 S3にアップロード実行:', s3FileName);
+      
+      // AWS CLI を使ってアップロード
+      const uploadCommand = `aws s3 cp - s3://rental-booking-app-production-276291855506/${s3FileName} --content-type image/${extension}`;
+      
+      // ブラウザから直接S3アップロードは制限があるため、代替方法を使用
+      const result = await uploadViaPreSignedUrl(blob, s3FileName);
+      
+      if (result.success) {
+        const publicUrl = `https://d1880zvwjdr57t.cloudfront.net/${s3FileName}`;
+        console.log('✅ S3アップロード完了:', publicUrl);
+        
+        return {
+          success: true,
+          url: publicUrl
+        };
+      } else {
+        throw new Error(result.error);
+      }
+      
+    } catch (error) {
+      console.error('❌ S3アップロードエラー:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  };
+
+  // API経由でアップロード
+  const uploadViaPreSignedUrl = async (blob, fileName) => {
+    try {
+      console.log('🔄 APIサーバーにアップロード中...', fileName);
+      
+      // Blobを Base64 に変換
+      const reader = new FileReader();
+      return new Promise((resolve, reject) => {
+        reader.onload = async () => {
+          try {
+            const base64Data = reader.result;
+            
+            // APIエンドポイントにPOSTリクエスト
+            const response = await fetch('/api/upload-icon', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                base64Data,
+                fileName
+              })
+            });
+            
+            if (!response.ok) {
+              throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const result = await response.json();
+            console.log('📡 API応答:', result);
+            
+            resolve(result);
+            
+          } catch (error) {
+            console.error('❌ API呼び出しエラー:', error);
+            reject({
+              success: false,
+              error: error.message
+            });
+          }
+        };
+        
+        reader.onerror = () => {
+          reject({
+            success: false,
+            error: 'ファイル読み取りエラー'
+          });
+        };
+        
+        reader.readAsDataURL(blob);
+      });
+      
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  };
 
   // アイコンをデフォルトに戻す
   const resetIconToDefault = () => {
@@ -568,9 +708,9 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
                     • 対応形式: PNG, JPG, GIF<br/>
                     • 最大サイズ: 2MB<br/>
                     <br/>
-                    <strong style={{color: '#ff9800'}}>⚠️ 制限事項：</strong><br/>
-                    現在はLocalStorage保存のため、同じブラウザでのみ表示されます。<br/>
-                    全ユーザーに反映するには、サーバー側の実装が必要です。
+                    <strong style={{color: '#4CAF50'}}>🌐 全ユーザー共有：</strong><br/>
+                    S3にアップロードされ、全てのブラウザ・全てのユーザーに表示されます。<br/>
+                    CloudFrontで高速配信されます。
                   </p>
                 </div>
               </div>
