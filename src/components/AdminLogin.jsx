@@ -44,7 +44,7 @@ const AdminLogin = ({ onLogin }) => {
               name="username"
               value={credentials.username}
               onChange={handleInputChange}
-              placeholder="admin"
+              placeholder="ユーザー名を入力"
               required
             />
           </div>
@@ -69,11 +69,6 @@ const AdminLogin = ({ onLogin }) => {
           </button>
         </form>
         
-        <div className="login-info">
-          <p><small>デモ用認証情報:</small></p>
-          <p><small>ユーザー名: admin</small></p>
-          <p><small>パスワード: rental123</small></p>
-        </div>
       </div>
     </div>
   );

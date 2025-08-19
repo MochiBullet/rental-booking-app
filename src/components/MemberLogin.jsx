@@ -147,11 +147,6 @@ const MemberLogin = ({ onLogin, onCancel, onRegister }) => {
           </button>
         </div>
         
-        <div className="demo-info">
-          <p><small>デモ用ログイン情報:</small></p>
-          <p><small>メール: test@example.com</small></p>
-          <p><small>パスワード: password123</small></p>
-        </div>
       </div>
     </div>
   );
