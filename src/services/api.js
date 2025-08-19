@@ -49,6 +49,7 @@ class ApiService {
     const url = `${this.baseURL}${endpoint}`;
     
     const config = {
+      mode: 'cors',
       headers: {
         'Content-Type': 'application/json',
         ...options.headers,
@@ -79,6 +80,12 @@ class ApiService {
       return data;
     } catch (error) {
       console.error(`API Request Failed:`, error);
+      console.error(`URL: ${url}`);
+      console.error(`Config:`, config);
+      // CORSエラーの可能性を明示
+      if (error.message === 'Failed to fetch') {
+        console.error('⚠️ CORS error or network issue. Check browser console for details.');
+      }
       throw error;
     }
   }

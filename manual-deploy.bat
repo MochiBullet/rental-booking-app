@@ -4,7 +4,7 @@ echo  Manual Deploy to S3 (Emergency Fix)
 echo ===============================================
 echo.
 
-cd /d C:\Users\hiyok\projects\rental-booking-app
+cd /d C:\Windows\System32\rental-booking-app
 
 echo Checking AWS CLI installation...
 aws --version >nul 2>&1
@@ -27,7 +27,9 @@ if %ERRORLEVEL% NEQ 0 (
 echo ✅ AWS CLI configured
 echo.
 
-set BUCKET_NAME=rental-booking-app-bucket
+REM 実際のバケット名を使用（どちらか有効な方）
+set BUCKET_NAME=rental-booking-app-production-276291855506
+REM set BUCKET_NAME=rental-booking-app-bucket
 set REGION=ap-southeast-2
 
 echo Step 1: Building React application...
@@ -78,13 +80,27 @@ echo Step 6: Uploading files...
 aws s3 sync build/ s3://%BUCKET_NAME%/ --delete --region %REGION%
 
 echo.
+echo Step 7: Clearing CloudFront cache...
+REM CloudFront Distribution IDを取得
+for /f "tokens=*" %%i in ('aws cloudfront list-distributions --query "DistributionList.Items[0].Id" --output text') do set DIST_ID=%%i
+
+if "%DIST_ID%" NEQ "None" (
+    echo Creating invalidation for distribution %DIST_ID%...
+    aws cloudfront create-invalidation --distribution-id %DIST_ID% --paths "/*"
+    echo ✅ CloudFront cache cleared
+) else (
+    echo ⚠️ No CloudFront distribution found
+)
+
+echo.
 echo ===============================================
 echo ✅ Manual deployment complete!
 echo.
 echo Your website should be accessible at:
-echo http://%BUCKET_NAME%.s3-website-%REGION%.amazonaws.com
+echo 🌐 Primary: https://ms-base-rental.com
+echo 🌐 S3 Direct: http://%BUCKET_NAME%.s3-website-%REGION%.amazonaws.com
 echo.
-echo If the site doesn't load, wait 2-3 minutes for DNS propagation
+echo ⚠️ IMPORTANT: Hard refresh your browser (Ctrl+Shift+R)
 echo ===============================================
 echo.
 pause
