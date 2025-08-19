@@ -1,0 +1,83 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Creates IAM user and access keys for Rental Booking App CDK deployment'
+
+Parameters:
+  UserName:
+    Type: String
+    Default: rental-app-cdk-user
+    Description: Name for the IAM user
+    MinLength: 1
+    MaxLength: 64
+
+Resources:
+  CDKDeployUser:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Ref UserName
+      ManagedPolicyArns:
+        # CDKデプロイに必要な権限
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+        - arn:aws:iam::aws:policy/CloudFrontFullAccess
+        - arn:aws:iam::aws:policy/IAMFullAccess
+        - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
+      Policies:
+        - PolicyName: CDKBootstrapPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              # CDK Bootstrap用の権限
+              - Effect: Allow
+                Action:
+                  - 'ssm:GetParameter'
+                  - 'ssm:PutParameter'
+                  - 'ecr:*'
+                  - 'sts:AssumeRole'
+                Resource: '*'
+              # CloudFormationスタック操作権限
+              - Effect: Allow
+                Action:
+                  - 'cloudformation:*'
+                Resource: '*'
+      Tags:
+        - Key: Purpose
+          Value: RentalBookingAppCDK
+        - Key: ManagedBy
+          Value: CloudFormation
+
+  CDKDeployUserAccessKey:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !Ref CDKDeployUser
+
+Outputs:
+  UserName:
+    Description: IAM User Name
+    Value: !Ref CDKDeployUser
+    Export:
+      Name: !Sub '${AWS::StackName}-UserName'
+
+  AccessKeyId:
+    Description: Access Key ID for the IAM user
+    Value: !Ref CDKDeployUserAccessKey
+    Export:
+      Name: !Sub '${AWS::StackName}-AccessKeyId'
+
+  SecretAccessKey:
+    Description: Secret Access Key for the IAM user (SAVE THIS - IT CANNOT BE RETRIEVED LATER)
+    Value: !GetAtt CDKDeployUserAccessKey.SecretAccessKey
+    Export:
+      Name: !Sub '${AWS::StackName}-SecretAccessKey'
+
+  Region:
+    Description: AWS Region
+    Value: !Ref AWS::Region
+
+  Instructions:
+    Description: Next Steps
+    Value: |
+      1. IMPORTANT: Save the SecretAccessKey immediately - it cannot be retrieved later!
+      2. Set environment variables or use AWS CLI configure:
+         - AWS_ACCESS_KEY_ID: Use the AccessKeyId output
+         - AWS_SECRET_ACCESS_KEY: Use the SecretAccessKey output
+         - AWS_DEFAULT_REGION: Use the Region output
+      3. Run 'cd cdk && deploy.bat' to deploy the application infrastructure
