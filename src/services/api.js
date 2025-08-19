@@ -31,6 +31,7 @@ class ApiService {
         fuelType: vehicle.fuelType,
         cc: vehicle.engineSize
       },
+      passengers: vehicle.capacity,
       insurance: vehicle.insurance,
       brand: vehicle.brand,
       model: vehicle.model,

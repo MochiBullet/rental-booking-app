@@ -299,7 +299,23 @@ function App() {
       
       <main>
         {currentView === 'home' && (
-          <Hero onViewChange={handleViewChange} />
+          <>
+            <Hero onViewChange={handleViewChange} />
+            <section className="featured-vehicles-section">
+              <div className="container">
+                <h2 style={{textAlign: 'center', margin: '40px 0 20px', color: '#333'}}>
+                  🚗 注目の車両ラインナップ 🏍️
+                </h2>
+                <VehicleList 
+                  vehicles={vehicles} 
+                  onVehicleSelect={handleVehicleSelect}
+                  initialFilter="all"
+                  hideFilters={false}
+                  user={currentMember}
+                />
+              </div>
+            </section>
+          </>
         )}
         
         {currentView === 'cars' && (
@@ -312,7 +328,7 @@ function App() {
                 <h2>🚗 車両一覧</h2>
               </div>
               <VehicleList 
-                vehicles={vehicles.filter(v => v.type === 'car')} 
+                vehicles={vehicles.filter(v => v.type === 'car' || v.vehicleType === 'car')} 
                 onVehicleSelect={handleVehicleSelect}
                 initialFilter="car"
                 hideFilters={true}
@@ -331,7 +347,7 @@ function App() {
                 <h2>🏍️ バイク一覧</h2>
               </div>
               <VehicleList 
-                vehicles={vehicles.filter(v => v.type === 'motorcycle')} 
+                vehicles={vehicles.filter(v => v.type === 'motorcycle' || v.vehicleType === 'motorcycle')} 
                 onVehicleSelect={handleVehicleSelect}
                 initialFilter="motorcycle"
                 hideFilters={true}

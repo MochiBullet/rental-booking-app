@@ -274,28 +274,28 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
                 alt={vehicle.name}
                 className="vehicle-image"
               />
-              <span className="vehicle-badge">{vehicle.type === 'car' ? '車' : vehicle.type === 'bike' ? 'バイク' : vehicle.type}</span>
-              {vehicle.available && <span className="available-badge">予約可能</span>}
+              <span className="vehicle-badge">{(vehicle.type === 'car' || vehicle.vehicleType === 'car') ? '車' : (vehicle.type === 'motorcycle' || vehicle.vehicleType === 'motorcycle') ? 'バイク' : vehicle.type || vehicle.vehicleType}</span>
+              {(vehicle.available || vehicle.isAvailable) && <span className="available-badge">予約可能</span>}
             </div>
             
             <div className="vehicle-details">
               <h3>{vehicle.name}</h3>
               <div className="vehicle-features">
-                <span className="feature-tag">👥 {vehicle.passengers}人乗り</span>
-                {vehicle.features?.split(',').slice(0, 2).map((feature, idx) => (
-                  <span key={idx} className="feature-tag">{feature.trim()}</span>
+                <span className="feature-tag">👥 {vehicle.passengers || vehicle.specifications?.seats || 4}人乗り</span>
+                {(Array.isArray(vehicle.features) ? vehicle.features : vehicle.features?.split(',') || []).slice(0, 2).map((feature, idx) => (
+                  <span key={idx} className="feature-tag">{typeof feature === 'string' ? feature.trim() : feature}</span>
                 ))}
               </div>
               
               <div className="vehicle-pricing">
                 <div className="price-display">
-                  <span className="price-amount">{formatCurrency(vehicle.price)}</span>
+                  <span className="price-amount">{formatCurrency(vehicle.price || vehicle.pricePerDay || 0)}</span>
                   <span className="price-period">/ 日</span>
                 </div>
                 <button 
                   className="modern-book-btn"
                   onClick={() => handleBookVehicle(vehicle)}
-                  disabled={!vehicle.available}
+                  disabled={!(vehicle.available || vehicle.isAvailable)}
                 >
                   {user ? '予約する' : '料金を確認'}
                 </button>
