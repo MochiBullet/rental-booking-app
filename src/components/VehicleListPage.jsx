@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import VehicleList from './VehicleList';
 import { vehicleAPI } from '../services/api';
+import { vehicleData } from '../data/vehicleData';
 import './VehicleListPage.css';
 
 const VehicleListPage = ({ user }) => {
@@ -17,11 +18,31 @@ const VehicleListPage = ({ user }) => {
         setLoading(true);
         setError(null);
         
-        const vehicleData = await vehicleAPI.getByType(type);
-        setVehicles(vehicleData);
+        // まずAPIからデータを取得を試行
+        try {
+          const apiVehicleData = await vehicleAPI.getByType(type);
+          setVehicles(apiVehicleData);
+          console.log('✅ APIからデータを取得しました');
+        } catch (apiError) {
+          console.warn('⚠️ API接続に失敗、ローカルデータを使用します:', apiError);
+          // APIに失敗した場合はローカルデータを使用
+          const localVehicles = vehicleData.filter(vehicle => 
+            type === 'car' ? vehicle.type === 'car' : vehicle.type === 'motorcycle'
+          );
+          setVehicles(localVehicles);
+        }
       } catch (err) {
         console.error('車両データの取得に失敗しました:', err);
-        setError('車両データの読み込みに失敗しました。しばらくしてから再度お試しください。');
+        // 最終的なフォールバックとしてローカルデータを使用
+        try {
+          const localVehicles = vehicleData.filter(vehicle => 
+            type === 'car' ? vehicle.type === 'car' : vehicle.type === 'motorcycle'
+          );
+          setVehicles(localVehicles);
+          console.log('📦 ローカルデータにフォールバックしました');
+        } catch (localError) {
+          setError('車両データの読み込みに失敗しました。しばらくしてから再度お試しください。');
+        }
       } finally {
         setLoading(false);
       }

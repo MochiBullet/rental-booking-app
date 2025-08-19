@@ -1,5 +1,5 @@
 // API通信サービス
-const API_BASE_URL = 'https://ysp1x4cqvk.execute-api.ap-southeast-2.amazonaws.com/prod';
+const API_BASE_URL = 'https://kgkjjv0rik.execute-api.ap-southeast-2.amazonaws.com/prod';
 
 class ApiService {
   constructor() {
