@@ -1,4 +1,4 @@
-// Version 3.0 - FORCE WEBPACK REBUILD - SECURITY CREDENTIALS COMPLETELY REMOVED
+// Version 3.0 - FINAL FIX - ADMIN LOGIN CREDENTIALS DISPLAY REMOVED COMPLETELY - BUILD 20250819
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import './App.css';
