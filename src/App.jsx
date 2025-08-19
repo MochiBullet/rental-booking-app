@@ -39,9 +39,9 @@ function App() {
     // 車両データをAPIから取得
     const loadVehicles = async () => {
       try {
-        console.log('🔄 App.jsx: データベースから車両データを取得中...');
+        console.log('🔄 App.jsx: データベースから車両データを取得中... [', new Date().toISOString(), ']');
         const apiVehicleData = await vehicleAPI.getAll();
-        console.log('✅ App.jsx: データベースから取得成功:', apiVehicleData?.length || 0, '件');
+        console.log('✅ App.jsx: データベースから取得成功:', apiVehicleData?.length || 0, '件 [', new Date().toISOString(), ']');
         setVehicles(apiVehicleData || []);
       } catch (error) {
         console.error('❌ App.jsx: 車両データ取得エラー:', error);
