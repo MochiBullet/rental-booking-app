@@ -29,6 +29,14 @@ jobs:
       env:
         CI: false
     
+    - name: Check GitHub Secrets
+      run: |
+        echo "🔍 Checking GitHub Secrets configuration..."
+        echo "AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID != '' && '✅ Set' || '❌ Missing' }}"
+        echo "AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY != '' && '✅ Set' || '❌ Missing' }}"
+        echo "S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME != '' && '✅ Set' || '❌ Missing' }}"
+        echo "Target bucket: ${{ secrets.S3_BUCKET_NAME || 'UNDEFINED' }}"
+    
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
@@ -36,9 +44,16 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ap-southeast-2
     
+    - name: Check S3 Bucket
+      run: |
+        echo "🪣 Checking S3 bucket: ${{ secrets.S3_BUCKET_NAME }}"
+        aws s3 ls s3://${{ secrets.S3_BUCKET_NAME }} || echo "⚠️ Bucket does not exist or access denied"
+    
     - name: Deploy to S3
       run: |
+        echo "🚀 Starting deployment to S3..."
         aws s3 sync build/ s3://${{ secrets.S3_BUCKET_NAME }} --delete
+        echo "✅ Deployment completed successfully!"
     
     - name: Show deployment URL
       run: |
