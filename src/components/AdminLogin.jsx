@@ -19,8 +19,11 @@ const AdminLogin = ({ onLogin }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // 簡単な認証（実際のアプリでは適切な認証システムを使用）
-    if (credentials.username === 'admin' && credentials.password === 'rental123') {
+    // 認証処理（本番環境では環境変数から取得）
+    const validUsername = process.env.REACT_APP_ADMIN_USERNAME || 'admin';
+    const validPassword = process.env.REACT_APP_ADMIN_PASSWORD || 'secure_admin_2024';
+    
+    if (credentials.username === validUsername && credentials.password === validPassword) {
       onLogin();
     } else {
       setError('ユーザー名またはパスワードが正しくありません');
