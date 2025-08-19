@@ -6,6 +6,43 @@ class ApiService {
     this.baseURL = API_BASE_URL;
   }
 
+  // DynamoDBの車両データをフロントエンドの形式に変換
+  transformVehicleData(vehicle) {
+    if (!vehicle || !vehicle.vehicleId) return vehicle;
+    
+    return {
+      id: vehicle.vehicleId,
+      vehicleId: vehicle.vehicleId,
+      name: vehicle.name,
+      type: vehicle.vehicleType,
+      vehicleType: vehicle.vehicleType,
+      price: vehicle.pricePerDay,
+      pricePerDay: vehicle.pricePerDay,
+      pricePerHour: vehicle.pricePerHour,
+      available: vehicle.isAvailable,
+      isAvailable: vehicle.isAvailable,
+      category: vehicle.category,
+      description: vehicle.description,
+      image: vehicle.images && vehicle.images[0] ? vehicle.images[0] : `https://via.placeholder.com/300x200?text=${encodeURIComponent(vehicle.name || 'Vehicle')}`,
+      images: vehicle.images,
+      specifications: {
+        seats: vehicle.capacity,
+        transmission: vehicle.transmission,
+        fuelType: vehicle.fuelType,
+        cc: vehicle.engineSize
+      },
+      insurance: vehicle.insurance,
+      brand: vehicle.brand,
+      model: vehicle.model,
+      year: vehicle.year,
+      location: vehicle.location,
+      licensePlate: vehicle.licensePlate,
+      features: vehicle.features || [],
+      createdAt: vehicle.createdAt,
+      updatedAt: vehicle.updatedAt
+    };
+  }
+
   // 共通のリクエスト処理
   async request(endpoint, options = {}) {
     const url = `${this.baseURL}${endpoint}`;
@@ -49,32 +86,109 @@ class ApiService {
   async getVehicles(type = null) {
     const endpoint = type ? `/vehicles?type=${type}` : '/vehicles';
     const response = await this.request(endpoint);
-    return response.vehicles || [];
+    const vehicles = response.vehicles || [];
+    
+    // DynamoDBの形式をフロントエンドの期待する形式に変換
+    return vehicles.map(vehicle => this.transformVehicleData(vehicle));
   }
 
   async getVehicle(vehicleId) {
     const response = await this.request(`/vehicles/${vehicleId}`);
-    return response;
+    
+    // DynamoDBの形式をフロントエンドの期待する形式に変換
+    return this.transformVehicleData(response);
   }
 
   async createVehicle(vehicleData) {
-    return await this.request('/vehicles', {
+    // フロントエンドの形式をDynamoDBの形式に変換
+    const dynamoDBData = {
+      name: vehicleData.name,
+      vehicleType: vehicleData.type || vehicleData.vehicleType,
+      description: vehicleData.description || '',
+      pricePerHour: parseFloat(vehicleData.pricePerHour || Math.round((vehicleData.price || vehicleData.pricePerDay || 0) / 8)),
+      pricePerDay: parseFloat(vehicleData.price || vehicleData.pricePerDay || 0),
+      capacity: parseInt(vehicleData.specifications?.seats || vehicleData.passengers || 4),
+      fuelType: vehicleData.specifications?.fuelType || vehicleData.fuelType || 'ガソリン',
+      transmission: vehicleData.specifications?.transmission || vehicleData.transmission || 'AT',
+      features: vehicleData.features || [],
+      images: vehicleData.images || (vehicleData.image ? [vehicleData.image] : []),
+      isAvailable: vehicleData.available !== undefined ? vehicleData.available : (vehicleData.isAvailable !== undefined ? vehicleData.isAvailable : true),
+      category: vehicleData.category || '',
+      brand: vehicleData.brand || '',
+      model: vehicleData.model || '',
+      year: vehicleData.year || new Date().getFullYear(),
+      location: vehicleData.location || '東京都',
+      licensePlate: vehicleData.licensePlate || '',
+      engineSize: vehicleData.specifications?.cc || vehicleData.engineSize || 1500,
+      insurance: vehicleData.insurance || {
+        description: '車両・対物・対人保険込み',
+        dailyRate: Math.round((vehicleData.price || vehicleData.pricePerDay || 0) * 0.1)
+      }
+    };
+    
+    const response = await this.request('/vehicles', {
       method: 'POST',
-      body: JSON.stringify(vehicleData),
+      body: JSON.stringify(dynamoDBData),
     });
+    
+    // レスポンスをフロントエンドの形式に変換
+    return this.transformVehicleData(response);
   }
 
   async updateVehicle(vehicleId, vehicleData) {
-    return await this.request(`/vehicles/${vehicleId}`, {
-      method: 'PUT',
-      body: JSON.stringify(vehicleData),
+    // フロントエンドの形式をDynamoDBの形式に変換
+    const dynamoDBData = {
+      name: vehicleData.name,
+      vehicleType: vehicleData.type || vehicleData.vehicleType,
+      description: vehicleData.description || '',
+      pricePerHour: parseFloat(vehicleData.pricePerHour || Math.round((vehicleData.price || vehicleData.pricePerDay || 0) / 8)),
+      pricePerDay: parseFloat(vehicleData.price || vehicleData.pricePerDay || 0),
+      capacity: parseInt(vehicleData.specifications?.seats || vehicleData.passengers || 4),
+      fuelType: vehicleData.specifications?.fuelType || vehicleData.fuelType || 'ガソリン',
+      transmission: vehicleData.specifications?.transmission || vehicleData.transmission || 'AT',
+      features: vehicleData.features || [],
+      images: vehicleData.images || (vehicleData.image ? [vehicleData.image] : []),
+      isAvailable: vehicleData.available !== undefined ? vehicleData.available : (vehicleData.isAvailable !== undefined ? vehicleData.isAvailable : true),
+      category: vehicleData.category || '',
+      brand: vehicleData.brand || '',
+      model: vehicleData.model || '',
+      year: vehicleData.year || new Date().getFullYear(),
+      location: vehicleData.location || '東京都',
+      licensePlate: vehicleData.licensePlate || '',
+      engineSize: vehicleData.specifications?.cc || vehicleData.engineSize || 1500,
+      insurance: vehicleData.insurance
+    };
+
+    // undefinedな値を削除
+    Object.keys(dynamoDBData).forEach(key => {
+      if (dynamoDBData[key] === undefined) {
+        delete dynamoDBData[key];
+      }
     });
+    
+    const response = await this.request(`/vehicles/${vehicleId}`, {
+      method: 'PUT',
+      body: JSON.stringify(dynamoDBData),
+    });
+    
+    // レスポンスをフロントエンドの形式に変換
+    return this.transformVehicleData(response);
   }
 
   async deleteVehicle(vehicleId) {
-    return await this.request(`/vehicles/${vehicleId}`, {
+    const response = await this.request(`/vehicles/${vehicleId}`, {
       method: 'DELETE',
     });
+    
+    // レスポンスに車両データが含まれている場合は変換
+    if (response && response.vehicle) {
+      return {
+        ...response,
+        vehicle: this.transformVehicleData(response.vehicle)
+      };
+    }
+    
+    return response;
   }
 
   // Members API
