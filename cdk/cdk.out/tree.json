@@ -276,11 +276,45 @@
               "version": "2.118.0"
             }
           },
-          "DomainCert": {
-            "id": "DomainCert",
-            "path": "RentalBookingWebStack-production/DomainCert",
+          "FastCachePolicy": {
+            "id": "FastCachePolicy",
+            "path": "RentalBookingWebStack-production/FastCachePolicy",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "RentalBookingWebStack-production/FastCachePolicy/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::CloudFront::CachePolicy",
+                  "aws:cdk:cloudformation:props": {
+                    "cachePolicyConfig": {
+                      "name": "RentalBookingWebStackproductionFastCachePolicy9AEB6E2F-ap-southeast-2",
+                      "minTtl": 0,
+                      "maxTtl": 300,
+                      "defaultTtl": 60,
+                      "parametersInCacheKeyAndForwardedToOrigin": {
+                        "cookiesConfig": {
+                          "cookieBehavior": "none"
+                        },
+                        "headersConfig": {
+                          "headerBehavior": "none"
+                        },
+                        "enableAcceptEncodingGzip": true,
+                        "enableAcceptEncodingBrotli": true,
+                        "queryStringsConfig": {
+                          "queryStringBehavior": "none"
+                        }
+                      }
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_cloudfront.CfnCachePolicy",
+                  "version": "2.118.0"
+                }
+              }
+            },
             "constructInfo": {
-              "fqn": "aws-cdk-lib.Resource",
+              "fqn": "aws-cdk-lib.aws_cloudfront.CachePolicy",
               "version": "2.118.0"
             }
           },
@@ -339,13 +373,12 @@
                           "HEAD",
                           "OPTIONS"
                         ],
-                        "cachePolicyId": "658327ea-f89d-4fab-a63d-7e88639e58f6",
+                        "cachePolicyId": {
+                          "Ref": "FastCachePolicy70410C0D"
+                        },
                         "compress": true,
                         "viewerProtocolPolicy": "redirect-to-https"
                       },
-                      "aliases": [
-                        "ms-base-rental.com"
-                      ],
                       "comment": "Rental Booking App Distribution - production",
                       "customErrorResponses": [
                         {
@@ -364,12 +397,7 @@
                       "defaultRootObject": "index.html",
                       "httpVersion": "http2",
                       "ipv6Enabled": true,
-                      "priceClass": "PriceClass_100",
-                      "viewerCertificate": {
-                        "acmCertificateArn": "arn:aws:acm:us-east-1:276291855506:certificate/6e60b6cf-d4de-4afe-88d3-83c23ff90721",
-                        "minimumProtocolVersion": "TLSv1.2_2021",
-                        "sslSupportMethod": "sni-only"
-                      }
+                      "priceClass": "PriceClass_100"
                     },
                     "tags": [
                       {

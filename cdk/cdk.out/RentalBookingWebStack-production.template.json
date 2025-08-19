@@ -260,13 +260,37 @@
     "aws:cdk:path": "RentalBookingWebStack-production/OAI/Resource"
    }
   },
+  "FastCachePolicy70410C0D": {
+   "Type": "AWS::CloudFront::CachePolicy",
+   "Properties": {
+    "CachePolicyConfig": {
+     "DefaultTTL": 60,
+     "MaxTTL": 300,
+     "MinTTL": 0,
+     "Name": "RentalBookingWebStackproductionFastCachePolicy9AEB6E2F-ap-southeast-2",
+     "ParametersInCacheKeyAndForwardedToOrigin": {
+      "CookiesConfig": {
+       "CookieBehavior": "none"
+      },
+      "EnableAcceptEncodingBrotli": true,
+      "EnableAcceptEncodingGzip": true,
+      "HeadersConfig": {
+       "HeaderBehavior": "none"
+      },
+      "QueryStringsConfig": {
+       "QueryStringBehavior": "none"
+      }
+     }
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalBookingWebStack-production/FastCachePolicy/Resource"
+   }
+  },
   "Distribution830FAC52": {
    "Type": "AWS::CloudFront::Distribution",
    "Properties": {
     "DistributionConfig": {
-     "Aliases": [
-      "ms-base-rental.com"
-     ],
      "Comment": "Rental Booking App Distribution - production",
      "CustomErrorResponses": [
       {
@@ -288,7 +312,9 @@
        "HEAD",
        "OPTIONS"
       ],
-      "CachePolicyId": "658327ea-f89d-4fab-a63d-7e88639e58f6",
+      "CachePolicyId": {
+       "Ref": "FastCachePolicy70410C0D"
+      },
       "Compress": true,
       "TargetOriginId": "RentalBookingWebStackproductionDistributionOrigin1EB8274FB",
       "ViewerProtocolPolicy": "redirect-to-https"
@@ -324,12 +350,7 @@
        "Id": "RentalBookingWebStackproductionDistributionOrigin1EB8274FB"
       }
      ],
-     "PriceClass": "PriceClass_100",
-     "ViewerCertificate": {
-      "AcmCertificateArn": "arn:aws:acm:us-east-1:276291855506:certificate/6e60b6cf-d4de-4afe-88d3-83c23ff90721",
-      "MinimumProtocolVersion": "TLSv1.2_2021",
-      "SslSupportMethod": "sni-only"
-     }
+     "PriceClass": "PriceClass_100"
     },
     "Tags": [
      {
@@ -353,7 +374,7 @@
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/22LTQrCMBCFz+I+HVsFcasVwZWlHkBiMpaxbSKZiSKld5daQQVX7+97M8iyJaQTfefE2Dpp6ATdQbSplb7zseM5dOtoahSVn93bjVL4hszjU4+5V6bx0Z6DdwLdPlBFbmUMMu8sOiF5PfKB2Q7MX2JDLIFOUci7Af/Ofa/yyOLbEtnHYHAAPv5nKoK/kcWw1oxqxYxyEF2Rq9T3eR/lGqVXzluEC09vsxSyBaSTCxMlITqhFqEc9QkhkIIMMQEAAA=="
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/22MUWvCQBCEf4vvl21iQXzVlEKfFP0Bcu6t6Zp4V273FAn57+WaQhR8mpmdb3YOVbWEcmZvUqBri46P0O/VYmvsTQ69vEO/TtiSmvrk/90o29Ax3qfzmAeDXUjuFINX6DeRG/YrRBL5cuSV9W9RZ+YzM68Ji980/X+MHywa+ZiUg8/dYx4GUyfRcNmRhBSRMjD5p2obw5UdxbUVMisR0r3ahn2TN5ukP0kH44MjOMvbdV5CtYBydhbmIiavfCHYjfoLAioJCkMBAAA="
    },
    "Metadata": {
     "aws:cdk:path": "RentalBookingWebStack-production/CDKMetadata/Default"

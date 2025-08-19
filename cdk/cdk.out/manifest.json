@@ -23,7 +23,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::276291855506:role/cdk-hnb659fds-deploy-role-276291855506-ap-southeast-2",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::276291855506:role/cdk-hnb659fds-cfn-exec-role-276291855506-ap-southeast-2",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-276291855506-ap-southeast-2/b31344b9e98f8cb51fac994c60562ba37cc62988d58c9e65fc94c88d1ebb237c.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-276291855506-ap-southeast-2/adbc1db9296f5bcb317ec4c95ce4c6813807f984b2f126f634e2504d71d7d57a.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -92,6 +92,12 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "OAIE1EFC67F"
+          }
+        ],
+        "/RentalBookingWebStack-production/FastCachePolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FastCachePolicy70410C0D"
           }
         ],
         "/RentalBookingWebStack-production/Distribution/Resource": [

@@ -21,5 +21,9 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  }
 }
