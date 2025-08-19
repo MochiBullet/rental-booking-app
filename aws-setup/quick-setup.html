@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rental Booking App - AWS簡単セットアップ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 800px;
+            width: 100%;
+            padding: 40px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        
+        .step {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .step h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        .step-number {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        
+        .button-group {
+            margin: 20px 0;
+        }
+        
+        .deploy-button {
+            display: inline-block;
+            padding: 15px 30px;
+            background: #ff9900;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .deploy-button:hover {
+            background: #ec8800;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255,153,0,0.3);
+        }
+        
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+        
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        
+        .success {
+            background: #d4edda;
+            border: 1px solid #28a745;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        
+        .region-select {
+            padding: 10px;
+            font-size: 1em;
+            border: 2px solid #667eea;
+            border-radius: 5px;
+            margin: 10px 0;
+            width: 100%;
+            max-width: 300px;
+        }
+        
+        .copy-button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-left: 10px;
+        }
+        
+        .copy-button:hover {
+            background: #218838;
+        }
+        
+        .credentials-output {
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .credentials-output.show {
+            display: block;
+        }
+        
+        .credential-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+        }
+        
+        .credential-item label {
+            font-weight: bold;
+            color: #495057;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .credential-item input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ced4da;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Rental Booking App</h1>
+        <p class="subtitle">AWS自動セットアップツール</p>
+        
+        <div class="warning">
+            <strong>⚠️ 前提条件:</strong> AWSアカウントが必要です。まだお持ちでない場合は
+            <a href="https://aws.amazon.com/jp/free/" target="_blank">こちら</a>から無料で作成できます。
+        </div>
+
+        <div class="step">
+            <h2><span class="step-number">1</span>リージョンを選択</h2>
+            <p>デプロイ先のAWSリージョンを選択してください：</p>
+            <select id="region-select" class="region-select">
+                <option value="ap-northeast-1">アジアパシフィック (東京)</option>
+                <option value="us-east-1">米国東部 (バージニア北部)</option>
+                <option value="us-west-2">米国西部 (オレゴン)</option>
+                <option value="eu-west-1">ヨーロッパ (アイルランド)</option>
+                <option value="ap-southeast-1">アジアパシフィック (シンガポール)</option>
+            </select>
+        </div>
+
+        <div class="step">
+            <h2><span class="step-number">2</span>IAMユーザーを自動作成</h2>
+            <p>下のボタンをクリックして、AWSコンソールでCloudFormationスタックを作成します。</p>
+            <p>これにより、CDKデプロイに必要なIAMユーザーとアクセスキーが自動的に作成されます。</p>
+            
+            <div class="button-group">
+                <button class="deploy-button" onclick="deployIAMUser()">
+                    🔐 IAMユーザーを作成
+                </button>
+            </div>
+            
+            <p style="margin-top: 15px; color: #666;">
+                ボタンをクリック後：<br>
+                1. AWSコンソールにログイン<br>
+                2. CloudFormationの画面が開きます<br>
+                3. 「スタックの作成」をクリック<br>
+                4. 完了まで約2分待ちます
+            </p>
+        </div>
+
+        <div class="step">
+            <h2><span class="step-number">3</span>認証情報を保存</h2>
+            <p>CloudFormationスタックが完了したら、「出力」タブから以下の値をコピーして保存してください：</p>
+            
+            <div class="credentials-output show">
+                <div class="credential-item">
+                    <label>Access Key ID:</label>
+                    <input type="text" id="access-key" placeholder="AKIA...">
+                    <button class="copy-button" onclick="copyToClipboard('access-key')">コピー</button>
+                </div>
+                <div class="credential-item">
+                    <label>Secret Access Key:</label>
+                    <input type="password" id="secret-key" placeholder="取得した値を入力">
+                    <button class="copy-button" onclick="copyToClipboard('secret-key')">コピー</button>
+                </div>
+            </div>
+            
+            <div class="warning">
+                <strong>重要:</strong> Secret Access Keyは一度しか表示されません。必ず安全な場所に保存してください。
+            </div>
+        </div>
+
+        <div class="step">
+            <h2><span class="step-number">4</span>環境変数の設定</h2>
+            <p>Windows PowerShellまたはコマンドプロンプトで以下のコマンドを実行：</p>
+            
+            <div class="code-block" id="env-commands">
+# PowerShellの場合
+$env:AWS_ACCESS_KEY_ID="YOUR_ACCESS_KEY_ID"
+$env:AWS_SECRET_ACCESS_KEY="YOUR_SECRET_ACCESS_KEY"
+$env:AWS_DEFAULT_REGION="ap-northeast-1"
+
+# または永続的に設定
+[System.Environment]::SetEnvironmentVariable("AWS_ACCESS_KEY_ID", "YOUR_ACCESS_KEY_ID", "User")
+[System.Environment]::SetEnvironmentVariable("AWS_SECRET_ACCESS_KEY", "YOUR_SECRET_ACCESS_KEY", "User")
+[System.Environment]::SetEnvironmentVariable("AWS_DEFAULT_REGION", "ap-northeast-1", "User")
+            </div>
+            <button class="copy-button" onclick="generateAndCopyEnvCommands()">コマンドを生成してコピー</button>
+        </div>
+
+        <div class="step">
+            <h2><span class="step-number">5</span>CDKをデプロイ</h2>
+            <p>認証情報設定後、以下のコマンドでアプリケーションをデプロイ：</p>
+            
+            <div class="code-block">
+cd rental-booking-app\cdk
+deploy.bat
+            </div>
+            <button class="copy-button" onclick="copyCommand('cd rental-booking-app\\cdk\ndeploy.bat')">コピー</button>
+        </div>
+
+        <div class="success">
+            <strong>✅ 完了!</strong> CDKデプロイが成功すると、アプリケーションのURLが表示されます。
+            GitHub Actionsも自動的に設定され、以降はコードをプッシュするだけで自動デプロイされます。
+        </div>
+    </div>
+
+    <script>
+        function deployIAMUser() {
+            const region = document.getElementById('region-select').value;
+            const templateUrl = 'https://raw.githubusercontent.com/MochiBullet/rental-booking-app/main/aws-setup/iam-user-template.yaml';
+            const stackName = 'RentalAppIAMUserStack';
+            
+            const cloudFormationUrl = `https://console.aws.amazon.com/cloudformation/home?region=${region}#/stacks/create/review?templateURL=${encodeURIComponent(templateUrl)}&stackName=${stackName}`;
+            
+            window.open(cloudFormationUrl, '_blank');
+        }
+        
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            element.select();
+            document.execCommand('copy');
+            
+            // Show feedback
+            const button = element.nextElementSibling;
+            const originalText = button.textContent;
+            button.textContent = 'コピーしました!';
+            button.style.background = '#28a745';
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.background = '';
+            }, 2000);
+        }
+        
+        function generateAndCopyEnvCommands() {
+            const accessKey = document.getElementById('access-key').value;
+            const secretKey = document.getElementById('secret-key').value;
+            const region = document.getElementById('region-select').value;
+            
+            if (!accessKey || !secretKey) {
+                alert('Access Key IDとSecret Access Keyを入力してください');
+                return;
+            }
+            
+            const commands = `# PowerShell
+[System.Environment]::SetEnvironmentVariable("AWS_ACCESS_KEY_ID", "${accessKey}", "User")
+[System.Environment]::SetEnvironmentVariable("AWS_SECRET_ACCESS_KEY", "${secretKey}", "User")
+[System.Environment]::SetEnvironmentVariable("AWS_DEFAULT_REGION", "${region}", "User")`;
+            
+            navigator.clipboard.writeText(commands).then(() => {
+                alert('環境変数設定コマンドをクリップボードにコピーしました！');
+            });
+        }
+        
+        function copyCommand(command) {
+            navigator.clipboard.writeText(command).then(() => {
+                alert('コマンドをクリップボードにコピーしました！');
+            });
+        }
+    </script>
+</body>
+</html>
