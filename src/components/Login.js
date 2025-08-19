@@ -101,7 +101,7 @@ function Login({ setUser }) {
               name="memberId"
               value={formData.memberId}
               onChange={handleChange}
-              placeholder="例: 2025081234 または admin"
+              placeholder="会員IDを入力"
               required
               style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '6px', fontSize: '1rem' }}
             />
