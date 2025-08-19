@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import './VehicleList.css';
+import { vehicleAPI } from '../services/api';
 
-const VehicleList = ({ user }) => {
+const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
   const { type } = useParams();
   const [vehicles, setVehicles] = useState([]);
   const [selectedVehicle, setSelectedVehicle] = useState(null);
@@ -69,66 +70,48 @@ const VehicleList = ({ user }) => {
   };
 
   useEffect(() => {
-    const storedVehicles = JSON.parse(localStorage.getItem('vehicles') || '[]');
-    let filteredVehicles = storedVehicles;
-    
-    if (type && type !== 'all') {
-      filteredVehicles = storedVehicles.filter(v => 
-        v.type.toLowerCase() === type.toLowerCase()
-      );
+    // propsでvehiclesが渡されている場合はそれを使用（空配列でも使用する）
+    if (vehiclesProp !== undefined) {
+      console.log('✅ VehicleList: propsからvehiclesを使用:', vehiclesProp.length, '件');
+      setVehicles(vehiclesProp);
+      return;
     }
-    
-    if (filteredVehicles.length === 0) {
-      const defaultVehicles = generateDefaultVehicles(type);
-      setVehicles(defaultVehicles);
-      localStorage.setItem('vehicles', JSON.stringify(defaultVehicles));
-    } else {
-      setVehicles(filteredVehicles);
-    }
-  }, [type]);
+
+    // propsでvehiclesが渡されていない場合はAPIから取得
+    const fetchVehicles = async () => {
+      try {
+        console.log('🔄 VehicleList: データベースから車両データを取得中...', type || initialFilter);
+        
+        // データベースから車両データを取得
+        let apiVehicleData;
+        const filterType = type || initialFilter;
+        if (filterType && filterType !== 'all') {
+          apiVehicleData = await vehicleAPI.getByType(filterType);
+        } else {
+          apiVehicleData = await vehicleAPI.getAll();
+        }
+        
+        console.log('✅ VehicleList: データベースから取得成功:', apiVehicleData?.length || 0, '件');
+        
+        // データが空の場合は空配列を設定（エラーにしない）
+        setVehicles(apiVehicleData || []);
+        
+      } catch (apiError) {
+        console.error('❌ VehicleList: データベース接続エラー:', apiError);
+        console.warn('⚠️ VehicleList: データベース接続失敗、在庫なし状態として処理します');
+        
+        // データベース接続失敗時は空配列を設定
+        setVehicles([]);
+      }
+    };
+
+    fetchVehicles();
+  }, [type, initialFilter, vehiclesProp]);
 
   useEffect(() => {
     calculateTotalPrice();
   }, [selectedVehicle, selectedPlan, selectedDuration, insuranceOptions]);
 
-  const generateDefaultVehicles = (vehicleType) => {
-    const carVehicles = [
-      { id: 1, name: 'Toyota Camry', type: 'car', price: 8000, passengers: 5, features: 'GPS, Bluetooth, Backup Camera', available: true },
-      { id: 2, name: 'Honda Civic', type: 'car', price: 7000, passengers: 5, features: 'Apple CarPlay, Lane Assist', available: true },
-      { id: 3, name: 'Ford Explorer', type: 'car', price: 12000, passengers: 7, features: '4WD, Navigation, Leather Seats', available: true },
-      { id: 4, name: 'Chevrolet Tahoe', type: 'car', price: 15000, passengers: 8, features: 'Premium Audio, Sunroof, DVD Player', available: true },
-      { id: 5, name: 'Honda Odyssey', type: 'car', price: 11000, passengers: 8, features: 'Sliding Doors, Entertainment System', available: true },
-      { id: 6, name: 'Toyota Sienna', type: 'car', price: 12000, passengers: 8, features: 'All-Wheel Drive, Spacious Interior', available: true },
-      { id: 7, name: 'Mercedes S-Class', type: 'car', price: 25000, passengers: 5, features: 'Massage Seats, Premium Sound, Autopilot', available: true },
-      { id: 8, name: 'BMW 7 Series', type: 'car', price: 23000, passengers: 5, features: 'Night Vision, Gesture Control, Wi-Fi', available: true },
-      { id: 9, name: 'Nissan Altima', type: 'car', price: 7500, passengers: 5, features: 'ProPILOT Assist, Remote Start', available: true },
-      { id: 10, name: 'Tesla Model 3', type: 'car', price: 18000, passengers: 5, features: 'Autopilot, Electric, Supercharging', available: true }
-    ];
-
-    const bikeVehicles = [
-      { id: 11, name: 'Honda PCX', type: 'bike', price: 3000, passengers: 2, features: 'Automatic, Storage Box, Fuel Efficient', available: true },
-      { id: 12, name: 'Yamaha MT-07', type: 'bike', price: 5000, passengers: 2, features: 'Sport Naked, ABS, LED Lights', available: true },
-      { id: 13, name: 'Kawasaki Ninja 400', type: 'bike', price: 5500, passengers: 2, features: 'Sport Bike, Slipper Clutch, Digital Display', available: true },
-      { id: 14, name: 'Honda CB400', type: 'bike', price: 4500, passengers: 2, features: 'Classic Style, VTEC Engine, Comfortable', available: true },
-      { id: 15, name: 'Suzuki Burgman', type: 'bike', price: 4000, passengers: 2, features: 'Maxi Scooter, Large Storage, Windshield', available: true },
-      { id: 16, name: 'Harley-Davidson Iron 883', type: 'bike', price: 8000, passengers: 2, features: 'Cruiser, V-Twin Engine, Classic Style', available: true },
-      { id: 17, name: 'BMW R1250GS', type: 'bike', price: 9500, passengers: 2, features: 'Adventure, Boxer Engine, Electronic Suspension', available: true },
-      { id: 18, name: 'Ducati Monster', type: 'bike', price: 7000, passengers: 2, features: 'Naked Sport, L-Twin Engine, Trellis Frame', available: true },
-      { id: 19, name: 'Vespa Primavera', type: 'bike', price: 2500, passengers: 2, features: 'Classic Scooter, Retro Style, City Friendly', available: true },
-      { id: 20, name: 'Triumph Street Triple', type: 'bike', price: 6500, passengers: 2, features: 'Street Fighter, Triple Engine, Quick Shifter', available: true }
-    ];
-
-    const allVehicles = [...carVehicles, ...bikeVehicles];
-
-    if (vehicleType === 'car') {
-      return carVehicles;
-    } else if (vehicleType === 'bike') {
-      return bikeVehicles;
-    } else if (vehicleType && vehicleType !== 'all') {
-      return allVehicles.filter(v => v.type.toLowerCase() === vehicleType.toLowerCase());
-    }
-    return allVehicles;
-  };
 
   const calculateTotalPrice = () => {
     if (!selectedVehicle) return;

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { vehicleData } from './data/vehicleData';
 import { initialMembers, memberUtils } from './data/memberData';
 import { siteSettingsManager } from './data/siteSettings';
+import { vehicleAPI } from './services/api';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import VehicleList from './components/VehicleList';
@@ -20,7 +21,7 @@ function App() {
   const [reservations, setReservations] = useState([]);
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [vehicleFilter, setVehicleFilter] = useState('all');
-  const [vehicles, setVehicles] = useState(vehicleData);
+  const [vehicles, setVehicles] = useState([]);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [members, setMembers] = useState(initialMembers);
   const [currentMember, setCurrentMember] = useState(null);
@@ -34,6 +35,23 @@ function App() {
     if (savedAdminState === 'true') {
       setIsAdminLoggedIn(true);
     }
+
+    // 車両データをAPIから取得
+    const loadVehicles = async () => {
+      try {
+        console.log('🔄 App.jsx: データベースから車両データを取得中...');
+        const apiVehicleData = await vehicleAPI.getAll();
+        console.log('✅ App.jsx: データベースから取得成功:', apiVehicleData?.length || 0, '件');
+        setVehicles(apiVehicleData || []);
+      } catch (error) {
+        console.error('❌ App.jsx: 車両データ取得エラー:', error);
+        console.warn('⚠️ App.jsx: データベース接続失敗、フォールバックデータを使用します');
+        // APIが失敗した場合はローカルデータをフォールバックとして使用
+        setVehicles(vehicleData);
+      }
+    };
+
+    loadVehicles();
   }, []);
 
   const handleViewChange = (view, filter = 'all') => {
@@ -294,7 +312,7 @@ function App() {
                 <h2>🚗 車両一覧</h2>
               </div>
               <VehicleList 
-                vehicles={vehicles} 
+                vehicles={vehicles.filter(v => v.type === 'car')} 
                 onVehicleSelect={handleVehicleSelect}
                 initialFilter="car"
                 hideFilters={true}
@@ -313,7 +331,7 @@ function App() {
                 <h2>🏍️ バイク一覧</h2>
               </div>
               <VehicleList 
-                vehicles={vehicles} 
+                vehicles={vehicles.filter(v => v.type === 'motorcycle')} 
                 onVehicleSelect={handleVehicleSelect}
                 initialFilter="motorcycle"
                 hideFilters={true}
