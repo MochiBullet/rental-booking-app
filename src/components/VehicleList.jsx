@@ -34,17 +34,17 @@ const VehicleList = ({ vehicles = [], onVehicleSelect, initialFilter = 'all', hi
     if (safeVehicles.length === 0) {
       if (initialFilter === 'car') {
         return {
-          icon: '🚗',
-          title: '現在ご利用可能な車両はございません',
-          message: '申し訳ございません。現在すべての車両が貸出中です。',
-          subMessage: 'お急ぎの場合は、お電話にてお問い合わせください。'
+          icon: '🚗✨',
+          title: '新しい車両の更新をお楽しみください',
+          message: '人気の車両は現在フル稼働中です！新しい車両が間もなく追加予定です。',
+          subMessage: '最新情報をお電話でお問い合わせいただけます。'
         };
       } else if (initialFilter === 'motorcycle') {
         return {
-          icon: '🏍️',
-          title: '現在ご利用可能なバイクはございません',
-          message: '申し訳ございません。現在すべてのバイクが貸出中です。',
-          subMessage: 'お急ぎの場合は、お電話にてお問い合わせください。'
+          icon: '🏍️✨',
+          title: '新しいバイクの更新をお楽しみください',
+          message: '人気のバイクは現在フル稼働中です！新しいバイクが間もなく追加予定です。',
+          subMessage: '最新情報をお電話でお問い合わせいただけます。'
         };
       }
     }
