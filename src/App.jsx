@@ -39,6 +39,7 @@ function App() {
     // 車両データをAPIから取得
     const loadVehicles = async () => {
       try {
+        console.log('📌 Version: 2025-08-20-v2 - Correct API URL');
         console.log('🔄 App.jsx: データベースから車両データを取得中... [', new Date().toISOString(), ']');
         const apiVehicleData = await vehicleAPI.getAll();
         console.log('✅ App.jsx: データベースから取得成功:', apiVehicleData?.length || 0, '件 [', new Date().toISOString(), ']');

@@ -1,4 +1,5 @@
 // API通信サービス
+// 正しいAPI URL (更新: 2025-08-20)
 const API_BASE_URL = 'https://kgkjjv0rik.execute-api.ap-southeast-2.amazonaws.com/prod';
 
 class ApiService {
