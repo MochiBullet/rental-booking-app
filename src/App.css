@@ -91,22 +91,106 @@ body {
   font-weight: bold;
 }
 
-/* Hero Section */
+/* Hero Section with Background Slider */
 .hero {
-  background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 50%, #2E8B8B 100%);
+  position: relative;
   color: white;
-  padding: 4rem 0;
   text-align: center;
+  overflow: hidden;
+  min-height: 600px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Background Slider */
+.background-slider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: -2;
+}
+
+.slider-track {
+  display: flex;
+  width: 500%;
+  height: 100%;
+  animation: slideAnimation 30s linear infinite;
+}
+
+.slide {
+  width: 20%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Overlay for better text readability */
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, 
+    rgba(78, 205, 196, 0.85) 0%, 
+    rgba(68, 160, 141, 0.85) 50%, 
+    rgba(46, 139, 139, 0.85) 100%);
+  z-index: -1;
+}
+
+/* Slider Animation - Smooth infinite loop */
+@keyframes slideAnimation {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-80%);
+  }
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  padding: 4rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .hero-content h2 {
-  font-size: 3rem;
+  font-size: 3.5rem;
   margin-bottom: 1rem;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+  animation: fadeInUp 1s ease-out;
 }
 
 .hero-content p {
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   margin-bottom: 2rem;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+  animation: fadeInUp 1s ease-out 0.2s both;
+}
+
+.hero-description {
+  font-size: 1.1rem;
+  opacity: 0.95;
+  animation: fadeInUp 1s ease-out 0.4s both;
+}
+
+/* Fade In Animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .hero-features {
@@ -115,6 +199,7 @@ body {
   gap: 2rem;
   margin: 2rem 0;
   flex-wrap: wrap;
+  animation: fadeInUp 1s ease-out 0.6s both;
 }
 
 .feature {
@@ -122,6 +207,26 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1rem 1.5rem;
+  border-radius: 15px;
+  backdrop-filter: blur(10px);
+  transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.feature:hover {
+  transform: translateY(-5px);
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.feature-text {
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.feature-description {
+  font-size: 0.9rem;
+  opacity: 0.9;
 }
 
 .feature-icon {
@@ -171,6 +276,7 @@ body {
 /* Vehicle Section */
 .vehicles-section {
   padding: 4rem 0;
+  min-height: 60vh;
 }
 
 .vehicles-section h2 {
@@ -178,6 +284,77 @@ body {
   font-size: 2.5rem;
   margin-bottom: 3rem;
   color: #333;
+}
+
+/* No Vehicles Display */
+.no-vehicles-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  padding: 2rem;
+}
+
+.no-vehicles-card {
+  background: white;
+  border-radius: 20px;
+  padding: 3rem;
+  max-width: 500px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.no-vehicles-icon {
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.no-vehicles-title {
+  font-size: 1.8rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.no-vehicles-message {
+  font-size: 1.1rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+  line-height: 1.6;
+}
+
+.no-vehicles-sub-message {
+  font-size: 1rem;
+  color: #888;
+  margin-bottom: 2rem;
+}
+
+.no-vehicles-contact {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 15px;
+  padding: 1.5rem;
+  margin-top: 2rem;
+}
+
+.no-vehicles-contact p {
+  margin: 0.5rem 0;
+  color: #495057;
+  font-size: 1rem;
+}
+
+.no-vehicles-contact p:first-child {
+  font-weight: bold;
+  color: #2E8B8B;
 }
 
 /* Filters */
@@ -615,10 +792,10 @@ body {
 
 .cancel-button,
 .submit-button {
-  padding: 1rem 2rem;
+  padding: 1rem 2.5rem;
   border: none;
-  border-radius: 25px;
-  font-size: 1rem;
+  border-radius: 30px;
+  font-size: 1.1rem;
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -633,13 +810,17 @@ body {
 }
 
 .submit-button {
-  background: #28a745;
+  background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%);
   color: white;
+  font-weight: 600;
+  min-width: 200px;
+  box-shadow: 0 4px 15px rgba(78, 205, 196, 0.2);
 }
 
 .submit-button:hover {
-  background: #218838;
-  transform: translateY(-2px);
+  background: linear-gradient(135deg, #44A08D 0%, #2E8B8B 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(78, 205, 196, 0.3);
 }
 
 /* Contact Section */
@@ -734,20 +915,24 @@ body {
 }
 
 .register-button {
-  background: #28a745;
+  background: linear-gradient(135deg, #28a745 0%, #218838 100%);
   color: white;
   border: none;
-  padding: 1rem 2rem;
-  border-radius: 25px;
-  font-size: 1rem;
+  padding: 1rem 2.5rem;
+  border-radius: 30px;
+  font-size: 1.1rem;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   margin-top: 0.5rem;
+  min-width: 200px;
+  box-shadow: 0 4px 15px rgba(40, 167, 69, 0.2);
 }
 
 .register-button:hover {
-  background: #218838;
-  transform: translateY(-2px);
+  background: linear-gradient(135deg, #218838 0%, #1e7e34 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
 }
 
 .forgot-password-link {
@@ -2266,6 +2451,7 @@ body {
 .vehicle-selection {
   margin-top: 3rem;
   text-align: center;
+  animation: fadeInUp 1s ease-out 0.8s both;
 }
 
 .selection-title {
@@ -2273,6 +2459,7 @@ body {
   font-size: 2rem;
   margin-bottom: 2rem;
   font-weight: 300;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
 }
 
 .vehicle-tiles {
@@ -2296,6 +2483,22 @@ body {
   box-shadow: 0 10px 30px rgba(0,0,0,0.2);
   position: relative;
   overflow: hidden;
+  animation: slideInFromBottom 0.6s ease-out both;
+}
+
+.vehicle-tile:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+@keyframes slideInFromBottom {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .vehicle-tile::before {
@@ -3295,8 +3498,26 @@ body {
     padding: 0.3rem 0.5rem;
   }
   
+  /* Hero and Background Slider Mobile */
+  .hero {
+    min-height: 500px;
+  }
+  
+  .hero-content {
+    padding: 3rem 1rem;
+  }
+  
   .hero-content h2 {
     font-size: 2rem;
+  }
+  
+  .hero-content p {
+    font-size: 1.1rem;
+  }
+  
+  /* Ensure slider continues to work on mobile */
+  .slider-track {
+    animation: slideAnimation 30s linear infinite;
   }
   
   .hero-features {

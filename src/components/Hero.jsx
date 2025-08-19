@@ -27,6 +27,18 @@ const Hero = ({ onViewChange }) => {
 
   return (
     <section className="hero">
+      {/* 背景スライダー */}
+      <div className="background-slider">
+        <div className="slider-track">
+          <div className="slide" style={{backgroundImage: 'url(https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1920&q=80)'}}></div>
+          <div className="slide" style={{backgroundImage: 'url(https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1920&q=80)'}}></div>
+          <div className="slide" style={{backgroundImage: 'url(https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=1920&q=80)'}}></div>
+          <div className="slide" style={{backgroundImage: 'url(https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=1920&q=80)'}}></div>
+          <div className="slide" style={{backgroundImage: 'url(https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1920&q=80)'}}></div>
+        </div>
+      </div>
+      <div className="hero-overlay"></div>
+      
       <div className="hero-content">
         <h2>{settings.hero.title}</h2>
         <p>{settings.hero.subtitle}</p>
