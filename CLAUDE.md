@@ -14,8 +14,9 @@
 ## 重要なアクセス情報
 
 ### 本番サイトURL
-- **S3直接URL**: https://rental-booking-app-bucket.s3-website-ap-southeast-2.amazonaws.com
-- **独自ドメイン**: https://ms-base-rental.com (転送設定済み)
+- **S3直接URL**: http://rental-booking-app-website.s3-website-ap-southeast-2.amazonaws.com
+- **独自ドメイン**: https://ms-base-rental.com
+- **CloudFront**: https://d1y20ady8hnkgx.cloudfront.net
 
 ### 管理者画面へのアクセス
 1. ロゴ（MB）を**10回クリック**
@@ -24,9 +25,20 @@
    - Username: `admin`
    - Password: `msbase7032`
 
-### デプロイ監視
-- GitHub Actions: https://github.com/MochiBullet/rental-booking-app/actions
-- S3バケット: rental-booking-app-bucket (ap-southeast-2)
+### デプロイ情報（緊急時用）
+- **GitHub Actions**: https://github.com/MochiBullet/rental-booking-app/actions
+- **正しいS3バケット**: `rental-booking-app-website`
+- **CloudFront Distribution**: `E2ANNXZ9LL61PY`
+- **間違いやすいバケット**: `rental-booking-app-production-276291855506` ❌
+
+### 緊急デプロイコマンド
+```bash
+# 手動デプロイ
+aws s3 sync build/ s3://rental-booking-app-website --delete --region ap-southeast-2
+
+# キャッシュクリア
+aws cloudfront create-invalidation --distribution-id E2ANNXZ9LL61PY --paths "/*"
+```
 
 ## コマンドリファレンス
 
@@ -249,6 +261,7 @@ src/
 **デプロイ**: GitHub Actions自動デプロイ中
 **緊急度**: 🔴 高（セキュリティ問題）
 **所要時間**: 30分
+**追加対応**: 強制デプロイ実行（f963cfdf）- 古いJSファイル問題解決
 
 ## 🔍 反映されない問題の調査項目チェックリスト
 
