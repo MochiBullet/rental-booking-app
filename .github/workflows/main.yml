@@ -55,7 +55,30 @@ jobs:
         aws s3 sync build/ s3://${{ secrets.S3_BUCKET_NAME }} --delete
         echo "✅ Deployment completed successfully!"
     
+    - name: Invalidate CloudFront Cache
+      run: |
+        echo "🔄 Invalidating CloudFront cache..."
+        DISTRIBUTION_ID=$(aws cloudfront list-distributions --query "DistributionList.Items[?Origins.Items[0].DomainName==\`${{ secrets.S3_BUCKET_NAME }}.s3.amazonaws.com\`].Id | [0]" --output text)
+        if [ "$DISTRIBUTION_ID" != "None" ] && [ "$DISTRIBUTION_ID" != "" ]; then
+          aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID --paths "/*"
+          echo "✅ CloudFront cache invalidated for distribution: $DISTRIBUTION_ID"
+        else
+          echo "⚠️ CloudFront distribution not found, skipping cache invalidation"
+        fi
+    
+    - name: Verify Deployment
+      run: |
+        echo "🔍 Verifying deployment..."
+        echo "Checking if index.html exists in S3:"
+        aws s3 ls s3://${{ secrets.S3_BUCKET_NAME }}/index.html || echo "❌ index.html not found"
+        echo "Checking main JS file:"
+        aws s3 ls s3://${{ secrets.S3_BUCKET_NAME }}/static/js/ | head -3
+        echo "Last modified time:"
+        aws s3 ls s3://${{ secrets.S3_BUCKET_NAME }}/index.html --recursive --human-readable | head -1
+    
     - name: Show deployment URL
       run: |
         echo "🚀 Deployment complete!"
-        echo "📱 Access your site at: http://${{ secrets.S3_BUCKET_NAME }}.s3-website-ap-southeast-2.amazonaws.com"
+        echo "📱 Primary site: https://ms-base-rental.com"
+        echo "📱 Direct S3: http://${{ secrets.S3_BUCKET_NAME }}.s3-website-ap-southeast-2.amazonaws.com"
+        echo "⏰ Current time: $(date -u)"
