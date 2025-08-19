@@ -112,7 +112,7 @@
   padding: 1.5rem;
   margin-bottom: 1.5rem;
   border: 2px solid rgba(67, 160, 71, 0.1);
-  min-height: 300px; /* 最小高さを統一 */
+  min-height: 380px; /* カード背景をより下まで伸ばす */
 }
 
 .member-id-section .form-group input {
@@ -174,7 +174,7 @@
   .member-id-section {
     padding: 1rem;
     margin-bottom: 1rem;
-    min-height: 250px; /* モバイル版の最小高さ */
+    min-height: 320px; /* モバイル版もより下まで伸ばす */
   }
   
   .member-id-section h3 {
@@ -224,7 +224,7 @@
   padding: 1.5rem;
   margin-bottom: 1.5rem;
   border: 2px solid rgba(67, 160, 71, 0.1);
-  min-height: 300px; /* 最小高さを統一 */
+  min-height: 380px; /* カード背景をより下まで伸ばす */
 }
 
 .password-section .form-group input {
@@ -248,7 +248,7 @@
   .password-section {
     padding: 1rem;
     margin-bottom: 1rem;
-    min-height: 250px; /* モバイル版の最小高さ */
+    min-height: 320px; /* モバイル版もより下まで伸ばす */
   }
   
   .password-section .form-group input {
