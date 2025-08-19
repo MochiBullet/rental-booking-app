@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import './AdminDashboard.css';
 import dataSyncService from '../services/dataSync';
 import SiteSettingsManagement from './SiteSettingsManagement';
+import { vehicleAPI } from '../services/api';
 
 const AdminDashboard = ({ onSettingsUpdate }) => {
   const navigate = useNavigate();
@@ -178,27 +179,25 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
   }, [navigate]);
 
   const loadDashboardData = async () => {
-    // First try to sync data from cloud
     try {
       setIsSyncing(true);
-      const syncResults = await dataSyncService.syncAllAdminData();
-      setSyncStatus(syncResults);
       
-      // Show sync status notification
-      const syncedCount = Object.values(syncResults).filter(r => r.success).length;
-      if (syncedCount > 0) {
-        showNotification(`📡 ${syncedCount}個のデータセットを同期しました`, 'info', 3000);
+      console.log('🔄 データベースから管理者データを読み込み中...');
+      
+      // データベースから車両データを取得
+      let vehiclesData = [];
+      try {
+        vehiclesData = await vehicleAPI.getAll();
+        console.log('✅ データベースから車両データ取得完了:', vehiclesData?.length || 0, '件');
+      } catch (vehicleError) {
+        console.warn('⚠️ 車両データベース接続エラー:', vehicleError.message);
+        // フォールバック: 空配列を使用（在庫なし状態）
+        vehiclesData = [];
       }
-    } catch (error) {
-      console.error('Data sync failed:', error);
-      showNotification('⚠️ データ同期に失敗しました。ローカルデータを使用します。', 'warning', 3000);
-    } finally {
-      setIsSyncing(false);
-    }
-    
-    const storedBookings = JSON.parse(localStorage.getItem('bookings') || '[]');
-    const storedVehicles = JSON.parse(localStorage.getItem('vehicles') || '[]');
-    const storedUsers = JSON.parse(localStorage.getItem('users') || '[]');
+      
+      // 予約とユーザーは一時的にローカルストレージから取得（後で移行予定）
+      const storedBookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+      const storedUsers = JSON.parse(localStorage.getItem('users') || '[]');
     
     // 既存ユーザーの会員番号を一括生成（未設定の場合のみ）
     let usersUpdated = false;
@@ -221,7 +220,7 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
     }
     
     setBookings(storedBookings);
-    setVehicles(storedVehicles);
+    setVehicles(vehiclesData);
     
     const today = new Date().toDateString();
     const todayBookingsCount = storedBookings.filter(b => 
@@ -252,10 +251,17 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
       completedBookings: completedBookings,
       totalRevenue: totalRevenue,
       cancelledRevenue: cancelledRevenue,
-      totalVehicles: storedVehicles.length,
+      totalVehicles: vehiclesData.length,
       totalUsers: storedUsers.length,
       todayBookings: todayBookingsCount
     });
+    
+    } catch (error) {
+      console.error('❌ 管理者データ読み込みエラー:', error);
+      showNotification(`❌ データ読み込みに失敗しました: ${error.message}`, 'error');
+    } finally {
+      setIsSyncing(false);
+    }
   };
 
   const handleLogout = () => {
@@ -263,88 +269,138 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
     navigate('/');
   };
 
-  const handleAddVehicle = () => {
+  const handleAddVehicle = async () => {
     if (!newVehicle.name || !newVehicle.price) {
       showNotification('❌ 車両名と価格は必須項目です', 'error');
       return;
     }
     
-    const vehicle = {
-      id: Date.now(),
-      ...newVehicle,
-      price: parseFloat(newVehicle.price),
-      passengers: parseInt(newVehicle.passengers) || 4,
-      available: true,
-      createdAt: new Date().toISOString()
-    };
-    
-    const updatedVehicles = [...vehicles, vehicle];
-    setVehicles(updatedVehicles);
-    localStorage.setItem('vehicles', JSON.stringify(updatedVehicles));
-    
-    // Sync to cloud
-    dataSyncService.saveToCloud('vehicles', updatedVehicles).catch(console.error);
-    
-    setNewVehicle({
-      name: '',
-      type: 'car',
-      price: '',
-      passengers: '',
-      features: ''
-    });
-    setShowAddVehicleModal(false);
-    loadDashboardData();
-    
-    showNotification(`🚗 車両「${vehicle.name}」が正常に追加されました！`, 'save');
+    try {
+      const vehicle = {
+        ...newVehicle,
+        price: parseFloat(newVehicle.price),
+        passengers: parseInt(newVehicle.passengers) || 4,
+        available: true,
+        createdAt: new Date().toISOString()
+      };
+      
+      console.log('🔄 データベースに車両を追加中...', vehicle);
+      
+      // データベースに直接保存
+      const savedVehicle = await vehicleAPI.create(vehicle);
+      console.log('✅ データベースに車両追加完了:', savedVehicle);
+      
+      // ローカル状態も更新（UIの即時反映のため）
+      const updatedVehicles = [...vehicles, savedVehicle];
+      setVehicles(updatedVehicles);
+      
+      setNewVehicle({
+        name: '',
+        type: 'car',
+        price: '',
+        passengers: '',
+        features: ''
+      });
+      setShowAddVehicleModal(false);
+      loadDashboardData();
+      
+      showNotification(`🚗 車両「${vehicle.name}」がデータベースに正常に追加されました！`, 'save');
+    } catch (error) {
+      console.error('❌ 車両追加エラー:', error);
+      showNotification(`❌ 車両追加に失敗しました: ${error.message}`, 'error');
+    }
   };
 
-  const handleEditVehicle = () => {
+  const handleEditVehicle = async () => {
     if (!selectedVehicle.name || !selectedVehicle.price) {
       showNotification('❌ 車両名と価格は必須項目です', 'error');
       return;
     }
     
-    const updatedVehicles = vehicles.map(v => 
-      v.id === selectedVehicle.id ? selectedVehicle : v
-    );
-    
-    setVehicles(updatedVehicles);
-    localStorage.setItem('vehicles', JSON.stringify(updatedVehicles));
-    
-    // Sync to cloud
-    dataSyncService.saveToCloud('vehicles', updatedVehicles).catch(console.error);
-    
-    setShowEditVehicleModal(false);
-    const vehicleName = selectedVehicle.name;
-    setSelectedVehicle(null);
-    loadDashboardData();
-    
-    showNotification(`✏️ 車両「${vehicleName}」の情報が正常に更新されました！`, 'save');
-  };
-
-  const handleDeleteVehicle = (vehicleId) => {
-    if (window.confirm('Delete this vehicle?')) {
-      const vehicle = vehicles.find(v => v.id === vehicleId);
-      const updatedVehicles = vehicles.filter(v => v.id !== vehicleId);
+    try {
+      const vehicleData = {
+        ...selectedVehicle,
+        price: parseFloat(selectedVehicle.price),
+        passengers: parseInt(selectedVehicle.passengers) || 4
+      };
+      
+      console.log('🔄 データベースで車両を更新中...', vehicleData);
+      
+      // データベースで車両を更新
+      const updatedVehicle = await vehicleAPI.update(selectedVehicle.id, vehicleData);
+      console.log('✅ データベースで車両更新完了:', updatedVehicle);
+      
+      // ローカル状態も更新（UIの即時反映のため）
+      const updatedVehicles = vehicles.map(v => 
+        v.id === selectedVehicle.id ? updatedVehicle : v
+      );
       setVehicles(updatedVehicles);
-      localStorage.setItem('vehicles', JSON.stringify(updatedVehicles));
+      
+      setShowEditVehicleModal(false);
+      const vehicleName = selectedVehicle.name;
+      setSelectedVehicle(null);
       loadDashboardData();
-      showNotification(`🗑️ 車両「${vehicle?.name}」を削除しました。`, 'info');
+      
+      showNotification(`✏️ 車両「${vehicleName}」の情報がデータベースで正常に更新されました！`, 'save');
+    } catch (error) {
+      console.error('❌ 車両更新エラー:', error);
+      showNotification(`❌ 車両更新に失敗しました: ${error.message}`, 'error');
     }
   };
 
-  const handleToggleVehicleAvailability = (vehicleId) => {
-    const vehicle = vehicles.find(v => v.id === vehicleId);
-    const updatedVehicles = vehicles.map(v => 
-      v.id === vehicleId ? { ...v, available: !v.available } : v
-    );
-    setVehicles(updatedVehicles);
-    localStorage.setItem('vehicles', JSON.stringify(updatedVehicles));
-    loadDashboardData();
-    showNotification(
-      `🔄 車両「${vehicle?.name}」を${!vehicle?.available ? '有効' : '無効'}に変更しました。`, 
-      'info'
-    );
+  const handleDeleteVehicle = async (vehicleId) => {
+    if (window.confirm('この車両を削除しますか？')) {
+      try {
+        const vehicle = vehicles.find(v => v.id === vehicleId);
+        
+        console.log('🔄 データベースから車両を削除中...', vehicleId);
+        
+        // データベースから車両を削除
+        await vehicleAPI.delete(vehicleId);
+        console.log('✅ データベースから車両削除完了:', vehicleId);
+        
+        // ローカル状態も更新（UIの即時反映のため）
+        const updatedVehicles = vehicles.filter(v => v.id !== vehicleId);
+        setVehicles(updatedVehicles);
+        
+        loadDashboardData();
+        showNotification(`🗑️ 車両「${vehicle?.name}」をデータベースから削除しました。`, 'info');
+      } catch (error) {
+        console.error('❌ 車両削除エラー:', error);
+        showNotification(`❌ 車両削除に失敗しました: ${error.message}`, 'error');
+      }
+    }
+  };
+
+  const handleToggleVehicleAvailability = async (vehicleId) => {
+    try {
+      const vehicle = vehicles.find(v => v.id === vehicleId);
+      const updatedAvailability = !vehicle.available;
+      
+      console.log('🔄 データベースで車両可用性を変更中...', vehicleId, updatedAvailability);
+      
+      // データベースで車両可用性を更新
+      const updatedVehicle = await vehicleAPI.update(vehicleId, { 
+        ...vehicle, 
+        available: updatedAvailability 
+      });
+      console.log('✅ データベースで車両可用性更新完了:', updatedVehicle);
+      
+      // ローカル状態も更新（UIの即時反映のため）
+      const updatedVehicles = vehicles.map(v => 
+        v.id === vehicleId ? { ...v, available: updatedAvailability } : v
+      );
+      setVehicles(updatedVehicles);
+      
+      loadDashboardData();
+      showNotification(
+        `🔄 車両「${vehicle?.name}」をデータベースで${updatedAvailability ? '有効' : '無効'}に変更しました。`, 
+        'info'
+      );
+    } catch (error) {
+      console.error('❌ 車両可用性変更エラー:', error);
+      showNotification(`❌ 車両可用性変更に失敗しました: ${error.message}`, 'error');
+    }
   };
 
 

@@ -18,9 +18,17 @@ class ApiService {
       ...options,
     };
 
+    // タイムアウト設定（5秒）
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('API request timeout')), 5000)
+    );
+
     try {
       console.log(`API Request: ${options.method || 'GET'} ${url}`);
-      const response = await fetch(url, config);
+      const response = await Promise.race([
+        fetch(url, config),
+        timeoutPromise
+      ]);
       
       if (!response.ok) {
         const errorText = await response.text();

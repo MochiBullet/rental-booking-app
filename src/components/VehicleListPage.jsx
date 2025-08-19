@@ -18,31 +18,28 @@ const VehicleListPage = ({ user }) => {
         setLoading(true);
         setError(null);
         
-        // まずAPIからデータを取得を試行
+        console.log('🔄 データベースから車両データを取得中...', type);
+        
         try {
+          // データベースから車両データを取得
           const apiVehicleData = await vehicleAPI.getByType(type);
-          setVehicles(apiVehicleData);
-          console.log('✅ APIからデータを取得しました');
+          console.log('✅ データベースから取得成功:', apiVehicleData?.length || 0, '件');
+          
+          // データが空でもエラーにしない（在庫なし状態として処理）
+          setVehicles(apiVehicleData || []);
+          
         } catch (apiError) {
-          console.warn('⚠️ API接続に失敗、ローカルデータを使用します:', apiError);
-          // APIに失敗した場合はローカルデータを使用
-          const localVehicles = vehicleData.filter(vehicle => 
-            type === 'car' ? vehicle.type === 'car' : vehicle.type === 'motorcycle'
-          );
-          setVehicles(localVehicles);
+          console.warn('⚠️ データベース接続エラー:', apiError.message);
+          
+          // データベース接続失敗時は空配列（在庫なし状態）
+          setVehicles([]);
+          console.log('📝 在庫なし状態として処理します');
         }
+        
       } catch (err) {
-        console.error('車両データの取得に失敗しました:', err);
-        // 最終的なフォールバックとしてローカルデータを使用
-        try {
-          const localVehicles = vehicleData.filter(vehicle => 
-            type === 'car' ? vehicle.type === 'car' : vehicle.type === 'motorcycle'
-          );
-          setVehicles(localVehicles);
-          console.log('📦 ローカルデータにフォールバックしました');
-        } catch (localError) {
-          setError('車両データの読み込みに失敗しました。しばらくしてから再度お試しください。');
-        }
+        console.error('予期しないエラー:', err);
+        // 予期しないエラーでも在庫なし状態として処理
+        setVehicles([]);
       } finally {
         setLoading(false);
       }
@@ -89,27 +86,7 @@ const VehicleListPage = ({ user }) => {
     );
   }
 
-  if (error) {
-    return (
-      <div className="vehicle-list-page">
-        <div className="page-header">
-          <h1>{getPageTitle()}</h1>
-        </div>
-        <div className="error-container">
-          <div className="error-message">
-            <h3>エラーが発生しました</h3>
-            <p>{error}</p>
-            <button 
-              className="retry-button"
-              onClick={() => window.location.reload()}
-            >
-              再読み込み
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // エラーページは表示しない（常に正常なページを表示）
 
   return (
     <div className="vehicle-list-page">
