@@ -294,15 +294,6 @@ const EmailRegistration = () => {
             </div>
           </div>
           
-          <div className="benefits-list">
-            <h3>会員特典</h3>
-            <ul>
-              <li>✨ 新規登録で500ポイントプレゼント</li>
-              <li>🎯 利用金額の5%をポイント還元</li>
-              <li>🚗 限定車両の優先予約</li>
-              <li>💳 ポイントでお得にレンタル</li>
-            </ul>
-          </div>
           
           <button 
             type="submit" 
