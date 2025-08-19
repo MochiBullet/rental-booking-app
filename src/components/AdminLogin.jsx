@@ -1,3 +1,4 @@
+// Security fix: v3.0 - FORCE NEW BUILD HASH - ADMIN CREDENTIALS COMPLETELY REMOVED
 import React, { useState } from 'react';
 
 const AdminLogin = ({ onLogin }) => {
@@ -35,7 +36,7 @@ const AdminLogin = ({ onLogin }) => {
       <div className="admin-login-card">
         <div className="login-header">
           <h2>🔐 管理者ログイン</h2>
-          <p>RentalEasy 管理システム</p>
+          <p>RentalEasy 管理システム v2.0</p>
         </div>
         
         <form onSubmit={handleSubmit} className="login-form">

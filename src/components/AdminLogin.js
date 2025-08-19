@@ -110,11 +110,6 @@ const AdminLogin = ({ setIsAdmin, onSuccess }) => {
         </form>
         
         
-        <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#f0f0f0', borderRadius: '8px', textAlign: 'center', fontSize: '14px', fontFamily: 'monospace' }}>
-          <strong>管理者ログイン情報:</strong><br />
-          ID: admin<br />
-          Password: msbase7032
-        </div>
         
         <button 
           className="back-btn"
