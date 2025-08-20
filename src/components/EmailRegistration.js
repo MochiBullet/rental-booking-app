@@ -108,7 +108,7 @@ const EmailRegistration = () => {
       
       try {
         // バックエンドAPIを呼び出し
-        const response = await fetch('https://9v7h3mj14g.execute-api.ap-southeast-2.amazonaws.com/prod/members', {
+        const response = await fetch('https://kgkjjv0rik.execute-api.ap-southeast-2.amazonaws.com/prod/members', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
