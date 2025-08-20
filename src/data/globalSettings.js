@@ -3,9 +3,8 @@
 
 export const GLOBAL_SITE_SETTINGS = {
   branding: {
-    siteName: "M's BASE Rental",
-    siteIcon: null, // カスタムアイコンのURL（管理者が設定）
-    siteIconType: 'default' // 'default' または 'custom'
+    siteName: "M's BASE Rental"
+    // siteIcon関連は削除（MBロゴを使用しない）
   },
   theme: {
     primaryColor: '#4CAF50',

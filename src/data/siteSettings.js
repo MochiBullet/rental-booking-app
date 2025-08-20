@@ -1,9 +1,8 @@
 // サイト設定データ
 export const initialSiteSettings = {
   branding: {
-    siteName: "RentalEasy",
-    siteIcon: null, // カスタムアイコン（Base64形式）null = デフォルトロゴ
-    siteIconType: 'default' // 'default' | 'custom'
+    siteName: "RentalEasy"
+    // siteIcon関連は削除（MBロゴを使用しない）
   },
   hero: {
     title: "車・バイクレンタル RentalEasy",
