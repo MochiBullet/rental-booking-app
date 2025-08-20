@@ -229,28 +229,15 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
     
     // 予約ステータス別集計
     const confirmedBookings = storedBookings.filter(b => b.status === 'confirmed').length;
-    const cancelledBookings = storedBookings.filter(b => b.status === 'cancelled').length;
     const activeBookings = storedBookings.filter(b => b.status === 'active').length;
     const completedBookings = storedBookings.filter(b => b.status === 'completed').length;
     
-    // 収益計算（キャンセル分を除外し、確定・完了分のみ）
-    const totalRevenue = storedBookings
-      .filter(b => b.status === 'confirmed' || b.status === 'completed')
-      .reduce((sum, b) => sum + (b.totalPrice || 0), 0);
-    
-    // キャンセル損失計算
-    const cancelledRevenue = storedBookings
-      .filter(b => b.status === 'cancelled')
-      .reduce((sum, b) => sum + (b.totalPrice || 0), 0);
     
     setStats({
       totalBookings: storedBookings.length,
       confirmedBookings: confirmedBookings,
-      cancelledBookings: cancelledBookings,
       activeBookings: activeBookings,
       completedBookings: completedBookings,
-      totalRevenue: totalRevenue,
-      cancelledRevenue: cancelledRevenue,
       totalVehicles: vehiclesData.length,
       totalUsers: storedUsers.length,
       todayBookings: todayBookingsCount
@@ -486,22 +473,6 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
     showNotification('🎨 デザイン設定が正常に保存されました！サイトに即座反映されます。', 'save', 5000);
   };
 
-  const handleCancelBooking = (bookingId) => {
-    if (window.confirm('Cancel this booking?')) {
-      const booking = bookings.find(b => b.id === bookingId);
-      const updatedBookings = bookings.map(b => 
-        b.id === bookingId ? { ...b, status: 'cancelled' } : b
-      );
-      setBookings(updatedBookings);
-      localStorage.setItem('bookings', JSON.stringify(updatedBookings));
-      
-      // Sync to cloud
-      dataSyncService.saveToCloud('bookings', updatedBookings).catch(console.error);
-      
-      loadDashboardData();
-      showNotification(`❌ 予約 #${booking?.id} をキャンセルしました。`, 'warning');
-    }
-  };
 
   const handleConfirmBooking = (bookingId) => {
     const booking = bookings.find(b => b.id === bookingId);
@@ -552,11 +523,8 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
   const getTypeDisplayName = (type) => {
     switch (type) {
       case 'confirmed': return '予約確定';
-      case 'cancelled': return 'キャンセル';
       case 'active': return '進行中';
       case 'completed': return '完了済み';
-      case 'revenue': return '実収益';
-      case 'cancelled-revenue': return 'キャンセル損失';
       default: return type;
     }
   };
@@ -588,24 +556,11 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
           case 'confirmed':
             if (booking.status === 'confirmed') months[monthIndex].data++;
             break;
-          case 'cancelled':
-            if (booking.status === 'cancelled') months[monthIndex].data++;
-            break;
           case 'active':
             if (booking.status === 'active') months[monthIndex].data++;
             break;
           case 'completed':
             if (booking.status === 'completed') months[monthIndex].data++;
-            break;
-          case 'revenue':
-            if (booking.status === 'confirmed' || booking.status === 'completed') {
-              months[monthIndex].data += booking.totalPrice || 0;
-            }
-            break;
-          case 'cancelled-revenue':
-            if (booking.status === 'cancelled') {
-              months[monthIndex].data += booking.totalPrice || 0;
-            }
             break;
         }
       }
@@ -938,16 +893,6 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
                   <div className="card-arrow">▶</div>
                 </div>
                 
-                <div className="stat-card cancelled clickable" onClick={() => handleCardClick('cancelled')}>
-                  <div className="stat-icon">❌</div>
-                  <div className="stat-details">
-                    <h3>キャンセル</h3>
-                    <p className="stat-number">{stats.cancelledBookings}</p>
-                    <span className="stat-label">Cancelled</span>
-                  </div>
-                  <div className="card-arrow">▶</div>
-                </div>
-                
                 <div className="stat-card active clickable" onClick={() => handleCardClick('active')}>
                   <div className="stat-icon">🚀</div>
                   <div className="stat-details">
@@ -964,26 +909,6 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
                     <h3>完了済み</h3>
                     <p className="stat-number">{stats.completedBookings}</p>
                     <span className="stat-label">Completed</span>
-                  </div>
-                  <div className="card-arrow">▶</div>
-                </div>
-                
-                <div className="stat-card revenue clickable" onClick={() => handleCardClick('revenue')}>
-                  <div className="stat-icon">💰</div>
-                  <div className="stat-details">
-                    <h3>実収益</h3>
-                    <p className="stat-number">{formatCurrency(stats.totalRevenue)}</p>
-                    <span className="stat-label">確定・完了のみ</span>
-                  </div>
-                  <div className="card-arrow">▶</div>
-                </div>
-                
-                <div className="stat-card cancelled-revenue clickable" onClick={() => handleCardClick('cancelled-revenue')}>
-                  <div className="stat-icon">📉</div>
-                  <div className="stat-details">
-                    <h3>キャンセル損失</h3>
-                    <p className="stat-number">{formatCurrency(stats.cancelledRevenue)}</p>
-                    <span className="stat-label">Lost Revenue</span>
                   </div>
                   <div className="card-arrow">▶</div>
                 </div>
@@ -1030,7 +955,6 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
                       <span className={`activity-status status-${booking.status}`}>
                         {booking.status === 'confirmed' ? '確定' : 
                          booking.status === 'active' ? 'アクティブ' : 
-                         booking.status === 'cancelled' ? 'キャンセル' : 
                          booking.status === 'completed' ? '完了済み' :
                          booking.status === 'pending' ? '保留中' : booking.status}
                       </span>
@@ -1080,7 +1004,6 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
                           <span className={`status-badge status-${booking.status}`}>
                             {booking.status === 'confirmed' ? '確定' : 
                              booking.status === 'active' ? 'アクティブ' : 
-                             booking.status === 'cancelled' ? 'キャンセル' : 
                              booking.status === 'completed' ? '完了済み' :
                              booking.status === 'pending' ? '保留中' : booking.status}
                           </span>
@@ -1102,14 +1025,6 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
                                 title="引き渡し当日のみ実行可能"
                               >
                                 引き渡し確定
-                              </button>
-                            )}
-                            {booking.status !== 'cancelled' && booking.status !== 'completed' && (
-                              <button 
-                                className="action-btn cancel"
-                                onClick={() => handleCancelBooking(booking.id)}
-                              >
-                                キャンセル
                               </button>
                             )}
                           </div>
@@ -1372,12 +1287,6 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
                       <span>Active</span>
                       <span className="stat-value">
                         {bookings.filter(b => b.status === 'active').length}
-                      </span>
-                    </div>
-                    <div className="stat-row">
-                      <span>Cancelled</span>
-                      <span className="stat-value">
-                        {bookings.filter(b => b.status === 'cancelled').length}
                       </span>
                     </div>
                   </div>

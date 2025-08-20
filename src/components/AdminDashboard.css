@@ -430,8 +430,8 @@
 .admin-sidebar {
   width: 220px;
   min-width: 220px;
-  background: var(--green-dark);
-  color: white;
+  background: #1b5e20;
+  color: #ffffff !important;
   display: flex;
   flex-direction: column;
   box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
@@ -467,23 +467,27 @@
   padding: 0.75rem 1.5rem;
   background: none;
   border: none;
-  color: white;
+  color: #ffffff !important;
   text-align: left;
   font-size: 0.9rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 1rem;
+  font-weight: 500;
 }
 
 .admin-nav button:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.15);
   padding-left: 2.5rem;
+  color: #ffffff !important;
 }
 
 .admin-nav button.active {
   background: rgba(255, 255, 255, 0.2);
-  border-left: 4px solid white;
+  border-left: 4px solid #ffffff;
+  color: #ffffff !important;
+  font-weight: 600;
 }
 
 .nav-icon {
@@ -519,6 +523,7 @@
 
 .admin-header {
   background: white;
+  color: #333333;
   padding: 1rem 1.5rem;
   display: flex;
   justify-content: space-between;
@@ -572,6 +577,7 @@
 
 .stat-card {
   background: white;
+  color: #333333;
   padding: 1rem;
   border-radius: 12px;
   border: 1px solid #e0e0e0;
