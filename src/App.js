@@ -109,21 +109,32 @@ function AppContent() {
     
     const root = document.documentElement;
     
-    // カラー設定がある場合は適用
-    if (settings.theme?.primaryColor || settings.primaryColor) {
-      const primaryColor = settings.theme?.primaryColor || settings.primaryColor;
-      const secondaryColor = settings.theme?.secondaryColor || settings.secondaryColor;
-      const accentColor = settings.theme?.accentColor || settings.accentColor;
-      
-      root.style.setProperty('--gradient-1', `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 50%, ${accentColor} 100%)`);
-      root.style.setProperty('--gradient-2', `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%)`);
-      root.style.setProperty('--gradient-soft', `linear-gradient(135deg, ${primaryColor}22 0%, ${secondaryColor}22 100%)`);
-      root.style.setProperty('--green', primaryColor);
-      root.style.setProperty('--green-hover', primaryColor + 'dd');
-      root.style.setProperty('--green-dark', primaryColor);
-      root.style.setProperty('--green-light', secondaryColor);
-      root.style.setProperty('--green-pale', accentColor + '22');
-    }
+    // 🎨 緑色テーマを強制適用（設定に関係なく統一された緑色テーマ）
+    console.log('🎨 緑色テーマを強制適用中...');
+    
+    // 緑色テーマの統一カラーパレットを強制適用
+    const primaryColor = '#2e7d32';   // 濃い緑色（メインテーマ）
+    const secondaryColor = '#4caf50'; // 明るい緑色（アクセント）
+    const accentColor = '#e8f5e9';    // 薄い緑色（背景）
+    const hoverColor = '#1b5e20';     // ホバー用さらに濃い緑
+    
+    root.style.setProperty('--gradient-1', `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%)`);
+    root.style.setProperty('--gradient-2', `linear-gradient(135deg, ${hoverColor} 0%, ${primaryColor} 100%)`);
+    root.style.setProperty('--gradient-soft', `linear-gradient(135deg, #fafafa 0%, ${accentColor} 100%)`);
+    root.style.setProperty('--green', primaryColor);
+    root.style.setProperty('--green-hover', hoverColor);
+    root.style.setProperty('--green-dark', hoverColor);
+    root.style.setProperty('--green-light', secondaryColor);
+    root.style.setProperty('--green-pale', accentColor);
+    root.style.setProperty('--extra-light-gray', '#fafafa');
+    root.style.setProperty('--dark-gray', '#263238');
+    
+    console.log('✅ 緑色テーマ強制適用完了:', {
+      primary: primaryColor,
+      secondary: secondaryColor,
+      accent: accentColor,
+      hover: hoverColor
+    });
     
     // ブランディング設定の適用
     if (settings.branding?.siteName) {
