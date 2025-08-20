@@ -43,6 +43,12 @@ aws s3 sync build/ s3://rental-booking-app-website --delete --region ap-southeas
 aws cloudfront create-invalidation --distribution-id E2ANNXZ9LL61PY --paths "/*"
 ```
 
+### データベース情報
+- **DynamoDB テーブル**: `vehicles`
+- **GSI**: `type-index` (type属性でクエリ)
+- **データ**: 車両6台 (車2台・バイク4台)
+- **リージョン**: `ap-southeast-2`
+
 ### 🔴 絶対にやってはいけないこと
 - ❌ `rental-booking-app-production-276291855506` へのデプロイ
 - ❌ Vercelの使用・言及・提案
