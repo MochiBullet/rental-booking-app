@@ -77,8 +77,17 @@ def main(event, context):
             body = json.loads(event.get('body', '{}'))
             
             # Validate required fields
-            if not body.get('email') or not body.get('licenseLastFour'):
-                return create_response(400, {'error': 'Email and license last 4 digits are required'})
+            if not body.get('email') or not body.get('licenseNumber'):
+                return create_response(400, {'error': 'Email and license number are required'})
+            
+            # Extract last 4 digits from license number
+            license_last_four = body.get('licenseNumber', '')[-4:]
+            
+            # Check if member ID already exists (based on year/month/license)
+            member_id = generate_member_id(license_last_four)
+            existing_member = table.get_item(Key={'memberId': member_id})
+            if existing_member.get('Item'):
+                return create_response(409, {'error': 'This member ID combination already exists'})
             
             # Check if email already exists
             existing = table.query(
@@ -89,16 +98,16 @@ def main(event, context):
             if existing['Items']:
                 return create_response(409, {'error': 'Email already registered'})
             
-            # Generate member ID
-            member_id = generate_member_id(body['licenseLastFour'])
-            
             # Create member record
             member = {
                 'memberId': member_id,
                 'email': body['email'],
-                'licenseLastFour': body['licenseLastFour'],
+                'password': body.get('password', ''),  # Store password (in production, should be hashed)
+                'licenseLastFour': license_last_four,
+                'points': 0,  # Initial points
                 'registrationDate': datetime.now().isoformat(),
                 'isActive': True,
+                'status': 'active',
                 'createdAt': datetime.now().isoformat(),
                 'updatedAt': datetime.now().isoformat()
             }
@@ -129,9 +138,21 @@ def main(event, context):
                 update_expression += ", email = :email"
                 expression_values[':email'] = body['email']
             
+            if 'password' in body:
+                update_expression += ", password = :password"
+                expression_values[':password'] = body['password']  # In production, should be hashed
+            
+            if 'points' in body:
+                update_expression += ", points = :points"
+                expression_values[':points'] = body['points']
+            
             if 'isActive' in body:
                 update_expression += ", isActive = :active"
                 expression_values[':active'] = body['isActive']
+            
+            if 'status' in body:
+                update_expression += ", status = :status"
+                expression_values[':status'] = body['status']
             
             # Update item
             response = table.update_item(

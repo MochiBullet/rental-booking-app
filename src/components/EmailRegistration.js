@@ -6,6 +6,7 @@ const EmailRegistration = () => {
     year: new Date().getFullYear(),
     month: new Date().getMonth() + 1,
     licenseNumber: '',
+    email: '',
     password: '',
     confirmPassword: ''
   });
@@ -59,6 +60,14 @@ const EmailRegistration = () => {
       newErrors.licenseNumber = '免許証番号の下4桁を入力してください';
     }
     
+    // メールアドレスのバリデーション
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!formData.email) {
+      newErrors.email = 'メールアドレスを入力してください';
+    } else if (!emailRegex.test(formData.email)) {
+      newErrors.email = '有効なメールアドレスを入力してください';
+    }
+    
     const passwordValidation = validatePassword(formData.password);
     if (!passwordValidation.isValid) {
       newErrors.password = 'パスワードは8桁以上で、大文字・小文字を含む必要があります';
@@ -82,8 +91,9 @@ const EmailRegistration = () => {
       // 会員データ作成
       const memberData = {
         id: memberId,
+        email: formData.email,
         password: formData.password,
-        points: 500, // 新規登録プレゼント500ポイント
+        points: 0, // ポイント初期値
         registeredAt: new Date().toISOString(),
         status: 'active'
       };
@@ -107,6 +117,7 @@ const EmailRegistration = () => {
             year: formData.year,
             month: formData.month,
             licenseNumber: formData.licenseNumber,
+            email: formData.email,
             password: formData.password
           })
         });
@@ -166,10 +177,10 @@ const EmailRegistration = () => {
               <h3>あなたの会員番号は</h3>
               <div className="member-id-number">{generatedMemberId}</div>
               <h3>です。</h3>
-            </div>
-            
-            <div className="success-message">
-              初回登録ボーナスとして<strong>500ポイント</strong>を付与いたします！
+              <div className="security-warning">
+                <strong>⚠️ 重要：この会員IDは他人に教えないでください</strong><br/>
+                パスワードリセット時はこの会員IDとメールアドレスが必要です。
+              </div>
             </div>
             
             <button 
@@ -246,8 +257,31 @@ const EmailRegistration = () => {
             {previewMemberId && (
               <div className="member-id-preview">
                 <strong>会員ID: {previewMemberId}</strong>
+                <div className="security-notice">
+                  ⚠️ この会員IDは他人に教えないでください
+                </div>
               </div>
             )}
+          </div>
+          
+          <div className="email-section">
+            <h3>メールアドレス</h3>
+            <div className="form-group">
+              <label>メールアドレス</label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                placeholder="example@example.com"
+                required
+                className={errors.email ? 'error' : ''}
+              />
+              {errors.email && <span className="error-message">{errors.email}</span>}
+              <div className="email-notice">
+                パスワードリセット時に使用されます
+              </div>
+            </div>
           </div>
           
           <div className="password-section">
@@ -298,7 +332,7 @@ const EmailRegistration = () => {
           <button 
             type="submit" 
             className="submit-btn"
-            disabled={isLoading || !passwordValidation.isValid || formData.password !== formData.confirmPassword || formData.licenseNumber.length < 4}
+            disabled={isLoading || !passwordValidation.isValid || formData.password !== formData.confirmPassword || formData.licenseNumber.length < 4 || !formData.email}
           >
             {isLoading ? (
               <div className="loading-spinner">

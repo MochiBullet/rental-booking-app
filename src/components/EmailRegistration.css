@@ -620,3 +620,106 @@
     margin-top: 1rem;
   }
 }
+
+/* Email Section */
+.email-section {
+  background: transparent;
+  border-radius: 15px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: none;
+  min-height: auto;
+}
+
+.email-section h3 {
+  color: #2e7d32;
+  margin-bottom: 1.5rem;
+  font-size: 1.3rem;
+  text-align: center;
+}
+
+.email-section .form-group input {
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.email-notice {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin-top: 0.5rem;
+  color: #666;
+  font-size: 0.875rem;
+  border-left: 4px solid #43a047;
+}
+
+/* モバイル対応 - Emailセクション */
+@media (max-width: 768px) {
+  .email-section {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .email-section .form-group input {
+    padding: 0.875rem;
+    font-size: 16px;
+  }
+  
+  .email-section h3 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .email-notice {
+    font-size: 0.8rem;
+    padding: 0.6rem;
+  }
+}
+
+/* Security Notice and Warning */
+.security-notice {
+  background: rgba(255, 193, 7, 0.1);
+  border: 1px solid #ffc107;
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin-top: 0.5rem;
+  color: #e65100;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+.security-warning {
+  background: rgba(244, 67, 54, 0.1);
+  border: 2px solid #f44336;
+  border-radius: 10px;
+  padding: 1rem;
+  margin-top: 1rem;
+  color: #c62828;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.security-warning strong {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #d32f2f;
+}
+
+/* モバイル対応 - セキュリティ関連 */
+@media (max-width: 768px) {
+  .security-notice {
+    font-size: 0.8rem;
+    padding: 0.6rem;
+  }
+  
+  .security-warning {
+    font-size: 0.85rem;
+    padding: 0.875rem;
+  }
+}
