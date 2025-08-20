@@ -8,4 +8,4 @@ root.render(
   <React.StrictMode>
     <App />
   </React.StrictMode>
-);
+);// Force cache clear 2025年 8月 21日 木曜日 00:48:50    
