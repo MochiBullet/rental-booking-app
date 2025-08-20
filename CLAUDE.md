@@ -11,12 +11,14 @@
 - **デプロイ**: GitHub Actions → AWS S3
 - **データ管理**: LocalStorage (現時点)
 
-## 重要なアクセス情報
+## 🚨 絶対条件 - 本番サイト情報
 
-### 本番サイトURL
+### 唯一の正しい本番URL
 - **S3直接URL**: http://rental-booking-app-website.s3-website-ap-southeast-2.amazonaws.com
 - **独自ドメイン**: https://ms-base-rental.com
 - **CloudFront**: https://d1y20ady8hnkgx.cloudfront.net
+
+⚠️ **これ以外のURLは使用禁止**
 
 ### 管理者画面へのアクセス
 1. ロゴ（MB）を**10回クリック**
@@ -25,20 +27,26 @@
    - Username: `admin`
    - Password: `msbase7032`
 
-### デプロイ情報（緊急時用）
-- **GitHub Actions**: https://github.com/MochiBullet/rental-booking-app/actions
-- **正しいS3バケット**: `rental-booking-app-website`
+### 🚨 絶対条件 - 必ず従うこと
+- **唯一の正しいS3バケット**: `rental-booking-app-website`
 - **CloudFront Distribution**: `E2ANNXZ9LL61PY`
-- **間違いやすいバケット**: `rental-booking-app-production-276291855506` ❌
+- **GitHub Actions**: https://github.com/MochiBullet/rental-booking-app/actions
+- **❌ 絶対に使用禁止**: `rental-booking-app-production-276291855506`
+- **❌ 絶対に使用禁止**: Vercel（過去に明確に拒否宣言）
 
-### 緊急デプロイコマンド
+### 🚨 唯一の正しいデプロイコマンド
 ```bash
-# 手動デプロイ
+# 手動デプロイ - rental-booking-app-website のみ使用
 aws s3 sync build/ s3://rental-booking-app-website --delete --region ap-southeast-2
 
-# キャッシュクリア
+# キャッシュクリア - E2ANNXZ9LL61PY のみ使用
 aws cloudfront create-invalidation --distribution-id E2ANNXZ9LL61PY --paths "/*"
 ```
+
+### 🔴 絶対にやってはいけないこと
+- ❌ `rental-booking-app-production-276291855506` へのデプロイ
+- ❌ Vercelの使用・言及・提案
+- ❌ 間違ったバケット名での作業
 
 ## コマンドリファレンス
 
