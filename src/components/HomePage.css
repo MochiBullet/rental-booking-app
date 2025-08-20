@@ -62,7 +62,7 @@
   background-repeat: no-repeat;
   flex-shrink: 0;
   background-attachment: scroll;
-  filter: brightness(0.4) grayscale(0.3);
+  filter: brightness(0.4) grayscale(1.0);
 }
 
 @keyframes slideShow {
