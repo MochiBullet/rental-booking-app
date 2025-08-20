@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './HomePage.css';
 import { siteSettingsManager, announcementManager } from '../data/siteSettings';
+import { siteSettingsAPI } from '../services/siteSettingsAPI';
 
 function HomePage() {
   const navigate = useNavigate();
@@ -43,26 +44,58 @@ function HomePage() {
   };
 
   useEffect(() => {
-    // サイト設定を読み込み
-    setSiteSettings(siteSettingsManager.getSettings());
-    
-    // お知らせを読み込み
-    setAnnouncements(announcementManager.getPublishedAnnouncements());
-    
-    const savedContent = localStorage.getItem('homeContent');
-    if (savedContent) {
-      setHomeContent(JSON.parse(savedContent));
-    }
+    loadHomePageData();
 
     // カスタムイベントリスナーを追加（管理者画面からの更新を受け取る）
     const handleSettingsUpdate = () => {
-      setSiteSettings(siteSettingsManager.getSettings());
-      setAnnouncements(announcementManager.getPublishedAnnouncements());
+      loadHomePageData();
     };
     
     window.addEventListener('siteSettingsUpdate', handleSettingsUpdate);
     return () => window.removeEventListener('siteSettingsUpdate', handleSettingsUpdate);
   }, []);
+
+  const loadHomePageData = async () => {
+    try {
+      console.log('🔄 Loading homepage data from DynamoDB...');
+      
+      // DynamoDBからサイト設定を取得
+      const dynamoSettings = await siteSettingsAPI.getAllSettings();
+      
+      if (dynamoSettings.siteSettings) {
+        console.log('✅ Site settings loaded from DynamoDB');
+        setSiteSettings(dynamoSettings.siteSettings);
+      } else {
+        console.log('⚠️ Using LocalStorage site settings');
+        setSiteSettings(siteSettingsManager.getSettings());
+      }
+
+      // ホームコンテンツを取得
+      if (dynamoSettings.homeContent) {
+        console.log('✅ Home content loaded from DynamoDB');
+        setHomeContent(dynamoSettings.homeContent);
+      } else {
+        console.log('⚠️ Using LocalStorage home content');
+        const savedContent = localStorage.getItem('homeContent');
+        if (savedContent) {
+          setHomeContent(JSON.parse(savedContent));
+        }
+      }
+      
+    } catch (error) {
+      console.error('❌ Failed to load data from DynamoDB:', error);
+      
+      // フォールバック: LocalStorageから読み込み
+      setSiteSettings(siteSettingsManager.getSettings());
+      const savedContent = localStorage.getItem('homeContent');
+      if (savedContent) {
+        setHomeContent(JSON.parse(savedContent));
+      }
+    }
+    
+    // お知らせを読み込み（現在はLocalStorageのみ）
+    setAnnouncements(announcementManager.getPublishedAnnouncements());
+  };
 
   const getBackgroundImages = () => {
     if (siteSettings?.hero?.backgroundImages?.length > 0 && !siteSettings.hero.useDefaultImages) {

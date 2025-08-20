@@ -57,7 +57,21 @@
         }
       }
     },
-    "2b1e1fb57afa9097a645f97e3310774fb06a712c2069285b00cd66ea8133abde": {
+    "80d980449eb663961a25ee606c7ad02852e267a630fc71190e9dfab13cf9f4fa": {
+      "source": {
+        "path": "asset.80d980449eb663961a25ee606c7ad02852e267a630fc71190e9dfab13cf9f4fa",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "276291855506-ap-southeast-2": {
+          "bucketName": "cdk-hnb659fds-assets-276291855506-ap-southeast-2",
+          "objectKey": "80d980449eb663961a25ee606c7ad02852e267a630fc71190e9dfab13cf9f4fa.zip",
+          "region": "ap-southeast-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::276291855506:role/cdk-hnb659fds-file-publishing-role-276291855506-ap-southeast-2"
+        }
+      }
+    },
+    "713115e5c964db77e0a197e86b8a03ef64733827609a0a44f624be578ae421a7": {
       "source": {
         "path": "RentalBookingBackendStack.template.json",
         "packaging": "file"
@@ -65,7 +79,7 @@
       "destinations": {
         "276291855506-ap-southeast-2": {
           "bucketName": "cdk-hnb659fds-assets-276291855506-ap-southeast-2",
-          "objectKey": "2b1e1fb57afa9097a645f97e3310774fb06a712c2069285b00cd66ea8133abde.json",
+          "objectKey": "713115e5c964db77e0a197e86b8a03ef64733827609a0a44f624be578ae421a7.json",
           "region": "ap-southeast-2",
           "assumeRoleArn": "arn:${AWS::Partition}:iam::276291855506:role/cdk-hnb659fds-file-publishing-role-276291855506-ap-southeast-2"
         }

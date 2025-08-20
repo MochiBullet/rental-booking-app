@@ -117,6 +117,33 @@
     "aws:cdk:path": "RentalBookingBackendStack/ReservationsTable/Resource"
    }
   },
+  "SiteSettingsTable3563448A": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "settingKey",
+      "AttributeType": "S"
+     }
+    ],
+    "BillingMode": "PAY_PER_REQUEST",
+    "KeySchema": [
+     {
+      "AttributeName": "settingKey",
+      "KeyType": "HASH"
+     }
+    ],
+    "PointInTimeRecoverySpecification": {
+     "PointInTimeRecoveryEnabled": true
+    },
+    "TableName": "rental-booking-site-settings"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "RentalBookingBackendStack/SiteSettingsTable/Resource"
+   }
+  },
   "CommonLayer306767A0": {
    "Type": "AWS::Lambda::LayerVersion",
    "Properties": {
@@ -201,6 +228,12 @@
         {
          "Fn::GetAtt": [
           "ReservationsTableD1629A9C",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::GetAtt": [
+          "SiteSettingsTable3563448A",
           "Arn"
          ]
         },
@@ -389,6 +422,48 @@
     "aws:asset:property": "Code"
    }
   },
+  "SiteSettingsFunctionE6B99471": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-276291855506-ap-southeast-2",
+     "S3Key": "80d980449eb663961a25ee606c7ad02852e267a630fc71190e9dfab13cf9f4fa.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "SITE_SETTINGS_TABLE": {
+       "Ref": "SiteSettingsTable3563448A"
+      },
+      "CORS_ORIGIN": "*"
+     }
+    },
+    "Handler": "handler.main",
+    "Layers": [
+     {
+      "Ref": "CommonLayer306767A0"
+     }
+    ],
+    "MemorySize": 256,
+    "Role": {
+     "Fn::GetAtt": [
+      "LambdaExecutionRoleD5C26073",
+      "Arn"
+     ]
+    },
+    "Runtime": "python3.11",
+    "Timeout": 30
+   },
+   "DependsOn": [
+    "LambdaExecutionRoleDefaultPolicy6D69732F",
+    "LambdaExecutionRoleD5C26073"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "RentalBookingBackendStack/SiteSettingsFunction/Resource",
+    "aws:asset:path": "asset.80d980449eb663961a25ee606c7ad02852e267a630fc71190e9dfab13cf9f4fa",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
   "RentalBookingAPI32714135": {
    "Type": "AWS::ApiGateway::RestApi",
    "Properties": {
@@ -454,7 +529,7 @@
     "aws:cdk:path": "RentalBookingBackendStack/RentalBookingAPI/Account"
    }
   },
-  "RentalBookingAPIDeploymentA832F613c5c2bd0efe9cab7afccfef435873cd47": {
+  "RentalBookingAPIDeploymentA832F6132c1e25c7102d0863c2c63d525e285485": {
    "Type": "AWS::ApiGateway::Deployment",
    "Properties": {
     "Description": "Rental Booking Backend API",
@@ -482,6 +557,15 @@
     "RentalBookingAPIreservationsOPTIONSABB10E9E",
     "RentalBookingAPIreservationsPOSTEF4C0C29",
     "RentalBookingAPIreservationsAC1D7383",
+    "RentalBookingAPIsitesettingssettingKeyDELETE6419917A",
+    "RentalBookingAPIsitesettingssettingKeyGET533078B5",
+    "RentalBookingAPIsitesettingssettingKeyOPTIONSE6EEE37C",
+    "RentalBookingAPIsitesettingssettingKeyPUT8CB13486",
+    "RentalBookingAPIsitesettingssettingKeyF170FDB5",
+    "RentalBookingAPIsitesettingsGET0B23E2E5",
+    "RentalBookingAPIsitesettingsOPTIONS0448C873",
+    "RentalBookingAPIsitesettingsPOST1CEC47FA",
+    "RentalBookingAPIsitesettings8DF76603",
     "RentalBookingAPIvehiclesvehicleIdDELETECFBFAE45",
     "RentalBookingAPIvehiclesvehicleIdGET45379B43",
     "RentalBookingAPIvehiclesvehicleIdOPTIONSB161C689",
@@ -500,7 +584,7 @@
    "Type": "AWS::ApiGateway::Stage",
    "Properties": {
     "DeploymentId": {
-     "Ref": "RentalBookingAPIDeploymentA832F613c5c2bd0efe9cab7afccfef435873cd47"
+     "Ref": "RentalBookingAPIDeploymentA832F6132c1e25c7102d0863c2c63d525e285485"
     },
     "RestApiId": {
      "Ref": "RentalBookingAPI32714135"
@@ -2356,6 +2440,604 @@
     "aws:cdk:path": "RentalBookingBackendStack/RentalBookingAPI/Default/reservations/{id}/DELETE/Resource"
    }
   },
+  "RentalBookingAPIsitesettings8DF76603": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Fn::GetAtt": [
+      "RentalBookingAPI32714135",
+      "RootResourceId"
+     ]
+    },
+    "PathPart": "site-settings",
+    "RestApiId": {
+     "Ref": "RentalBookingAPI32714135"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalBookingBackendStack/RentalBookingAPI/Default/site-settings/Resource"
+   }
+  },
+  "RentalBookingAPIsitesettingsOPTIONS0448C873": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'",
+        "method.response.header.Access-Control-Allow-Credentials": "'true'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true,
+       "method.response.header.Access-Control-Allow-Credentials": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "RentalBookingAPIsitesettings8DF76603"
+    },
+    "RestApiId": {
+     "Ref": "RentalBookingAPI32714135"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalBookingBackendStack/RentalBookingAPI/Default/site-settings/OPTIONS/Resource"
+   }
+  },
+  "RentalBookingAPIsitesettingsGETApiPermissionRentalBookingBackendStackRentalBookingAPI4D7EF860GETsitesettingsD49A8197": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "SiteSettingsFunctionE6B99471",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:ap-southeast-2:276291855506:",
+       {
+        "Ref": "RentalBookingAPI32714135"
+       },
+       "/",
+       {
+        "Ref": "RentalBookingAPIDeploymentStageprod7D02C3A4"
+       },
+       "/GET/site-settings"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalBookingBackendStack/RentalBookingAPI/Default/site-settings/GET/ApiPermission.RentalBookingBackendStackRentalBookingAPI4D7EF860.GET..site-settings"
+   }
+  },
+  "RentalBookingAPIsitesettingsGETApiPermissionTestRentalBookingBackendStackRentalBookingAPI4D7EF860GETsitesettingsE0D9275C": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "SiteSettingsFunctionE6B99471",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:ap-southeast-2:276291855506:",
+       {
+        "Ref": "RentalBookingAPI32714135"
+       },
+       "/test-invoke-stage/GET/site-settings"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalBookingBackendStack/RentalBookingAPI/Default/site-settings/GET/ApiPermission.Test.RentalBookingBackendStackRentalBookingAPI4D7EF860.GET..site-settings"
+   }
+  },
+  "RentalBookingAPIsitesettingsGET0B23E2E5": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "GET",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:ap-southeast-2:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "SiteSettingsFunctionE6B99471",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "RentalBookingAPIsitesettings8DF76603"
+    },
+    "RestApiId": {
+     "Ref": "RentalBookingAPI32714135"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalBookingBackendStack/RentalBookingAPI/Default/site-settings/GET/Resource"
+   }
+  },
+  "RentalBookingAPIsitesettingsPOSTApiPermissionRentalBookingBackendStackRentalBookingAPI4D7EF860POSTsitesettings6A003F31": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "SiteSettingsFunctionE6B99471",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:ap-southeast-2:276291855506:",
+       {
+        "Ref": "RentalBookingAPI32714135"
+       },
+       "/",
+       {
+        "Ref": "RentalBookingAPIDeploymentStageprod7D02C3A4"
+       },
+       "/POST/site-settings"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalBookingBackendStack/RentalBookingAPI/Default/site-settings/POST/ApiPermission.RentalBookingBackendStackRentalBookingAPI4D7EF860.POST..site-settings"
+   }
+  },
+  "RentalBookingAPIsitesettingsPOSTApiPermissionTestRentalBookingBackendStackRentalBookingAPI4D7EF860POSTsitesettingsCA325C40": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "SiteSettingsFunctionE6B99471",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:ap-southeast-2:276291855506:",
+       {
+        "Ref": "RentalBookingAPI32714135"
+       },
+       "/test-invoke-stage/POST/site-settings"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalBookingBackendStack/RentalBookingAPI/Default/site-settings/POST/ApiPermission.Test.RentalBookingBackendStackRentalBookingAPI4D7EF860.POST..site-settings"
+   }
+  },
+  "RentalBookingAPIsitesettingsPOST1CEC47FA": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "POST",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:ap-southeast-2:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "SiteSettingsFunctionE6B99471",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "RentalBookingAPIsitesettings8DF76603"
+    },
+    "RestApiId": {
+     "Ref": "RentalBookingAPI32714135"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalBookingBackendStack/RentalBookingAPI/Default/site-settings/POST/Resource"
+   }
+  },
+  "RentalBookingAPIsitesettingssettingKeyF170FDB5": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Ref": "RentalBookingAPIsitesettings8DF76603"
+    },
+    "PathPart": "{settingKey}",
+    "RestApiId": {
+     "Ref": "RentalBookingAPI32714135"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalBookingBackendStack/RentalBookingAPI/Default/site-settings/{settingKey}/Resource"
+   }
+  },
+  "RentalBookingAPIsitesettingssettingKeyOPTIONSE6EEE37C": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'",
+        "method.response.header.Access-Control-Allow-Credentials": "'true'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true,
+       "method.response.header.Access-Control-Allow-Credentials": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "RentalBookingAPIsitesettingssettingKeyF170FDB5"
+    },
+    "RestApiId": {
+     "Ref": "RentalBookingAPI32714135"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalBookingBackendStack/RentalBookingAPI/Default/site-settings/{settingKey}/OPTIONS/Resource"
+   }
+  },
+  "RentalBookingAPIsitesettingssettingKeyGETApiPermissionRentalBookingBackendStackRentalBookingAPI4D7EF860GETsitesettingssettingKeyE4FC9CBB": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "SiteSettingsFunctionE6B99471",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:ap-southeast-2:276291855506:",
+       {
+        "Ref": "RentalBookingAPI32714135"
+       },
+       "/",
+       {
+        "Ref": "RentalBookingAPIDeploymentStageprod7D02C3A4"
+       },
+       "/GET/site-settings/*"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalBookingBackendStack/RentalBookingAPI/Default/site-settings/{settingKey}/GET/ApiPermission.RentalBookingBackendStackRentalBookingAPI4D7EF860.GET..site-settings.{settingKey}"
+   }
+  },
+  "RentalBookingAPIsitesettingssettingKeyGETApiPermissionTestRentalBookingBackendStackRentalBookingAPI4D7EF860GETsitesettingssettingKey12ACFA62": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "SiteSettingsFunctionE6B99471",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:ap-southeast-2:276291855506:",
+       {
+        "Ref": "RentalBookingAPI32714135"
+       },
+       "/test-invoke-stage/GET/site-settings/*"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalBookingBackendStack/RentalBookingAPI/Default/site-settings/{settingKey}/GET/ApiPermission.Test.RentalBookingBackendStackRentalBookingAPI4D7EF860.GET..site-settings.{settingKey}"
+   }
+  },
+  "RentalBookingAPIsitesettingssettingKeyGET533078B5": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "GET",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:ap-southeast-2:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "SiteSettingsFunctionE6B99471",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "RentalBookingAPIsitesettingssettingKeyF170FDB5"
+    },
+    "RestApiId": {
+     "Ref": "RentalBookingAPI32714135"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalBookingBackendStack/RentalBookingAPI/Default/site-settings/{settingKey}/GET/Resource"
+   }
+  },
+  "RentalBookingAPIsitesettingssettingKeyPUTApiPermissionRentalBookingBackendStackRentalBookingAPI4D7EF860PUTsitesettingssettingKeyEE7B51B8": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "SiteSettingsFunctionE6B99471",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:ap-southeast-2:276291855506:",
+       {
+        "Ref": "RentalBookingAPI32714135"
+       },
+       "/",
+       {
+        "Ref": "RentalBookingAPIDeploymentStageprod7D02C3A4"
+       },
+       "/PUT/site-settings/*"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalBookingBackendStack/RentalBookingAPI/Default/site-settings/{settingKey}/PUT/ApiPermission.RentalBookingBackendStackRentalBookingAPI4D7EF860.PUT..site-settings.{settingKey}"
+   }
+  },
+  "RentalBookingAPIsitesettingssettingKeyPUTApiPermissionTestRentalBookingBackendStackRentalBookingAPI4D7EF860PUTsitesettingssettingKey110E3BE8": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "SiteSettingsFunctionE6B99471",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:ap-southeast-2:276291855506:",
+       {
+        "Ref": "RentalBookingAPI32714135"
+       },
+       "/test-invoke-stage/PUT/site-settings/*"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalBookingBackendStack/RentalBookingAPI/Default/site-settings/{settingKey}/PUT/ApiPermission.Test.RentalBookingBackendStackRentalBookingAPI4D7EF860.PUT..site-settings.{settingKey}"
+   }
+  },
+  "RentalBookingAPIsitesettingssettingKeyPUT8CB13486": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "PUT",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:ap-southeast-2:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "SiteSettingsFunctionE6B99471",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "RentalBookingAPIsitesettingssettingKeyF170FDB5"
+    },
+    "RestApiId": {
+     "Ref": "RentalBookingAPI32714135"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalBookingBackendStack/RentalBookingAPI/Default/site-settings/{settingKey}/PUT/Resource"
+   }
+  },
+  "RentalBookingAPIsitesettingssettingKeyDELETEApiPermissionRentalBookingBackendStackRentalBookingAPI4D7EF860DELETEsitesettingssettingKey84A638E0": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "SiteSettingsFunctionE6B99471",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:ap-southeast-2:276291855506:",
+       {
+        "Ref": "RentalBookingAPI32714135"
+       },
+       "/",
+       {
+        "Ref": "RentalBookingAPIDeploymentStageprod7D02C3A4"
+       },
+       "/DELETE/site-settings/*"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalBookingBackendStack/RentalBookingAPI/Default/site-settings/{settingKey}/DELETE/ApiPermission.RentalBookingBackendStackRentalBookingAPI4D7EF860.DELETE..site-settings.{settingKey}"
+   }
+  },
+  "RentalBookingAPIsitesettingssettingKeyDELETEApiPermissionTestRentalBookingBackendStackRentalBookingAPI4D7EF860DELETEsitesettingssettingKey7E50952A": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "SiteSettingsFunctionE6B99471",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:ap-southeast-2:276291855506:",
+       {
+        "Ref": "RentalBookingAPI32714135"
+       },
+       "/test-invoke-stage/DELETE/site-settings/*"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalBookingBackendStack/RentalBookingAPI/Default/site-settings/{settingKey}/DELETE/ApiPermission.Test.RentalBookingBackendStackRentalBookingAPI4D7EF860.DELETE..site-settings.{settingKey}"
+   }
+  },
+  "RentalBookingAPIsitesettingssettingKeyDELETE6419917A": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "DELETE",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:ap-southeast-2:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "SiteSettingsFunctionE6B99471",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "RentalBookingAPIsitesettingssettingKeyF170FDB5"
+    },
+    "RestApiId": {
+     "Ref": "RentalBookingAPI32714135"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalBookingBackendStack/RentalBookingAPI/Default/site-settings/{settingKey}/DELETE/Resource"
+   }
+  },
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
@@ -2428,6 +3110,12 @@
    "Description": "DynamoDB Reservations table name",
    "Value": {
     "Ref": "ReservationsTableD1629A9C"
+   }
+  },
+  "SiteSettingsTableName": {
+   "Description": "DynamoDB Site Settings table name",
+   "Value": {
+    "Ref": "SiteSettingsTable3563448A"
    }
   }
  },

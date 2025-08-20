@@ -181,22 +181,6 @@ function AppContent() {
         <header className="main-header">
           <div className="header-container">
             <Link to="/" className="logo-section" onClick={handleLogoClick} style={{cursor: 'pointer', textDecoration: 'none', color: 'inherit'}}>
-              <div className="logo">
-                {siteSettings?.branding?.siteIconType === 'custom' && siteSettings?.branding?.siteIcon ? (
-                  <img 
-                    src={siteSettings.branding.siteIcon} 
-                    alt="サイトアイコン" 
-                    style={{ 
-                      width: '40px', 
-                      height: '40px', 
-                      borderRadius: '10px',
-                      objectFit: 'cover'
-                    }}
-                  />
-                ) : (
-                  'MB'
-                )}
-              </div>
               <h1 className="site-title">
                 {siteSettings?.branding?.siteName || 'M\'s BASE Rental'}
               </h1>

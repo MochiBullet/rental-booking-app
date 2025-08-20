@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { siteSettingsManager, initialSiteSettings, announcementManager } from '../data/siteSettings';
+import { siteSettingsAPI } from '../services/siteSettingsAPI';
 
 const SiteSettingsManagement = ({ onSettingsUpdate }) => {
   const [settings, setSettings] = useState(initialSiteSettings);
@@ -9,16 +10,56 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
   const [activeSection, setActiveSection] = useState('branding');
 
   useEffect(() => {
-    setSettings(siteSettingsManager.getSettings());
+    loadSettings();
     setAnnouncements(announcementManager.getAllAnnouncements());
   }, []);
 
-  const handleSave = () => {
-    siteSettingsManager.saveSettings(settings);
-    if (onSettingsUpdate) {
-      onSettingsUpdate(settings);
+  const loadSettings = async () => {
+    try {
+      console.log('🔄 Loading settings from DynamoDB...');
+      const dynamoSettings = await siteSettingsAPI.getAllSettings();
+      
+      if (Object.keys(dynamoSettings).length > 0) {
+        console.log('✅ Settings loaded from DynamoDB');
+        setSettings(dynamoSettings.siteSettings || initialSiteSettings);
+      } else {
+        console.log('⚠️ No settings in DynamoDB, using LocalStorage');
+        setSettings(siteSettingsManager.getSettings());
+        // 移行実行
+        await siteSettingsAPI.migrateFromLocalStorage();
+      }
+    } catch (error) {
+      console.error('❌ Failed to load settings:', error);
+      // フォールバック: LocalStorageから読み込み
+      setSettings(siteSettingsManager.getSettings());
     }
-    alert('サイト設定が保存されました');
+  };
+
+  const handleSave = async () => {
+    try {
+      console.log('🔄 Saving settings to DynamoDB...');
+      await siteSettingsAPI.saveSetting('siteSettings', settings);
+      
+      // LocalStorageにもバックアップ保存
+      siteSettingsManager.saveSettings(settings);
+      
+      if (onSettingsUpdate) {
+        onSettingsUpdate(settings);
+      }
+      
+      alert('✅ サイト設定がDynamoDBに保存されました');
+      console.log('✅ Settings saved successfully');
+    } catch (error) {
+      console.error('❌ Failed to save settings:', error);
+      
+      // フォールバック: LocalStorageにのみ保存
+      siteSettingsManager.saveSettings(settings);
+      if (onSettingsUpdate) {
+        onSettingsUpdate(settings);
+      }
+      
+      alert('⚠️ サイト設定がLocalStorageに保存されました (DynamoDB接続エラー)');
+    }
   };
 
   const handleReset = () => {
@@ -104,246 +145,7 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
     }));
   };
 
-  // アイコンファイルのアップロード処理
-  const handleIconUpload = async (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
 
-    console.log('📷 アイコンアップロード開始:', file.name, 'サイズ:', file.size);
-
-    // ファイルサイズチェック（最大2MB）
-    if (file.size > 2 * 1024 * 1024) {
-      alert('ファイルサイズは2MB以下にしてください。');
-      console.log('❌ ファイルサイズエラー:', file.size);
-      return;
-    }
-
-    // 画像ファイルかチェック
-    if (!file.type.startsWith('image/')) {
-      alert('画像ファイルを選択してください。');
-      console.log('❌ ファイル形式エラー:', file.type);
-      return;
-    }
-
-    try {
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        const base64Data = e.target.result;
-        console.log('✅ Base64変換完了、データ長:', base64Data.length);
-        
-        // アップロード開始の通知
-        alert('🚀 アイコンをパブリック画像サービスにアップロード中...\n少々お待ちください。');
-        
-        try {
-          // まずGitHub Pagesに直接デプロイできるか試す
-          const deployResult = await deployIconDirectly(base64Data, file.name);
-          
-          if (deployResult.success) {
-            const publicIconUrl = deployResult.url;
-            console.log('🌐 アイコンデプロイ成功:', publicIconUrl);
-            
-            // 設定を更新（パブリックURLを保存）
-            updateBrandingSettings('siteIcon', publicIconUrl);
-            updateBrandingSettings('siteIconType', 'custom');
-            
-            // リアルタイム更新の実行
-            if (onSettingsUpdate) {
-              const updatedSettings = {
-                ...settings,
-                branding: {
-                  ...settings.branding,
-                  siteIcon: publicIconUrl,
-                  siteIconType: 'custom'
-                }
-              };
-              onSettingsUpdate(updatedSettings);
-            }
-            
-            alert('✅ アイコンが正常にアップロードされました！\n\n🌐 全ユーザー（他のブラウザや他の人）からも表示されます。\n\nURL: ' + publicIconUrl);
-            
-          } else {
-            throw new Error(deployResult.error || 'アップロードに失敗しました');
-          }
-          
-        } catch (uploadError) {
-          console.error('❌ S3アップロードエラー:', uploadError);
-          
-          // S3アップロードが失敗した場合はBase64フォールバック
-          console.log('📱 フォールバック：LocalStorage保存を実行');
-          updateBrandingSettings('siteIcon', base64Data);
-          updateBrandingSettings('siteIconType', 'custom');
-          
-          if (onSettingsUpdate) {
-            const updatedSettings = {
-              ...settings,
-              branding: {
-                ...settings.branding,
-                siteIcon: base64Data,
-                siteIconType: 'custom'
-              }
-            };
-            onSettingsUpdate(updatedSettings);
-          }
-          
-          alert('⚠️ パブリック画像アップロードに失敗しましたが、LocalStorageに保存しました。\n\n同じブラウザでのみ表示されます。\nエラー: ' + uploadError.message);
-        }
-      };
-      reader.readAsDataURL(file);
-      
-    } catch (error) {
-      console.error('❌ アイコン処理エラー:', error);
-      alert('アイコンの処理中にエラーが発生しました。');
-    }
-  };
-
-  // 画像を直接パブリックサービスにアップロードする関数
-  const deployIconDirectly = async (base64Data, fileName) => {
-    try {
-      console.log('📤 パブリック画像サービスにアップロード開始:', fileName);
-      
-      // imgur API を使用してパブリック画像ホスティング
-      const result = await uploadToImgur(base64Data);
-      
-      if (result.success) {
-        console.log('✅ Imgurアップロード完了:', result.url);
-        return {
-          success: true,
-          url: result.url
-        };
-      } else {
-        throw new Error(result.error);
-      }
-      
-    } catch (error) {
-      console.error('❌ パブリック画像アップロードエラー:', error);
-      return {
-        success: false,
-        error: error.message
-      };
-    }
-  };
-
-  // Imgur API にアップロード（認証不要・パブリック）
-  const uploadToImgur = async (base64Data) => {
-    try {
-      const base64Image = base64Data.split(',')[1]; // data:image/... の部分を削除
-      
-      const response = await fetch('https://api.imgur.com/3/image', {
-        method: 'POST',
-        headers: {
-          'Authorization': 'Client-ID 546c25a59c58ad7', // パブリッククライアントID
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          image: base64Image,
-          type: 'base64',
-          title: 'Site Icon',
-          description: 'Custom site icon for rental booking app'
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error(`Imgur API error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      
-      if (data.success) {
-        return {
-          success: true,
-          url: data.data.link // パブリック URL
-        };
-      } else {
-        throw new Error('Imgur upload failed');
-      }
-
-    } catch (error) {
-      console.error('❌ Imgur API エラー:', error);
-      return {
-        success: false,
-        error: error.message
-      };
-    }
-  };
-
-  // API経由でアップロード
-  const uploadViaPreSignedUrl = async (blob, fileName) => {
-    try {
-      console.log('🔄 APIサーバーにアップロード中...', fileName);
-      
-      // Blobを Base64 に変換
-      const reader = new FileReader();
-      return new Promise((resolve, reject) => {
-        reader.onload = async () => {
-          try {
-            const base64Data = reader.result;
-            
-            // APIエンドポイントにPOSTリクエスト
-            const response = await fetch('/api/upload-icon', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                base64Data,
-                fileName
-              })
-            });
-            
-            if (!response.ok) {
-              throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-            
-            const result = await response.json();
-            console.log('📡 API応答:', result);
-            
-            resolve(result);
-            
-          } catch (error) {
-            console.error('❌ API呼び出しエラー:', error);
-            reject({
-              success: false,
-              error: error.message
-            });
-          }
-        };
-        
-        reader.onerror = () => {
-          reject({
-            success: false,
-            error: 'ファイル読み取りエラー'
-          });
-        };
-        
-        reader.readAsDataURL(blob);
-      });
-      
-    } catch (error) {
-      return {
-        success: false,
-        error: error.message
-      };
-    }
-  };
-
-  // アイコンをデフォルトに戻す
-  const resetIconToDefault = () => {
-    updateBrandingSettings('siteIcon', null);
-    updateBrandingSettings('siteIconType', 'default');
-    
-    // リアルタイム更新の実行
-    if (onSettingsUpdate) {
-      const updatedSettings = {
-        ...settings,
-        branding: {
-          ...settings.branding,
-          siteIcon: null,
-          siteIconType: 'default'
-        }
-      };
-      onSettingsUpdate(updatedSettings);
-    }
-  };
 
   // ヒーロー背景画像のアップロード処理
   const handleHeroImageUpload = (event) => {
@@ -665,77 +467,6 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
               />
             </div>
 
-            <div className="form-group">
-              <label>サイトアイコン</label>
-              <div className="icon-management">
-                <div className="current-icon-preview">
-                  <h4>現在のアイコン</h4>
-                  <div className="icon-preview">
-                    {settings.branding?.siteIconType === 'custom' && settings.branding?.siteIcon ? (
-                      <img 
-                        src={settings.branding.siteIcon} 
-                        alt="カスタムアイコン" 
-                        style={{ width: '40px', height: '40px', borderRadius: '8px' }}
-                      />
-                    ) : (
-                      <div 
-                        className="default-icon"
-                        style={{ 
-                          width: '40px', 
-                          height: '40px', 
-                          background: 'var(--green)', 
-                          borderRadius: '8px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          color: 'white',
-                          fontWeight: 'bold',
-                          fontSize: '18px'
-                        }}
-                      >
-                        MB
-                      </div>
-                    )}
-                    <span style={{ marginLeft: '10px' }}>
-                      {settings.branding?.siteIconType === 'custom' ? 'カスタムアイコン' : 'デフォルトロゴ'}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="icon-upload-controls">
-                  <input
-                    type="file"
-                    id="iconUpload"
-                    accept="image/*"
-                    onChange={handleIconUpload}
-                    style={{ display: 'none' }}
-                  />
-                  <div className="icon-buttons">
-                    <label htmlFor="iconUpload" className="upload-button">
-                      📷 アイコンをアップロード
-                    </label>
-                    {settings.branding?.siteIconType === 'custom' && (
-                      <button 
-                        type="button" 
-                        onClick={resetIconToDefault}
-                        className="reset-icon-button"
-                      >
-                        🔄 デフォルトに戻す
-                      </button>
-                    )}
-                  </div>
-                  <p className="upload-info">
-                    • 推奨サイズ: 40x40px 以上<br/>
-                    • 対応形式: PNG, JPG, GIF<br/>
-                    • 最大サイズ: 2MB<br/>
-                    <br/>
-                    <strong style={{color: '#4CAF50'}}>🌐 全ユーザー共有：</strong><br/>
-                    パブリック画像サービスにアップロードされ、全てのブラウザ・全てのユーザーに表示されます。<br/>
-                    高速配信でどこからでもアクセス可能です。
-                  </p>
-                </div>
-              </div>
-            </div>
           </div>
         )}
 

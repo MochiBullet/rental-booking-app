@@ -72,6 +72,19 @@ class RentalBookingBackendStack(Stack):
             point_in_time_recovery=True
         )
 
+        # Site Settings Table
+        site_settings_table = dynamodb.Table(
+            self, "SiteSettingsTable",
+            table_name="rental-booking-site-settings",
+            partition_key=dynamodb.Attribute(
+                name="settingKey",
+                type=dynamodb.AttributeType.STRING
+            ),
+            billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
+            removal_policy=cdk.RemovalPolicy.DESTROY,
+            point_in_time_recovery=True
+        )
+
         # Lambda Layer for common functions
         lambda_layer = lambda_.LayerVersion(
             self, "CommonLayer",
@@ -93,6 +106,7 @@ class RentalBookingBackendStack(Stack):
         members_table.grant_read_write_data(lambda_role)
         vehicles_table.grant_read_write_data(lambda_role)
         reservations_table.grant_read_write_data(lambda_role)
+        site_settings_table.grant_read_write_data(lambda_role)
 
         # Members Lambda Function
         members_lambda = lambda_.Function(
@@ -144,6 +158,22 @@ class RentalBookingBackendStack(Stack):
             memory_size=256
         )
 
+        # Site Settings Lambda Function
+        site_settings_lambda = lambda_.Function(
+            self, "SiteSettingsFunction",
+            runtime=lambda_.Runtime.PYTHON_3_11,
+            code=lambda_.Code.from_asset("../lambda/site-settings"),
+            handler="handler.main",
+            environment={
+                "SITE_SETTINGS_TABLE": site_settings_table.table_name,
+                "CORS_ORIGIN": "*"
+            },
+            layers=[lambda_layer],
+            role=lambda_role,
+            timeout=cdk.Duration.seconds(30),
+            memory_size=256
+        )
+
         # API Gateway
         api = apigateway.RestApi(
             self, "RentalBookingAPI",
@@ -185,6 +215,15 @@ class RentalBookingBackendStack(Stack):
         reservation_resource.add_method("PUT", apigateway.LambdaIntegration(reservations_lambda))
         reservation_resource.add_method("DELETE", apigateway.LambdaIntegration(reservations_lambda))
 
+        site_settings_resource = api.root.add_resource("site-settings")
+        site_settings_resource.add_method("GET", apigateway.LambdaIntegration(site_settings_lambda))
+        site_settings_resource.add_method("POST", apigateway.LambdaIntegration(site_settings_lambda))
+        
+        site_setting_resource = site_settings_resource.add_resource("{settingKey}")
+        site_setting_resource.add_method("GET", apigateway.LambdaIntegration(site_settings_lambda))
+        site_setting_resource.add_method("PUT", apigateway.LambdaIntegration(site_settings_lambda))
+        site_setting_resource.add_method("DELETE", apigateway.LambdaIntegration(site_settings_lambda))
+
         # Outputs
         cdk.CfnOutput(
             self, "APIEndpoint",
@@ -208,6 +247,12 @@ class RentalBookingBackendStack(Stack):
             self, "ReservationsTableName",
             value=reservations_table.table_name,
             description="DynamoDB Reservations table name"
+        )
+        
+        cdk.CfnOutput(
+            self, "SiteSettingsTableName",
+            value=site_settings_table.table_name,
+            description="DynamoDB Site Settings table name"
         )
 
 app = cdk.App()
