@@ -37,9 +37,12 @@ function AppContent() {
       const adminUser = localStorage.getItem('adminUser');
       const adminSession = sessionStorage.getItem('adminSession');
       const adminTimestamp = localStorage.getItem('adminLoginTime');
+      const adminInfo = localStorage.getItem('adminInfo');
+      
+      console.log('🔍 App.js 管理者認証チェック:', { adminUser, adminSession, adminTimestamp, hasAdminInfo: !!adminInfo });
       
       // 複数の保存場所をチェック
-      if (adminUser === 'true' || adminSession === 'true') {
+      if (adminUser === 'true' || adminSession === 'true' || adminInfo) {
         // ログイン時刻をチェック（7日間有効）
         if (adminTimestamp) {
           const loginTime = parseInt(adminTimestamp);
@@ -48,21 +51,38 @@ function AppContent() {
           
           if (currentTime - loginTime < sevenDays) {
             setIsAdmin(true);
-            console.log('✅ 管理者ログイン状態を復元しました');
+            console.log('✅ App.js 管理者ログイン状態を復元しました');
             
             // ログイン時刻を更新（アクティブな場合）
             localStorage.setItem('adminLoginTime', currentTime.toString());
+            localStorage.setItem('adminUser', 'true');
+            sessionStorage.setItem('adminSession', 'true');
+            
+            // adminInfoが存在しない場合は作成
+            if (!adminInfo) {
+              const newAdminInfo = {
+                username: 'admin',
+                loginTime: currentTime,
+                lastActivity: currentTime
+              };
+              localStorage.setItem('adminInfo', JSON.stringify(newAdminInfo));
+            }
+            
             return true;
           } else {
             // 期限切れの場合はクリア
             localStorage.removeItem('adminUser');
             localStorage.removeItem('adminLoginTime');
+            localStorage.removeItem('adminInfo');
             sessionStorage.removeItem('adminSession');
             console.log('⏰ 管理者ログインが期限切れです');
           }
         } else {
           // タイムスタンプがない場合は新たに設定
-          localStorage.setItem('adminLoginTime', Date.now().toString());
+          const currentTime = Date.now();
+          localStorage.setItem('adminLoginTime', currentTime.toString());
+          localStorage.setItem('adminUser', 'true');
+          sessionStorage.setItem('adminSession', 'true');
           setIsAdmin(true);
           console.log('✅ 管理者ログイン状態を復元しました（新規タイムスタンプ設定）');
           return true;

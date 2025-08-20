@@ -8,6 +8,66 @@ import { vehicleAPI } from '../services/api';
 const AdminDashboard = ({ onSettingsUpdate }) => {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('overview');
+  const [isAuthenticating, setIsAuthenticating] = useState(true);
+  
+  // 管理者認証チェック（リロード時の状態復元）
+  useEffect(() => {
+    const checkAuthentication = () => {
+      const adminUser = localStorage.getItem('adminUser');
+      const adminSession = sessionStorage.getItem('adminSession');
+      const adminTimestamp = localStorage.getItem('adminLoginTime');
+      const adminInfo = localStorage.getItem('adminInfo');
+      
+      console.log('🔐 認証チェック開始:', { adminUser, adminSession, adminTimestamp, hasAdminInfo: !!adminInfo });
+      
+      // 複数の認証情報をチェック
+      if (adminUser === 'true' || adminSession === 'true' || adminInfo) {
+        if (adminTimestamp) {
+          const loginTime = parseInt(adminTimestamp);
+          const currentTime = Date.now();
+          const sevenDays = 7 * 24 * 60 * 60 * 1000;
+          
+          if (currentTime - loginTime < sevenDays) {
+            console.log('✅ 管理者認証成功 - ダッシュボードアクセス許可');
+            setIsAuthenticating(false);
+            
+            // 認証情報を更新
+            localStorage.setItem('adminUser', 'true');
+            sessionStorage.setItem('adminSession', 'true');
+            localStorage.setItem('adminLoginTime', currentTime.toString());
+            
+            if (!adminInfo) {
+              const newAdminInfo = {
+                username: 'admin',
+                loginTime: currentTime,
+                lastActivity: currentTime
+              };
+              localStorage.setItem('adminInfo', JSON.stringify(newAdminInfo));
+            }
+            return;
+          } else {
+            console.log('⏰ ログインセッション期限切れ');
+          }
+        } else {
+          // タイムスタンプがない場合は新規設定
+          console.log('🆕 新しいタイムスタンプを設定');
+          localStorage.setItem('adminLoginTime', Date.now().toString());
+          setIsAuthenticating(false);
+          return;
+        }
+      }
+      
+      // 認証失敗の場合
+      console.log('❌ 認証失敗 - ログインページにリダイレクト');
+      localStorage.removeItem('adminUser');
+      localStorage.removeItem('adminLoginTime');
+      localStorage.removeItem('adminInfo');
+      sessionStorage.removeItem('adminSession');
+      navigate('/admin/login');
+    };
+    
+    checkAuthentication();
+  }, [navigate]);
   
   // 管理者の活動時刻を定期的に更新（ログイン状態維持のため）
   useEffect(() => {
@@ -252,8 +312,20 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
   };
 
   const handleLogout = () => {
+    // すべての管理者関連の認証情報をクリア
     localStorage.removeItem('adminUser');
-    navigate('/');
+    localStorage.removeItem('adminLoginTime');
+    localStorage.removeItem('adminInfo');
+    sessionStorage.removeItem('adminSession');
+    
+    console.log('🚪 管理者ログアウト - すべての認証情報をクリアしました');
+    
+    showNotification('ログアウトしました。お疲れ様でした。', 'info');
+    
+    // ホームページにリダイレクト
+    setTimeout(() => {
+      navigate('/');
+    }, 1000);
   };
 
   const handleAddVehicle = async () => {
@@ -748,6 +820,19 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
       currency: 'JPY'
     }).format(amount);
   };
+
+  // 認証チェック中の表示
+  if (isAuthenticating) {
+    return (
+      <div className="admin-dashboard">
+        <div className="auth-loading">
+          <div className="auth-spinner"></div>
+          <h2>認証確認中...</h2>
+          <p>管理者権限を確認しています</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="admin-dashboard">
