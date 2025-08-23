@@ -18,7 +18,7 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
       const adminTimestamp = localStorage.getItem('adminLoginTime');
       const adminInfo = localStorage.getItem('adminInfo');
       
-      console.log('🔐 認証チェック開始:', { adminUser, adminSession, adminTimestamp, hasAdminInfo: !!adminInfo });
+      console.log('🔐 AdminDashboard認証チェック開始:', { adminUser, adminSession, adminTimestamp, hasAdminInfo: !!adminInfo });
       
       // 複数の認証情報をチェック
       if (adminUser === 'true' || adminSession === 'true' || adminInfo) {
@@ -28,7 +28,7 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
           const sevenDays = 7 * 24 * 60 * 60 * 1000;
           
           if (currentTime - loginTime < sevenDays) {
-            console.log('✅ 管理者認証成功 - ダッシュボードアクセス許可');
+            console.log('✅ AdminDashboard管理者認証成功 - ダッシュボードアクセス許可');
             setIsAuthenticating(false);
             
             // 認証情報を更新
@@ -46,24 +46,26 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
             }
             return;
           } else {
-            console.log('⏰ ログインセッション期限切れ');
+            console.log('⏰ AdminDashboardログインセッション期限切れ');
           }
         } else {
           // タイムスタンプがない場合は新規設定
-          console.log('🆕 新しいタイムスタンプを設定');
+          console.log('🆕 AdminDashboard新しいタイムスタンプを設定');
           localStorage.setItem('adminLoginTime', Date.now().toString());
+          localStorage.setItem('adminUser', 'true');
+          sessionStorage.setItem('adminSession', 'true');
           setIsAuthenticating(false);
           return;
         }
       }
       
       // 認証失敗の場合
-      console.log('❌ 認証失敗 - ログインページにリダイレクト');
+      console.log('❌ AdminDashboard認証失敗 - ログインページにリダイレクト');
       localStorage.removeItem('adminUser');
       localStorage.removeItem('adminLoginTime');
       localStorage.removeItem('adminInfo');
       sessionStorage.removeItem('adminSession');
-      navigate('/admin/login');
+      navigate('/admin-login');
     };
     
     checkAuthentication();
@@ -74,10 +76,14 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
     const updateAdminActivity = () => {
       const adminInfo = localStorage.getItem('adminInfo');
       if (adminInfo) {
-        const info = JSON.parse(adminInfo);
-        info.lastActivity = Date.now();
-        localStorage.setItem('adminInfo', JSON.stringify(info));
-        localStorage.setItem('adminLoginTime', Date.now().toString());
+        try {
+          const info = JSON.parse(adminInfo);
+          info.lastActivity = Date.now();
+          localStorage.setItem('adminInfo', JSON.stringify(info));
+          localStorage.setItem('adminLoginTime', Date.now().toString());
+        } catch (e) {
+          console.warn('adminInfo parse error:', e);
+        }
       }
     };
     
@@ -85,11 +91,11 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
     updateAdminActivity();
     
     // 5分ごとに活動時刻を更新
-    const activityInterval = setInterval(updateAdminActivity, 5 * 60 * 1000);
+    const interval = setInterval(updateAdminActivity, 5 * 60 * 1000);
     
-    // クリーンアップ
-    return () => clearInterval(activityInterval);
+    return () => clearInterval(interval);
   }, []);
+  
   const [detailsType, setDetailsType] = useState(null);
   const [monthlyStats, setMonthlyStats] = useState({});
   const [showAddUserModal, setShowAddUserModal] = useState(false);
