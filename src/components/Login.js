@@ -33,27 +33,8 @@ function Login({ setUser }) {
         return;
       }
 
-      // まずローカルストレージをチェック（デモ用）
-      const members = JSON.parse(localStorage.getItem('members') || '[]');
-      const localMember = members.find(member => member.id === formData.memberId);
-      
-      if (localMember) {
-        // ローカルでのパスワードチェック（平文比較）
-        if (localMember.password === formData.password) {
-          localStorage.setItem('currentUser', JSON.stringify(localMember));
-          setUser(localMember);
-          setLoading(false);
-          navigate('/mypage');
-          return;
-        } else {
-          setError('会員IDまたはパスワードが正しくありません。');
-          setLoading(false);
-          return;
-        }
-      }
-
-      // バックエンドAPIを呼び出し
-      const response = await fetch('https://9v7h3mj14g.execute-api.ap-southeast-2.amazonaws.com/prod/members/login', {
+      // バックエンドAPIを呼び出し（DB優先）
+      const response = await fetch('https://kgkjjv0rik.execute-api.ap-southeast-2.amazonaws.com/prod/members/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

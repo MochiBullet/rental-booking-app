@@ -73,32 +73,6 @@ def main(event, context):
                 return create_response(200, {'members': response.get('Items', [])})
         
         elif http_method == 'POST':
-            body = json.loads(event.get('body', '{}'))
-            
-            # Check if this is a login request
-            if event.get('path', '').endswith('/login'):
-                # Login endpoint
-                member_id = body.get('id', body.get('memberId'))
-                password = body.get('password')
-                
-                if not member_id or not password:
-                    return create_response(400, {'error': 'Member ID and password are required'})
-                
-                # Get member by ID
-                response = table.get_item(Key={'memberId': member_id})
-                
-                if 'Item' in response:
-                    member = response['Item']
-                    # Simple password check (should be hashed in production)
-                    if member.get('password') == password:
-                        # Remove password from response
-                        member.pop('password', None)
-                        return create_response(200, {'member': member})
-                    else:
-                        return create_response(401, {'error': 'Invalid credentials'})
-                else:
-                    return create_response(404, {'error': 'Member not found'})
-            
             # Create new member
             body = json.loads(event.get('body', '{}'))
             
@@ -109,8 +83,8 @@ def main(event, context):
             # Extract last 4 digits from license number
             license_last_four = body.get('licenseNumber', '')[-4:]
             
-            # Use provided member ID or generate one
-            member_id = body.get('memberId') or generate_member_id(license_last_four)
+            # Check if member ID already exists (based on year/month/license)
+            member_id = generate_member_id(license_last_four)
             existing_member = table.get_item(Key={'memberId': member_id})
             if existing_member.get('Item'):
                 return create_response(409, {'error': 'This member ID combination already exists'})

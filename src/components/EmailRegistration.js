@@ -98,35 +98,30 @@ const EmailRegistration = () => {
         status: 'active'
       };
       
-      // まずローカルストレージをチェック（デモ用）
-      const existingMembers = JSON.parse(localStorage.getItem('members') || '[]');
-      if (existingMembers.find(member => member.id === memberId)) {
-        setErrors({ general: 'この会員IDは既に使用されています。別の組み合わせをお試しください。' });
-        setIsLoading(false);
-        return;
-      }
-      
       try {
-        // バックエンドAPIを呼び出し
+        // バックエンドAPIを呼び出し（DB保存）
         const response = await fetch('https://kgkjjv0rik.execute-api.ap-southeast-2.amazonaws.com/prod/members', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            year: formData.year,
-            month: formData.month,
-            licenseNumber: formData.licenseNumber,
+            memberId: memberId,
             email: formData.email,
-            password: formData.password
+            password: formData.password,
+            licenseNumber: formData.licenseNumber,
+            licenseLastFour: formData.licenseNumber.slice(-4),
+            registrationDate: new Date().toISOString(),
+            status: 'active',
+            isActive: true,
+            points: 0,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
           })
         });
 
         if (response.ok) {
           const data = await response.json();
-          // ローカルストレージにも保存（デモ用）
-          existingMembers.push(memberData);
-          localStorage.setItem('members', JSON.stringify(existingMembers));
           setGeneratedMemberId(memberId);
           setRegistrationComplete(true);
         } else {
@@ -139,11 +134,7 @@ const EmailRegistration = () => {
         }
       } catch (error) {
         console.error('Registration error:', error);
-        // ネットワークエラーの場合はローカルストレージに保存（デモ用フォールバック）
-        existingMembers.push(memberData);
-        localStorage.setItem('members', JSON.stringify(existingMembers));
-        setGeneratedMemberId(memberId);
-        setRegistrationComplete(true);
+        setErrors({ general: 'ネットワークエラーが発生しました。もう一度お試しください。' });
       }
       
     } catch (error) {

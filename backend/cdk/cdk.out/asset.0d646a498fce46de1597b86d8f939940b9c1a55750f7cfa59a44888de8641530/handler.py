@@ -4,7 +4,7 @@ import boto3
 import uuid
 from datetime import datetime
 from decimal import Decimal
-from boto3.dynamodb.conditions import Key, Attr
+from boto3.dynamodb.conditions import Key
 
 # DynamoDB client
 dynamodb = boto3.resource('dynamodb')
@@ -49,10 +49,11 @@ def main(event, context):
                     return create_response(404, {'error': 'Vehicle not found'})
             
             elif query_parameters and 'type' in query_parameters:
-                # Filter by vehicle type using scan (fallback for tables without GSI)
+                # Query by vehicle type using GSI
                 vehicle_type = query_parameters['type']
-                response = table.scan(
-                    FilterExpression=Attr('vehicleType').eq(vehicle_type)
+                response = table.query(
+                    IndexName='vehicleType-index',
+                    KeyConditionExpression=Key('vehicleType').eq(vehicle_type)
                 )
                 
                 return create_response(200, {'vehicles': response.get('Items', [])})

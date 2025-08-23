@@ -35,20 +35,35 @@ const MyPage = ({ user, setUser }) => {
     }
   }, [user]);
 
-  const loadUserData = () => {
+  const loadUserData = async () => {
     if (!user) return; // userが存在しない場合は何もしない
     
-    // Load bookings
-    const allBookings = JSON.parse(localStorage.getItem('bookings') || '[]');
-    const userBookings = allBookings.filter(booking => booking.userId === user.id);
-    setBookings(userBookings);
+    try {
+      // Load bookings from API
+      const bookingsResponse = await fetch(`https://kgkjjv0rik.execute-api.ap-southeast-2.amazonaws.com/prod/reservations?memberId=${user.memberId || user.id}`);
+      if (bookingsResponse.ok) {
+        const bookingsData = await bookingsResponse.json();
+        setBookings(bookingsData.reservations || []);
+      } else {
+        // Fallback to localStorage if API fails
+        const allBookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+        const userBookings = allBookings.filter(booking => booking.userId === user.id);
+        setBookings(userBookings);
+      }
+    } catch (error) {
+      console.error('Error loading bookings:', error);
+      // Fallback to localStorage
+      const allBookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+      const userBookings = allBookings.filter(booking => booking.userId === user.id);
+      setBookings(userBookings);
+    }
     
     // Load point history (generate if doesn't exist)
     let userPointHistory = JSON.parse(localStorage.getItem('pointHistory') || '[]')
       .filter(history => history.userId === user.id);
     
     if (userPointHistory.length === 0) {
-      userPointHistory = generatePointHistory(user, userBookings);
+      userPointHistory = generatePointHistory(user, bookings);
       const allPointHistory = JSON.parse(localStorage.getItem('pointHistory') || '[]');
       allPointHistory.push(...userPointHistory);
       localStorage.setItem('pointHistory', JSON.stringify(allPointHistory));
