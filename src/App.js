@@ -32,62 +32,103 @@ function AppContent() {
       setUser(JSON.parse(savedUser));
     }
     
-    // 管理者ログイン状態を復元（より確実な維持）
+    // 管理者ログイン状態を復元（リロード対応強化版）
     const checkAdminLogin = () => {
       const adminUser = localStorage.getItem('adminUser');
       const adminSession = sessionStorage.getItem('adminSession');
       const adminTimestamp = localStorage.getItem('adminLoginTime');
       const adminInfo = localStorage.getItem('adminInfo');
       
-      console.log('🔍 App.js 管理者認証チェック:', { adminUser, adminSession, adminTimestamp, hasAdminInfo: !!adminInfo });
+      console.log('🔍 App.js 管理者認証チェック:', { 
+        adminUser, 
+        adminSession, 
+        adminTimestamp, 
+        hasAdminInfo: !!adminInfo,
+        currentTime: Date.now()
+      });
       
-      // 複数の保存場所をチェック
-      if (adminUser === 'true' || adminSession === 'true' || adminInfo) {
-        // ログイン時刻をチェック（7日間有効）
+      // セッション確認：sessionStorageまたはlocalStorageのいずれかで管理者フラグが存在
+      const hasAdminSession = adminSession === 'true' || adminUser === 'true';
+      
+      // 管理者情報オブジェクトの確認
+      let parsedAdminInfo = null;
+      if (adminInfo) {
+        try {
+          parsedAdminInfo = JSON.parse(adminInfo);
+        } catch (e) {
+          console.warn('adminInfo parse error:', e);
+          localStorage.removeItem('adminInfo');
+        }
+      }
+      
+      // ログイン状態の判定（複数チェック）
+      if (hasAdminSession || parsedAdminInfo) {
+        const currentTime = Date.now();
+        const sevenDays = 7 * 24 * 60 * 60 * 1000; // 7日間のミリ秒
+        
+        // タイムスタンプチェック
+        let loginTime = null;
         if (adminTimestamp) {
-          const loginTime = parseInt(adminTimestamp);
-          const currentTime = Date.now();
-          const sevenDays = 7 * 24 * 60 * 60 * 1000; // 7日間のミリ秒
+          loginTime = parseInt(adminTimestamp);
+        } else if (parsedAdminInfo?.loginTime) {
+          loginTime = parsedAdminInfo.loginTime;
+        }
+        
+        if (loginTime && !isNaN(loginTime)) {
+          // 期限チェック（7日以内）
+          const timeDiff = currentTime - loginTime;
+          console.log('⏰ ログイン経過時間:', Math.floor(timeDiff / (1000 * 60 * 60 * 24)), '日');
           
-          if (currentTime - loginTime < sevenDays) {
+          if (timeDiff < sevenDays) {
+            // 管理者状態を復元
             setIsAdmin(true);
-            console.log('✅ App.js 管理者ログイン状態を復元しました');
+            console.log('✅ 管理者ログイン状態を復元しました（期限内）');
             
-            // ログイン時刻を更新（アクティブな場合）
+            // アクティビティ更新
             localStorage.setItem('adminLoginTime', currentTime.toString());
             localStorage.setItem('adminUser', 'true');
             sessionStorage.setItem('adminSession', 'true');
             
-            // adminInfoが存在しない場合は作成
-            if (!adminInfo) {
-              const newAdminInfo = {
-                username: 'admin',
-                loginTime: currentTime,
-                lastActivity: currentTime
-              };
-              localStorage.setItem('adminInfo', JSON.stringify(newAdminInfo));
-            }
+            // adminInfo更新
+            const updatedAdminInfo = {
+              username: 'admin',
+              loginTime: loginTime, // 元のログイン時刻は保持
+              lastActivity: currentTime // 最新アクティビティ時刻を更新
+            };
+            localStorage.setItem('adminInfo', JSON.stringify(updatedAdminInfo));
             
             return true;
           } else {
-            // 期限切れの場合はクリア
+            // 期限切れ - 全データクリア
+            console.log('⏰ 管理者ログインが期限切れです（7日超過）');
             localStorage.removeItem('adminUser');
             localStorage.removeItem('adminLoginTime');
             localStorage.removeItem('adminInfo');
             sessionStorage.removeItem('adminSession');
-            console.log('⏰ 管理者ログインが期限切れです');
+            return false;
           }
         } else {
-          // タイムスタンプがない場合は新たに設定
-          const currentTime = Date.now();
-          localStorage.setItem('adminLoginTime', currentTime.toString());
+          // タイムスタンプが無効な場合は新規設定
+          console.log('🆕 タイムスタンプが見つからないため新規設定します');
+          const newLoginTime = currentTime;
+          localStorage.setItem('adminLoginTime', newLoginTime.toString());
           localStorage.setItem('adminUser', 'true');
           sessionStorage.setItem('adminSession', 'true');
+          
+          const newAdminInfo = {
+            username: 'admin',
+            loginTime: newLoginTime,
+            lastActivity: newLoginTime
+          };
+          localStorage.setItem('adminInfo', JSON.stringify(newAdminInfo));
+          
           setIsAdmin(true);
-          console.log('✅ 管理者ログイン状態を復元しました（新規タイムスタンプ設定）');
+          console.log('✅ 管理者ログイン状態を復元しました（新規タイムスタンプ）');
           return true;
         }
       }
+      
+      console.log('❌ 管理者ログイン状態が見つかりません');
       return false;
     };
     
