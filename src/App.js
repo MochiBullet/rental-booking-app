@@ -275,11 +275,8 @@ function AppContent() {
                   {isAdmin && <span className="admin-badge">管理者モード</span>}
                 </div>
               ) : (
-                // INFO SITE MODE: Minimal navigation
+                // INFO SITE MODE: Clean header without navigation
                 <div className="info-site-nav">
-                  <div className="nav-menu">
-                    <Link to="/" className="nav-link">ホーム</Link>
-                  </div>
                   <span className="site-mode-indicator">車両情報サイト</span>
                 </div>
               )}
