@@ -1,25 +1,29 @@
-// Version 3.0 - FINAL FIX - ADMIN LOGIN CREDENTIALS DISPLAY REMOVED COMPLETELY - BUILD 20250819
+// Version 4.0 - MAJOR REFACTOR - AUTHENTICATION FEATURES DISABLED FOR INFO SITE MODE
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import './App.css';
 import HomePage from './components/HomePage';
 import VehicleListPage from './components/VehicleListPage';
-import Login from './components/Login';
-import EmailRegistration from './components/EmailRegistration';
-import CompleteRegistration from './components/CompleteRegistration';
-import MyPage from './components/MyPage';
+// DISABLED: Authentication and User Management Features
+// import Login from './components/Login';
+// import EmailRegistration from './components/EmailRegistration';
+// import CompleteRegistration from './components/CompleteRegistration';
+// import MyPage from './components/MyPage';
+// DISABLED: Password Reset Features  
+// import ForgotPassword from './components/ForgotPassword';
+// import ResetPassword from './components/ResetPassword';
 import AdminLogin from './components/AdminLogin';
 import AdminDashboard from './components/AdminDashboard';
 import ContactForm from './components/ContactForm';
 import Terms from './components/Terms';
 import PrivacyPolicy from './components/PrivacyPolicy';
-import ForgotPassword from './components/ForgotPassword';
-import ResetPassword from './components/ResetPassword';
 import AnnouncementDetail from './components/AnnouncementDetail';
 import { getGlobalSettings, updateGlobalSettings } from './data/globalSettings';
 
 function AppContent() {
-  const [user, setUser] = useState(null);
+  // INFO SITE MODE: Simplified state management
+  // DISABLED: User authentication state
+  // const [user, setUser] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [logoClickCount, setLogoClickCount] = useState(0);
   const [logoClickTimer, setLogoClickTimer] = useState(null);
@@ -27,10 +31,13 @@ function AppContent() {
   const location = useLocation();
 
   useEffect(() => {
+    // DISABLED: User authentication features
+    /*
     const savedUser = localStorage.getItem('currentUser');
     if (savedUser) {
       setUser(JSON.parse(savedUser));
     }
+    */
     
     // 管理者ログイン状態を復元（リロード対応強化版）
     const checkAdminLogin = () => {
@@ -208,6 +215,8 @@ function AppContent() {
     }
   };
 
+  // DISABLED: User authentication features
+  /*
   const handleLogout = () => {
     setUser(null);
     setIsAdmin(false);
@@ -221,6 +230,7 @@ function AppContent() {
     
     console.log('🚪 ログアウトしました（全ての認証データを削除）');
   };
+  */
 
   // サイト設定更新の処理
   const handleSiteSettingsUpdate = (newSettings) => {
@@ -264,49 +274,77 @@ function AppContent() {
                 <div className="admin-indicator">
                   {isAdmin && <span className="admin-badge">管理者モード</span>}
                 </div>
-              ) : user ? (
-                <div className="user-menu">
-                  <Link to="/mypage" className="mypage-link">マイページ</Link>
-                  <div className="welcome-text">
-                    <span className="greeting">ようこそ</span>
-                    <span className="username">{user.name}様</span>
-                  </div>
-                  <button className="logout-btn" onClick={handleLogout}>ログアウト</button>
-                </div>
               ) : (
-                <div className="auth-buttons">
-                  <Link to="/login" className="login-btn">ログイン</Link>
-                  <Link to="/register" className="register-btn">新規登録</Link>
+                // INFO SITE MODE: Simple navigation for information browsing
+                <div className="info-site-nav">
+                  <div className="nav-menu">
+                    <Link to="/" className="nav-link">ホーム</Link>
+                    <Link to="/vehicles/car" className="nav-link">車両一覧</Link>
+                    <Link to="/contact" className="nav-link">お問い合わせ</Link>
+                  </div>
+                  <span className="site-mode-indicator">車両情報サイト</span>
                 </div>
+                /* DISABLED: User Authentication Navigation
+                user ? (
+                  <div className="user-menu">
+                    <Link to="/mypage" className="mypage-link">マイページ</Link>
+                    <div className="welcome-text">
+                      <span className="greeting">ようこそ</span>
+                      <span className="username">{user.name}様</span>
+                    </div>
+                    <button className="logout-btn" onClick={handleLogout}>ログアウト</button>
+                  </div>
+                ) : (
+                  <div className="auth-buttons">
+                    <Link to="/login" className="login-btn">ログイン</Link>
+                    <Link to="/register" className="register-btn">新規登録</Link>
+                  </div>
+                )
+                */
               )}
             </nav>
           </div>
         </header>
 
         <Routes>
+          {/* INFO SITE MODE: Core Routes */}
           <Route path="/" element={<HomePage />} />
-          <Route path="/vehicles/:type" element={<VehicleListPage user={user} />} />
+          
+          {/* Vehicle Information Routes */}
+          <Route path="/vehicles/:type" element={<VehicleListPage user={null} />} />
+          <Route path="/cars" element={<Navigate to="/vehicles/car" replace />} />
+          <Route path="/motorcycles" element={<Navigate to="/vehicles/motorcycle" replace />} />
+          
+          {/* Static Information Pages */}
+          <Route path="/contact" element={<ContactForm />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          
+          {/* Admin Routes (Hidden from main navigation) */}
+          <Route path="/admin-login" element={<AdminLogin setIsAdmin={setIsAdmin} onSuccess={() => window.location.href = '/admin'} />} />
+          <Route path="/admin" element={isAdmin ? <AdminDashboard onSettingsUpdate={handleSiteSettingsUpdate} /> : <Navigate to="/admin-login" />} />
+          
+          {/* Legacy/Optional Routes */}
+          <Route path="/announcement/:id" element={<AnnouncementDetail />} />
+          
+          {/* DISABLED: Authentication Routes
           <Route path="/login" element={<Login setUser={setUser} />} />
           <Route path="/register" element={<EmailRegistration />} />
           <Route path="/complete-registration/:token" element={<CompleteRegistration />} />
           <Route path="/mypage" element={<MyPage user={user} setUser={setUser} />} />
-          <Route path="/admin-login" element={<AdminLogin setIsAdmin={setIsAdmin} onSuccess={() => window.location.href = '/admin'} />} />
-          <Route path="/admin" element={isAdmin ? <AdminDashboard onSettingsUpdate={handleSiteSettingsUpdate} /> : <Navigate to="/admin-login" />} />
-          <Route path="/contact" element={<ContactForm />} />
-          <Route path="/terms" element={<Terms />} />
-          <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
-          <Route path="/announcement/:id" element={<AnnouncementDetail />} />
+          */}
         </Routes>
 
         <footer className="main-footer">
           <div className="footer-container">
-            <p>&copy; 2024 M's BASE Rental - 信頼のレンタルサービス</p>
+            <p>&copy; 2024 M's BASE Rental - 車両情報サイト</p>
             <div className="footer-links">
+              <Link to="/vehicles/car">車両一覧</Link>
+              <Link to="/contact">お問い合わせ</Link>
               <Link to="/terms">利用規約</Link>
               <Link to="/privacy">プライバシーポリシー</Link>
-              <Link to="/contact">お問い合わせ</Link>
             </div>
           </div>
         </footer>

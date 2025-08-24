@@ -7,8 +7,9 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
   const { type } = useParams();
   const [vehicles, setVehicles] = useState([]);
   const [selectedVehicle, setSelectedVehicle] = useState(null);
-  const [showBookingModal, setShowBookingModal] = useState(false);
-  const [bookingSuccess, setBookingSuccess] = useState(false);
+  const [showSimulationModal, setShowSimulationModal] = useState(false);
+  // DISABLED: Booking functionality replaced with price simulation
+  // const [bookingSuccess, setBookingSuccess] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState('daily');
   const [selectedDuration, setSelectedDuration] = useState(1);
   const [selectedDate, setSelectedDate] = useState('');
@@ -164,14 +165,16 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
     }
   };
 
-  const handleBookVehicle = (vehicle) => {
+  const handleSimulatePrice = (vehicle) => {
     setSelectedVehicle(vehicle);
-    setShowBookingModal(true);
+    setShowSimulationModal(true);
     const today = new Date().toISOString().split('T')[0];
     setSelectedDate(today);
     handleDateChange(today);
   };
 
+  // DISABLED: Booking functionality - replaced with price simulation only
+  /*
   const confirmBooking = () => {
     if (!user) {
       alert('予約を確定するにはログインが必要です。ログインページに移動してください。');
@@ -237,8 +240,9 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
       resetBookingForm();
     }, 2000);
   };
+  */
 
-  const resetBookingForm = () => {
+  const resetSimulationForm = () => {
     setSelectedPlan('daily');
     setSelectedDuration(1);
     setSelectedDate('');
@@ -275,7 +279,18 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
                 className="vehicle-image"
               />
               <span className="vehicle-badge">{(vehicle.type === 'car' || vehicle.vehicleType === 'car') ? '車' : (vehicle.type === 'motorcycle' || vehicle.vehicleType === 'motorcycle') ? 'バイク' : vehicle.type || vehicle.vehicleType}</span>
-              {(vehicle.available || vehicle.isAvailable) && <span className="available-badge">予約可能</span>}
+              {/* Vehicle Status Display - Enhanced for Info Site Mode */}
+              {vehicle.available || vehicle.isAvailable ? (
+                <span className="status-badge available">利用可能</span>
+              ) : vehicle.currentBooking ? (
+                <span className="status-badge rented">
+                  レンタル中 ({vehicle.currentBooking.endDate ? new Date(vehicle.currentBooking.endDate).toLocaleDateString() : '期間未定'}まで)
+                </span>
+              ) : vehicle.maintenance ? (
+                <span className="status-badge maintenance">メンテナンス中</span>
+              ) : (
+                <span className="status-badge unavailable">利用不可</span>
+              )}
             </div>
             
             <div className="vehicle-details">
@@ -294,10 +309,10 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
                 </div>
                 <button 
                   className="modern-book-btn"
-                  onClick={() => handleBookVehicle(vehicle)}
+                  onClick={() => handleSimulatePrice(vehicle)}
                   disabled={!(vehicle.available || vehicle.isAvailable)}
                 >
-                  {user ? '予約する' : '料金を確認'}
+                  料金シミュレーション
                 </button>
               </div>
             </div>
@@ -305,28 +320,13 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
         ))}
       </div>
 
-      {showBookingModal && selectedVehicle && (
+      {showSimulationModal && selectedVehicle && (
         <div className="modern-modal-overlay">
           <div className="modern-modal">
-            {bookingSuccess ? (
-              <div className="success-animation">
-                <div className="success-icon">✓</div>
-                <h2>予約完了！</h2>
-                <p>{selectedVehicle.name}の予約が完了しました</p>
-                {user?.id && (
-                  <div className="points-earned">
-                    <span className="points-icon">🎁</span>
-                    <span className="points-text">
-                      {Math.floor(totalPrice * 0.05)}ポイント獲得！
-                    </span>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <>
+            <>
                 <div className="modal-header">
-                  <h2>{user ? '予約内容の確認' : '料金計算・見積もり'}</h2>
-                  <button className="close-btn" onClick={() => setShowBookingModal(false)}>×</button>
+                  <h2>料金シミュレーション</h2>
+                  <button className="close-btn" onClick={() => setShowSimulationModal(false)}>×</button>
                 </div>
 
                 <div className="booking-content">
@@ -477,26 +477,19 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
                     </div>
 
                     <div className="modal-actions">
-                      <button className="cancel-btn" onClick={() => setShowBookingModal(false)}>
-                        キャンセル
-                      </button>
-                      {user ? (
-                        <button className="confirm-btn" onClick={confirmBooking}>
-                          予約を確定
-                        </button>
-                      ) : (
-                        <div className="login-required-section">
-                          <p className="login-message">予約を確定するにはログインが必要です</p>
-                          <button className="login-btn" onClick={() => window.location.href = '/login'}>
-                            ログインして予約
-                          </button>
+                      <div className="simulation-result">
+                        <div className="final-price-display">
+                          <h3>見積もり合計: {formatCurrency(totalPrice)}</h3>
+                          <p className="price-note">※実際の料金は条件により変動する場合があります</p>
                         </div>
-                      )}
+                      </div>
+                      <button className="close-simulation-btn" onClick={() => setShowSimulationModal(false)}>
+                        閉じる
+                      </button>
                     </div>
                   </div>
                 </div>
               </>
-            )}
           </div>
         </div>
       )}
