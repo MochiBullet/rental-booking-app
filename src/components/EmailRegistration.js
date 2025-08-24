@@ -99,47 +99,46 @@ const EmailRegistration = () => {
       };
       
       try {
-        // バックエンドAPIを呼び出し（DB保存）
-        const response = await fetch('https://kgkjjv0rik.execute-api.ap-southeast-2.amazonaws.com/prod/members', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
+        // 新しいユーザーDBのAPIサービスを使用
+        const userAuthService = (await import('../services/userAPI.js')).default;
+        
+        const userData = {
+          email: formData.email,
+          password: formData.password,
+          profile: {
+            firstName: '',
+            lastName: '',
+            phone: ''
           },
-          body: JSON.stringify({
-            memberId: memberId,
-            email: formData.email,
-            password: formData.password,
-            licenseNumber: formData.licenseNumber,
-            licenseLastFour: formData.licenseNumber.slice(-4),
-            registrationDate: new Date().toISOString(),
-            status: 'active',
-            isActive: true,
-            points: 0,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-          })
-        });
+          address: {
+            postalCode: '',
+            prefecture: '',
+            city: '',
+            street: ''
+          }
+        };
+        
+        const result = await userAuthService.register(userData);
 
-        if (response.ok) {
-          const data = await response.json();
-          setGeneratedMemberId(memberId);
+        if (result.success) {
+          setGeneratedMemberId(result.user.memberNumber);
           setRegistrationComplete(true);
         } else {
-          const errorData = await response.json();
-          if (response.status === 409) {
-            setErrors({ general: 'この会員IDは既に使用されています。別の組み合わせをお試しください。' });
+          if (result.message && result.message.includes('already exists')) {
+            setErrors({ general: 'このメールアドレスは既に登録されています。' });
           } else {
-            setErrors({ general: errorData.message || '登録中にエラーが発生しました。' });
+            setErrors({ general: result.message || '登録中にエラーが発生しました。' });
           }
         }
       } catch (error) {
         console.error('Registration error:', error);
         setErrors({ general: 'ネットワークエラーが発生しました。もう一度お試しください。' });
+      } finally {
+        setIsLoading(false);
       }
-      
-    } catch (error) {
-      setErrors({ general: '登録中にエラーが発生しました。もう一度お試しください。' });
-    } finally {
+    } catch (outerError) {
+      console.error('Outer registration error:', outerError);
+      setErrors({ general: '登録処理中にエラーが発生しました。' });
       setIsLoading(false);
     }
   };
