@@ -1,0 +1,42 @@
+{
+  "timestamp": "2025-08-24T06:08:13.593508+00:00",
+  "timestamp_jst": "2025年08月24日 15:08:13",
+  "git_info": {
+    "commit_hash": "81b1e2fff840f1c998a04427155d0f0b2fda6b8a",
+    "commit_message": "Error: 'NoneType' object has no attribute 'strip'",
+    "branch": "master",
+    "author": "Your Name",
+    "date": "2025-08-24 15:01:01 +0900",
+    "files_changed": [
+      "src/components/EmailRegistration.js"
+    ],
+    "insertions": "1 file changed, 29 insertions(+), 30 deletions(-)",
+    "repo_status": "?? scripts/generate-progress-report.py\n?? scripts/setup-progress-hooks.md"
+  },
+  "project_stats": {
+    "total_files": 53895,
+    "src_files": 1,
+    "component_files": 1,
+    "total_lines": "14945 total"
+  },
+  "commit_patterns": {
+    "feature_commits": 0,
+    "bug_fixes": 0,
+    "docs_updates": 0,
+    "refactor": 0
+  },
+  "todo_status": {
+    "pending_todos": 0
+  },
+  "work_summary": {
+    "last_session_focus": [
+      "general_development"
+    ],
+    "completion_indicators": {
+      "build_success": false,
+      "tests_passing": false,
+      "docs_updated": false,
+      "deployment_ready": false
+    }
+  }
+}
