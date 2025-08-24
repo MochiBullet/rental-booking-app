@@ -51,14 +51,9 @@ const VehicleListPage = ({ user }) => {
   }, [type]);
 
   const handleVehicleSelect = (vehicle) => {
-    if (!user) {
-      navigate('/login');
-      return;
-    }
-    
-    // 予約画面への遷移（今後実装予定）
+    // INFO SITE MODE: 情報表示のみ（予約機能は無効）
     console.log('選択された車両:', vehicle);
-    alert(`${vehicle.name}の予約機能は準備中です。`);
+    alert(`${vehicle.name}の詳細情報を表示中です。現在は情報サイトモードで運営されています。`);
   };
 
   const getPageTitle = () => {

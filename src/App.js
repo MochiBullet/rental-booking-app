@@ -284,23 +284,6 @@ function AppContent() {
                   </div>
                   <span className="site-mode-indicator">車両情報サイト</span>
                 </div>
-                /* DISABLED: User Authentication Navigation
-                user ? (
-                  <div className="user-menu">
-                    <Link to="/mypage" className="mypage-link">マイページ</Link>
-                    <div className="welcome-text">
-                      <span className="greeting">ようこそ</span>
-                      <span className="username">{user.name}様</span>
-                    </div>
-                    <button className="logout-btn" onClick={handleLogout}>ログアウト</button>
-                  </div>
-                ) : (
-                  <div className="auth-buttons">
-                    <Link to="/login" className="login-btn">ログイン</Link>
-                    <Link to="/register" className="register-btn">新規登録</Link>
-                  </div>
-                )
-                */
               )}
             </nav>
           </div>
