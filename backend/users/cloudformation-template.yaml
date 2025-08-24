@@ -1,0 +1,597 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'User Database Infrastructure for Rental Booking App'
+
+Parameters:
+  Environment:
+    Type: String
+    Default: development
+    AllowedValues:
+      - development
+      - staging
+      - production
+    Description: Environment name
+
+Resources:
+  # DynamoDB Table for Users
+  UsersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub 'rental-users-${Environment}'
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: userId
+          AttributeType: S
+        - AttributeName: email
+          AttributeType: S
+        - AttributeName: memberNumber
+          AttributeType: S
+      KeySchema:
+        - AttributeName: userId
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: email-index
+          KeySchema:
+            - AttributeName: email
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+        - IndexName: memberNumber-index
+          KeySchema:
+            - AttributeName: memberNumber
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      SSESpecification:
+        SSEEnabled: true
+        SSEType: KMS
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Application
+          Value: RentalBookingApp
+
+  # Lambda Execution Role
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub 'rental-users-lambda-role-${Environment}'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: DynamoDBAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:GetItem
+                  - dynamodb:PutItem
+                  - dynamodb:UpdateItem
+                  - dynamodb:DeleteItem
+                  - dynamodb:Query
+                  - dynamodb:Scan
+                  - dynamodb:BatchGetItem
+                  - dynamodb:BatchWriteItem
+                Resource:
+                  - !GetAtt UsersTable.Arn
+                  - !Sub '${UsersTable.Arn}/index/*'
+              - Effect: Allow
+                Action:
+                  - kms:Decrypt
+                  - kms:Encrypt
+                  - kms:GenerateDataKey
+                Resource: '*'
+
+  # Lambda Layer for Common Dependencies
+  CommonLayer:
+    Type: AWS::Lambda::LayerVersion
+    Properties:
+      LayerName: !Sub 'rental-users-common-layer-${Environment}'
+      Description: Common dependencies for user management
+      Content:
+        S3Bucket: !Sub 'rental-booking-lambda-code-${AWS::Region}'
+        S3Key: layers/common-layer.zip
+      CompatibleRuntimes:
+        - nodejs18.x
+        - nodejs20.x
+
+  # Lambda Function - Create User
+  CreateUserFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'rental-users-create-${Environment}'
+      Runtime: nodejs20.x
+      Handler: index.handler
+      Code:
+        ZipFile: |
+          const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
+          const { DynamoDBDocumentClient, PutCommand } = require("@aws-sdk/lib-dynamodb");
+          const bcrypt = require('bcryptjs');
+          const { v4: uuidv4 } = require('uuid');
+
+          const client = new DynamoDBClient({});
+          const docClient = DynamoDBDocumentClient.from(client);
+
+          exports.handler = async (event) => {
+            try {
+              const body = JSON.parse(event.body);
+              const userId = uuidv4();
+              const memberNumber = 'M' + Date.now().toString().slice(-6);
+              const salt = await bcrypt.genSalt(10);
+              const passwordHash = await bcrypt.hash(body.password, salt);
+              
+              const user = {
+                userId,
+                email: body.email,
+                memberNumber,
+                memberType: 'regular',
+                status: 'active',
+                profile: body.profile || {},
+                address: body.address || {},
+                driverLicense: body.driverLicense || {},
+                authentication: {
+                  passwordHash,
+                  salt,
+                  lastLogin: null,
+                  loginAttempts: 0,
+                  lockedUntil: null,
+                  mfaEnabled: false
+                },
+                points: {
+                  balance: 1000,
+                  totalEarned: 1000,
+                  totalUsed: 0,
+                  expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
+                },
+                statistics: {
+                  totalReservations: 0,
+                  totalSpent: 0,
+                  joinDate: new Date().toISOString()
+                },
+                preferences: {
+                  language: 'ja',
+                  currency: 'JPY',
+                  notifications: {
+                    email: true,
+                    sms: false,
+                    push: true
+                  },
+                  newsletter: true
+                },
+                metadata: {
+                  createdAt: new Date().toISOString(),
+                  updatedAt: new Date().toISOString(),
+                  createdBy: 'system',
+                  version: 1
+                }
+              };
+
+              await docClient.send(new PutCommand({
+                TableName: process.env.TABLE_NAME,
+                Item: user,
+                ConditionExpression: 'attribute_not_exists(userId)'
+              }));
+
+              // Remove sensitive data before returning
+              delete user.authentication.passwordHash;
+              delete user.authentication.salt;
+
+              return {
+                statusCode: 201,
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Access-Control-Allow-Origin': '*'
+                },
+                body: JSON.stringify({
+                  message: 'User created successfully',
+                  user
+                })
+              };
+            } catch (error) {
+              console.error('Error:', error);
+              return {
+                statusCode: error.name === 'ConditionalCheckFailedException' ? 409 : 500,
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Access-Control-Allow-Origin': '*'
+                },
+                body: JSON.stringify({
+                  message: error.name === 'ConditionalCheckFailedException' 
+                    ? 'User already exists' 
+                    : 'Internal server error'
+                })
+              };
+            }
+          };
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref UsersTable
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 30
+      MemorySize: 256
+      Layers:
+        - !Ref CommonLayer
+
+  # Lambda Function - Get User
+  GetUserFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'rental-users-get-${Environment}'
+      Runtime: nodejs20.x
+      Handler: index.handler
+      Code:
+        ZipFile: |
+          const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
+          const { DynamoDBDocumentClient, GetCommand, QueryCommand } = require("@aws-sdk/lib-dynamodb");
+
+          const client = new DynamoDBClient({});
+          const docClient = DynamoDBDocumentClient.from(client);
+
+          exports.handler = async (event) => {
+            try {
+              const { userId, email } = event.pathParameters || {};
+              
+              let user;
+              
+              if (userId) {
+                const result = await docClient.send(new GetCommand({
+                  TableName: process.env.TABLE_NAME,
+                  Key: { userId }
+                }));
+                user = result.Item;
+              } else if (email) {
+                const result = await docClient.send(new QueryCommand({
+                  TableName: process.env.TABLE_NAME,
+                  IndexName: 'email-index',
+                  KeyConditionExpression: 'email = :email',
+                  ExpressionAttributeValues: {
+                    ':email': email
+                  }
+                }));
+                user = result.Items?.[0];
+              }
+
+              if (!user) {
+                return {
+                  statusCode: 404,
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                  },
+                  body: JSON.stringify({ message: 'User not found' })
+                };
+              }
+
+              // Remove sensitive data
+              delete user.authentication?.passwordHash;
+              delete user.authentication?.salt;
+
+              return {
+                statusCode: 200,
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Access-Control-Allow-Origin': '*'
+                },
+                body: JSON.stringify(user)
+              };
+            } catch (error) {
+              console.error('Error:', error);
+              return {
+                statusCode: 500,
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Access-Control-Allow-Origin': '*'
+                },
+                body: JSON.stringify({ message: 'Internal server error' })
+              };
+            }
+          };
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref UsersTable
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 30
+      MemorySize: 256
+
+  # Lambda Function - Update User
+  UpdateUserFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'rental-users-update-${Environment}'
+      Runtime: nodejs20.x
+      Handler: index.handler
+      Code:
+        ZipFile: |
+          const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
+          const { DynamoDBDocumentClient, UpdateCommand } = require("@aws-sdk/lib-dynamodb");
+
+          const client = new DynamoDBClient({});
+          const docClient = DynamoDBDocumentClient.from(client);
+
+          exports.handler = async (event) => {
+            try {
+              const { userId } = event.pathParameters;
+              const updates = JSON.parse(event.body);
+              
+              // Build update expression
+              const updateExpressions = [];
+              const expressionAttributeNames = {};
+              const expressionAttributeValues = {};
+              
+              Object.keys(updates).forEach((key) => {
+                if (key !== 'userId' && key !== 'authentication') {
+                  updateExpressions.push(`#${key} = :${key}`);
+                  expressionAttributeNames[`#${key}`] = key;
+                  expressionAttributeValues[`:${key}`] = updates[key];
+                }
+              });
+              
+              updateExpressions.push('#updatedAt = :updatedAt');
+              expressionAttributeNames['#updatedAt'] = 'updatedAt';
+              expressionAttributeValues[':updatedAt'] = new Date().toISOString();
+
+              const result = await docClient.send(new UpdateCommand({
+                TableName: process.env.TABLE_NAME,
+                Key: { userId },
+                UpdateExpression: `SET ${updateExpressions.join(', ')}`,
+                ExpressionAttributeNames: expressionAttributeNames,
+                ExpressionAttributeValues: expressionAttributeValues,
+                ReturnValues: 'ALL_NEW'
+              }));
+
+              // Remove sensitive data
+              delete result.Attributes.authentication?.passwordHash;
+              delete result.Attributes.authentication?.salt;
+
+              return {
+                statusCode: 200,
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Access-Control-Allow-Origin': '*'
+                },
+                body: JSON.stringify({
+                  message: 'User updated successfully',
+                  user: result.Attributes
+                })
+              };
+            } catch (error) {
+              console.error('Error:', error);
+              return {
+                statusCode: 500,
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Access-Control-Allow-Origin': '*'
+                },
+                body: JSON.stringify({ message: 'Internal server error' })
+              };
+            }
+          };
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref UsersTable
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 30
+      MemorySize: 256
+
+  # Lambda Function - Delete User
+  DeleteUserFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'rental-users-delete-${Environment}'
+      Runtime: nodejs20.x
+      Handler: index.handler
+      Code:
+        ZipFile: |
+          const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
+          const { DynamoDBDocumentClient, DeleteCommand } = require("@aws-sdk/lib-dynamodb");
+
+          const client = new DynamoDBClient({});
+          const docClient = DynamoDBDocumentClient.from(client);
+
+          exports.handler = async (event) => {
+            try {
+              const { userId } = event.pathParameters;
+
+              await docClient.send(new DeleteCommand({
+                TableName: process.env.TABLE_NAME,
+                Key: { userId }
+              }));
+
+              return {
+                statusCode: 200,
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Access-Control-Allow-Origin': '*'
+                },
+                body: JSON.stringify({ message: 'User deleted successfully' })
+              };
+            } catch (error) {
+              console.error('Error:', error);
+              return {
+                statusCode: 500,
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Access-Control-Allow-Origin': '*'
+                },
+                body: JSON.stringify({ message: 'Internal server error' })
+              };
+            }
+          };
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref UsersTable
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 30
+      MemorySize: 256
+
+  # API Gateway
+  UserAPI:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: !Sub 'rental-users-api-${Environment}'
+      Description: User Management API
+      ProtocolType: HTTP
+      CorsConfiguration:
+        AllowOrigins:
+          - '*'
+        AllowMethods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        AllowHeaders:
+          - '*'
+
+  # API Gateway Integration - Create User
+  CreateUserIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref UserAPI
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Sub
+        - 'arn:aws:apigatewayv2:${AWS::Region}:lambda:path/2015-03-31/functions/${Function}/invocations'
+        - Function: !GetAtt CreateUserFunction.Arn
+      PayloadFormatVersion: '2.0'
+
+  # API Gateway Route - Create User
+  CreateUserRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref UserAPI
+      RouteKey: 'POST /users'
+      Target: !Sub 'integrations/${CreateUserIntegration}'
+
+  # API Gateway Integration - Get User
+  GetUserIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref UserAPI
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Sub
+        - 'arn:aws:apigatewayv2:${AWS::Region}:lambda:path/2015-03-31/functions/${Function}/invocations'
+        - Function: !GetAtt GetUserFunction.Arn
+      PayloadFormatVersion: '2.0'
+
+  # API Gateway Route - Get User
+  GetUserRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref UserAPI
+      RouteKey: 'GET /users/{userId}'
+      Target: !Sub 'integrations/${GetUserIntegration}'
+
+  # API Gateway Integration - Update User
+  UpdateUserIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref UserAPI
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Sub
+        - 'arn:aws:apigatewayv2:${AWS::Region}:lambda:path/2015-03-31/functions/${Function}/invocations'
+        - Function: !GetAtt UpdateUserFunction.Arn
+      PayloadFormatVersion: '2.0'
+
+  # API Gateway Route - Update User
+  UpdateUserRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref UserAPI
+      RouteKey: 'PUT /users/{userId}'
+      Target: !Sub 'integrations/${UpdateUserIntegration}'
+
+  # API Gateway Integration - Delete User
+  DeleteUserIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref UserAPI
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Sub
+        - 'arn:aws:apigatewayv2:${AWS::Region}:lambda:path/2015-03-31/functions/${Function}/invocations'
+        - Function: !GetAtt DeleteUserFunction.Arn
+      PayloadFormatVersion: '2.0'
+
+  # API Gateway Route - Delete User
+  DeleteUserRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref UserAPI
+      RouteKey: 'DELETE /users/{userId}'
+      Target: !Sub 'integrations/${DeleteUserIntegration}'
+
+  # API Gateway Stage
+  UserAPIStage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      ApiId: !Ref UserAPI
+      StageName: !Ref Environment
+      AutoDeploy: true
+
+  # Lambda Permissions for API Gateway
+  CreateUserFunctionPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref CreateUserFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${UserAPI}/*/*'
+
+  GetUserFunctionPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref GetUserFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${UserAPI}/*/*'
+
+  UpdateUserFunctionPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref UpdateUserFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${UserAPI}/*/*'
+
+  DeleteUserFunctionPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref DeleteUserFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${UserAPI}/*/*'
+
+Outputs:
+  UserTableName:
+    Description: DynamoDB Table Name
+    Value: !Ref UsersTable
+    Export:
+      Name: !Sub '${AWS::StackName}-UserTableName'
+
+  UserTableArn:
+    Description: DynamoDB Table ARN
+    Value: !GetAtt UsersTable.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-UserTableArn'
+
+  UserAPIEndpoint:
+    Description: API Gateway Endpoint
+    Value: !Sub 'https://${UserAPI}.execute-api.${AWS::Region}.amazonaws.com/${Environment}'
+    Export:
+      Name: !Sub '${AWS::StackName}-UserAPIEndpoint'
+
+  UserAPIId:
+    Description: API Gateway ID
+    Value: !Ref UserAPI
+    Export:
+      Name: !Sub '${AWS::StackName}-UserAPIId'

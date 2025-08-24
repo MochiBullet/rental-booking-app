@@ -17,18 +17,10 @@ const ResetPassword = () => {
   const [passwordStrength, setPasswordStrength] = useState(0);
 
   useEffect(() => {
-    // トークンの検証
-    const passwordResets = JSON.parse(localStorage.getItem('passwordResets') || '[]');
-    const resetRequest = passwordResets.find(r => r.token === token && !r.used);
-    
-    if (resetRequest) {
-      const expiry = new Date(resetRequest.expiry);
-      if (expiry > new Date()) {
-        setIsValid(true);
-        setEmail(resetRequest.email);
-      } else {
-        setError('このリンクは期限切れです。');
-      }
+    // トークンの検証はパスワードリセット時にサーバーで実行
+    // ここではUIだけ準備
+    if (token) {
+      setIsValid(true);
     } else {
       setError('無効なリンクです。');
     }
@@ -84,36 +76,27 @@ const ResetPassword = () => {
 
     setIsLoading(true);
 
-    // パスワードの更新
-    setTimeout(() => {
-      const users = JSON.parse(localStorage.getItem('users') || '[]');
-      const userIndex = users.findIndex(u => u.email === email);
+    try {
+      // 新しいAPIサービスを使用
+      const userAuthService = (await import('../services/userAPI.js')).default;
+      const result = await userAuthService.resetPassword(token, password);
       
-      if (userIndex !== -1) {
-        // パスワードを更新（実際の実装ではハッシュ化が必要）
-        users[userIndex].password = password;
-        localStorage.setItem('users', JSON.stringify(users));
-        
-        // トークンを使用済みにする
-        const passwordResets = JSON.parse(localStorage.getItem('passwordResets') || '[]');
-        const resetIndex = passwordResets.findIndex(r => r.token === token);
-        if (resetIndex !== -1) {
-          passwordResets[resetIndex].used = true;
-          localStorage.setItem('passwordResets', JSON.stringify(passwordResets));
-        }
-        
+      if (result.success) {
         setSuccess(true);
-        setIsLoading(false);
         
         // 3秒後にログインページへリダイレクト
         setTimeout(() => {
           navigate('/login');
         }, 3000);
       } else {
-        setError('ユーザーが見つかりません。');
-        setIsLoading(false);
+        setError(result.message || 'パスワードリセットに失敗しました。');
       }
-    }, 2000);
+    } catch (error) {
+      console.error('Password reset error:', error);
+      setError('ネットワークエラーが発生しました。');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (isChecking) {
@@ -160,7 +143,7 @@ const ResetPassword = () => {
       <div className="reset-password-card">
         <h2>新しいパスワードを設定</h2>
         <p className="description">
-          {email} のパスワードをリセットします
+          パスワードをリセットします
         </p>
         
         <form onSubmit={handleSubmit}>

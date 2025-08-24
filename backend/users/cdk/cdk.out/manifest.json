@@ -1,0 +1,355 @@
+{
+  "version": "35.0.0",
+  "artifacts": {
+    "RentalUserDatabaseStack.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "RentalUserDatabaseStack.assets.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "RentalUserDatabaseStack": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://276291855506/ap-southeast-2",
+      "properties": {
+        "templateFile": "RentalUserDatabaseStack.template.json",
+        "terminationProtection": false,
+        "tags": {
+          "Application": "RentalBookingApp",
+          "Environment": "development",
+          "ManagedBy": "CDK"
+        },
+        "validateOnSynth": false,
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::276291855506:role/cdk-hnb659fds-deploy-role-276291855506-ap-southeast-2",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::276291855506:role/cdk-hnb659fds-cfn-exec-role-276291855506-ap-southeast-2",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-276291855506-ap-southeast-2/da8c91a3d96891a99938b7f241cedd772554bcc3352b979da512e83cdb9820eb.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
+        "additionalDependencies": [
+          "RentalUserDatabaseStack.assets"
+        ],
+        "lookupRole": {
+          "arn": "arn:${AWS::Partition}:iam::276291855506:role/cdk-hnb659fds-lookup-role-276291855506-ap-southeast-2",
+          "requiresBootstrapStackVersion": 8,
+          "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+        }
+      },
+      "dependencies": [
+        "RentalUserDatabaseStack.assets"
+      ],
+      "metadata": {
+        "/RentalUserDatabaseStack": [
+          {
+            "type": "aws:cdk:stack-tags",
+            "data": [
+              {
+                "Key": "Application",
+                "Value": "RentalBookingApp"
+              },
+              {
+                "Key": "Environment",
+                "Value": "development"
+              },
+              {
+                "Key": "ManagedBy",
+                "Value": "CDK"
+              }
+            ]
+          }
+        ],
+        "/RentalUserDatabaseStack/UsersTable": [
+          {
+            "type": "aws:cdk:hasPhysicalName",
+            "data": {
+              "Ref": "UsersTable9725E9C8"
+            }
+          }
+        ],
+        "/RentalUserDatabaseStack/UsersTable/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UsersTable9725E9C8"
+          }
+        ],
+        "/RentalUserDatabaseStack/CreateUserFunction/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CreateUserFunctionServiceRole56357EFD"
+          }
+        ],
+        "/RentalUserDatabaseStack/CreateUserFunction/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CreateUserFunctionServiceRoleDefaultPolicy09FCE141"
+          }
+        ],
+        "/RentalUserDatabaseStack/CreateUserFunction/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CreateUserFunctionB24ECABE"
+          }
+        ],
+        "/RentalUserDatabaseStack/ForgotPasswordFunction/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ForgotPasswordFunctionServiceRoleE83ABE29"
+          }
+        ],
+        "/RentalUserDatabaseStack/ForgotPasswordFunction/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ForgotPasswordFunctionServiceRoleDefaultPolicy89088EA3"
+          }
+        ],
+        "/RentalUserDatabaseStack/ForgotPasswordFunction/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ForgotPasswordFunction03A164E6"
+          }
+        ],
+        "/RentalUserDatabaseStack/ResetPasswordFunction/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ResetPasswordFunctionServiceRoleAE5DF4BC"
+          }
+        ],
+        "/RentalUserDatabaseStack/ResetPasswordFunction/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ResetPasswordFunctionServiceRoleDefaultPolicy9724F96E"
+          }
+        ],
+        "/RentalUserDatabaseStack/ResetPasswordFunction/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ResetPasswordFunction6786158F"
+          }
+        ],
+        "/RentalUserDatabaseStack/LoginFunction/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LoginFunctionServiceRole74B42ABA"
+          }
+        ],
+        "/RentalUserDatabaseStack/LoginFunction/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LoginFunctionServiceRoleDefaultPolicy2FE1C77C"
+          }
+        ],
+        "/RentalUserDatabaseStack/LoginFunction/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LoginFunction66F090C6"
+          }
+        ],
+        "/RentalUserDatabaseStack/UserAPI/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserAPI0AEB35F6"
+          }
+        ],
+        "/RentalUserDatabaseStack/UserAPI/Deployment/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserAPIDeployment4E70121790b4cdf0cf446458c5673e2a91bb28e5"
+          }
+        ],
+        "/RentalUserDatabaseStack/UserAPI/DeploymentStage.prod/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserAPIDeploymentStageprod780A164E"
+          }
+        ],
+        "/RentalUserDatabaseStack/UserAPI/Endpoint": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserAPIEndpoint1F2677D6"
+          }
+        ],
+        "/RentalUserDatabaseStack/UserAPI/Default/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserAPIOPTIONS4C56D77A"
+          }
+        ],
+        "/RentalUserDatabaseStack/UserAPI/Default/users/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserAPIusersABA84647"
+          }
+        ],
+        "/RentalUserDatabaseStack/UserAPI/Default/users/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserAPIusersOPTIONSD62A2F53"
+          }
+        ],
+        "/RentalUserDatabaseStack/UserAPI/Default/users/POST/ApiPermission.RentalUserDatabaseStackUserAPIA3C5AB3F.POST..users": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserAPIusersPOSTApiPermissionRentalUserDatabaseStackUserAPIA3C5AB3FPOSTusers3A46A5EB"
+          }
+        ],
+        "/RentalUserDatabaseStack/UserAPI/Default/users/POST/ApiPermission.Test.RentalUserDatabaseStackUserAPIA3C5AB3F.POST..users": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserAPIusersPOSTApiPermissionTestRentalUserDatabaseStackUserAPIA3C5AB3FPOSTusers2BFA10F9"
+          }
+        ],
+        "/RentalUserDatabaseStack/UserAPI/Default/users/POST/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserAPIusersPOST77D1E3FA"
+          }
+        ],
+        "/RentalUserDatabaseStack/UserAPI/Default/auth/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserAPIauth3ED834EC"
+          }
+        ],
+        "/RentalUserDatabaseStack/UserAPI/Default/auth/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserAPIauthOPTIONSC4D62D4B"
+          }
+        ],
+        "/RentalUserDatabaseStack/UserAPI/Default/auth/login/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserAPIauthlogin1ECF3CF9"
+          }
+        ],
+        "/RentalUserDatabaseStack/UserAPI/Default/auth/login/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserAPIauthloginOPTIONS5DFC12C4"
+          }
+        ],
+        "/RentalUserDatabaseStack/UserAPI/Default/auth/login/POST/ApiPermission.RentalUserDatabaseStackUserAPIA3C5AB3F.POST..auth.login": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserAPIauthloginPOSTApiPermissionRentalUserDatabaseStackUserAPIA3C5AB3FPOSTauthloginC2C2953E"
+          }
+        ],
+        "/RentalUserDatabaseStack/UserAPI/Default/auth/login/POST/ApiPermission.Test.RentalUserDatabaseStackUserAPIA3C5AB3F.POST..auth.login": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserAPIauthloginPOSTApiPermissionTestRentalUserDatabaseStackUserAPIA3C5AB3FPOSTauthlogin454AE79A"
+          }
+        ],
+        "/RentalUserDatabaseStack/UserAPI/Default/auth/login/POST/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserAPIauthloginPOSTD52C2C78"
+          }
+        ],
+        "/RentalUserDatabaseStack/UserAPI/Default/auth/forgot-password/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserAPIauthforgotpassword834CFBD8"
+          }
+        ],
+        "/RentalUserDatabaseStack/UserAPI/Default/auth/forgot-password/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserAPIauthforgotpasswordOPTIONS49ABBF69"
+          }
+        ],
+        "/RentalUserDatabaseStack/UserAPI/Default/auth/forgot-password/POST/ApiPermission.RentalUserDatabaseStackUserAPIA3C5AB3F.POST..auth.forgot-password": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserAPIauthforgotpasswordPOSTApiPermissionRentalUserDatabaseStackUserAPIA3C5AB3FPOSTauthforgotpassword53C619FE"
+          }
+        ],
+        "/RentalUserDatabaseStack/UserAPI/Default/auth/forgot-password/POST/ApiPermission.Test.RentalUserDatabaseStackUserAPIA3C5AB3F.POST..auth.forgot-password": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserAPIauthforgotpasswordPOSTApiPermissionTestRentalUserDatabaseStackUserAPIA3C5AB3FPOSTauthforgotpassword59C7B20A"
+          }
+        ],
+        "/RentalUserDatabaseStack/UserAPI/Default/auth/forgot-password/POST/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserAPIauthforgotpasswordPOSTF472A131"
+          }
+        ],
+        "/RentalUserDatabaseStack/UserAPI/Default/auth/reset-password/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserAPIauthresetpassword75883400"
+          }
+        ],
+        "/RentalUserDatabaseStack/UserAPI/Default/auth/reset-password/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserAPIauthresetpasswordOPTIONSA6EED057"
+          }
+        ],
+        "/RentalUserDatabaseStack/UserAPI/Default/auth/reset-password/POST/ApiPermission.RentalUserDatabaseStackUserAPIA3C5AB3F.POST..auth.reset-password": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserAPIauthresetpasswordPOSTApiPermissionRentalUserDatabaseStackUserAPIA3C5AB3FPOSTauthresetpassword1B3B9FE9"
+          }
+        ],
+        "/RentalUserDatabaseStack/UserAPI/Default/auth/reset-password/POST/ApiPermission.Test.RentalUserDatabaseStackUserAPIA3C5AB3F.POST..auth.reset-password": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserAPIauthresetpasswordPOSTApiPermissionTestRentalUserDatabaseStackUserAPIA3C5AB3FPOSTauthresetpassword875B95AE"
+          }
+        ],
+        "/RentalUserDatabaseStack/UserAPI/Default/auth/reset-password/POST/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserAPIauthresetpasswordPOST8BD8DF76"
+          }
+        ],
+        "/RentalUserDatabaseStack/UserTableName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserTableName"
+          }
+        ],
+        "/RentalUserDatabaseStack/UserAPIEndpoint": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserAPIEndpoint"
+          }
+        ],
+        "/RentalUserDatabaseStack/UserAPIId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserAPIId"
+          }
+        ],
+        "/RentalUserDatabaseStack/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/RentalUserDatabaseStack/BootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BootstrapVersion"
+          }
+        ],
+        "/RentalUserDatabaseStack/CheckBootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CheckBootstrapVersion"
+          }
+        ]
+      },
+      "displayName": "RentalUserDatabaseStack"
+    },
+    "Tree": {
+      "type": "cdk:tree",
+      "properties": {
+        "file": "tree.json"
+      }
+    }
+  }
+}

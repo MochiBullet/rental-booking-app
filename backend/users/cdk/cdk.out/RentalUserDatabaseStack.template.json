@@ -1,0 +1,1460 @@
+{
+ "Description": "User management infrastructure for Rental Booking App",
+ "Resources": {
+  "UsersTable9725E9C8": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "userId",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "email",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "memberNumber",
+      "AttributeType": "S"
+     }
+    ],
+    "BillingMode": "PAY_PER_REQUEST",
+    "GlobalSecondaryIndexes": [
+     {
+      "IndexName": "email-index",
+      "KeySchema": [
+       {
+        "AttributeName": "email",
+        "KeyType": "HASH"
+       }
+      ],
+      "Projection": {
+       "ProjectionType": "ALL"
+      }
+     },
+     {
+      "IndexName": "memberNumber-index",
+      "KeySchema": [
+       {
+        "AttributeName": "memberNumber",
+        "KeyType": "HASH"
+       }
+      ],
+      "Projection": {
+       "ProjectionType": "ALL"
+      }
+     }
+    ],
+    "KeySchema": [
+     {
+      "AttributeName": "userId",
+      "KeyType": "HASH"
+     }
+    ],
+    "PointInTimeRecoverySpecification": {
+     "PointInTimeRecoveryEnabled": true
+    },
+    "SSESpecification": {
+     "SSEEnabled": true
+    },
+    "TableName": "rental-users"
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "RentalUserDatabaseStack/UsersTable/Resource"
+   }
+  },
+  "CreateUserFunctionServiceRole56357EFD": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalUserDatabaseStack/CreateUserFunction/ServiceRole/Resource"
+   }
+  },
+  "CreateUserFunctionServiceRoleDefaultPolicy09FCE141": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:BatchWriteItem",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:DescribeTable",
+        "dynamodb:GetItem",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:PutItem",
+        "dynamodb:Query",
+        "dynamodb:Scan",
+        "dynamodb:UpdateItem"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "UsersTable9725E9C8",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "UsersTable9725E9C8",
+             "Arn"
+            ]
+           },
+           "/index/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "CreateUserFunctionServiceRoleDefaultPolicy09FCE141",
+    "Roles": [
+     {
+      "Ref": "CreateUserFunctionServiceRole56357EFD"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalUserDatabaseStack/CreateUserFunction/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "CreateUserFunctionB24ECABE": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "ZipFile": "\n        const { DynamoDBClient } = require(\"@aws-sdk/client-dynamodb\");\n        const { DynamoDBDocumentClient, PutCommand, QueryCommand } = require(\"@aws-sdk/lib-dynamodb\");\n        const crypto = require('crypto');\n\n        const client = new DynamoDBClient({});\n        const docClient = DynamoDBDocumentClient.from(client);\n\n        exports.handler = async (event) => {\n          const headers = {\n            'Content-Type': 'application/json',\n            'Access-Control-Allow-Origin': '*',\n            'Access-Control-Allow-Headers': 'Content-Type',\n            'Access-Control-Allow-Methods': 'OPTIONS,POST'\n          };\n\n          if (event.httpMethod === 'OPTIONS') {\n            return { statusCode: 200, headers, body: '' };\n          }\n\n          try {\n            if (!event.body) {\n              return { statusCode: 400, headers, body: JSON.stringify({ message: 'Request body is required' }) };\n            }\n\n            const request = JSON.parse(event.body);\n            if (!request.email || !request.password) {\n              return { statusCode: 400, headers, body: JSON.stringify({ message: 'Email and password are required' }) };\n            }\n\n            // Check if email exists\n            const existingUserQuery = await docClient.send(new QueryCommand({\n              TableName: process.env.TABLE_NAME,\n              IndexName: 'email-index',\n              KeyConditionExpression: 'email = :email',\n              ExpressionAttributeValues: { ':email': request.email },\n              Limit: 1,\n            }));\n\n            if (existingUserQuery.Items && existingUserQuery.Items.length > 0) {\n              return { statusCode: 409, headers, body: JSON.stringify({ message: 'Email already exists' }) };\n            }\n\n            const userId = crypto.randomUUID();\n            const memberNumber = 'M' + Date.now().toString().slice(-6);\n            const passwordHash = crypto.createHash('sha256').update(request.password + 'salt').digest('hex');\n            const now = new Date().toISOString();\n\n            const user = {\n              userId, email: request.email, memberNumber, memberType: 'regular', status: 'active',\n              profile: request.profile || {}, address: request.address || {},\n              authentication: { passwordHash, lastLogin: null, loginAttempts: 0 },\n              points: { balance: 1000, totalEarned: 1000, totalUsed: 0 },\n              metadata: { createdAt: now, updatedAt: now, version: 1 }\n            };\n\n            await docClient.send(new PutCommand({ TableName: process.env.TABLE_NAME, Item: user }));\n\n            const { authentication, ...safeUser } = user;\n            return { statusCode: 201, headers, body: JSON.stringify({ message: 'User created', user: safeUser }) };\n          } catch (error) {\n            console.error('Error:', error);\n            return { statusCode: 500, headers, body: JSON.stringify({ message: 'Internal server error' }) };\n          }\n        };\n      "
+    },
+    "Environment": {
+     "Variables": {
+      "TABLE_NAME": {
+       "Ref": "UsersTable9725E9C8"
+      },
+      "NODE_ENV": "production",
+      "JWT_SECRET": "rental-booking-jwt-secret-2025"
+     }
+    },
+    "Handler": "index.handler",
+    "MemorySize": 256,
+    "Role": {
+     "Fn::GetAtt": [
+      "CreateUserFunctionServiceRole56357EFD",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Timeout": 30
+   },
+   "DependsOn": [
+    "CreateUserFunctionServiceRoleDefaultPolicy09FCE141",
+    "CreateUserFunctionServiceRole56357EFD"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "RentalUserDatabaseStack/CreateUserFunction/Resource"
+   }
+  },
+  "ForgotPasswordFunctionServiceRoleE83ABE29": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalUserDatabaseStack/ForgotPasswordFunction/ServiceRole/Resource"
+   }
+  },
+  "ForgotPasswordFunctionServiceRoleDefaultPolicy89088EA3": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:BatchWriteItem",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:DescribeTable",
+        "dynamodb:GetItem",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:PutItem",
+        "dynamodb:Query",
+        "dynamodb:Scan",
+        "dynamodb:UpdateItem"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "UsersTable9725E9C8",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "UsersTable9725E9C8",
+             "Arn"
+            ]
+           },
+           "/index/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "ForgotPasswordFunctionServiceRoleDefaultPolicy89088EA3",
+    "Roles": [
+     {
+      "Ref": "ForgotPasswordFunctionServiceRoleE83ABE29"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalUserDatabaseStack/ForgotPasswordFunction/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "ForgotPasswordFunction03A164E6": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "ZipFile": "\n        const { DynamoDBClient } = require(\"@aws-sdk/client-dynamodb\");\n        const { DynamoDBDocumentClient, QueryCommand, UpdateCommand } = require(\"@aws-sdk/lib-dynamodb\");\n        const crypto = require('crypto');\n\n        const client = new DynamoDBClient({});\n        const docClient = DynamoDBDocumentClient.from(client);\n\n        exports.handler = async (event) => {\n          const headers = {\n            'Content-Type': 'application/json',\n            'Access-Control-Allow-Origin': '*',\n            'Access-Control-Allow-Headers': 'Content-Type',\n            'Access-Control-Allow-Methods': 'OPTIONS,POST'\n          };\n\n          if (event.httpMethod === 'OPTIONS') {\n            return { statusCode: 200, headers, body: '' };\n          }\n\n          try {\n            const { email } = JSON.parse(event.body || '{}');\n            if (!email) {\n              return { statusCode: 400, headers, body: JSON.stringify({ message: 'Email is required' }) };\n            }\n\n            // Find user by email\n            const result = await docClient.send(new QueryCommand({\n              TableName: process.env.TABLE_NAME,\n              IndexName: 'email-index',\n              KeyConditionExpression: 'email = :email',\n              ExpressionAttributeValues: { ':email': email },\n              Limit: 1,\n            }));\n\n            const user = result.Items?.[0];\n            if (!user) {\n              // セキュリティ上、ユーザーが存在しない場合でも成功レスポンスを返す\n              return { statusCode: 200, headers, body: JSON.stringify({ message: 'Password reset email sent if account exists' }) };\n            }\n\n            // Generate reset token\n            const resetToken = crypto.randomBytes(32).toString('hex');\n            const resetExpiry = new Date(Date.now() + 3600000).toISOString(); // 1 hour\n\n            // Save reset token to user record\n            await docClient.send(new UpdateCommand({\n              TableName: process.env.TABLE_NAME,\n              Key: { userId: user.userId },\n              UpdateExpression: 'SET #auth.#resetToken = :token, #auth.#resetExpiry = :expiry',\n              ExpressionAttributeNames: { \n                '#auth': 'authentication', \n                '#resetToken': 'resetToken',\n                '#resetExpiry': 'resetExpiry'\n              },\n              ExpressionAttributeValues: { \n                ':token': resetToken,\n                ':expiry': resetExpiry \n              },\n            }));\n\n            // TODO: Send email with reset link\n            console.log('Reset token for', email, ':', resetToken);\n            console.log('Reset link: /reset-password/' + resetToken);\n\n            return { \n              statusCode: 200, \n              headers, \n              body: JSON.stringify({ \n                message: 'Password reset email sent if account exists',\n                resetToken: resetToken  // 開発用（本番では削除）\n              }) \n            };\n          } catch (error) {\n            console.error('Error:', error);\n            return { statusCode: 500, headers, body: JSON.stringify({ message: 'Internal server error' }) };\n          }\n        };\n      "
+    },
+    "Environment": {
+     "Variables": {
+      "TABLE_NAME": {
+       "Ref": "UsersTable9725E9C8"
+      },
+      "NODE_ENV": "production",
+      "JWT_SECRET": "rental-booking-jwt-secret-2025"
+     }
+    },
+    "Handler": "index.handler",
+    "MemorySize": 256,
+    "Role": {
+     "Fn::GetAtt": [
+      "ForgotPasswordFunctionServiceRoleE83ABE29",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Timeout": 30
+   },
+   "DependsOn": [
+    "ForgotPasswordFunctionServiceRoleDefaultPolicy89088EA3",
+    "ForgotPasswordFunctionServiceRoleE83ABE29"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "RentalUserDatabaseStack/ForgotPasswordFunction/Resource"
+   }
+  },
+  "ResetPasswordFunctionServiceRoleAE5DF4BC": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalUserDatabaseStack/ResetPasswordFunction/ServiceRole/Resource"
+   }
+  },
+  "ResetPasswordFunctionServiceRoleDefaultPolicy9724F96E": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:BatchWriteItem",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:DescribeTable",
+        "dynamodb:GetItem",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:PutItem",
+        "dynamodb:Query",
+        "dynamodb:Scan",
+        "dynamodb:UpdateItem"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "UsersTable9725E9C8",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "UsersTable9725E9C8",
+             "Arn"
+            ]
+           },
+           "/index/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "ResetPasswordFunctionServiceRoleDefaultPolicy9724F96E",
+    "Roles": [
+     {
+      "Ref": "ResetPasswordFunctionServiceRoleAE5DF4BC"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalUserDatabaseStack/ResetPasswordFunction/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "ResetPasswordFunction6786158F": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "ZipFile": "\n        const { DynamoDBClient } = require(\"@aws-sdk/client-dynamodb\");\n        const { DynamoDBDocumentClient, ScanCommand, UpdateCommand } = require(\"@aws-sdk/lib-dynamodb\");\n        const crypto = require('crypto');\n\n        const client = new DynamoDBClient({});\n        const docClient = DynamoDBDocumentClient.from(client);\n\n        exports.handler = async (event) => {\n          const headers = {\n            'Content-Type': 'application/json',\n            'Access-Control-Allow-Origin': '*',\n            'Access-Control-Allow-Headers': 'Content-Type',\n            'Access-Control-Allow-Methods': 'OPTIONS,POST'\n          };\n\n          if (event.httpMethod === 'OPTIONS') {\n            return { statusCode: 200, headers, body: '' };\n          }\n\n          try {\n            const { token, newPassword } = JSON.parse(event.body || '{}');\n            if (!token || !newPassword) {\n              return { statusCode: 400, headers, body: JSON.stringify({ message: 'Token and new password are required' }) };\n            }\n\n            if (newPassword.length < 8) {\n              return { statusCode: 400, headers, body: JSON.stringify({ message: 'Password must be at least 8 characters' }) };\n            }\n\n            // Find user by reset token\n            const result = await docClient.send(new ScanCommand({\n              TableName: process.env.TABLE_NAME,\n              FilterExpression: '#auth.#resetToken = :token',\n              ExpressionAttributeNames: { \n                '#auth': 'authentication', \n                '#resetToken': 'resetToken'\n              },\n              ExpressionAttributeValues: { ':token': token },\n            }));\n\n            const user = result.Items?.[0];\n            if (!user || !user.authentication?.resetToken) {\n              return { statusCode: 400, headers, body: JSON.stringify({ message: 'Invalid or expired reset token' }) };\n            }\n\n            // Check if token is expired\n            const resetExpiry = new Date(user.authentication.resetExpiry);\n            if (resetExpiry < new Date()) {\n              return { statusCode: 400, headers, body: JSON.stringify({ message: 'Reset token has expired' }) };\n            }\n\n            // Update password and remove reset token\n            const newPasswordHash = crypto.createHash('sha256').update(newPassword + 'salt').digest('hex');\n            \n            await docClient.send(new UpdateCommand({\n              TableName: process.env.TABLE_NAME,\n              Key: { userId: user.userId },\n              UpdateExpression: 'SET #auth.#passwordHash = :password REMOVE #auth.#resetToken, #auth.#resetExpiry',\n              ExpressionAttributeNames: { \n                '#auth': 'authentication', \n                '#passwordHash': 'passwordHash',\n                '#resetToken': 'resetToken',\n                '#resetExpiry': 'resetExpiry'\n              },\n              ExpressionAttributeValues: { ':password': newPasswordHash },\n            }));\n\n            return { \n              statusCode: 200, \n              headers, \n              body: JSON.stringify({ message: 'Password reset successfully' }) \n            };\n          } catch (error) {\n            console.error('Error:', error);\n            return { statusCode: 500, headers, body: JSON.stringify({ message: 'Internal server error' }) };\n          }\n        };\n      "
+    },
+    "Environment": {
+     "Variables": {
+      "TABLE_NAME": {
+       "Ref": "UsersTable9725E9C8"
+      },
+      "NODE_ENV": "production",
+      "JWT_SECRET": "rental-booking-jwt-secret-2025"
+     }
+    },
+    "Handler": "index.handler",
+    "MemorySize": 256,
+    "Role": {
+     "Fn::GetAtt": [
+      "ResetPasswordFunctionServiceRoleAE5DF4BC",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Timeout": 30
+   },
+   "DependsOn": [
+    "ResetPasswordFunctionServiceRoleDefaultPolicy9724F96E",
+    "ResetPasswordFunctionServiceRoleAE5DF4BC"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "RentalUserDatabaseStack/ResetPasswordFunction/Resource"
+   }
+  },
+  "LoginFunctionServiceRole74B42ABA": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalUserDatabaseStack/LoginFunction/ServiceRole/Resource"
+   }
+  },
+  "LoginFunctionServiceRoleDefaultPolicy2FE1C77C": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:BatchWriteItem",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:DescribeTable",
+        "dynamodb:GetItem",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:PutItem",
+        "dynamodb:Query",
+        "dynamodb:Scan",
+        "dynamodb:UpdateItem"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "UsersTable9725E9C8",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "UsersTable9725E9C8",
+             "Arn"
+            ]
+           },
+           "/index/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "LoginFunctionServiceRoleDefaultPolicy2FE1C77C",
+    "Roles": [
+     {
+      "Ref": "LoginFunctionServiceRole74B42ABA"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalUserDatabaseStack/LoginFunction/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "LoginFunction66F090C6": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "ZipFile": "\n        const { DynamoDBClient } = require(\"@aws-sdk/client-dynamodb\");\n        const { DynamoDBDocumentClient, QueryCommand, UpdateCommand } = require(\"@aws-sdk/lib-dynamodb\");\n        const crypto = require('crypto');\n\n        const client = new DynamoDBClient({});\n        const docClient = DynamoDBDocumentClient.from(client);\n\n        exports.handler = async (event) => {\n          const headers = {\n            'Content-Type': 'application/json',\n            'Access-Control-Allow-Origin': '*',\n            'Access-Control-Allow-Headers': 'Content-Type',\n            'Access-Control-Allow-Methods': 'OPTIONS,POST'\n          };\n\n          if (event.httpMethod === 'OPTIONS') {\n            return { statusCode: 200, headers, body: '' };\n          }\n\n          try {\n            if (!event.body) {\n              return { statusCode: 400, headers, body: JSON.stringify({ message: 'Request body is required' }) };\n            }\n\n            const { email, password } = JSON.parse(event.body);\n            if (!email || !password) {\n              return { statusCode: 400, headers, body: JSON.stringify({ message: 'Email and password are required' }) };\n            }\n\n            const result = await docClient.send(new QueryCommand({\n              TableName: process.env.TABLE_NAME,\n              IndexName: 'email-index',\n              KeyConditionExpression: 'email = :email',\n              ExpressionAttributeValues: { ':email': email },\n              Limit: 1,\n            }));\n\n            const user = result.Items?.[0];\n            if (!user) {\n              return { statusCode: 401, headers, body: JSON.stringify({ message: 'Invalid email or password' }) };\n            }\n\n            const inputHash = crypto.createHash('sha256').update(password + 'salt').digest('hex');\n            if (inputHash !== user.authentication?.passwordHash) {\n              return { statusCode: 401, headers, body: JSON.stringify({ message: 'Invalid email or password' }) };\n            }\n\n            // Update last login\n            await docClient.send(new UpdateCommand({\n              TableName: process.env.TABLE_NAME,\n              Key: { userId: user.userId },\n              UpdateExpression: 'SET #auth.#lastLogin = :lastLogin',\n              ExpressionAttributeNames: { '#auth': 'authentication', '#lastLogin': 'lastLogin' },\n              ExpressionAttributeValues: { ':lastLogin': new Date().toISOString() },\n            }));\n\n            const token = Buffer.from(JSON.stringify({\n              userId: user.userId, \n              email: user.email, \n              memberNumber: user.memberNumber,\n              exp: Date.now() + 24*60*60*1000\n            })).toString('base64');\n\n            const { authentication, ...safeUser } = user;\n            return { statusCode: 200, headers, body: JSON.stringify({ message: 'Login successful', token, user: safeUser }) };\n          } catch (error) {\n            console.error('Error:', error);\n            return { statusCode: 500, headers, body: JSON.stringify({ message: 'Internal server error' }) };\n          }\n        };\n      "
+    },
+    "Environment": {
+     "Variables": {
+      "TABLE_NAME": {
+       "Ref": "UsersTable9725E9C8"
+      },
+      "NODE_ENV": "production",
+      "JWT_SECRET": "rental-booking-jwt-secret-2025"
+     }
+    },
+    "Handler": "index.handler",
+    "MemorySize": 256,
+    "Role": {
+     "Fn::GetAtt": [
+      "LoginFunctionServiceRole74B42ABA",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Timeout": 30
+   },
+   "DependsOn": [
+    "LoginFunctionServiceRoleDefaultPolicy2FE1C77C",
+    "LoginFunctionServiceRole74B42ABA"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "RentalUserDatabaseStack/LoginFunction/Resource"
+   }
+  },
+  "UserAPI0AEB35F6": {
+   "Type": "AWS::ApiGateway::RestApi",
+   "Properties": {
+    "Description": "User Management API for Rental Booking App",
+    "Name": "rental-users-api"
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalUserDatabaseStack/UserAPI/Resource"
+   }
+  },
+  "UserAPIDeployment4E70121790b4cdf0cf446458c5673e2a91bb28e5": {
+   "Type": "AWS::ApiGateway::Deployment",
+   "Properties": {
+    "Description": "User Management API for Rental Booking App",
+    "RestApiId": {
+     "Ref": "UserAPI0AEB35F6"
+    }
+   },
+   "DependsOn": [
+    "UserAPIauthforgotpasswordOPTIONS49ABBF69",
+    "UserAPIauthforgotpasswordPOSTF472A131",
+    "UserAPIauthforgotpassword834CFBD8",
+    "UserAPIauthloginOPTIONS5DFC12C4",
+    "UserAPIauthloginPOSTD52C2C78",
+    "UserAPIauthlogin1ECF3CF9",
+    "UserAPIauthOPTIONSC4D62D4B",
+    "UserAPIauthresetpasswordOPTIONSA6EED057",
+    "UserAPIauthresetpasswordPOST8BD8DF76",
+    "UserAPIauthresetpassword75883400",
+    "UserAPIauth3ED834EC",
+    "UserAPIOPTIONS4C56D77A",
+    "UserAPIusersOPTIONSD62A2F53",
+    "UserAPIusersPOST77D1E3FA",
+    "UserAPIusersABA84647"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "RentalUserDatabaseStack/UserAPI/Deployment/Resource"
+   }
+  },
+  "UserAPIDeploymentStageprod780A164E": {
+   "Type": "AWS::ApiGateway::Stage",
+   "Properties": {
+    "DeploymentId": {
+     "Ref": "UserAPIDeployment4E70121790b4cdf0cf446458c5673e2a91bb28e5"
+    },
+    "RestApiId": {
+     "Ref": "UserAPI0AEB35F6"
+    },
+    "StageName": "prod"
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalUserDatabaseStack/UserAPI/DeploymentStage.prod/Resource"
+   }
+  },
+  "UserAPIOPTIONS4C56D77A": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Fn::GetAtt": [
+      "UserAPI0AEB35F6",
+      "RootResourceId"
+     ]
+    },
+    "RestApiId": {
+     "Ref": "UserAPI0AEB35F6"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalUserDatabaseStack/UserAPI/Default/OPTIONS/Resource"
+   }
+  },
+  "UserAPIusersABA84647": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Fn::GetAtt": [
+      "UserAPI0AEB35F6",
+      "RootResourceId"
+     ]
+    },
+    "PathPart": "users",
+    "RestApiId": {
+     "Ref": "UserAPI0AEB35F6"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalUserDatabaseStack/UserAPI/Default/users/Resource"
+   }
+  },
+  "UserAPIusersOPTIONSD62A2F53": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "UserAPIusersABA84647"
+    },
+    "RestApiId": {
+     "Ref": "UserAPI0AEB35F6"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalUserDatabaseStack/UserAPI/Default/users/OPTIONS/Resource"
+   }
+  },
+  "UserAPIusersPOSTApiPermissionRentalUserDatabaseStackUserAPIA3C5AB3FPOSTusers3A46A5EB": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "CreateUserFunctionB24ECABE",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:ap-southeast-2:276291855506:",
+       {
+        "Ref": "UserAPI0AEB35F6"
+       },
+       "/",
+       {
+        "Ref": "UserAPIDeploymentStageprod780A164E"
+       },
+       "/POST/users"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalUserDatabaseStack/UserAPI/Default/users/POST/ApiPermission.RentalUserDatabaseStackUserAPIA3C5AB3F.POST..users"
+   }
+  },
+  "UserAPIusersPOSTApiPermissionTestRentalUserDatabaseStackUserAPIA3C5AB3FPOSTusers2BFA10F9": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "CreateUserFunctionB24ECABE",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:ap-southeast-2:276291855506:",
+       {
+        "Ref": "UserAPI0AEB35F6"
+       },
+       "/test-invoke-stage/POST/users"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalUserDatabaseStack/UserAPI/Default/users/POST/ApiPermission.Test.RentalUserDatabaseStackUserAPIA3C5AB3F.POST..users"
+   }
+  },
+  "UserAPIusersPOST77D1E3FA": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "POST",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:ap-southeast-2:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "CreateUserFunctionB24ECABE",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "UserAPIusersABA84647"
+    },
+    "RestApiId": {
+     "Ref": "UserAPI0AEB35F6"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalUserDatabaseStack/UserAPI/Default/users/POST/Resource"
+   }
+  },
+  "UserAPIauth3ED834EC": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Fn::GetAtt": [
+      "UserAPI0AEB35F6",
+      "RootResourceId"
+     ]
+    },
+    "PathPart": "auth",
+    "RestApiId": {
+     "Ref": "UserAPI0AEB35F6"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalUserDatabaseStack/UserAPI/Default/auth/Resource"
+   }
+  },
+  "UserAPIauthOPTIONSC4D62D4B": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "UserAPIauth3ED834EC"
+    },
+    "RestApiId": {
+     "Ref": "UserAPI0AEB35F6"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalUserDatabaseStack/UserAPI/Default/auth/OPTIONS/Resource"
+   }
+  },
+  "UserAPIauthlogin1ECF3CF9": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Ref": "UserAPIauth3ED834EC"
+    },
+    "PathPart": "login",
+    "RestApiId": {
+     "Ref": "UserAPI0AEB35F6"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalUserDatabaseStack/UserAPI/Default/auth/login/Resource"
+   }
+  },
+  "UserAPIauthloginOPTIONS5DFC12C4": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "UserAPIauthlogin1ECF3CF9"
+    },
+    "RestApiId": {
+     "Ref": "UserAPI0AEB35F6"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalUserDatabaseStack/UserAPI/Default/auth/login/OPTIONS/Resource"
+   }
+  },
+  "UserAPIauthloginPOSTApiPermissionRentalUserDatabaseStackUserAPIA3C5AB3FPOSTauthloginC2C2953E": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "LoginFunction66F090C6",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:ap-southeast-2:276291855506:",
+       {
+        "Ref": "UserAPI0AEB35F6"
+       },
+       "/",
+       {
+        "Ref": "UserAPIDeploymentStageprod780A164E"
+       },
+       "/POST/auth/login"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalUserDatabaseStack/UserAPI/Default/auth/login/POST/ApiPermission.RentalUserDatabaseStackUserAPIA3C5AB3F.POST..auth.login"
+   }
+  },
+  "UserAPIauthloginPOSTApiPermissionTestRentalUserDatabaseStackUserAPIA3C5AB3FPOSTauthlogin454AE79A": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "LoginFunction66F090C6",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:ap-southeast-2:276291855506:",
+       {
+        "Ref": "UserAPI0AEB35F6"
+       },
+       "/test-invoke-stage/POST/auth/login"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalUserDatabaseStack/UserAPI/Default/auth/login/POST/ApiPermission.Test.RentalUserDatabaseStackUserAPIA3C5AB3F.POST..auth.login"
+   }
+  },
+  "UserAPIauthloginPOSTD52C2C78": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "POST",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:ap-southeast-2:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "LoginFunction66F090C6",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "UserAPIauthlogin1ECF3CF9"
+    },
+    "RestApiId": {
+     "Ref": "UserAPI0AEB35F6"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalUserDatabaseStack/UserAPI/Default/auth/login/POST/Resource"
+   }
+  },
+  "UserAPIauthforgotpassword834CFBD8": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Ref": "UserAPIauth3ED834EC"
+    },
+    "PathPart": "forgot-password",
+    "RestApiId": {
+     "Ref": "UserAPI0AEB35F6"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalUserDatabaseStack/UserAPI/Default/auth/forgot-password/Resource"
+   }
+  },
+  "UserAPIauthforgotpasswordOPTIONS49ABBF69": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "UserAPIauthforgotpassword834CFBD8"
+    },
+    "RestApiId": {
+     "Ref": "UserAPI0AEB35F6"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalUserDatabaseStack/UserAPI/Default/auth/forgot-password/OPTIONS/Resource"
+   }
+  },
+  "UserAPIauthforgotpasswordPOSTApiPermissionRentalUserDatabaseStackUserAPIA3C5AB3FPOSTauthforgotpassword53C619FE": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ForgotPasswordFunction03A164E6",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:ap-southeast-2:276291855506:",
+       {
+        "Ref": "UserAPI0AEB35F6"
+       },
+       "/",
+       {
+        "Ref": "UserAPIDeploymentStageprod780A164E"
+       },
+       "/POST/auth/forgot-password"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalUserDatabaseStack/UserAPI/Default/auth/forgot-password/POST/ApiPermission.RentalUserDatabaseStackUserAPIA3C5AB3F.POST..auth.forgot-password"
+   }
+  },
+  "UserAPIauthforgotpasswordPOSTApiPermissionTestRentalUserDatabaseStackUserAPIA3C5AB3FPOSTauthforgotpassword59C7B20A": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ForgotPasswordFunction03A164E6",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:ap-southeast-2:276291855506:",
+       {
+        "Ref": "UserAPI0AEB35F6"
+       },
+       "/test-invoke-stage/POST/auth/forgot-password"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalUserDatabaseStack/UserAPI/Default/auth/forgot-password/POST/ApiPermission.Test.RentalUserDatabaseStackUserAPIA3C5AB3F.POST..auth.forgot-password"
+   }
+  },
+  "UserAPIauthforgotpasswordPOSTF472A131": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "POST",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:ap-southeast-2:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "ForgotPasswordFunction03A164E6",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "UserAPIauthforgotpassword834CFBD8"
+    },
+    "RestApiId": {
+     "Ref": "UserAPI0AEB35F6"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalUserDatabaseStack/UserAPI/Default/auth/forgot-password/POST/Resource"
+   }
+  },
+  "UserAPIauthresetpassword75883400": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Ref": "UserAPIauth3ED834EC"
+    },
+    "PathPart": "reset-password",
+    "RestApiId": {
+     "Ref": "UserAPI0AEB35F6"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalUserDatabaseStack/UserAPI/Default/auth/reset-password/Resource"
+   }
+  },
+  "UserAPIauthresetpasswordOPTIONSA6EED057": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "UserAPIauthresetpassword75883400"
+    },
+    "RestApiId": {
+     "Ref": "UserAPI0AEB35F6"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalUserDatabaseStack/UserAPI/Default/auth/reset-password/OPTIONS/Resource"
+   }
+  },
+  "UserAPIauthresetpasswordPOSTApiPermissionRentalUserDatabaseStackUserAPIA3C5AB3FPOSTauthresetpassword1B3B9FE9": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ResetPasswordFunction6786158F",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:ap-southeast-2:276291855506:",
+       {
+        "Ref": "UserAPI0AEB35F6"
+       },
+       "/",
+       {
+        "Ref": "UserAPIDeploymentStageprod780A164E"
+       },
+       "/POST/auth/reset-password"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalUserDatabaseStack/UserAPI/Default/auth/reset-password/POST/ApiPermission.RentalUserDatabaseStackUserAPIA3C5AB3F.POST..auth.reset-password"
+   }
+  },
+  "UserAPIauthresetpasswordPOSTApiPermissionTestRentalUserDatabaseStackUserAPIA3C5AB3FPOSTauthresetpassword875B95AE": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ResetPasswordFunction6786158F",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:ap-southeast-2:276291855506:",
+       {
+        "Ref": "UserAPI0AEB35F6"
+       },
+       "/test-invoke-stage/POST/auth/reset-password"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalUserDatabaseStack/UserAPI/Default/auth/reset-password/POST/ApiPermission.Test.RentalUserDatabaseStackUserAPIA3C5AB3F.POST..auth.reset-password"
+   }
+  },
+  "UserAPIauthresetpasswordPOST8BD8DF76": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "POST",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:ap-southeast-2:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "ResetPasswordFunction6786158F",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "UserAPIauthresetpassword75883400"
+    },
+    "RestApiId": {
+     "Ref": "UserAPI0AEB35F6"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalUserDatabaseStack/UserAPI/Default/auth/reset-password/POST/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/1WMO2/DMAyEf0t2mbUzdO8D3YoGTvaCltiUiR6GRccwBP33wrILJNN9vDveHpqmhnqHU6y0uVaWO0hHQX1VOMXvZGaPLpgO0gk7S+rtxxfIyqLrDEL6GL0WDn6J7vlAg+MYOfisGB2kNqz/RQ/Bsp5Lr1BW2PMZhSacIbUU5aXn0t7wnXobZkdeFvfuOgqey+4KLcUwDppeMZL6JPkNZgk3+k+35cI5P9hfo/SjPBSUD4bgEp9u+xqaZ6h3l8hcDaMXdgTtqn8zBxI8SwEAAA=="
+   },
+   "Metadata": {
+    "aws:cdk:path": "RentalUserDatabaseStack/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "UserAPIEndpoint1F2677D6": {
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Ref": "UserAPI0AEB35F6"
+      },
+      ".execute-api.ap-southeast-2.",
+      {
+       "Ref": "AWS::URLSuffix"
+      },
+      "/",
+      {
+       "Ref": "UserAPIDeploymentStageprod780A164E"
+      },
+      "/"
+     ]
+    ]
+   }
+  },
+  "UserTableName": {
+   "Description": "DynamoDB Table Name for Users",
+   "Value": {
+    "Ref": "UsersTable9725E9C8"
+   },
+   "Export": {
+    "Name": "UserTableName"
+   }
+  },
+  "UserAPIEndpoint": {
+   "Description": "API Gateway Endpoint URL",
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Ref": "UserAPI0AEB35F6"
+      },
+      ".execute-api.ap-southeast-2.",
+      {
+       "Ref": "AWS::URLSuffix"
+      },
+      "/",
+      {
+       "Ref": "UserAPIDeploymentStageprod780A164E"
+      },
+      "/"
+     ]
+    ]
+   },
+   "Export": {
+    "Name": "UserAPIEndpoint"
+   }
+  },
+  "UserAPIId": {
+   "Description": "API Gateway ID",
+   "Value": {
+    "Ref": "UserAPI0AEB35F6"
+   },
+   "Export": {
+    "Name": "UserAPIId"
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

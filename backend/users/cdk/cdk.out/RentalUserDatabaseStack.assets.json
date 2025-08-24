@@ -1,0 +1,20 @@
+{
+  "version": "35.0.0",
+  "files": {
+    "da8c91a3d96891a99938b7f241cedd772554bcc3352b979da512e83cdb9820eb": {
+      "source": {
+        "path": "RentalUserDatabaseStack.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "276291855506-ap-southeast-2": {
+          "bucketName": "cdk-hnb659fds-assets-276291855506-ap-southeast-2",
+          "objectKey": "da8c91a3d96891a99938b7f241cedd772554bcc3352b979da512e83cdb9820eb.json",
+          "region": "ap-southeast-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::276291855506:role/cdk-hnb659fds-file-publishing-role-276291855506-ap-southeast-2"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}
