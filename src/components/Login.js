@@ -33,26 +33,16 @@ function Login({ setUser }) {
         return;
       }
 
-      // バックエンドAPIを呼び出し（DB優先）
-      const response = await fetch('https://kgkjjv0rik.execute-api.ap-southeast-2.amazonaws.com/prod/members/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          id: formData.memberId,
-          password: formData.password
-        })
-      });
+      // 新しいユーザーDBのAPIサービスを使用
+      const userAuthService = (await import('../services/userAPI.js')).default;
+      const result = await userAuthService.login(formData.memberId, formData.password);
 
-      if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem('currentUser', JSON.stringify(data.member));
-        setUser(data.member);
+      if (result.success) {
+        localStorage.setItem('currentUser', JSON.stringify(result.user));
+        setUser(result.user);
         navigate('/mypage');
       } else {
-        const errorData = await response.json();
-        setError(errorData.message || 'ログインに失敗しました。');
+        setError(result.message || 'ログインに失敗しました。');
       }
     } catch (error) {
       console.error('Login error:', error);
@@ -75,19 +65,19 @@ function Login({ setUser }) {
         <h2 style={{ textAlign: 'center', color: '#2d7a2d', marginBottom: '1.5rem' }}>ログイン</h2>
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: '1.5rem' }}>
-            <label htmlFor="memberId" style={{ display: 'block', marginBottom: '0.5rem', color: '#333', fontWeight: '500' }}>会員ID</label>
+            <label htmlFor="memberId" style={{ display: 'block', marginBottom: '0.5rem', color: '#333', fontWeight: '500' }}>メールアドレス</label>
             <input
-              type="text"
+              type="email"
               id="memberId"
               name="memberId"
               value={formData.memberId}
               onChange={handleChange}
-              placeholder="会員IDを入力"
+              placeholder="メールアドレスを入力"
               required
               style={{ width: '100%', padding: '0.75rem', border: '1px solid #ddd', borderRadius: '6px', fontSize: '1rem' }}
             />
             <div style={{ fontSize: '0.8rem', color: '#666', marginTop: '0.25rem' }}>
-              会員ID形式: 西暦 + 月 + 免許証番号下4桁
+              登録時のメールアドレスを入力してください
             </div>
           </div>
           
