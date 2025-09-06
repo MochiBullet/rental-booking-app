@@ -122,10 +122,8 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
       console.log('🔍 認証失敗理由詳細:', {
         hasAdminSession,
         parsedAdminInfo,
-        loginTimeValid: loginTime && !isNaN(loginTime),
-        actualLoginTime: loginTime,
-        timeDiffMs: loginTime ? (Date.now() - loginTime) : null,
-        sevenDaysMs: 7 * 24 * 60 * 60 * 1000
+        adminTimestamp,
+        currentTime: Date.now()
       });
       localStorage.removeItem('adminUser');
       localStorage.removeItem('adminLoginTime');
