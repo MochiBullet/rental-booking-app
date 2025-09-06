@@ -4,9 +4,6 @@ import { siteSettingsAPI } from '../services/siteSettingsAPI';
 
 const SiteSettingsManagement = ({ onSettingsUpdate }) => {
   const [settings, setSettings] = useState(initialSiteSettings);
-  // お知らせ管理は AdminDashboard.js に移行済み
-  const [editingAnnouncement, setEditingAnnouncement] = useState(null);
-  const [showAnnouncementForm, setShowAnnouncementForm] = useState(false);
   const [activeSection, setActiveSection] = useState('branding');
 
   useEffect(() => {
@@ -343,36 +340,7 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
     }
   };
 
-  // お知らせ関連の関数
-  const handleCreateAnnouncement = () => {
-    setEditingAnnouncement({
-      id: null,
-      date: new Date().toISOString().split('T')[0],
-      title: '',
-      content: '',
-      published: false
-    });
-    setShowAnnouncementForm(true);
-  };
-
-  const handleSaveAnnouncement = () => {
-    // お知らせ管理は AdminDashboard.js に移行済み
-    alert('お知らせ管理は管理者画面に移行しました');
-    setShowAnnouncementForm(false);
-    setEditingAnnouncement(null);
-  };
-
-  const handleCancelAnnouncementEdit = () => {
-    setShowAnnouncementForm(false);
-    setEditingAnnouncement(null);
-  };
-
-  const updateEditingAnnouncement = (field, value) => {
-    setEditingAnnouncement(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
+  // お知らせ関連の関数は管理者ダッシュボードに移行済み
 
   return (
     <div className="site-settings-management">
@@ -814,77 +782,22 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
           <div className="section">
             <h3>📢 お知らせ管理</h3>
             
-            <div className="announcements-header">
-              <button 
-                className="create-announcement-btn" 
-                onClick={handleCreateAnnouncement}
-              >
-                ➕ 新しいお知らせを作成
-              </button>
-            </div>
-
-            {showAnnouncementForm && (
-              <div className="announcement-form">
-                <h4>{editingAnnouncement?.id ? 'お知らせを編集' : '新しいお知らせを作成'}</h4>
-                
-                <div className="form-row">
-                  <div className="form-group">
-                    <label>日付</label>
-                    <input
-                      type="date"
-                      value={editingAnnouncement?.date || ''}
-                      onChange={(e) => updateEditingAnnouncement('date', e.target.value)}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>公開状態</label>
-                    <label className="checkbox-label">
-                      <input
-                        type="checkbox"
-                        checked={editingAnnouncement?.published || false}
-                        onChange={(e) => updateEditingAnnouncement('published', e.target.checked)}
-                      />
-                      公開する
-                    </label>
-                  </div>
-                </div>
-                
-                <div className="form-group">
-                  <label>タイトル</label>
-                  <input
-                    type="text"
-                    value={editingAnnouncement?.title || ''}
-                    onChange={(e) => updateEditingAnnouncement('title', e.target.value)}
-                    placeholder="お知らせのタイトルを入力..."
-                  />
-                </div>
-                
-                <div className="form-group">
-                  <label>内容</label>
-                  <textarea
-                    value={editingAnnouncement?.content || ''}
-                    onChange={(e) => updateEditingAnnouncement('content', e.target.value)}
-                    placeholder="お知らせの内容を入力..."
-                    rows={8}
-                  />
-                </div>
-                
-                <div className="form-buttons">
-                  <button className="save-button" onClick={handleSaveAnnouncement}>
-                    💾 保存
-                  </button>
-                  <button className="cancel-button" onClick={handleCancelAnnouncementEdit}>
-                    ❌ キャンセル
-                  </button>
-                </div>
+            <div className="migration-notice-container">
+              <div className="migration-message">
+                <h4>🚀 お知らせ管理は管理者ダッシュボードに移行されました</h4>
+                <p>
+                  お知らせの作成・編集・削除は<strong>管理者ダッシュボード</strong>の「お知らせ管理」タブで行ってください。
+                </p>
+                <ul>
+                  <li>✅ DynamoDBによる本格的なデータベース管理</li>
+                  <li>✅ リアルタイム更新機能</li>
+                  <li>✅ 公開/非公開の切り替え</li>
+                  <li>✅ 管理者権限による安全な操作</li>
+                </ul>
+                <p>
+                  管理者ダッシュボードにアクセスするには、サイトのロゴを10回クリックしてください。
+                </p>
               </div>
-            )}
-
-            <div className="announcements-list-admin">
-              <h4>お知らせ管理は管理者ダッシュボードに移行されました</h4>
-              <p className="migration-notice">
-                お知らせの作成・編集・削除は管理者ダッシュボードの「お知らせ管理」タブで行ってください。
-              </p>
             </div>
           </div>
         )}
