@@ -365,7 +365,9 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
           { key: 'tile-images', label: '🚗 タイル画像' },
           { key: 'hero', label: 'ヒーローセクション' },
           { key: 'features', label: '特徴・機能' },
-          { key: 'contact', label: 'お問い合わせ情報' }
+          { key: 'contact', label: 'お問い合わせ情報' },
+          { key: 'terms', label: '📋 利用規約' },
+          { key: 'privacy', label: '🔒 プライバシーポリシー' }
         ].map(tab => (
           <button
             key={tab.key}
@@ -752,10 +754,10 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
           </div>
         )}
 
-        {/* TERMS SECTION REMOVED - SIMPLIFIED SITE SETTINGS */}
-        {false && activeSection === 'terms' && (
+        {activeSection === 'terms' && (
           <div className="section">
-            <h3>利用規約設定</h3>
+            <h3>📋 レンタルサービス利用規約設定</h3>
+            <p className="section-description">車両・バイクレンタルに関する利用規約を管理します。法的に重要な文書のため慎重に編集してください。</p>
             <div className="form-group">
               <label>タイトル</label>
               <input
@@ -780,10 +782,10 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
 
         {/* お知らせ管理は管理者ダッシュボードに完全移行済み */}
 
-        {/* PRIVACY SECTION REMOVED - SIMPLIFIED SITE SETTINGS */}
-        {false && activeSection === 'privacy' && (
+        {activeSection === 'privacy' && (
           <div className="section">
-            <h3>プライバシーポリシー設定</h3>
+            <h3>🔒 レンタルサービス プライバシーポリシー設定</h3>
+            <p className="section-description">個人情報の取り扱いに関するプライバシーポリシーを管理します。GDPR・個人情報保護法に準拠した内容にしてください。</p>
             <div className="form-group">
               <label>タイトル</label>
               <input
