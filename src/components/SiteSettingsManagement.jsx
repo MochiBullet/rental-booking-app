@@ -363,13 +363,9 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
           { key: 'branding', label: '🎨 ブランディング' },
           { key: 'hero-images', label: '🏞️ ヒーロー画像' },
           { key: 'tile-images', label: '🚗 タイル画像' },
-          { key: 'announcements', label: '📢 お知らせ管理' },
           { key: 'hero', label: 'ヒーローセクション' },
           { key: 'features', label: '特徴・機能' },
-          { key: 'contact', label: 'お問い合わせ情報' },
-          { key: 'services', label: 'サービス内容' },
-          { key: 'terms', label: '利用規約' },
-          { key: 'privacy', label: 'プライバシーポリシー' }
+          { key: 'contact', label: 'お問い合わせ情報' }
         ].map(tab => (
           <button
             key={tab.key}
@@ -738,7 +734,8 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
           </div>
         )}
 
-        {activeSection === 'services' && (
+        {/* SERVICES SECTION REMOVED - SIMPLIFIED SITE SETTINGS */}
+        {false && activeSection === 'services' && (
           <div className="section">
             <h3>サービス内容設定</h3>
             {settings.services.map((service, index) => (
@@ -755,7 +752,8 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
           </div>
         )}
 
-        {activeSection === 'terms' && (
+        {/* TERMS SECTION REMOVED - SIMPLIFIED SITE SETTINGS */}
+        {false && activeSection === 'terms' && (
           <div className="section">
             <h3>利用規約設定</h3>
             <div className="form-group">
@@ -780,34 +778,10 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
           </div>
         )}
 
-        {activeSection === 'announcements' && (
-          <div className="section">
-            <h3>📢 お知らせ管理</h3>
-            
-            <div className="migration-notice-container" style={{padding: '20px', backgroundColor: '#f0f9ff', border: '2px solid #3b82f6', borderRadius: '8px'}}>
-              <div className="migration-message">
-                <h4 style={{color: '#1e40af', marginBottom: '15px'}}>🚀 お知らせ管理は管理者ダッシュボードに移行されました</h4>
-                <p style={{marginBottom: '15px'}}>
-                  お知らせの作成・編集・削除は<strong style={{color: '#dc2626'}}>管理者ダッシュボード</strong>の「お知らせ管理」タブで行ってください。
-                </p>
-                <ul style={{marginBottom: '15px', paddingLeft: '20px'}}>
-                  <li style={{marginBottom: '5px'}}>✅ DynamoDBによる本格的なデータベース管理</li>
-                  <li style={{marginBottom: '5px'}}>✅ リアルタイム更新機能</li>
-                  <li style={{marginBottom: '5px'}}>✅ 公開/非公開の切り替え</li>
-                  <li style={{marginBottom: '5px'}}>✅ 管理者権限による安全な操作</li>
-                </ul>
-                <p style={{fontWeight: 'bold', color: '#059669'}}>
-                  管理者ダッシュボードにアクセスするには、サイトのロゴを10回クリックしてください。
-                </p>
-                <div style={{marginTop: '15px', padding: '10px', backgroundColor: '#fef3c7', borderRadius: '4px', fontSize: '14px'}}>
-                  ⚠️ このセクションのお知らせ機能は完全に無効化されています（キャッシュクリア済み）
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* お知らせ管理は管理者ダッシュボードに完全移行済み */}
 
-        {activeSection === 'privacy' && (
+        {/* PRIVACY SECTION REMOVED - SIMPLIFIED SITE SETTINGS */}
+        {false && activeSection === 'privacy' && (
           <div className="section">
             <h3>プライバシーポリシー設定</h3>
             <div className="form-group">

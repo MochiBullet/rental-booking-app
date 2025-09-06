@@ -9,7 +9,7 @@ import { announcementsAPI } from '../services/announcementsAPI';
 const AdminDashboard = ({ onSettingsUpdate }) => {
   const navigate = useNavigate();
   const [isAuthChecking, setIsAuthChecking] = useState(true);
-  const [activeSection, setActiveSection] = useState('overview');
+  const [activeSection, setActiveSection] = useState('vehicles');
   const [isAuthenticating, setIsAuthenticating] = useState(true);
   
   // 統合認証チェック（リロード対応）
@@ -939,46 +939,18 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
         
         <nav className="admin-nav">
           <button 
-            className={activeSection === 'overview' ? 'active' : ''}
-            onClick={() => setActiveSection('overview')}
-          >
-            <span className="nav-icon">📊</span>
-            Overview
-          </button>
-          <button 
-            className={activeSection === 'bookings' ? 'active' : ''}
-            onClick={() => setActiveSection('bookings')}
-          >
-            <span className="nav-icon">📅</span>
-            Bookings
-          </button>
-          <button 
             className={activeSection === 'vehicles' ? 'active' : ''}
             onClick={() => setActiveSection('vehicles')}
           >
             <span className="nav-icon">🚗</span>
-            Vehicles
-          </button>
-          <button 
-            className={activeSection === 'users' ? 'active' : ''}
-            onClick={() => setActiveSection('users')}
-          >
-            <span className="nav-icon">👥</span>
-            Users
-          </button>
-          <button 
-            className={activeSection === 'analytics' ? 'active' : ''}
-            onClick={() => setActiveSection('analytics')}
-          >
-            <span className="nav-icon">📈</span>
-            Analytics
+            車両管理
           </button>
           <button 
             className={activeSection === 'settings' ? 'active' : ''}
             onClick={() => setActiveSection('settings')}
           >
             <span className="nav-icon">⚙️</span>
-            Site Settings
+            サイト設定
           </button>
           <button 
             className={activeSection === 'announcements' ? 'active' : ''}
@@ -986,34 +958,6 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
           >
             <span className="nav-icon">📢</span>
             お知らせ管理
-          </button>
-          <button 
-            className={`${activeSection === 'content' ? 'active' : ''}`}
-            onClick={() => setActiveSection('content')}
-          >
-            <span className="nav-icon">📝</span>
-            Content Editor
-          </button>
-          <button 
-            className={`${activeSection === 'terms' ? 'active' : ''}`}
-            onClick={() => setActiveSection('terms')}
-          >
-            <span className="nav-icon">📋</span>
-            Terms Editor
-          </button>
-          <button 
-            className={`${activeSection === 'contacts' ? 'active' : ''}`}
-            onClick={() => setActiveSection('contacts')}
-          >
-            <span className="nav-icon">📧</span>
-            Contact Management
-          </button>
-          <button 
-            className={`${activeSection === 'privacy' ? 'active' : ''}`}
-            onClick={() => setActiveSection('privacy')}
-          >
-            <span className="nav-icon">🔒</span>
-            Privacy Policy Editor
           </button>
         </nav>
         
@@ -1025,18 +969,9 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
       <div className="admin-main">
         <div className="admin-header">
           <h1>
-            {activeSection === 'overview' && 'Dashboard Overview'}
-            {activeSection === 'bookings' && 'Booking Management'}
-            {activeSection === 'vehicles' && 'Vehicle Management'}
-            {activeSection === 'users' && 'User Management'}
-            {activeSection === 'analytics' && 'Sales Analytics'}
-            {activeSection === 'settings' && 'Site Settings'}
-            {activeSection === 'announcements' && 'お知らせ管理'}
-            {activeSection === 'content' && 'Content Editor'}
-            {activeSection === 'terms' && 'Terms Editor'}
-            {activeSection === 'contacts' && 'Contact Management'}
-            {activeSection === 'privacy' && 'Privacy Policy Editor'}
-            {activeSection === 'details' && `詳細分析 - ${getTypeDisplayName(detailsType)}`}
+            {activeSection === 'vehicles' && '🚗 車両管理'}
+            {activeSection === 'settings' && '⚙️ サイト設定'}
+            {activeSection === 'announcements' && '📢 お知らせ管理'}
           </h1>
           <div className="admin-header-info">
             <div className="sync-status">
@@ -1068,162 +1003,7 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
         </div>
         
         <div className="admin-content">
-          {activeSection === 'overview' && (
-            <div className="overview-section">
-              <div className="stats-grid">
-                <div className="stat-card confirmed clickable" onClick={() => handleCardClick('confirmed')}>
-                  <div className="stat-icon">✅</div>
-                  <div className="stat-details">
-                    <h3>予約確定</h3>
-                    <p className="stat-number">{stats.confirmedBookings}</p>
-                    <span className="stat-label">Confirmed</span>
-                  </div>
-                  <div className="card-arrow">▶</div>
-                </div>
-                
-                <div className="stat-card active clickable" onClick={() => handleCardClick('active')}>
-                  <div className="stat-icon">🚀</div>
-                  <div className="stat-details">
-                    <h3>進行中</h3>
-                    <p className="stat-number">{stats.activeBookings}</p>
-                    <span className="stat-label">Active</span>
-                  </div>
-                  <div className="card-arrow">▶</div>
-                </div>
-                
-                <div className="stat-card completed clickable" onClick={() => handleCardClick('completed')}>
-                  <div className="stat-icon">🏁</div>
-                  <div className="stat-details">
-                    <h3>完了済み</h3>
-                    <p className="stat-number">{stats.completedBookings}</p>
-                    <span className="stat-label">Completed</span>
-                  </div>
-                  <div className="card-arrow">▶</div>
-                </div>
-                
-                <div className="stat-card">
-                  <div className="stat-icon">🚗</div>
-                  <div className="stat-details">
-                    <h3>Total Vehicles</h3>
-                    <p className="stat-number">{stats.totalVehicles}</p>
-                    <span className="stat-label">Registered</span>
-                  </div>
-                </div>
-                
-                <div className="stat-card">
-                  <div className="stat-icon">👥</div>
-                  <div className="stat-details">
-                    <h3>Total Users</h3>
-                    <p className="stat-number">{stats.totalUsers}</p>
-                    <span className="stat-label">Registered</span>
-                  </div>
-                </div>
-                
-                <div className="stat-card">
-                  <div className="stat-icon">📆</div>
-                  <div className="stat-details">
-                    <h3>Today's Bookings</h3>
-                    <p className="stat-number">{stats.todayBookings}</p>
-                    <span className="stat-label">New</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="recent-activities">
-                <h2>Recent Bookings</h2>
-                <div className="activity-list">
-                  {bookings.slice(0, 5).map(booking => (
-                    <div key={booking.id} className="activity-item">
-                      <div className="activity-info">
-                        <p className="activity-title">{booking.vehicleName}</p>
-                        <p className="activity-details">
-                          {booking.userName} - {new Date(booking.pickupDate).toLocaleDateString('ja-JP')}
-                        </p>
-                      </div>
-                      <span className={`activity-status status-${booking.status}`}>
-                        {booking.status === 'confirmed' ? '確定' : 
-                         booking.status === 'active' ? 'アクティブ' : 
-                         booking.status === 'completed' ? '完了済み' :
-                         booking.status === 'pending' ? '保留中' : booking.status}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
           
-          {activeSection === 'bookings' && (
-            <div className="bookings-section">
-              <div className="section-header">
-                <h2>Booking List</h2>
-                <div className="filter-buttons">
-                  <button className="filter-btn active">All</button>
-                  <button className="filter-btn">Confirmed</button>
-                  <button className="filter-btn">Pending</button>
-                  <button className="filter-btn">Cancelled</button>
-                </div>
-              </div>
-              
-              <div className="bookings-table">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Booking ID</th>
-                      <th>Customer</th>
-                      <th>Vehicle</th>
-                      <th>Start Date</th>
-                      <th>End Date</th>
-                      <th>Price</th>
-                      <th>Status</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {bookings.map(booking => (
-                      <tr key={booking.id}>
-                        <td>#{booking.id}</td>
-                        <td>{booking.userName || 'Guest'}</td>
-                        <td>{booking.vehicleName}</td>
-                        <td>{new Date(booking.pickupDate).toLocaleDateString('ja-JP')}</td>
-                        <td>{new Date(booking.returnDate).toLocaleDateString('ja-JP')}</td>
-                        <td>{formatCurrency(booking.totalPrice)}</td>
-                        <td>
-                          <span className={`status-badge status-${booking.status}`}>
-                            {booking.status === 'confirmed' ? '確定' : 
-                             booking.status === 'active' ? 'アクティブ' : 
-                             booking.status === 'completed' ? '完了済み' :
-                             booking.status === 'pending' ? '保留中' : booking.status}
-                          </span>
-                        </td>
-                        <td>
-                          <div className="action-buttons">
-                            {booking.status === 'pending' && (
-                              <button 
-                                className="action-btn confirm"
-                                onClick={() => handleConfirmBooking(booking.id)}
-                              >
-                                承認
-                              </button>
-                            )}
-                            {booking.status === 'confirmed' && (
-                              <button 
-                                className="action-btn handover"
-                                onClick={() => handleCompleteHandover(booking.id)}
-                                title="引き渡し当日のみ実行可能"
-                              >
-                                引き渡し確定
-                              </button>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
           
           {activeSection === 'vehicles' && (
             <div className="vehicles-section">
@@ -1281,7 +1061,8 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
             </div>
           )}
           
-          {activeSection === 'users' && (
+          {/* USERS SECTION REMOVED - SIMPLIFIED ADMIN PANEL */}
+          {false && activeSection === 'users' && (
             <div className="users-section">
               <div className="section-header">
                 <h2>ユーザー管理</h2>
@@ -1420,7 +1201,8 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
             </div>
           )}
           
-          {activeSection === 'analytics' && (
+          {/* ANALYTICS SECTION REMOVED - SIMPLIFIED ADMIN PANEL */}
+          {false && activeSection === 'analytics' && (
             <div className="analytics-section">
               <div className="analytics-header">
                 <h2>Sales Analytics</h2>
@@ -1582,7 +1364,8 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
             </div>
           )}
           
-          {activeSection === 'content' && (
+          {/* CONTENT SECTION REMOVED - SIMPLIFIED ADMIN PANEL */}
+          {false && activeSection === 'content' && (
             <div className="content-section">
               <div className="content-editor">
                 <h2>ホームページコンテンツ編集</h2>
@@ -1848,7 +1631,8 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
             </div>
           )}
           
-          {activeSection === 'terms' && (
+          {/* TERMS SECTION REMOVED - SIMPLIFIED ADMIN PANEL */}
+          {false && activeSection === 'terms' && (
             <div className="terms-section">
               <div className="terms-editor">
                 <h2>約款内容編集</h2>
@@ -1933,7 +1717,8 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
             </div>
           )}
           
-          {activeSection === 'contacts' && (
+          {/* CONTACTS SECTION REMOVED - SIMPLIFIED ADMIN PANEL */}
+          {false && activeSection === 'contacts' && (
             <div className="contacts-section">
               <div className="section-header">
                 <h2>お問い合わせ管理</h2>
@@ -2001,7 +1786,8 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
             </div>
           )}
           
-          {activeSection === 'privacy' && (
+          {/* PRIVACY SECTION REMOVED - SIMPLIFIED ADMIN PANEL */}
+          {false && activeSection === 'privacy' && (
             <div className="privacy-section">
               <div className="privacy-editor">
                 <h2>プライバシーポリシー編集</h2>
