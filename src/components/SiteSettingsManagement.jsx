@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { siteSettingsManager, initialSiteSettings, announcementManager } from '../data/siteSettings';
+import { siteSettingsManager, initialSiteSettings } from '../data/siteSettings';
 import { siteSettingsAPI } from '../services/siteSettingsAPI';
 
 const SiteSettingsManagement = ({ onSettingsUpdate }) => {
@@ -11,7 +11,7 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
 
   useEffect(() => {
     loadSettings();
-    setAnnouncements(announcementManager.getAllAnnouncements());
+    // お知らせ管理は AdminDashboard.js に移行済み
   }, []);
 
   const loadSettings = async () => {
@@ -361,46 +361,15 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
   };
 
   const handleSaveAnnouncement = () => {
-    if (!editingAnnouncement.title.trim()) {
-      alert('タイトルを入力してください');
-      return;
-    }
-
-    if (editingAnnouncement.id) {
-      // 更新
-      announcementManager.updateAnnouncement(editingAnnouncement.id, editingAnnouncement);
-    } else {
-      // 新規作成
-      announcementManager.createAnnouncement(editingAnnouncement);
-    }
-
-    // 状態を更新
-    setAnnouncements(announcementManager.getAllAnnouncements());
+    // お知らせ管理は AdminDashboard.js に移行済み
+    alert('お知らせ管理は管理者画面に移行しました');
     setShowAnnouncementForm(false);
     setEditingAnnouncement(null);
-
-    // リアルタイム更新
-    if (onSettingsUpdate) {
-      const updatedSettings = siteSettingsManager.getSettings();
-      onSettingsUpdate(updatedSettings);
-    }
-
-    alert('お知らせを保存しました');
   };
 
   const handleDeleteAnnouncement = (id) => {
-    if (window.confirm('このお知らせを削除しますか？')) {
-      announcementManager.deleteAnnouncement(id);
-      setAnnouncements(announcementManager.getAllAnnouncements());
-
-      // リアルタイム更新
-      if (onSettingsUpdate) {
-        const updatedSettings = siteSettingsManager.getSettings();
-        onSettingsUpdate(updatedSettings);
-      }
-
-      alert('お知らせを削除しました');
-    }
+    // お知らせ管理は AdminDashboard.js に移行済み
+    alert('お知らせ管理は管理者画面に移行しました');
   };
 
   const handleCancelAnnouncementEdit = () => {
