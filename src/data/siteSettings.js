@@ -137,5 +137,6 @@ export const siteSettingsManager = {
   }
 };
 
-// 注意: announcementManagerは廃止され、DynamoDB APIに移行済み
-// すべてのお知らせ管理はAdminDashboard.jsとannouncementsAPIを使用してください
+// IMPORTANT: announcementManager has been completely removed and migrated to DynamoDB API
+// All announcements management should use AdminDashboard.js and announcementsAPI
+// このファイルにはお知らせ管理機能は含まれていません - キャッシュクリア目的の更新
