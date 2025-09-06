@@ -261,11 +261,82 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
   };
 
   useEffect(() => {
-    const adminUser = localStorage.getItem('adminUser');
-    if (!adminUser) {
+    // App.jsと同じロジックで管理者認証チェック
+    const checkAdminAuth = () => {
+      const adminUser = localStorage.getItem('adminUser');
+      const adminSession = sessionStorage.getItem('adminSession');
+      const adminTimestamp = localStorage.getItem('adminLoginTime');
+      const adminInfo = localStorage.getItem('adminInfo');
+      
+      // セッション確認：sessionStorageまたはlocalStorageのいずれかで管理者フラグが存在
+      const hasAdminSession = adminSession === 'true' || adminUser === 'true';
+      
+      // 管理者情報オブジェクトの確認
+      let parsedAdminInfo = null;
+      if (adminInfo) {
+        try {
+          parsedAdminInfo = JSON.parse(adminInfo);
+        } catch (e) {
+          console.error('Failed to parse adminInfo:', e);
+        }
+      }
+      
+      // ログイン状態の判定（複数チェック）
+      if (hasAdminSession || parsedAdminInfo) {
+        const currentTime = Date.now();
+        const sevenDays = 7 * 24 * 60 * 60 * 1000; // 7日間（ミリ秒）
+        
+        // タイムスタンプチェック
+        let loginTime = null;
+        if (adminTimestamp) {
+          loginTime = parseInt(adminTimestamp);
+        } else if (parsedAdminInfo?.loginTime) {
+          loginTime = parsedAdminInfo.loginTime;
+        }
+        
+        if (loginTime && !isNaN(loginTime)) {
+          // 期限チェック（7日以内）
+          const timeDiff = currentTime - loginTime;
+          
+          if (timeDiff < sevenDays) {
+            // ログイン状態有効
+            console.log('✅ 管理者認証確認済み');
+            
+            // セッションを更新
+            localStorage.setItem('adminLoginTime', currentTime.toString());
+            localStorage.setItem('adminUser', 'true');
+            sessionStorage.setItem('adminSession', 'true');
+            
+            return true;
+          } else {
+            // 期限切れ
+            console.log('⏰ 管理者ログインが期限切れです');
+            localStorage.removeItem('adminUser');
+            localStorage.removeItem('adminLoginTime');
+            localStorage.removeItem('adminInfo');
+            sessionStorage.removeItem('adminSession');
+            return false;
+          }
+        } else {
+          // タイムスタンプがない場合は新規設定
+          const newLoginTime = currentTime;
+          localStorage.setItem('adminLoginTime', newLoginTime.toString());
+          localStorage.setItem('adminUser', 'true');
+          sessionStorage.setItem('adminSession', 'true');
+          
+          return true;
+        }
+      }
+      
+      return false;
+    };
+    
+    // 認証チェック
+    if (!checkAdminAuth()) {
       navigate('/admin-login');
       return;
     }
+    
     loadDashboardData();
     loadSiteSettings();
   }, [navigate]);
