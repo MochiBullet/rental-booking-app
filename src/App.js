@@ -24,7 +24,28 @@ function AppContent() {
   // INFO SITE MODE: Simplified state management
   // DISABLED: User authentication state
   // const [user, setUser] = useState(null);
-  const [isAdmin, setIsAdmin] = useState(false);
+  
+  // 初期状態で管理者認証をチェック
+  const checkInitialAdminAuth = () => {
+    const adminUser = localStorage.getItem('adminUser');
+    const adminSession = sessionStorage.getItem('adminSession');
+    const adminTimestamp = localStorage.getItem('adminLoginTime');
+    
+    if (adminUser === 'true' || adminSession === 'true') {
+      if (adminTimestamp) {
+        const loginTime = parseInt(adminTimestamp);
+        const currentTime = Date.now();
+        const sevenDays = 7 * 24 * 60 * 60 * 1000;
+        
+        if (!isNaN(loginTime) && (currentTime - loginTime) < sevenDays) {
+          return true;
+        }
+      }
+    }
+    return false;
+  };
+  
+  const [isAdmin, setIsAdmin] = useState(checkInitialAdminAuth());
   const [logoClickCount, setLogoClickCount] = useState(0);
   const [logoClickTimer, setLogoClickTimer] = useState(null);
   const [siteSettings, setSiteSettings] = useState(null);
@@ -300,7 +321,7 @@ function AppContent() {
           
           {/* Admin Routes (Hidden from main navigation) */}
           <Route path="/admin-login" element={<AdminLogin setIsAdmin={setIsAdmin} onSuccess={() => window.location.href = '/admin'} />} />
-          <Route path="/admin" element={isAdmin ? <AdminDashboard onSettingsUpdate={handleSiteSettingsUpdate} /> : <Navigate to="/admin-login" />} />
+          <Route path="/admin" element={<AdminDashboard onSettingsUpdate={handleSiteSettingsUpdate} />} />
           
           {/* Legacy/Optional Routes */}
           <Route path="/announcement/:id" element={<AnnouncementDetail />} />
