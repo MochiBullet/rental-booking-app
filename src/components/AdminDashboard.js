@@ -1497,8 +1497,8 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
                                   if (window.confirm('このお知らせを削除しますか？')) {
                                     const result = await announcementsAPI.deleteAnnouncement(announcement.id);
                                     if (result.success) {
-                                      const updatedAnnouncements = announcements.filter((a) => a.id !== announcement.id);
-                                      setAnnouncements(updatedAnnouncements);
+                                      // 削除後にデータを再取得
+                                      await loadAnnouncements();
                                       showNotification('📢 お知らせを削除しました', 'info');
                                     } else {
                                       showNotification('❌ 削除に失敗しました', 'error');
@@ -2817,10 +2817,8 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
                   // 更新処理
                   const result = await announcementsAPI.updateAnnouncement(editingAnnouncement.id, announcementForm);
                   if (result.success) {
-                    const updatedAnnouncements = announcements.map(a => 
-                      a.id === editingAnnouncement.id ? {...a, ...announcementForm} : a
-                    );
-                    setAnnouncements(updatedAnnouncements);
+                    // 更新後にデータを再取得
+                    await loadAnnouncements();
                     showNotification('📢 お知らせを更新しました', 'success');
                   } else {
                     showNotification('❌ 更新に失敗しました', 'error');
@@ -2829,7 +2827,8 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
                   // 新規作成処理
                   const result = await announcementsAPI.createAnnouncement(announcementForm);
                   if (result.success) {
-                    setAnnouncements([...announcements, result.announcement]);
+                    // 作成後にデータを再取得
+                    await loadAnnouncements();
                     showNotification('📢 新しいお知らせを追加しました', 'success');
                   } else {
                     showNotification('❌ 追加に失敗しました', 'error');
