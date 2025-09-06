@@ -4,7 +4,7 @@ import { siteSettingsAPI } from '../services/siteSettingsAPI';
 
 const SiteSettingsManagement = ({ onSettingsUpdate }) => {
   const [settings, setSettings] = useState(initialSiteSettings);
-  const [announcements, setAnnouncements] = useState([]);
+  // お知らせ管理は AdminDashboard.js に移行済み
   const [editingAnnouncement, setEditingAnnouncement] = useState(null);
   const [showAnnouncementForm, setShowAnnouncementForm] = useState(false);
   const [activeSection, setActiveSection] = useState('branding');
@@ -355,21 +355,11 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
     setShowAnnouncementForm(true);
   };
 
-  const handleEditAnnouncement = (announcement) => {
-    setEditingAnnouncement(announcement);
-    setShowAnnouncementForm(true);
-  };
-
   const handleSaveAnnouncement = () => {
     // お知らせ管理は AdminDashboard.js に移行済み
     alert('お知らせ管理は管理者画面に移行しました');
     setShowAnnouncementForm(false);
     setEditingAnnouncement(null);
-  };
-
-  const handleDeleteAnnouncement = (id) => {
-    // お知らせ管理は AdminDashboard.js に移行済み
-    alert('お知らせ管理は管理者画面に移行しました');
   };
 
   const handleCancelAnnouncementEdit = () => {
@@ -891,46 +881,10 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
             )}
 
             <div className="announcements-list-admin">
-              <h4>現在のお知らせ一覧</h4>
-              
-              {announcements.length === 0 ? (
-                <p className="no-announcements">お知らせがありません。</p>
-              ) : (
-                <div className="announcements-table">
-                  {announcements.map((announcement) => (
-                    <div key={announcement.id} className="announcement-row">
-                      <div className="announcement-info">
-                        <div className="announcement-header-info">
-                          <span className="announcement-date">{announcement.date}</span>
-                          <span className={`announcement-status ${announcement.published ? 'published' : 'draft'}`}>
-                            {announcement.published ? '公開中' : '下書き'}
-                          </span>
-                        </div>
-                        <h5 className="announcement-title">{announcement.title}</h5>
-                        <p className="announcement-preview">
-                          {announcement.content.length > 100 
-                            ? announcement.content.substring(0, 100) + '...' 
-                            : announcement.content}
-                        </p>
-                      </div>
-                      <div className="announcement-actions">
-                        <button 
-                          className="edit-btn" 
-                          onClick={() => handleEditAnnouncement(announcement)}
-                        >
-                          ✏️ 編集
-                        </button>
-                        <button 
-                          className="delete-btn" 
-                          onClick={() => handleDeleteAnnouncement(announcement.id)}
-                        >
-                          🗑️ 削除
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+              <h4>お知らせ管理は管理者ダッシュボードに移行されました</h4>
+              <p className="migration-notice">
+                お知らせの作成・編集・削除は管理者ダッシュボードの「お知らせ管理」タブで行ってください。
+              </p>
             </div>
           </div>
         )}

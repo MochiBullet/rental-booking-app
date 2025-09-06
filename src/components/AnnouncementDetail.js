@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { announcementManager } from '../data/siteSettings';
+import { announcementsAPI } from '../services/announcementsAPI';
 import './AnnouncementDetail.css';
 
 function AnnouncementDetail() {
@@ -10,14 +10,28 @@ function AnnouncementDetail() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadAnnouncement = () => {
-      const announcementData = announcementManager.getAnnouncementById(id);
-      
-      if (!announcementData || !announcementData.published) {
-        // お知らせが見つからない、または非公開の場合
+    const loadAnnouncement = async () => {
+      try {
+        const result = await announcementsAPI.getAllAnnouncements();
+        if (result.success) {
+          // IDで該当するお知らせを検索
+          const announcementData = result.announcements.find(
+            announcement => announcement.id === parseInt(id)
+          );
+          
+          if (!announcementData || !announcementData.published) {
+            // お知らせが見つからない、または非公開の場合
+            setAnnouncement(null);
+          } else {
+            setAnnouncement(announcementData);
+          }
+        } else {
+          console.error('Failed to load announcements:', result.error);
+          setAnnouncement(null);
+        }
+      } catch (error) {
+        console.error('Error loading announcement:', error);
         setAnnouncement(null);
-      } else {
-        setAnnouncement(announcementData);
       }
       setLoading(false);
     };
