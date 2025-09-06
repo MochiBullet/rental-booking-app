@@ -1,5 +1,5 @@
-// Version 4.0.2 - OVERVIEW SECTION ELIMINATED - ADMIN PANEL FINALIZED  
-// Timestamp: 2025-09-06-15:45 - Dashboard Overview完全削除
+// Version 4.0.3 - EMERGENCY CACHE BUSTING - OVERVIEW COMPLETELY PURGED  
+// Timestamp: 2025-09-06-16:10 - 緊急キャッシュクリア: Overview完全削除確認
 // 管理画面簡素化完了: 車両管理・サイト設定・お知らせ管理の3機能のみ
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate, useLocation, Navigate } from 'react-router-dom';

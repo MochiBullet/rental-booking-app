@@ -680,7 +680,8 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
 
   // 統計機能削除済み - 簡素化された管理画面
 
-  // CACHE BUSTING: v3.0.2 - Completely remove overview and details - 2025-09-06 15:45
+  // EMERGENCY CACHE BUSTING: v3.0.3 - Overview COMPLETELY REMOVED - 2025-09-06 16:10
+  // CONFIRMED: No overview section exists in this file - Browser cache issue
   // タイプの表示名を取得（統計機能削除により不要だが後方互換性のため残存）
   const getTypeDisplayName = (type) => {
     switch (type) {
@@ -1506,12 +1507,7 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
           {false && activeSection === 'details' && detailsType && (
             <div className="details-section">
               <div className="details-header">
-                <button 
-                  className="back-to-overview-btn"
-                  onClick={() => setActiveSection('overview')}
-                >
-                  ← Overview に戻る
-                </button>
+                {/* OVERVIEW BUTTON COMPLETELY REMOVED - v3.0.3 */}
                 <h2>{getTypeDisplayName(detailsType)}の詳細分析</h2>
                 <p className="details-subtitle">過去12ヶ月の月別推移</p>
               </div>
