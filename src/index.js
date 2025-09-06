@@ -8,4 +8,8 @@ root.render(
   <React.StrictMode>
     <App />
   </React.StrictMode>
-);// Force cache clear 2025年 8月 21日 水曜日 01:10:30 - 緑色デザイン完全修復確認
+);
+
+// CRITICAL CACHE BUSTING v3.0.1 - 2025-09-06 15:31
+// お知らせシステムエラー完全解決 - announcementManager削除済み
+// 新しいビルドハッシュ強制生成 - ブラウザキャッシュクリア対応

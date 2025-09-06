@@ -1,4 +1,6 @@
-// Version 4.0 - MAJOR REFACTOR - AUTHENTICATION FEATURES DISABLED FOR INFO SITE MODE
+// Version 4.0.1 - CACHE BUSTING UPDATE - ANNOUNCEMENTS SYSTEM UNIFIED
+// Timestamp: 2025-09-06-15:30 - Force new build hash for cache clear
+// 古いannouncementManager完全削除済み - DynamoDB API統一完了
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import './App.css';
