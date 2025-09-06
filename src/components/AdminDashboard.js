@@ -16,6 +16,8 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
   useEffect(() => {
     const checkAdminAuthentication = () => {
       console.log('🔐 AdminDashboard統合認証チェック開始...');
+      console.log('🌐 現在のURL:', window.location.href);
+      console.log('⏰ チェック時刻:', new Date().toISOString());
       
       const adminUser = localStorage.getItem('adminUser');
       const adminSession = sessionStorage.getItem('adminSession');
@@ -117,6 +119,14 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
       
       // 認証失敗 - 全データクリア後リダイレクト
       console.log('❌ AdminDashboard認証失敗 - ログインページにリダイレクト');
+      console.log('🔍 認証失敗理由詳細:', {
+        hasAdminSession,
+        parsedAdminInfo,
+        loginTimeValid: loginTime && !isNaN(loginTime),
+        actualLoginTime: loginTime,
+        timeDiffMs: loginTime ? (Date.now() - loginTime) : null,
+        sevenDaysMs: 7 * 24 * 60 * 60 * 1000
+      });
       localStorage.removeItem('adminUser');
       localStorage.removeItem('adminLoginTime');
       localStorage.removeItem('adminInfo');
