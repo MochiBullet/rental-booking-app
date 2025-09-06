@@ -678,15 +678,10 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
     }
   };
 
-  // 統計カードクリックハンドラー
-  const handleCardClick = (type) => {
-    setDetailsType(type);
-    setActiveSection('details');
-    calculateMonthlyStats(type);
-    showNotification(`📊 ${getTypeDisplayName(type)}の詳細データを表示中...`, 'info');
-  };
+  // 統計機能削除済み - 簡素化された管理画面
 
-  // タイプの表示名を取得
+  // CACHE BUSTING: v3.0.2 - Completely remove overview and details - 2025-09-06 15:45
+  // タイプの表示名を取得（統計機能削除により不要だが後方互換性のため残存）
   const getTypeDisplayName = (type) => {
     switch (type) {
       case 'confirmed': return '予約確定';
@@ -1507,7 +1502,8 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
             </div>
           )}
 
-          {activeSection === 'details' && detailsType && (
+          {/* DETAILS SECTION REMOVED - SIMPLIFIED ADMIN PANEL */}
+          {false && activeSection === 'details' && detailsType && (
             <div className="details-section">
               <div className="details-header">
                 <button 

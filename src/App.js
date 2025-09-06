@@ -1,6 +1,6 @@
-// Version 4.0.1 - CACHE BUSTING UPDATE - ANNOUNCEMENTS SYSTEM UNIFIED
-// Timestamp: 2025-09-06-15:30 - Force new build hash for cache clear
-// 古いannouncementManager完全削除済み - DynamoDB API統一完了
+// Version 4.0.2 - OVERVIEW SECTION ELIMINATED - ADMIN PANEL FINALIZED  
+// Timestamp: 2025-09-06-15:45 - Dashboard Overview完全削除
+// 管理画面簡素化完了: 車両管理・サイト設定・お知らせ管理の3機能のみ
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import './App.css';

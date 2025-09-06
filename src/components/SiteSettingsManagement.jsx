@@ -3,10 +3,10 @@ import { siteSettingsManager, initialSiteSettings } from '../data/siteSettings';
 import { siteSettingsAPI } from '../services/siteSettingsAPI';
 
 const SiteSettingsManagement = ({ onSettingsUpdate }) => {
-  // CACHE BUSTING v3.0.1 - お知らせシステム完全統一
+  // CACHE BUSTING v3.0.2 - Dashboard Overview完全削除 (2025-09-06 15:46)
   const [settings, setSettings] = useState(initialSiteSettings);
   const [activeSection, setActiveSection] = useState('branding');
-  const [forceRender, setForceRender] = useState(Date.now()); // Force new hash
+  const [forceRender, setForceRender] = useState(Date.now() + 1000); // Aggressive cache clear
 
   useEffect(() => {
     loadSettings();
