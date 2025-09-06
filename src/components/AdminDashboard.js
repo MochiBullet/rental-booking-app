@@ -8,68 +8,127 @@ import { announcementsAPI } from '../services/announcementsAPI';
 
 const AdminDashboard = ({ onSettingsUpdate }) => {
   const navigate = useNavigate();
+  const [isAuthChecking, setIsAuthChecking] = useState(true);
   const [activeSection, setActiveSection] = useState('overview');
   const [isAuthenticating, setIsAuthenticating] = useState(true);
   
-  // 管理者認証チェック（リロード時の状態復元）
+  // 統合認証チェック（リロード対応）
   useEffect(() => {
-    const checkAuthentication = () => {
+    const checkAdminAuthentication = () => {
+      console.log('🔐 AdminDashboard統合認証チェック開始...');
+      
       const adminUser = localStorage.getItem('adminUser');
       const adminSession = sessionStorage.getItem('adminSession');
       const adminTimestamp = localStorage.getItem('adminLoginTime');
       const adminInfo = localStorage.getItem('adminInfo');
       
-      console.log('🔐 AdminDashboard認証チェック開始:', { adminUser, adminSession, adminTimestamp, hasAdminInfo: !!adminInfo });
+      console.log('🔍 認証データ確認:', { 
+        adminUser, 
+        adminSession, 
+        adminTimestamp, 
+        hasAdminInfo: !!adminInfo,
+        currentTime: Date.now()
+      });
       
-      // 複数の認証情報をチェック
-      if (adminUser === 'true' || adminSession === 'true' || adminInfo) {
+      // セッション確認（複数の認証方法をチェック）
+      const hasAdminSession = adminSession === 'true' || adminUser === 'true';
+      
+      // 管理者情報オブジェクトの確認
+      let parsedAdminInfo = null;
+      if (adminInfo) {
+        try {
+          parsedAdminInfo = JSON.parse(adminInfo);
+        } catch (e) {
+          console.warn('adminInfo parse error:', e);
+          localStorage.removeItem('adminInfo');
+        }
+      }
+      
+      // 認証状態判定（いずれかの方法で認証されている場合）
+      if (hasAdminSession || parsedAdminInfo) {
+        const currentTime = Date.now();
+        const sevenDays = 7 * 24 * 60 * 60 * 1000; // 7日間
+        
+        // タイムスタンプ取得（複数ソースから）
+        let loginTime = null;
         if (adminTimestamp) {
-          const loginTime = parseInt(adminTimestamp);
-          const currentTime = Date.now();
-          const sevenDays = 7 * 24 * 60 * 60 * 1000;
+          loginTime = parseInt(adminTimestamp);
+        } else if (parsedAdminInfo?.loginTime) {
+          loginTime = parsedAdminInfo.loginTime;
+        }
+        
+        if (loginTime && !isNaN(loginTime)) {
+          // 期限チェック（7日以内）
+          const timeDiff = currentTime - loginTime;
+          console.log('⏰ ログイン経過時間:', Math.floor(timeDiff / (1000 * 60 * 60 * 24)), '日');
           
-          if (currentTime - loginTime < sevenDays) {
-            console.log('✅ AdminDashboard管理者認証成功 - ダッシュボードアクセス許可');
-            setIsAuthenticating(false);
+          if (timeDiff < sevenDays) {
+            // 認証成功 - セッション更新
+            console.log('✅ AdminDashboard管理者認証成功 - アクセス許可');
             
-            // 認証情報を更新
             localStorage.setItem('adminUser', 'true');
             sessionStorage.setItem('adminSession', 'true');
             localStorage.setItem('adminLoginTime', currentTime.toString());
             
-            if (!adminInfo) {
-              const newAdminInfo = {
-                username: 'admin',
-                loginTime: currentTime,
-                lastActivity: currentTime
-              };
-              localStorage.setItem('adminInfo', JSON.stringify(newAdminInfo));
-            }
-            return;
+            // adminInfo更新
+            const updatedAdminInfo = {
+              username: 'admin',
+              loginTime: loginTime, // 元のログイン時刻を保持
+              lastActivity: currentTime // 最新活動時刻を更新
+            };
+            localStorage.setItem('adminInfo', JSON.stringify(updatedAdminInfo));
+            
+            setIsAuthChecking(false);
+            setIsAuthenticating(false);
+            
+            // データロード開始
+            loadDashboardData();
+            loadSiteSettings();
+            return true;
           } else {
-            console.log('⏰ AdminDashboardログインセッション期限切れ');
+            // 期限切れ
+            console.log('⏰ AdminDashboard管理者ログインが期限切れです（7日超過）');
           }
         } else {
-          // タイムスタンプがない場合は新規設定
-          console.log('🆕 AdminDashboard新しいタイムスタンプを設定');
-          localStorage.setItem('adminLoginTime', Date.now().toString());
+          // タイムスタンプが無効 - 新規設定
+          console.log('🆕 AdminDashboardタイムスタンプ新規設定');
+          const newLoginTime = currentTime;
+          
           localStorage.setItem('adminUser', 'true');
           sessionStorage.setItem('adminSession', 'true');
+          localStorage.setItem('adminLoginTime', newLoginTime.toString());
+          
+          const newAdminInfo = {
+            username: 'admin',
+            loginTime: newLoginTime,
+            lastActivity: newLoginTime
+          };
+          localStorage.setItem('adminInfo', JSON.stringify(newAdminInfo));
+          
+          setIsAuthChecking(false);
           setIsAuthenticating(false);
-          return;
+          
+          // データロード開始
+          loadDashboardData();
+          loadSiteSettings();
+          return true;
         }
       }
       
-      // 認証失敗の場合
+      // 認証失敗 - 全データクリア後リダイレクト
       console.log('❌ AdminDashboard認証失敗 - ログインページにリダイレクト');
       localStorage.removeItem('adminUser');
       localStorage.removeItem('adminLoginTime');
       localStorage.removeItem('adminInfo');
       sessionStorage.removeItem('adminSession');
+      
+      setIsAuthChecking(false);
       navigate('/admin-login');
+      return false;
     };
     
-    checkAuthentication();
+    // 認証チェック実行
+    checkAdminAuthentication();
   }, [navigate]);
   
   // 管理者の活動時刻を定期的に更新（ログイン状態維持のため）
@@ -260,86 +319,7 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
     loadAnnouncements();
   };
 
-  useEffect(() => {
-    // App.jsと同じロジックで管理者認証チェック
-    const checkAdminAuth = () => {
-      const adminUser = localStorage.getItem('adminUser');
-      const adminSession = sessionStorage.getItem('adminSession');
-      const adminTimestamp = localStorage.getItem('adminLoginTime');
-      const adminInfo = localStorage.getItem('adminInfo');
-      
-      // セッション確認：sessionStorageまたはlocalStorageのいずれかで管理者フラグが存在
-      const hasAdminSession = adminSession === 'true' || adminUser === 'true';
-      
-      // 管理者情報オブジェクトの確認
-      let parsedAdminInfo = null;
-      if (adminInfo) {
-        try {
-          parsedAdminInfo = JSON.parse(adminInfo);
-        } catch (e) {
-          console.error('Failed to parse adminInfo:', e);
-        }
-      }
-      
-      // ログイン状態の判定（複数チェック）
-      if (hasAdminSession || parsedAdminInfo) {
-        const currentTime = Date.now();
-        const sevenDays = 7 * 24 * 60 * 60 * 1000; // 7日間（ミリ秒）
-        
-        // タイムスタンプチェック
-        let loginTime = null;
-        if (adminTimestamp) {
-          loginTime = parseInt(adminTimestamp);
-        } else if (parsedAdminInfo?.loginTime) {
-          loginTime = parsedAdminInfo.loginTime;
-        }
-        
-        if (loginTime && !isNaN(loginTime)) {
-          // 期限チェック（7日以内）
-          const timeDiff = currentTime - loginTime;
-          
-          if (timeDiff < sevenDays) {
-            // ログイン状態有効
-            console.log('✅ 管理者認証確認済み');
-            
-            // セッションを更新
-            localStorage.setItem('adminLoginTime', currentTime.toString());
-            localStorage.setItem('adminUser', 'true');
-            sessionStorage.setItem('adminSession', 'true');
-            
-            return true;
-          } else {
-            // 期限切れ
-            console.log('⏰ 管理者ログインが期限切れです');
-            localStorage.removeItem('adminUser');
-            localStorage.removeItem('adminLoginTime');
-            localStorage.removeItem('adminInfo');
-            sessionStorage.removeItem('adminSession');
-            return false;
-          }
-        } else {
-          // タイムスタンプがない場合は新規設定
-          const newLoginTime = currentTime;
-          localStorage.setItem('adminLoginTime', newLoginTime.toString());
-          localStorage.setItem('adminUser', 'true');
-          sessionStorage.setItem('adminSession', 'true');
-          
-          return true;
-        }
-      }
-      
-      return false;
-    };
-    
-    // 認証チェック
-    if (!checkAdminAuth()) {
-      navigate('/admin-login');
-      return;
-    }
-    
-    loadDashboardData();
-    loadSiteSettings();
-  }, [navigate]);
+  // この重複したuseEffectは削除（上記の統合認証チェックに統合済み）
 
   const loadDashboardData = async () => {
     try {
@@ -925,7 +905,7 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
   };
 
   // 認証チェック中の表示
-  if (isAuthenticating) {
+  if (isAuthenticating || isAuthChecking) {
     return (
       <div className="admin-dashboard">
         <div className="auth-loading">
