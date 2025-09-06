@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './HomePage.css';
-import { siteSettingsManager, announcementManager } from '../data/siteSettings';
+import { siteSettingsManager } from '../data/siteSettings';
 import { siteSettingsAPI } from '../services/siteSettingsAPI';
+import { announcementsAPI } from '../services/announcementsAPI';
 
 function HomePage() {
   const navigate = useNavigate();
@@ -55,6 +56,23 @@ function HomePage() {
     return () => window.removeEventListener('siteSettingsUpdate', handleSettingsUpdate);
   }, []);
 
+  const loadAnnouncements = async () => {
+    try {
+      const result = await announcementsAPI.getPublishedAnnouncements();
+      if (result.success) {
+        // 日付順にソート（新しい順）
+        const sortedAnnouncements = result.announcements.sort((a, b) => 
+          new Date(b.date) - new Date(a.date)
+        );
+        setAnnouncements(sortedAnnouncements);
+      } else {
+        console.error('Failed to load announcements:', result.error);
+      }
+    } catch (error) {
+      console.error('Error loading announcements:', error);
+    }
+  };
+
   const loadHomePageData = async () => {
     try {
       console.log('🔄 Loading homepage data from DynamoDB...');
@@ -93,8 +111,8 @@ function HomePage() {
       }
     }
     
-    // お知らせを読み込み（現在はLocalStorageのみ）
-    setAnnouncements(announcementManager.getPublishedAnnouncements());
+    // お知らせを読み込み（DynamoDBから）
+    loadAnnouncements();
   };
 
   const getBackgroundImages = () => {

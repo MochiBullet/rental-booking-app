@@ -4,6 +4,7 @@ import './AdminDashboard.css';
 import dataSyncService from '../services/dataSync';
 import SiteSettingsManagement from './SiteSettingsManagement';
 import { vehicleAPI } from '../services/api';
+import { announcementsAPI } from '../services/announcementsAPI';
 
 const AdminDashboard = ({ onSettingsUpdate }) => {
   const navigate = useNavigate();
@@ -144,6 +145,15 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
     theme: 'green'
   });
   const [showDesignModal, setShowDesignModal] = useState(false);
+  const [announcements, setAnnouncements] = useState([]);
+  const [showAnnouncementModal, setShowAnnouncementModal] = useState(false);
+  const [editingAnnouncement, setEditingAnnouncement] = useState(null);
+  const [announcementForm, setAnnouncementForm] = useState({
+    title: '',
+    date: new Date().toISOString().split('T')[0],
+    content: '',
+    published: true
+  });
   const [homeContent, setHomeContent] = useState({
     heroTitle: 'あなたの旅を、私たちがサポート',
     heroSubtitle: '安心・安全・快適なレンタルサービス',
@@ -202,6 +212,19 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
     root.style.setProperty('--green-pale', settings.accentColor + '22');
   };
 
+  const loadAnnouncements = async () => {
+    try {
+      const result = await announcementsAPI.getAllAnnouncements();
+      if (result.success) {
+        setAnnouncements(result.announcements);
+      } else {
+        console.error('Failed to load announcements:', result.error);
+      }
+    } catch (error) {
+      console.error('Error loading announcements:', error);
+    }
+  };
+
   const loadSiteSettings = () => {
     const savedSettings = localStorage.getItem('siteSettings');
     if (savedSettings) {
@@ -232,6 +255,9 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
     if (savedPrivacy) {
       setPrivacyPolicyContent(JSON.parse(savedPrivacy));
     }
+    
+    // お知らせデータの読み込み（DynamoDBから）
+    loadAnnouncements();
   };
 
   useEffect(() => {
@@ -892,6 +918,13 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
             Site Settings
           </button>
           <button 
+            className={activeSection === 'announcements' ? 'active' : ''}
+            onClick={() => setActiveSection('announcements')}
+          >
+            <span className="nav-icon">📢</span>
+            お知らせ管理
+          </button>
+          <button 
             className={`${activeSection === 'content' ? 'active' : ''}`}
             onClick={() => setActiveSection('content')}
           >
@@ -935,6 +968,7 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
             {activeSection === 'users' && 'User Management'}
             {activeSection === 'analytics' && 'Sales Analytics'}
             {activeSection === 'settings' && 'Site Settings'}
+            {activeSection === 'announcements' && 'お知らせ管理'}
             {activeSection === 'content' && 'Content Editor'}
             {activeSection === 'terms' && 'Terms Editor'}
             {activeSection === 'contacts' && 'Contact Management'}
@@ -1388,6 +1422,101 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
           
           {activeSection === 'settings' && (
             <SiteSettingsManagement onSettingsUpdate={onSettingsUpdate} />
+          )}
+          
+          {activeSection === 'announcements' && (
+            <div className="announcements-section">
+              <div className="section-header">
+                <h2>お知らせ一覧</h2>
+                <button 
+                  className="add-btn"
+                  onClick={() => {
+                    setEditingAnnouncement(null);
+                    setAnnouncementForm({
+                      title: '',
+                      date: new Date().toISOString().split('T')[0],
+                      content: '',
+                      published: true
+                    });
+                    setShowAnnouncementModal(true);
+                  }}
+                >
+                  + 新しいお知らせを追加
+                </button>
+              </div>
+              
+              <div className="announcements-list">
+                {announcements.length === 0 ? (
+                  <div className="empty-state">
+                    <p>お知らせがありません</p>
+                  </div>
+                ) : (
+                  <table className="data-table">
+                    <thead>
+                      <tr>
+                        <th>日付</th>
+                        <th>タイトル</th>
+                        <th>内容</th>
+                        <th>公開状態</th>
+                        <th>操作</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {announcements.map((announcement, index) => (
+                        <tr key={announcement.id || index}>
+                          <td>{announcement.date}</td>
+                          <td>{announcement.title}</td>
+                          <td className="content-preview">
+                            {announcement.content ? announcement.content.substring(0, 50) + '...' : ''}
+                          </td>
+                          <td>
+                            <span className={`status-badge ${announcement.published ? 'active' : 'inactive'}`}>
+                              {announcement.published ? '公開中' : '非公開'}
+                            </span>
+                          </td>
+                          <td>
+                            <div className="action-buttons">
+                              <button 
+                                className="edit-btn"
+                                onClick={() => {
+                                  setEditingAnnouncement(announcement);
+                                  setAnnouncementForm({
+                                    title: announcement.title,
+                                    date: announcement.date,
+                                    content: announcement.content || '',
+                                    published: announcement.published
+                                  });
+                                  setShowAnnouncementModal(true);
+                                }}
+                              >
+                                編集
+                              </button>
+                              <button 
+                                className="delete-btn"
+                                onClick={async () => {
+                                  if (window.confirm('このお知らせを削除しますか？')) {
+                                    const result = await announcementsAPI.deleteAnnouncement(announcement.id);
+                                    if (result.success) {
+                                      const updatedAnnouncements = announcements.filter((a) => a.id !== announcement.id);
+                                      setAnnouncements(updatedAnnouncements);
+                                      showNotification('📢 お知らせを削除しました', 'info');
+                                    } else {
+                                      showNotification('❌ 削除に失敗しました', 'error');
+                                    }
+                                  }
+                                }}
+                              >
+                                削除
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            </div>
           )}
           
           {activeSection === 'content' && (
@@ -2630,6 +2759,91 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
               <button className="cancel-btn" onClick={() => {
                 setShowEditPrivacyModal(false);
                 setSelectedPrivacySection(null);
+              }}>キャンセル</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* お知らせ追加/編集モーダル */}
+      {showAnnouncementModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h2>{editingAnnouncement ? 'お知らせを編集' : '新しいお知らせを追加'}</h2>
+            <div className="form-group">
+              <label>日付</label>
+              <input 
+                type="date"
+                value={announcementForm.date}
+                onChange={(e) => setAnnouncementForm({...announcementForm, date: e.target.value})}
+              />
+            </div>
+            <div className="form-group">
+              <label>タイトル</label>
+              <input 
+                type="text"
+                value={announcementForm.title}
+                onChange={(e) => setAnnouncementForm({...announcementForm, title: e.target.value})}
+                placeholder="お知らせのタイトルを入力"
+              />
+            </div>
+            <div className="form-group">
+              <label>内容</label>
+              <textarea 
+                value={announcementForm.content}
+                onChange={(e) => setAnnouncementForm({...announcementForm, content: e.target.value})}
+                rows="6"
+                placeholder="お知らせの内容を入力"
+              />
+            </div>
+            <div className="form-group">
+              <label className="checkbox-label">
+                <input 
+                  type="checkbox"
+                  checked={announcementForm.published}
+                  onChange={(e) => setAnnouncementForm({...announcementForm, published: e.target.checked})}
+                />
+                <span>公開する</span>
+              </label>
+            </div>
+            <div className="modal-actions">
+              <button className="save-btn" onClick={async () => {
+                if (!announcementForm.title) {
+                  showNotification('❌ タイトルは必須項目です', 'error');
+                  return;
+                }
+                
+                if (editingAnnouncement) {
+                  // 更新処理
+                  const result = await announcementsAPI.updateAnnouncement(editingAnnouncement.id, announcementForm);
+                  if (result.success) {
+                    const updatedAnnouncements = announcements.map(a => 
+                      a.id === editingAnnouncement.id ? {...a, ...announcementForm} : a
+                    );
+                    setAnnouncements(updatedAnnouncements);
+                    showNotification('📢 お知らせを更新しました', 'success');
+                  } else {
+                    showNotification('❌ 更新に失敗しました', 'error');
+                  }
+                } else {
+                  // 新規作成処理
+                  const result = await announcementsAPI.createAnnouncement(announcementForm);
+                  if (result.success) {
+                    setAnnouncements([...announcements, result.announcement]);
+                    showNotification('📢 新しいお知らせを追加しました', 'success');
+                  } else {
+                    showNotification('❌ 追加に失敗しました', 'error');
+                  }
+                }
+                
+                setShowAnnouncementModal(false);
+                setEditingAnnouncement(null);
+              }}>
+                {editingAnnouncement ? '更新' : '追加'}
+              </button>
+              <button className="cancel-btn" onClick={() => {
+                setShowAnnouncementModal(false);
+                setEditingAnnouncement(null);
               }}>キャンセル</button>
             </div>
           </div>
