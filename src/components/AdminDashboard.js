@@ -283,12 +283,15 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
 
   const loadAnnouncements = async () => {
     try {
-      const result = await announcementsAPI.getAllAnnouncements();
-      if (result.success) {
-        setAnnouncements(result.announcements);
-      } else {
-        console.error('Failed to load announcements:', result.error);
-      }
+      console.log('📢 お知らせ機能は一時的に無効化されています（CORS設定修正中）');
+      // 一時的に無効化（CORS問題解決まで）
+      // const result = await announcementsAPI.getAllAnnouncements();
+      // if (result.success) {
+      //   setAnnouncements(result.announcements);
+      // } else {
+      //   console.error('Failed to load announcements:', result.error);
+      // }
+      setAnnouncements([]); // 空の配列をセット
     } catch (error) {
       console.error('Error loading announcements:', error);
     }
