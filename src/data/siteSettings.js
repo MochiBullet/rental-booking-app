@@ -124,21 +124,26 @@ export const initialSiteSettings = {
 };
 
 // サイト設定管理ユーティリティ
+// TODO: DynamoDB/CDK統合予定 - LocalStorage使用禁止
 export const siteSettingsManager = {
-  // 設定を取得
+  // 設定を取得 - LocalStorage無効化、初期設定のみ使用
   getSettings: () => {
-    const saved = localStorage.getItem('rentalEasySiteSettings');
-    return saved ? JSON.parse(saved) : initialSiteSettings;
+    // LocalStorage使用禁止 - DB統合まで初期設定を返す
+    console.log('📋 Site Settings loaded (DB integration pending):', initialSiteSettings);
+    return initialSiteSettings;
   },
 
-  // 設定を保存
+  // 設定を保存 - 現在は何もしない（DB統合待ち）
   saveSettings: (settings) => {
-    localStorage.setItem('rentalEasySiteSettings', JSON.stringify(settings));
+    console.log('⚠️ Save skipped - DB integration pending:', settings);
+    // LocalStorage使用禁止 - DynamoDB統合予定
+    // localStorage.setItem('rentalEasySiteSettings', JSON.stringify(settings));
   },
 
   // 設定をリセット
   resetSettings: () => {
-    localStorage.removeItem('rentalEasySiteSettings');
+    // LocalStorage使用禁止
+    console.log('🔄 Settings reset to initial values');
     return initialSiteSettings;
   }
 };
