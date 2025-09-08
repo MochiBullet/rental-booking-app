@@ -366,6 +366,7 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
           { key: 'hero', label: 'ヒーローセクション' },
           { key: 'features', label: '特徴・機能' },
           { key: 'contact', label: 'お問い合わせ情報' },
+          { key: 'googleforms', label: '📝 Google Forms連携' },
           { key: 'terms', label: '📋 利用規約' },
           { key: 'privacy', label: '🔒 プライバシーポリシー' }
         ].map(tab => (
@@ -781,6 +782,110 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
         )}
 
         {/* お知らせ管理は管理者ダッシュボードに完全移行済み */}
+
+        {activeSection === 'googleforms' && (
+          <div className="section">
+            <h3>📝 Google Forms連携設定</h3>
+            <p className="section-description">
+              セキュリティ強化のため、個人情報をGoogle Formsで管理します。<br/>
+              フォーム送信先: <a href="https://docs.google.com/forms/d/e/1FAIpQLSdM1hGazWWkJJFFbMJBAzl-lEXE20XMtwfO_h-o7hEol8-bpw/viewform" target="_blank" rel="noopener noreferrer">M's BASE レンタル予約フォーム</a>
+            </p>
+            
+            <div className="form-group">
+              <label>Google Forms連携を有効化</label>
+              <label className="switch">
+                <input
+                  type="checkbox"
+                  checked={settings.googleForms?.enabled || false}
+                  onChange={(e) => setSettings(prev => ({
+                    ...prev,
+                    googleForms: {
+                      ...prev.googleForms,
+                      enabled: e.target.checked
+                    }
+                  }))}
+                />
+                <span className="slider round"></span>
+              </label>
+              <small>有効にすると、予約時に個人情報がGoogle Formsに送信されます</small>
+            </div>
+
+            <div className="form-group">
+              <label>フォームURL（送信先）</label>
+              <input
+                type="text"
+                value={settings.googleForms?.formUrl || 'https://docs.google.com/forms/u/0/d/e/1FAIpQLSdM1hGazWWkJJFFbMJBAzl-lEXE20XMtwfO_h-o7hEol8-bpw/formResponse'}
+                onChange={(e) => setSettings(prev => ({
+                  ...prev,
+                  googleForms: {
+                    ...prev.googleForms,
+                    formUrl: e.target.value
+                  }
+                }))}
+                placeholder="https://docs.google.com/forms/u/0/d/e/.../formResponse"
+              />
+              <small>フォームのaction URLを入力（末尾は/formResponse）</small>
+            </div>
+
+            <div className="form-group">
+              <label>埋め込みフォーム表示</label>
+              <label className="switch">
+                <input
+                  type="checkbox"
+                  checked={settings.googleForms?.showEmbedded || false}
+                  onChange={(e) => setSettings(prev => ({
+                    ...prev,
+                    googleForms: {
+                      ...prev.googleForms,
+                      showEmbedded: e.target.checked
+                    }
+                  }))}
+                />
+                <span className="slider round"></span>
+              </label>
+              <small>予約ページにGoogle Formを埋め込み表示します</small>
+            </div>
+
+            {settings.googleForms?.showEmbedded && (
+              <div className="form-group">
+                <label>埋め込みフォームの高さ（px）</label>
+                <input
+                  type="number"
+                  value={settings.googleForms?.embedHeight || 800}
+                  onChange={(e) => setSettings(prev => ({
+                    ...prev,
+                    googleForms: {
+                      ...prev.googleForms,
+                      embedHeight: parseInt(e.target.value)
+                    }
+                  }))}
+                  placeholder="800"
+                  min="400"
+                  max="2000"
+                />
+              </div>
+            )}
+
+            <div className="alert-info" style={{marginTop: '20px', padding: '15px', backgroundColor: '#e3f2fd', borderRadius: '5px'}}>
+              <strong>🔐 セキュリティ向上のポイント：</strong>
+              <ul style={{marginTop: '10px', paddingLeft: '20px'}}>
+                <li>個人情報はGoogleの安全なサーバーに保存されます</li>
+                <li>SSL/TLS暗号化により通信が保護されます</li>
+                <li>Google Formsの自動バックアップ機能</li>
+                <li>管理者はGoogleスプレッドシートで一元管理可能</li>
+              </ul>
+            </div>
+
+            <div className="alert-warning" style={{marginTop: '15px', padding: '15px', backgroundColor: '#fff3e0', borderRadius: '5px'}}>
+              <strong>⚠️ 設定時の注意：</strong>
+              <ul style={{marginTop: '10px', paddingLeft: '20px'}}>
+                <li>Google Formの共有設定を「リンクを知っている全員」に設定してください</li>
+                <li>フォームの編集権限は管理者のみに制限してください</li>
+                <li>定期的にGoogle Formsの回答をバックアップしてください</li>
+              </ul>
+            </div>
+          </div>
+        )}
 
         {activeSection === 'privacy' && (
           <div className="section">

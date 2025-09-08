@@ -2,12 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import './VehicleList.css';
 import { vehicleAPI } from '../services/api';
+import GoogleFormsEmbed from './GoogleFormsEmbed';
+import { siteSettingsManager } from '../data/siteSettings';
 
 const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
   const { type } = useParams();
   const [vehicles, setVehicles] = useState([]);
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [showSimulationModal, setShowSimulationModal] = useState(false);
+  const [showGoogleForms, setShowGoogleForms] = useState(false);
+  const [siteSettings, setSiteSettings] = useState(null);
   // DISABLED: Booking functionality replaced with price simulation
   // const [bookingSuccess, setBookingSuccess] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState('daily');
@@ -71,6 +75,10 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
   };
 
   useEffect(() => {
+    // Site Settings を読み込み
+    const settings = siteSettingsManager.getSettings();
+    setSiteSettings(settings);
+    
     // propsでvehiclesが渡されている場合はそれを使用（空配列でも使用する）
     if (vehiclesProp !== undefined) {
       console.log('✅ VehicleList: propsからvehiclesを使用:', vehiclesProp.length, '件');
@@ -320,6 +328,35 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
         ))}
       </div>
 
+      {showGoogleForms && selectedVehicle && (
+        <div className="modern-modal-overlay">
+          <div className="modern-modal" style={{ maxWidth: '900px', width: '90%' }}>
+            <div className="modal-header">
+              <h2>予約フォーム</h2>
+              <button 
+                className="modal-close" 
+                onClick={() => setShowGoogleForms(false)}
+                style={{
+                  position: 'absolute',
+                  right: '20px',
+                  top: '20px',
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '24px',
+                  cursor: 'pointer'
+                }}
+              >
+                ×
+              </button>
+            </div>
+            <GoogleFormsEmbed 
+              vehicleInfo={selectedVehicle}
+              onClose={() => setShowGoogleForms(false)}
+            />
+          </div>
+        </div>
+      )}
+
       {showSimulationModal && selectedVehicle && (
         <div className="modern-modal-overlay">
           <div className="modern-modal">
@@ -483,6 +520,28 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
                           <p className="price-note">※実際の料金は条件により変動する場合があります</p>
                         </div>
                       </div>
+                      {siteSettings?.googleForms?.enabled && (
+                        <button 
+                          className="reserve-btn" 
+                          onClick={() => {
+                            setShowSimulationModal(false);
+                            setShowGoogleForms(true);
+                          }}
+                          style={{
+                            backgroundColor: '#4caf50',
+                            color: 'white',
+                            padding: '12px 30px',
+                            border: 'none',
+                            borderRadius: '5px',
+                            fontSize: '16px',
+                            fontWeight: 'bold',
+                            cursor: 'pointer',
+                            marginRight: '10px'
+                          }}
+                        >
+                          予約フォームへ進む →
+                        </button>
+                      )}
                       <button className="close-simulation-btn" onClick={() => setShowSimulationModal(false)}>
                         閉じる
                       </button>
