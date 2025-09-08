@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Forms テスト送信</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; }
+        .test-info { background: #e8f5e9; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        button { padding: 15px 30px; background: #4caf50; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
+        button:hover { background: #45a049; }
+        .log { background: #f5f5f5; padding: 10px; border-radius: 5px; margin-top: 10px; font-family: monospace; white-space: pre-wrap; }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Google Forms テストデータ送信</h1>
+    
+    <div class="test-info">
+        <h3>📋 送信予定のテストデータ</h3>
+        <ul>
+            <li><strong>姓:</strong> 田中</li>
+            <li><strong>名:</strong> 太郎</li>
+            <li><strong>セイ:</strong> タナカ</li>
+            <li><strong>メイ:</strong> タロウ</li>
+            <li><strong>メール:</strong> test@example.com</li>
+            <li><strong>電話:</strong> 090-1234-5678</li>
+            <li><strong>免許証番号:</strong> 123456789012</li>
+            <li><strong>免許種類:</strong> 普通自動車免許</li>
+            <li><strong>車両タイプ:</strong> 軽自動車・乗用車・貨物車等</li>
+            <li><strong>追加情報:</strong> レンタル希望日数: 3日, 受取希望日: 2025-09-15, 希望車両: トヨタ アクア</li>
+        </ul>
+    </div>
+
+    <button onclick="sendMinimalData()">🧪 最小限データテスト</button>
+    <button onclick="sendCarData()">🚗 車タイプテスト</button>
+    <button onclick="sendTestData()">📤 完全データテスト</button>
+    <button onclick="runAllTests()">🎯 段階的全テスト実行</button>
+    
+    <div id="log" class="log"></div>
+
+    <script>
+        function log(message, type = 'info') {
+            const logElement = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'success' ? 'success' : type === 'error' ? 'error' : '';
+            logElement.innerHTML += `<div class="${className}">[${timestamp}] ${message}</div>`;
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+
+        // 最もシンプルな送信テスト（必須フィールドのみ）
+        async function sendMinimalData() {
+            log('🧪 最小限データ送信テスト...');
+            
+            const formUrl = 'https://docs.google.com/forms/u/0/d/e/1FAIpQLSdM1hGazWWkJJFFbMJBAzl-lEXE20XMtwfO_h-o7hEol8-bpw/formResponse';
+            
+            // 最も基本的なフィールドのみ
+            const formData = new FormData();
+            
+            // 車両タイプを先に設定（必須の可能性が高い）
+            formData.append('entry.370718445', 'バイク');
+            log('✓ 車両タイプ: バイク');
+            
+            // バイク選択時は排気量も必要の可能性
+            formData.append('entry.733230829', '125cc以下（原付二種）');
+            log('✓ バイク排気量: 125cc以下（原付二種）');
+            
+            // 基本個人情報
+            formData.append('entry.1280174264', '田中');
+            formData.append('entry.846732635', '太郎');
+            formData.append('entry.1979973897', 'test@example.com');
+            formData.append('entry.1952002308', '090-1234-5678');
+            
+            log('📝 最小限の送信データ:');
+            for (let [key, value] of formData.entries()) {
+                log(`  ${key}: ${value}`);
+            }
+
+            try {
+                await fetch(formUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: formData
+                });
+                log('✅ 最小限データ送信完了', 'success');
+            } catch (err) {
+                log(`❌ 送信エラー: ${err.message}`, 'error');
+            }
+        }
+        
+        // 車両タイプ別のテスト
+        async function sendCarData() {
+            log('🚗 車タイプデータ送信テスト...');
+            
+            const formUrl = 'https://docs.google.com/forms/u/0/d/e/1FAIpQLSdM1hGazWWkJJFFbMJBAzl-lEXE20XMtwfO_h-o7hEol8-bpw/formResponse';
+            
+            const formData = new FormData();
+            
+            // 車両タイプ: 車
+            formData.append('entry.370718445', '軽自動車・乗用車・貨物車等');
+            log('✓ 車両タイプ: 軽自動車・乗用車・貨物車等');
+            
+            // 車のサブカテゴリが必要かもしれない
+            formData.append('entry.976138385', '軽自動車');
+            log('✓ 車カテゴリ: 軽自動車');
+            
+            // 基本個人情報
+            formData.append('entry.1280174264', '佐藤');
+            formData.append('entry.846732635', '花子');
+            formData.append('entry.1979973897', 'hanako@example.com');
+            formData.append('entry.1952002308', '080-9876-5432');
+
+            log('📝 車用送信データ:');
+            for (let [key, value] of formData.entries()) {
+                log(`  ${key}: ${value}`);
+            }
+
+            try {
+                await fetch(formUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: formData
+                });
+                log('✅ 車データ送信完了', 'success');
+            } catch (err) {
+                log(`❌ 送信エラー: ${err.message}`, 'error');
+            }
+        }
+
+        async function sendTestData() {
+            log('🚀 テストデータ送信を開始します...');
+            
+            const formUrl = 'https://docs.google.com/forms/u/0/d/e/1FAIpQLSdM1hGazWWkJJFFbMJBAzl-lEXE20XMtwfO_h-o7hEol8-bpw/formResponse';
+            
+            // テストデータ
+            const testData = {
+                firstName: '田中',
+                lastName: '太郎', 
+                firstNamePhonetic: 'タナカ',
+                lastNamePhonetic: 'タロウ',
+                email: 'test@example.com',
+                phone: '090-1234-5678',
+                licenseNumber: '123456789012',
+                licenseType: '普通自動車免許',
+                vehicleType: '軽自動車・乗用車・貨物車等',
+                additionalInfo: 'レンタル希望日数: 3日\n受取希望日: 2025-09-15\n希望車両: トヨタ アクア\n日額料金: ¥8000\nその他備考: テストデータです'
+            };
+            
+            // FormDataを作成
+            const formDataToSend = new FormData();
+            formDataToSend.append('entry.1280174264', testData.firstName); // 姓
+            formDataToSend.append('entry.846732635', testData.lastName); // 名
+            formDataToSend.append('entry.616715639', testData.firstNamePhonetic); // セイ
+            formDataToSend.append('entry.701002604', testData.lastNamePhonetic); // メイ
+            formDataToSend.append('entry.1979973897', testData.email); // メール
+            formDataToSend.append('entry.1952002308', testData.phone); // 電話
+            formDataToSend.append('entry.1318842287', testData.licenseNumber); // 免許証番号
+            formDataToSend.append('entry.538505772', testData.licenseType); // 免許種類
+            formDataToSend.append('entry.370718445', testData.vehicleType); // 車両タイプ
+            
+            // 複数の自由記述欄entry IDを試す
+            formDataToSend.append('entry.1000000000', testData.additionalInfo);
+            formDataToSend.append('entry.2000000000', testData.additionalInfo);
+            formDataToSend.append('entry.999999999', testData.additionalInfo);
+
+            log('📝 送信データ:');
+            for (let [key, value] of formDataToSend.entries()) {
+                log(`  ${key}: ${value}`);
+            }
+
+            // Method 3: 隠しiframe送信（最も確実な方法）
+            log('🚀 隠しiframe送信を実行...');
+            try {
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                iframe.name = 'hidden_iframe_' + Date.now();
+                iframe.onload = () => log('📄 iframe読み込み完了');
+                document.body.appendChild(iframe);
+
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = formUrl;
+                form.target = iframe.name;
+                form.style.display = 'none';
+
+                // フォームフィールドを動的作成
+                for (let [key, value] of formDataToSend.entries()) {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = key;
+                    input.value = value;
+                    form.appendChild(input);
+                }
+
+                document.body.appendChild(form);
+                form.submit();
+                log('📤 フォーム送信実行');
+
+                // 5秒後にクリーンアップ
+                setTimeout(() => {
+                    if (document.body.contains(iframe)) document.body.removeChild(iframe);
+                    if (document.body.contains(form)) document.body.removeChild(form);
+                    log('🧹 要素クリーンアップ完了');
+                }, 5000);
+
+                log('✅ iframe送信完了', 'success');
+            } catch (err) {
+                log(`❌ iframe送信エラー: ${err.message}`, 'error');
+            }
+
+            log('');
+            log('🎉 送信完了！スプレッドシートを確認してください。', 'success');
+        }
+        
+        // 段階的テスト実行
+        async function runAllTests() {
+            log('🧪 段階的テスト開始...');
+            log('');
+            
+            // Test 1: 最小限のデータ
+            await sendMinimalData();
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            log('');
+            log('⏳ 2秒待機...');
+            log('');
+            
+            // Test 2: 車タイプのデータ
+            await sendCarData();
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            log('');
+            log('⏳ 2秒待機...');
+            log('');
+            
+            // Test 3: 完全なデータ
+            await sendTestData();
+            
+            log('');
+            log('🏁 全テスト完了！スプレッドシートで3つのエントリを確認してください。', 'success');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Forms Entry ID 抽出</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }
+        .instruction { background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .result { background: #f5f5f5; padding: 10px; border-radius: 5px; margin-top: 10px; font-family: monospace; white-space: pre-wrap; }
+        button { padding: 10px 20px; background: #2196f3; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 5px; }
+        input[type="text"] { width: 100%; padding: 8px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Google Forms Entry ID 抽出ツール</h1>
+    
+    <div class="instruction">
+        <h3>📋 手順:</h3>
+        <ol>
+            <li>Google Forms (<a href="https://docs.google.com/forms/d/e/1FAIpQLSdM1hGazWWkJJFFbMJBAzl-lEXE20XMtwfO_h-o7hEol8-bpw/viewform" target="_blank">リンク</a>) を別タブで開く</li>
+            <li>フォーム上で右クリック → 「ページのソースを表示」</li>
+            <li>HTMLソース全体をコピー</li>
+            <li>下のテキストエリアに貼り付け</li>
+            <li>「Entry ID を抽出」ボタンをクリック</li>
+        </ol>
+    </div>
+
+    <textarea id="htmlSource" placeholder="ここにGoogle FormsのHTMLソースを貼り付けてください..." style="width: 100%; height: 200px; font-family: monospace; font-size: 12px;"></textarea>
+    
+    <button onclick="extractEntryIds()">🔍 Entry ID を抽出</button>
+    <button onclick="testWithBlankForm()">📝 空のフォームで試す</button>
+    
+    <div id="result" class="result"></div>
+
+    <script>
+        function extractEntryIds() {
+            const htmlSource = document.getElementById('htmlSource').value;
+            const resultDiv = document.getElementById('result');
+            
+            if (!htmlSource.trim()) {
+                resultDiv.innerHTML = '❌ HTMLソースを入力してください。';
+                return;
+            }
+            
+            console.log('HTML Source Length:', htmlSource.length);
+            
+            // entry. で始まるパターンを抽出
+            const entryPattern = /entry\.(\d+)/g;
+            const entries = [];
+            let match;
+            
+            while ((match = entryPattern.exec(htmlSource)) !== null) {
+                const entryId = match[1];
+                if (!entries.includes(entryId)) {
+                    entries.push(entryId);
+                }
+            }
+            
+            // name属性のentry IDを抽出
+            const namePattern = /name=["']entry\.(\d+)["']/g;
+            while ((match = namePattern.exec(htmlSource)) !== null) {
+                const entryId = match[1];
+                if (!entries.includes(entryId)) {
+                    entries.push(entryId);
+                }
+            }
+            
+            // data-params内のentry IDを抽出
+            const dataParamsPattern = /data-params=".*?entry\.(\d+).*?"/g;
+            while ((match = dataParamsPattern.exec(htmlSource)) !== null) {
+                const entryId = match[1];
+                if (!entries.includes(entryId)) {
+                    entries.push(entryId);
+                }
+            }
+            
+            // FB_PUBLIC_LOAD_DATA内のentry IDを抽出
+            const fbDataPattern = /FB_PUBLIC_LOAD_DATA.*?"entry\.(\d+)"/g;
+            while ((match = fbDataPattern.exec(htmlSource)) !== null) {
+                const entryId = match[1];
+                if (!entries.includes(entryId)) {
+                    entries.push(entryId);
+                }
+            }
+            
+            entries.sort();
+            
+            let result = `見つかったEntry IDs (${entries.length}個):\n\n`;
+            
+            entries.forEach((entryId, index) => {
+                result += `entry.${entryId}\n`;
+            });
+            
+            result += '\n\n📝 フォーム送信用コード:\n';
+            result += 'const formData = new FormData();\n';
+            entries.forEach((entryId, index) => {
+                result += `formData.append('entry.${entryId}', 'テスト値${index + 1}'); // フィールド${index + 1}\n`;
+            });
+            
+            result += '\n\n🧪 テスト送信用URL:\n';
+            const testUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSdM1hGazWWkJJFFbMJBAzl-lEXE20XMtwfO_h-o7hEol8-bpw/viewform?usp=pp_url';
+            entries.forEach((entryId, index) => {
+                result += `&entry.${entryId}=TEST${index + 1}`;
+            });
+            
+            resultDiv.innerHTML = result;
+        }
+        
+        function testWithBlankForm() {
+            // 新しいブラウザウィンドウで空のフォームを開く
+            const formUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSdM1hGazWWkJJFFbMJBAzl-lEXE20XMtwfO_h-o7hEol8-bpw/formResponse';
+            
+            console.log('空のフォームでテスト送信中...');
+            
+            // 空のFormDataで送信
+            const formData = new FormData();
+            
+            fetch(formUrl, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: formData
+            }).then(() => {
+                console.log('空フォーム送信完了');
+                document.getElementById('result').innerHTML = '✅ 空のフォームテスト送信完了\n\nスプレッドシートを確認してタイムスタンプのみの行が追加されているか確認してください。';
+            }).catch(err => {
+                console.error('送信エラー:', err);
+            });
+        }
+    </script>
+</body>
+</html>

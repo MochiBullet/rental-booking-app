@@ -9,6 +9,7 @@ function HomePage() {
   const navigate = useNavigate();
   const [siteSettings, setSiteSettings] = useState(null);
   const [announcements, setAnnouncements] = useState([]);
+  const [announcementsLoaded, setAnnouncementsLoaded] = useState(false);
   const [homeContent, setHomeContent] = useState({
     heroTitle: 'あなたの旅を、私たちがサポート',
     heroSubtitle: '安心・安全・快適なレンタルサービス',
@@ -45,7 +46,16 @@ function HomePage() {
   };
 
   useEffect(() => {
-    loadHomePageData();
+    // 並列読み込みで高速化
+    const initializeHomePage = async () => {
+      // お知らせとホームデータを並列で読み込み
+      await Promise.all([
+        loadAnnouncements(),
+        loadHomePageData()
+      ]);
+    };
+
+    initializeHomePage();
 
     // カスタムイベントリスナーを追加（管理者画面からの更新を受け取る）
     const handleSettingsUpdate = () => {
@@ -58,18 +68,111 @@ function HomePage() {
 
   const loadAnnouncements = async () => {
     try {
+      // ローカル環境では localStorage から高速読み込み
+      const isLocal = window.location.hostname === 'localhost' || 
+                     window.location.hostname === '127.0.0.1' ||
+                     window.location.hostname === '';
+      
+      if (isLocal) {
+        console.log('📋 ローカル環境: localStorageからお知らせを読み込み');
+        const localAnnouncements = localStorage.getItem('announcements');
+        if (localAnnouncements) {
+          const announcements = JSON.parse(localAnnouncements);
+          const publishedAnnouncements = announcements
+            .filter(announcement => announcement.published)
+            .sort((a, b) => new Date(b.date) - new Date(a.date));
+          setAnnouncements(publishedAnnouncements);
+          setAnnouncementsLoaded(true);
+          console.log('📋 ローカルお知らせ読み込み完了:', publishedAnnouncements.length, '件');
+          return;
+        } else {
+          console.log('📋 ローカルにお知らせがありません - デフォルトを設定');
+          const defaultAnnouncements = [
+            {
+              id: '1',
+              title: 'サービス開始のお知らせ',
+              content: 'M\'s BASE レンタルサービスを開始いたしました。安心・安全な車両をご提供いたします。',
+              date: new Date().toISOString().split('T')[0],
+              published: true,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString()
+            }
+          ];
+          localStorage.setItem('announcements', JSON.stringify(defaultAnnouncements));
+          setAnnouncements(defaultAnnouncements);
+          setAnnouncementsLoaded(true);
+          return;
+        }
+      }
+
+      // 本番環境: まずキャッシュから高速表示、その後APIで更新
+      console.log('📋 本番環境: キャッシュとAPIの2段階読み込み');
+      
+      // Stage 1: キャッシュから即座に表示
+      const cacheKey = 'announcements-cache';
+      const cacheTimestampKey = 'announcements-cache-timestamp';
+      const cachedData = localStorage.getItem(cacheKey);
+      const cacheTimestamp = localStorage.getItem(cacheTimestampKey);
+      
+      if (cachedData && cacheTimestamp) {
+        const cacheAge = Date.now() - parseInt(cacheTimestamp);
+        const maxCacheAge = 5 * 60 * 1000; // 5分間
+        
+        if (cacheAge < maxCacheAge) {
+          console.log('📋 キャッシュから即座に表示 (キャッシュ年齢:', Math.floor(cacheAge / 1000), '秒)');
+          const cachedAnnouncements = JSON.parse(cachedData);
+          setAnnouncements(cachedAnnouncements);
+          setAnnouncementsLoaded(true);
+          
+          // バックグラウンドでAPIを呼び出して更新
+          console.log('📋 バックグラウンドでAPI更新中...');
+          loadAnnouncementsFromAPI();
+          return;
+        }
+      }
+
+      // Stage 2: APIから直接読み込み（キャッシュが無効の場合）
+      console.log('📋 APIから直接読み込み');
+      await loadAnnouncementsFromAPI();
+      
+    } catch (error) {
+      console.error('📋 お知らせ読み込みエラー:', error);
+      setAnnouncements([]);
+      setAnnouncementsLoaded(true);
+    }
+  };
+
+  // API から お知らせを読み込んでキャッシュも更新する関数
+  const loadAnnouncementsFromAPI = async () => {
+    try {
       const result = await announcementsAPI.getPublishedAnnouncements();
       if (result.success) {
         // 日付順にソート（新しい順）
         const sortedAnnouncements = result.announcements.sort((a, b) => 
           new Date(b.date) - new Date(a.date)
         );
+        
         setAnnouncements(sortedAnnouncements);
+        setAnnouncementsLoaded(true);
+        
+        // キャッシュを更新
+        localStorage.setItem('announcements-cache', JSON.stringify(sortedAnnouncements));
+        localStorage.setItem('announcements-cache-timestamp', Date.now().toString());
+        
+        console.log('📋 API読み込み完了 & キャッシュ更新:', sortedAnnouncements.length, '件');
       } else {
-        console.error('Failed to load announcements:', result.error);
+        console.error('📋 API読み込み失敗:', result.error);
+        if (!announcementsLoaded) {
+          setAnnouncements([]);
+          setAnnouncementsLoaded(true);
+        }
       }
     } catch (error) {
-      console.error('Error loading announcements:', error);
+      console.error('📋 API呼び出しエラー:', error);
+      if (!announcementsLoaded) {
+        setAnnouncements([]);
+        setAnnouncementsLoaded(true);
+      }
     }
   };
 
@@ -111,8 +214,7 @@ function HomePage() {
       }
     }
     
-    // お知らせを読み込み（DynamoDBから）
-    loadAnnouncements();
+    // お知らせは並列読み込みで既に処理済み
   };
 
   const getBackgroundImages = () => {
@@ -171,9 +273,33 @@ function HomePage() {
 
       <div className="selection-container">
         {/* お知らせセクション */}
-        {announcements.length > 0 && (
-          <div className="announcements-section">
-            <h3 className="announcements-title">📢 お知らせ</h3>
+        <div className="announcements-section">
+          <h3 className="announcements-title">📢 お知らせ</h3>
+          
+          {!announcementsLoaded ? (
+            // ローディング中のスケルトン表示
+            <div className="announcements-list">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="announcement-item skeleton" style={{
+                  backgroundColor: '#f0f0f0',
+                  animation: 'pulse 1.5s ease-in-out infinite',
+                  cursor: 'default'
+                }}>
+                  <span className="announcement-date" style={{ 
+                    backgroundColor: '#e0e0e0', 
+                    color: 'transparent',
+                    borderRadius: '4px'
+                  }}>2024-01-01</span>
+                  <span className="announcement-title" style={{ 
+                    backgroundColor: '#e0e0e0', 
+                    color: 'transparent',
+                    borderRadius: '4px'
+                  }}>読み込み中...</span>
+                </div>
+              ))}
+            </div>
+          ) : announcements.length > 0 ? (
+            // お知らせ一覧表示
             <div className="announcements-list">
               {announcements.slice(0, 5).map((announcement) => (
                 <div key={announcement.id} className="announcement-item" onClick={() => navigate(`/announcement/${announcement.id}`)}>
@@ -182,8 +308,18 @@ function HomePage() {
                 </div>
               ))}
             </div>
-          </div>
-        )}
+          ) : (
+            // お知らせがない場合
+            <div className="announcements-empty" style={{
+              padding: '20px',
+              textAlign: 'center',
+              color: '#666',
+              fontStyle: 'italic'
+            }}>
+              現在お知らせはありません
+            </div>
+          )}
+        </div>
         
         <h3 className="selection-title">レンタルする車両を選択してください</h3>
         

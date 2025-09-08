@@ -15,6 +15,19 @@
   --shadow-strong: 0 20px 60px rgba(46, 125, 50, 0.3);
 }
 
+/* スケルトンローディング アニメーション */
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
 .home-page {
   min-height: 100vh;
   background: linear-gradient(135deg, var(--extra-light-gray) 0%, var(--mint-green) 100%);

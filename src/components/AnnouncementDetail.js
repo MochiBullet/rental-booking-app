@@ -14,40 +14,66 @@ function AnnouncementDetail() {
       try {
         console.log('📋 お知らせ詳細ページ - ID:', id);
         
-        const result = await announcementsAPI.getAllAnnouncements();
-        console.log('📋 APIレスポンス:', result);
+        // ローカル環境判定
+        const isLocal = window.location.hostname === 'localhost' || 
+                        window.location.hostname === '127.0.0.1' ||
+                        window.location.hostname === '';
         
-        if (result.success) {
-          console.log('📋 取得されたお知らせ一覧:', result.announcements);
-          
-          // IDで該当するお知らせを検索（文字列と数値の両方で試す）
-          let announcementData = result.announcements.find(
-            announcement => announcement.id === parseInt(id)
-          );
-          
-          if (!announcementData) {
-            // 数値変換で見つからない場合は文字列で検索
-            announcementData = result.announcements.find(
-              announcement => announcement.id === id || announcement.id === id.toString()
-            );
-          }
-          
-          console.log('📋 見つかったお知らせ:', announcementData);
-          
-          if (!announcementData) {
-            console.warn('📋 お知らせが見つかりません - ID:', id);
-            console.warn('📋 利用可能なID一覧:', result.announcements.map(a => a.id));
-            setAnnouncement(null);
-          } else if (!announcementData.published) {
-            console.warn('📋 お知らせは非公開です - ID:', id);
-            setAnnouncement(null);
+        let announcements = [];
+        
+        if (isLocal) {
+          console.log('📋 ローカル環境: localStorageから読み込み');
+          const localAnnouncements = localStorage.getItem('announcements');
+          if (localAnnouncements) {
+            announcements = JSON.parse(localAnnouncements);
+            console.log('📋 ローカルお知らせ:', announcements);
           } else {
-            console.log('📋 お知らせを設定:', announcementData);
-            setAnnouncement(announcementData);
+            console.log('📋 ローカルにお知らせがありません');
+            setAnnouncement(null);
+            setLoading(false);
+            return;
           }
         } else {
-          console.error('📋 APIエラー:', result.error);
+          console.log('📋 本番環境: DynamoDBから読み込み');
+          const result = await announcementsAPI.getAllAnnouncements();
+          console.log('📋 APIレスポンス:', result);
+          
+          if (result.success) {
+            announcements = result.announcements;
+          } else {
+            console.error('📋 APIエラー:', result.error);
+            setAnnouncement(null);
+            setLoading(false);
+            return;
+          }
+        }
+        
+        console.log('📋 取得されたお知らせ一覧:', announcements);
+        
+        // IDで該当するお知らせを検索（文字列と数値の両方で試す）
+        let announcementData = announcements.find(
+          announcement => String(announcement.id) === String(id)
+        );
+        
+        if (!announcementData) {
+          // 数値変換で検索
+          announcementData = announcements.find(
+            announcement => announcement.id === parseInt(id)
+          );
+        }
+        
+        console.log('📋 見つかったお知らせ:', announcementData);
+        
+        if (!announcementData) {
+          console.warn('📋 お知らせが見つかりません - ID:', id);
+          console.warn('📋 利用可能なID一覧:', announcements.map(a => `${a.id} (${typeof a.id})`));
           setAnnouncement(null);
+        } else if (!announcementData.published) {
+          console.warn('📋 お知らせは非公開です - ID:', id);
+          setAnnouncement(null);
+        } else {
+          console.log('📋 お知らせを設定:', announcementData);
+          setAnnouncement(announcementData);
         }
       } catch (error) {
         console.error('📋 読み込みエラー:', error);

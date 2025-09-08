@@ -35,13 +35,20 @@ class AnnouncementsAPI {
     }
   }
 
-  // 公開中のお知らせのみ取得
+  // 公開中のお知らせのみ取得（タイムアウト付き）
   async getPublishedAnnouncements() {
     try {
+      // AbortController でタイムアウトを設定
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000); // 8秒タイムアウト
+      
       const response = await fetch(`${API_BASE_URL}/announcements?published=true`, {
         method: 'GET',
         headers: this.headers,
+        signal: controller.signal,
       });
+      
+      clearTimeout(timeoutId);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
