@@ -11,7 +11,15 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [showSimulationModal, setShowSimulationModal] = useState(false);
   const [showGoogleForms, setShowGoogleForms] = useState(false);
-  const [siteSettings, setSiteSettings] = useState(null);
+  // Google Forms強制有効化（キャッシュ問題対策）
+  const [siteSettings, setSiteSettings] = useState({
+    googleForms: {
+      enabled: true,
+      formUrl: 'https://docs.google.com/forms/u/0/d/e/1FAIpQLSdM1hGazWWkJJFFbMJBAzl-lEXE20XMtwfO_h-o7hEol8-bpw/formResponse',
+      showEmbedded: true,
+      embedHeight: 800
+    }
+  });
   // DISABLED: Booking functionality replaced with price simulation
   // const [bookingSuccess, setBookingSuccess] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState('daily');
