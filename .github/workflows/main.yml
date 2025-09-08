@@ -55,16 +55,14 @@ jobs:
         aws s3 sync build/ s3://${{ secrets.S3_BUCKET_NAME }} --delete
         echo "✅ Deployment completed successfully!"
     
-    - name: Invalidate CloudFront Cache
+    - name: Invalidate CloudFront Cache (CRITICAL for https://ms-base-rental.com/)
       run: |
-        echo "🔄 Invalidating CloudFront cache..."
-        DISTRIBUTION_ID=$(aws cloudfront list-distributions --query "DistributionList.Items[?Origins.Items[0].DomainName==\`${{ secrets.S3_BUCKET_NAME }}.s3.amazonaws.com\`].Id | [0]" --output text)
-        if [ "$DISTRIBUTION_ID" != "None" ] && [ "$DISTRIBUTION_ID" != "" ]; then
-          aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID --paths "/*"
-          echo "✅ CloudFront cache invalidated for distribution: $DISTRIBUTION_ID"
-        else
-          echo "⚠️ CloudFront distribution not found, skipping cache invalidation"
-        fi
+        echo "🔄 Invalidating CloudFront cache for https://ms-base-rental.com/ domain reflection..."
+        # 🚨 Fixed Distribution ID for https://ms-base-rental.com/
+        DISTRIBUTION_ID="E2ANNXZ9LL61PY"
+        aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID --paths "/*"
+        echo "✅ CloudFront cache invalidated for https://ms-base-rental.com/"
+        echo "⏰ Domain reflection may take 5-15 minutes"
     
     - name: Verify Deployment
       run: |

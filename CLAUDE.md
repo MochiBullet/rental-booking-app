@@ -36,14 +36,26 @@
 - **❌ 絶対に使用禁止**: `rental-booking-app-production-276291855506`
 - **❌ 絶対に使用禁止**: Vercel（過去に明確に拒否宣言）
 
+## 🚨 重要：独自ドメイン反映問題
+- **S3直接URL**: 正常動作
+- **独自ドメイン**: `https://ms-base-rental.com/` - CloudFrontキャッシュで反映遅延
+- **解決必須**: 全作業後にCloudFrontキャッシュクリア必要
+- **確認必須**: 独自ドメインでの動作確認を毎回実施
+
 ### 🚨 唯一の正しいデプロイコマンド
 ```bash
 # 手動デプロイ - rental-booking-app-website のみ使用
 aws s3 sync build/ s3://rental-booking-app-website --delete --region ap-southeast-2
 
-# キャッシュクリア - E2ANNXZ9LL61PY のみ使用
+# 🚨 必須：キャッシュクリア - E2ANNXZ9LL61PY のみ使用
 aws cloudfront create-invalidation --distribution-id E2ANNXZ9LL61PY --paths "/*"
 ```
+
+### 🚨 毎回必須：独自ドメイン反映確認プロセス
+1. **GitHub Actions完了確認**
+2. **CloudFrontキャッシュクリア実行** (下記コマンド使用)
+3. **独自ドメインでの動作確認**: `https://ms-base-rental.com/`
+4. **反映まで5-15分待機が必要な場合あり**
 
 ### データベース情報
 - **DynamoDB テーブル**: `vehicles`
