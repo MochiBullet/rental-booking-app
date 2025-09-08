@@ -79,7 +79,7 @@ const MemberLogin = ({ onLogin, onCancel, onRegister }) => {
       <div className="login-card">
         <div className="login-header">
           <h2>👤 会員ログイン</h2>
-          <p>RentalEasy会員サービス</p>
+          <p>M's BASE Rental会員サービス</p>
         </div>
         
         <form onSubmit={handleSubmit} className="login-form">

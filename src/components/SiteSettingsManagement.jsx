@@ -389,9 +389,9 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
               <label>サイト名</label>
               <input
                 type="text"
-                value={settings.branding?.siteName || 'RentalEasy'}
+                value={settings.branding?.siteName || 'M\'s BASE Rental'}
                 onChange={(e) => updateBrandingSettings('siteName', e.target.value)}
-                placeholder="RentalEasy"
+                placeholder="M's BASE Rental"
               />
             </div>
 
@@ -629,7 +629,7 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
                 type="text"
                 value={settings.hero.title}
                 onChange={(e) => updateHeroSettings('title', e.target.value)}
-                placeholder="車・バイクレンタル RentalEasy"
+                placeholder="車・バイクレンタル M's BASE Rental"
               />
             </div>
             <div className="form-group">

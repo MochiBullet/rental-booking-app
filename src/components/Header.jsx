@@ -43,7 +43,7 @@ const Header = ({ currentView, onViewChange, reservationCount, isAdminLoggedIn, 
     <header className="header">
       <nav className="navbar">
         <div className="nav-brand">
-          <h1 onClick={handleLogoClick}>RentalEasy</h1>
+          <h1 onClick={handleLogoClick}>M's BASE Rental</h1>
         </div>
         <ul className="nav-menu">
           <li>

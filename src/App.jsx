@@ -470,7 +470,7 @@ function App() {
                 プライバシーポリシー
               </button>
             </div>
-            <p className="footer-copyright">&copy; 2024 RentalEasy. All rights reserved.</p>
+            <p className="footer-copyright">&copy; 2024 M's BASE Rental. All rights reserved.</p>
           </div>
         </div>
       </footer>
