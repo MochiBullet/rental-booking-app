@@ -222,7 +222,7 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
     published: true
   });
   const [homeContent, setHomeContent] = useState({
-    heroTitle: 'あなたの旅を、私たちがサポート',
+    heroTitle: 'M\'s BASE Rental',
     heroSubtitle: '安心・安全・快適なレンタルサービス',
     carTile: {
       title: '車',
@@ -1494,7 +1494,10 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
                     // Sync to cloud
                     dataSyncService.saveToCloud('homeContent', homeContent).catch(console.error);
                     
-                    showNotification('📝 ホームページコンテンツが正常に保存されました！ページをリロードして確認してください。', 'save', 5000);
+                    // ホームページに変更を即座に反映
+                    window.dispatchEvent(new CustomEvent('homeContentUpdate'));
+                    
+                    showNotification('📝 ホームページコンテンツが正常に保存され、即座に反映されました！', 'save', 5000);
                   }}>
                     コンテンツを保存
                   </button>

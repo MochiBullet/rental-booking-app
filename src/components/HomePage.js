@@ -10,26 +10,8 @@ function HomePage() {
   const [siteSettings, setSiteSettings] = useState(null);
   const [announcements, setAnnouncements] = useState([]);
   const [announcementsLoaded, setAnnouncementsLoaded] = useState(false);
-  const [homeContent, setHomeContent] = useState({
-    heroTitle: 'あなたの旅を、私たちがサポート',
-    heroSubtitle: '安心・安全・快適なレンタルサービス',
-    carTile: {
-      title: '車',
-      description: 'ファミリー向けから\nビジネスまで幅広く対応',
-      features: ['最新モデル', '保険完備', '24時間サポート']
-    },
-    bikeTile: {
-      title: 'バイク',
-      description: '街乗りから\nツーリングまで対応',
-      features: ['ヘルメット付', '整備済み', 'ロードサービス']
-    },
-    infoCards: [
-      { icon: '📱', title: '簡単予約', description: '24時間いつでもオンラインで予約可能' },
-      { icon: '🛡️', title: '安心保証', description: '充実の保険と補償制度' },
-      { icon: '💰', title: '明朗会計', description: '追加料金なしの安心価格' },
-      { icon: '🏆', title: '高品質', description: '定期メンテナンス済みの車両' }
-    ]
-  });
+  const [homeContent, setHomeContent] = useState(null);
+  const [contentLoaded, setContentLoaded] = useState(false);
 
   // デフォルト背景画像（美しいレンタカー関連の画像URL）
   const defaultImages = [
@@ -62,8 +44,20 @@ function HomePage() {
       loadHomePageData();
     };
     
+    const handleHomeContentUpdate = () => {
+      // LocalStorageから即座に読み込んで反映
+      const savedContent = localStorage.getItem('homeContent');
+      if (savedContent) {
+        setHomeContent(JSON.parse(savedContent));
+      }
+    };
+    
     window.addEventListener('siteSettingsUpdate', handleSettingsUpdate);
-    return () => window.removeEventListener('siteSettingsUpdate', handleSettingsUpdate);
+    window.addEventListener('homeContentUpdate', handleHomeContentUpdate);
+    return () => {
+      window.removeEventListener('siteSettingsUpdate', handleSettingsUpdate);
+      window.removeEventListener('homeContentUpdate', handleHomeContentUpdate);
+    };
   }, []);
 
   const loadAnnouncements = async () => {
@@ -178,43 +172,62 @@ function HomePage() {
 
   const loadHomePageData = async () => {
     try {
-      console.log('🔄 Loading homepage data from DynamoDB...');
+      console.log('🔄 Loading homepage data...');
       
-      // DynamoDBからサイト設定を取得
+      // まずLocalStorageから即座に読み込み（チラつき防止）
+      const savedContent = localStorage.getItem('homeContent');
+      if (savedContent) {
+        setHomeContent(JSON.parse(savedContent));
+      } else {
+        // LocalStorageにない場合はデフォルト値を設定して保存
+        const defaultContent = {
+          heroTitle: 'M\'s BASE Rental',
+          heroSubtitle: '安心・安全・快適なレンタルサービス',
+          carTile: {
+            title: '車',
+            description: 'ファミリー向けから\nビジネスまで幅広く対応',
+            features: ['最新モデル', '保険完備', '24時間サポート']
+          },
+          bikeTile: {
+            title: 'バイク',
+            description: '街乗りから\nツーリングまで対応',
+            features: ['ヘルメット付', '整備済み', 'ロードサービス']
+          },
+          infoCards: [
+            { icon: '📱', title: '簡単予約', description: '24時間いつでもオンラインで予約可能' },
+            { icon: '🛡️', title: '安心保証', description: '充実の保険と補償制度' },
+            { icon: '💰', title: '明朗会計', description: '追加料金なしの安心価格' },
+            { icon: '🏆', title: '高品質', description: '定期メンテナンス済みの車両' }
+          ]
+        };
+        localStorage.setItem('homeContent', JSON.stringify(defaultContent));
+        setHomeContent(defaultContent);
+      }
+      
+      // サイト設定も同様に処理
+      setSiteSettings(siteSettingsManager.getSettings());
+      
+      // DynamoDBからの取得を試みる（バックグラウンド）
       const dynamoSettings = await siteSettingsAPI.getAllSettings();
       
       if (dynamoSettings.siteSettings) {
         console.log('✅ Site settings loaded from DynamoDB');
         setSiteSettings(dynamoSettings.siteSettings);
-      } else {
-        console.log('⚠️ Using LocalStorage site settings');
-        setSiteSettings(siteSettingsManager.getSettings());
       }
 
-      // ホームコンテンツを取得
       if (dynamoSettings.homeContent) {
         console.log('✅ Home content loaded from DynamoDB');
         setHomeContent(dynamoSettings.homeContent);
-      } else {
-        console.log('⚠️ Using LocalStorage home content');
-        const savedContent = localStorage.getItem('homeContent');
-        if (savedContent) {
-          setHomeContent(JSON.parse(savedContent));
-        }
+        // DynamoDBのデータをLocalStorageにも保存
+        localStorage.setItem('homeContent', JSON.stringify(dynamoSettings.homeContent));
       }
       
     } catch (error) {
       console.error('❌ Failed to load data from DynamoDB:', error);
-      
-      // フォールバック: LocalStorageから読み込み
-      setSiteSettings(siteSettingsManager.getSettings());
-      const savedContent = localStorage.getItem('homeContent');
-      if (savedContent) {
-        setHomeContent(JSON.parse(savedContent));
-      }
+      // エラーの場合もLocalStorageのデータを使用（既に設定済み）
+    } finally {
+      setContentLoaded(true);
     }
-    
-    // お知らせは並列読み込みで既に処理済み
   };
 
   const getBackgroundImages = () => {
@@ -242,6 +255,17 @@ function HomePage() {
     }
     return defaultTileImages[type];
   };
+
+  // コンテンツが読み込まれるまで何も表示しない（チラつき防止）
+  if (!homeContent || !contentLoaded) {
+    return (
+      <div className="home-page">
+        <div className="hero-section" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ color: 'white', fontSize: '24px' }}>読み込み中...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="home-page">
