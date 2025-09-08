@@ -12,31 +12,56 @@ function AnnouncementDetail() {
   useEffect(() => {
     const loadAnnouncement = async () => {
       try {
+        console.log('📋 お知らせ詳細ページ - ID:', id);
+        
         const result = await announcementsAPI.getAllAnnouncements();
+        console.log('📋 APIレスポンス:', result);
+        
         if (result.success) {
-          // IDで該当するお知らせを検索
-          const announcementData = result.announcements.find(
+          console.log('📋 取得されたお知らせ一覧:', result.announcements);
+          
+          // IDで該当するお知らせを検索（文字列と数値の両方で試す）
+          let announcementData = result.announcements.find(
             announcement => announcement.id === parseInt(id)
           );
           
-          if (!announcementData || !announcementData.published) {
-            // お知らせが見つからない、または非公開の場合
+          if (!announcementData) {
+            // 数値変換で見つからない場合は文字列で検索
+            announcementData = result.announcements.find(
+              announcement => announcement.id === id || announcement.id === id.toString()
+            );
+          }
+          
+          console.log('📋 見つかったお知らせ:', announcementData);
+          
+          if (!announcementData) {
+            console.warn('📋 お知らせが見つかりません - ID:', id);
+            console.warn('📋 利用可能なID一覧:', result.announcements.map(a => a.id));
+            setAnnouncement(null);
+          } else if (!announcementData.published) {
+            console.warn('📋 お知らせは非公開です - ID:', id);
             setAnnouncement(null);
           } else {
+            console.log('📋 お知らせを設定:', announcementData);
             setAnnouncement(announcementData);
           }
         } else {
-          console.error('Failed to load announcements:', result.error);
+          console.error('📋 APIエラー:', result.error);
           setAnnouncement(null);
         }
       } catch (error) {
-        console.error('Error loading announcement:', error);
+        console.error('📋 読み込みエラー:', error);
         setAnnouncement(null);
       }
       setLoading(false);
     };
 
-    loadAnnouncement();
+    if (id) {
+      loadAnnouncement();
+    } else {
+      console.error('📋 IDが指定されていません');
+      setLoading(false);
+    }
   }, [id]);
 
   if (loading) {
@@ -89,9 +114,25 @@ function AnnouncementDetail() {
           <h1 className="announcement-title">{announcement.title}</h1>
           
           <div className="announcement-body">
-            {announcement.content.split('\n').map((paragraph, index) => (
-              <p key={index}>{paragraph}</p>
-            ))}
+            {announcement.content ? (
+              announcement.content.split('\n').map((paragraph, index) => (
+                <p key={index}>{paragraph}</p>
+              ))
+            ) : (
+              <p style={{ color: '#999', fontStyle: 'italic' }}>
+                内容が設定されていません。
+              </p>
+            )}
+            
+            {/* デバッグ情報 */}
+            <div style={{ marginTop: '20px', padding: '10px', backgroundColor: '#f5f5f5', fontSize: '12px', color: '#666' }}>
+              <strong>デバッグ情報:</strong>
+              <br />ID: {announcement.id}
+              <br />タイトル: {announcement.title}
+              <br />内容の長さ: {announcement.content ? announcement.content.length : 0}文字
+              <br />公開状態: {announcement.published ? '公開' : '非公開'}
+              <br />作成日: {announcement.date}
+            </div>
           </div>
         </article>
         
