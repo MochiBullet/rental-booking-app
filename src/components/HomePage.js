@@ -192,13 +192,7 @@ function HomePage() {
             title: 'バイク',
             description: '街乗りから\nツーリングまで対応',
             features: ['ヘルメット付', '整備済み', 'ロードサービス']
-          },
-          infoCards: [
-            { icon: '📱', title: '簡単予約', description: '24時間いつでもオンラインで予約可能' },
-            { icon: '🛡️', title: '安心保証', description: '充実の保険と補償制度' },
-            { icon: '💰', title: '明朗会計', description: '追加料金なしの安心価格' },
-            { icon: '🏆', title: '高品質', description: '定期メンテナンス済みの車両' }
-          ]
+          }
         };
         localStorage.setItem('homeContent', JSON.stringify(defaultContent));
         setHomeContent(defaultContent);
@@ -404,17 +398,6 @@ function HomePage() {
         </div>
       </div>
 
-      <div className="info-section">
-        <div className="info-cards">
-          {homeContent.infoCards.map((card, i) => (
-            <div key={i} className="info-card">
-              <div className="info-icon">{card.icon}</div>
-              <h4>{card.title}</h4>
-              <p>{card.description}</p>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }

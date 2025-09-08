@@ -233,13 +233,7 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
       title: 'バイク',
       description: '街乗りから\nツーリングまで対応',
       features: ['ヘルメット付', '整備済み', 'ロードサービス']
-    },
-    infoCards: [
-      { icon: '📱', title: '簡単予約', description: '24時間いつでもオンラインで予約可能' },
-      { icon: '🛡️', title: '安心保証', description: '充実の保険と補償制度' },
-      { icon: '💰', title: '明朗会計', description: '追加料金なしの安心価格' },
-      { icon: '🏆', title: '高品質', description: '定期メンテナンス済みの車両' }
-    ]
+    }
   });
   const [termsContent, setTermsContent] = useState({
     title: 'M\'s BASE Rental 利用規約',
@@ -1440,51 +1434,6 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
                       onChange={(e) => setHomeContent({...homeContent, bikeTile: {...homeContent.bikeTile, features: e.target.value.split(', ')}})}
                     />
                   </div>
-                </div>
-                
-                <div className="editor-section">
-                  <h3>情報カード設定</h3>
-                  {homeContent.infoCards.map((card, index) => (
-                    <div key={index} className="info-card-editor">
-                      <h4>カード {index + 1}</h4>
-                      <div className="form-group">
-                        <label>アイコン</label>
-                        <input 
-                          type="text"
-                          value={card.icon}
-                          onChange={(e) => {
-                            const newCards = [...homeContent.infoCards];
-                            newCards[index].icon = e.target.value;
-                            setHomeContent({...homeContent, infoCards: newCards});
-                          }}
-                        />
-                      </div>
-                      <div className="form-group">
-                        <label>タイトル</label>
-                        <input 
-                          type="text"
-                          value={card.title}
-                          onChange={(e) => {
-                            const newCards = [...homeContent.infoCards];
-                            newCards[index].title = e.target.value;
-                            setHomeContent({...homeContent, infoCards: newCards});
-                          }}
-                        />
-                      </div>
-                      <div className="form-group">
-                        <label>説明</label>
-                        <input 
-                          type="text"
-                          value={card.description}
-                          onChange={(e) => {
-                            const newCards = [...homeContent.infoCards];
-                            newCards[index].description = e.target.value;
-                            setHomeContent({...homeContent, infoCards: newCards});
-                          }}
-                        />
-                      </div>
-                    </div>
-                  ))}
                 </div>
                 
                 <div className="form-actions">
