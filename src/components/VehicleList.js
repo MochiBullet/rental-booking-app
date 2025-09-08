@@ -77,6 +77,10 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
   useEffect(() => {
     // Site Settings を読み込み
     const settings = siteSettingsManager.getSettings();
+    console.log('🔍 VehicleList - Google Forms設定確認:', {
+      enabled: settings?.googleForms?.enabled,
+      fullSettings: settings?.googleForms
+    });
     setSiteSettings(settings);
     
     // propsでvehiclesが渡されている場合はそれを使用（空配列でも使用する）
@@ -520,7 +524,7 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
                           <p className="price-note">※実際の料金は条件により変動する場合があります</p>
                         </div>
                       </div>
-                      {siteSettings?.googleForms?.enabled && (
+                      {console.log('🎯 予約ボタン表示条件:', siteSettings?.googleForms?.enabled) || siteSettings?.googleForms?.enabled && (
                         <button 
                           className="reserve-btn" 
                           onClick={() => {
