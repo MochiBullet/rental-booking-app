@@ -532,7 +532,8 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
                           <p className="price-note">※実際の料金は条件により変動する場合があります</p>
                         </div>
                       </div>
-                      {console.log('🎯 予約ボタン表示条件:', siteSettings?.googleForms?.enabled) || siteSettings?.googleForms?.enabled && (
+                      {/* Google Forms予約ボタンを強制表示 */}
+                      {true && (
                         <button 
                           className="reserve-btn" 
                           onClick={() => {
