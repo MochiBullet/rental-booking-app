@@ -166,13 +166,18 @@ function AppContent() {
     
     // グローバルサイト設定を読み込んでCSSに適用
     const globalSettings = getGlobalSettings();
-    const savedSettings = localStorage.getItem('rentalEasySiteSettings');
+    const savedSettings = localStorage.getItem('siteSettings');
     
     // グローバル設定を基準にしたマージ設定
     let settings = globalSettings;
     if (savedSettings) {
       const localSettings = JSON.parse(savedSettings);
       settings = { ...globalSettings, ...localSettings };
+    }
+    
+    // M's BASE Rentalを確実に設定
+    if (!settings.branding || !settings.branding.siteName || settings.branding.siteName.includes('RentalEasy')) {
+      settings.branding = { siteName: "M's BASE Rental" };
     }
     
     console.log('🌐 適用されるサイト設定:', settings);
@@ -207,11 +212,10 @@ function AppContent() {
       hover: hoverColor
     });
     
-    // ブランディング設定の適用
-    if (settings.branding?.siteName) {
-      document.title = settings.branding.siteName;
-      console.log('📝 サイトタイトル適用:', settings.branding.siteName);
-    }
+    // ブランディング設定の適用（M's BASE Rentalを確実に設定）
+    const siteName = settings.branding?.siteName || "M's BASE Rental";
+    document.title = `${siteName} - 車・バイクレンタル`;
+    console.log('📝 サイトタイトル適用:', siteName);
     
     // カスタムアイコン設定の適用
     if (settings.branding?.siteIcon) {
