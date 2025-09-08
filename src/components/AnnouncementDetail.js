@@ -149,16 +149,6 @@ function AnnouncementDetail() {
                 内容が設定されていません。
               </p>
             )}
-            
-            {/* デバッグ情報 */}
-            <div style={{ marginTop: '20px', padding: '10px', backgroundColor: '#f5f5f5', fontSize: '12px', color: '#666' }}>
-              <strong>デバッグ情報:</strong>
-              <br />ID: {announcement.id}
-              <br />タイトル: {announcement.title}
-              <br />内容の長さ: {announcement.content ? announcement.content.length : 0}文字
-              <br />公開状態: {announcement.published ? '公開' : '非公開'}
-              <br />作成日: {announcement.date}
-            </div>
           </div>
         </article>
         
