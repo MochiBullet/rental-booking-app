@@ -16,6 +16,12 @@ export const initialSiteSettings = {
     bikeImage: null, // カスタムバイクタイル画像（Base64形式）
     useDefaultImages: true // デフォルト画像を使用するか
   },
+  googleForms: {
+    enabled: true, // テスト用に有効化
+    formUrl: 'https://docs.google.com/forms/u/0/d/e/1FAIpQLSdM1hGazWWkJJFFbMJBAzl-lEXE20XMtwfO_h-o7hEol8-bpw/formResponse',
+    showEmbedded: true, // 埋め込み表示（true）または外部リンク（false）
+    embedHeight: 800 // 埋め込み時の高さ（px）
+  },
   announcements: [
     {
       id: 1,
