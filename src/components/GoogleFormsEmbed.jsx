@@ -5,9 +5,15 @@ const GoogleFormsEmbed = ({ vehicleInfo = null, onClose }) => {
   const [settings, setSettings] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [formData, setFormData] = useState({
-    name: '',
+    firstName: '',
+    lastName: '',
+    firstNamePhonetic: '',
+    lastNamePhonetic: '',
     email: '',
     phone: '',
+    licenseNumber: '',
+    licenseType: 'regular',
+    vehicleType: '',
     rentDays: '1',
     pickupDate: '',
     notes: ''
@@ -25,9 +31,7 @@ const GoogleFormsEmbed = ({ vehicleInfo = null, onClose }) => {
     if (vehicleInfo) {
       setFormData(prev => ({
         ...prev,
-        vehicleName: vehicleInfo.name,
-        vehicleType: vehicleInfo.type === 'car' ? '車' : 'バイク',
-        dailyRate: vehicleInfo.price
+        vehicleType: vehicleInfo.type === 'car' ? 'car' : 'motorcycle'
       }));
     }
   }, [vehicleInfo]);
@@ -48,18 +52,38 @@ const GoogleFormsEmbed = ({ vehicleInfo = null, onClose }) => {
       // Google Forms のformResponse URLを使用
       const formUrl = 'https://docs.google.com/forms/u/0/d/e/1FAIpQLSdM1hGazWWkJJFFbMJBAzl-lEXE20XMtwfO_h-o7hEol8-bpw/formResponse';
       
-      // Google Forms の各フィールドのentry IDを設定（実際のフォームに合わせて調整が必要）
+      // Google Forms の実際のentry IDを使用
       const formDataToSend = new FormData();
-      formDataToSend.append('entry.123456789', formData.name); // お名前
-      formDataToSend.append('entry.987654321', formData.email); // メールアドレス
-      formDataToSend.append('entry.555666777', formData.phone); // 電話番号
-      formDataToSend.append('entry.111222333', formData.rentDays); // レンタル日数
-      formDataToSend.append('entry.444555666', formData.pickupDate); // 受取希望日
-      formDataToSend.append('entry.777888999', formData.notes); // 備考
+      formDataToSend.append('entry.1280174264', formData.firstName); // 性（名字）
+      formDataToSend.append('entry.846732635', formData.lastName); // 名（名前）
+      formDataToSend.append('entry.616715639', formData.firstNamePhonetic); // セイ（名字読み）
+      formDataToSend.append('entry.701002604', formData.lastNamePhonetic); // メイ（名前読み）
+      formDataToSend.append('entry.1979973897', formData.email); // メールアドレス
+      formDataToSend.append('entry.1952002308', formData.phone); // 電話番号
+      formDataToSend.append('entry.1318842287', formData.licenseNumber); // 免許証番号
+      formDataToSend.append('entry.538505772', formData.licenseType); // 免許証種類
       
-      // 車両情報があれば追加
+      // 車両タイプを適切な形式で送信
+      if (formData.vehicleType === 'car') {
+        formDataToSend.append('entry.370718445', '軽自動車・乗用車・貨物車等');
+      } else if (formData.vehicleType === 'motorcycle') {
+        formDataToSend.append('entry.370718445', 'バイク');
+      }
+      
+      // 追加情報を備考欄として送信
+      const additionalNotes = [];
+      if (formData.rentDays) additionalNotes.push(`レンタル日数: ${formData.rentDays}`);
+      if (formData.pickupDate) additionalNotes.push(`受取希望日: ${formData.pickupDate}`);
       if (vehicleInfo) {
-        formDataToSend.append('entry.101112131', `${vehicleInfo.name} (${vehicleInfo.type === 'car' ? '車' : 'バイク'}) - ¥${vehicleInfo.price}/日`);
+        additionalNotes.push(`選択車両: ${vehicleInfo.name} (¥${vehicleInfo.price}/日)`);
+      }
+      if (formData.notes) additionalNotes.push(`備考: ${formData.notes}`);
+      
+      // 追加の備考エントリーがあれば使用（フォーム構造によって調整）
+      const combinedNotes = additionalNotes.join('\n');
+      if (combinedNotes) {
+        // 備考欄のentry IDは確認が必要ですが、とりあえず一般的なパターンを使用
+        formDataToSend.append('entry.2000000000', combinedNotes);
       }
 
       // Google Forms に直接送信（CORSエラーを避けるため、no-corsモードを使用）
@@ -73,9 +97,15 @@ const GoogleFormsEmbed = ({ vehicleInfo = null, onClose }) => {
       
       // フォームをリセット
       setFormData({
-        name: '',
+        firstName: '',
+        lastName: '',
+        firstNamePhonetic: '',
+        lastNamePhonetic: '',
         email: '',
         phone: '',
+        licenseNumber: '',
+        licenseType: 'regular',
+        vehicleType: '',
         rentDays: '1',
         pickupDate: '',
         notes: ''
@@ -186,33 +216,128 @@ const GoogleFormsEmbed = ({ vehicleInfo = null, onClose }) => {
         boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
       }}>
         
-        <div className="form-group" style={{ marginBottom: '20px' }}>
-          <label style={{ 
-            display: 'block', 
-            marginBottom: '8px', 
-            fontWeight: 'bold',
-            color: '#333'
-          }}>
-            お名前 <span style={{ color: '#f44336' }}>*</span>
-          </label>
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleInputChange}
-            required
-            style={{
-              width: '100%',
-              padding: '12px',
-              border: '2px solid #e0e0e0',
-              borderRadius: '8px',
-              fontSize: '16px',
-              boxSizing: 'border-box',
-              transition: 'border-color 0.3s'
-            }}
-            onFocus={(e) => e.target.style.borderColor = '#4caf50'}
-            onBlur={(e) => e.target.style.borderColor = '#e0e0e0'}
-          />
+        <div className="form-row" style={{ display: 'flex', gap: '15px', marginBottom: '20px' }}>
+          <div className="form-group" style={{ flex: '1' }}>
+            <label style={{ 
+              display: 'block', 
+              marginBottom: '8px', 
+              fontWeight: 'bold',
+              color: '#333'
+            }}>
+              姓（名字） <span style={{ color: '#f44336' }}>*</span>
+            </label>
+            <input
+              type="text"
+              name="firstName"
+              value={formData.firstName}
+              onChange={handleInputChange}
+              required
+              placeholder="田中"
+              style={{
+                width: '100%',
+                padding: '12px',
+                border: '2px solid #e0e0e0',
+                borderRadius: '8px',
+                fontSize: '16px',
+                boxSizing: 'border-box',
+                transition: 'border-color 0.3s'
+              }}
+              onFocus={(e) => e.target.style.borderColor = '#4caf50'}
+              onBlur={(e) => e.target.style.borderColor = '#e0e0e0'}
+            />
+          </div>
+          
+          <div className="form-group" style={{ flex: '1' }}>
+            <label style={{ 
+              display: 'block', 
+              marginBottom: '8px', 
+              fontWeight: 'bold',
+              color: '#333'
+            }}>
+              名（名前） <span style={{ color: '#f44336' }}>*</span>
+            </label>
+            <input
+              type="text"
+              name="lastName"
+              value={formData.lastName}
+              onChange={handleInputChange}
+              required
+              placeholder="太郎"
+              style={{
+                width: '100%',
+                padding: '12px',
+                border: '2px solid #e0e0e0',
+                borderRadius: '8px',
+                fontSize: '16px',
+                boxSizing: 'border-box',
+                transition: 'border-color 0.3s'
+              }}
+              onFocus={(e) => e.target.style.borderColor = '#4caf50'}
+              onBlur={(e) => e.target.style.borderColor = '#e0e0e0'}
+            />
+          </div>
+        </div>
+
+        <div className="form-row" style={{ display: 'flex', gap: '15px', marginBottom: '20px' }}>
+          <div className="form-group" style={{ flex: '1' }}>
+            <label style={{ 
+              display: 'block', 
+              marginBottom: '8px', 
+              fontWeight: 'bold',
+              color: '#333'
+            }}>
+              セイ（名字ふりがな） <span style={{ color: '#f44336' }}>*</span>
+            </label>
+            <input
+              type="text"
+              name="firstNamePhonetic"
+              value={formData.firstNamePhonetic}
+              onChange={handleInputChange}
+              required
+              placeholder="タナカ"
+              style={{
+                width: '100%',
+                padding: '12px',
+                border: '2px solid #e0e0e0',
+                borderRadius: '8px',
+                fontSize: '16px',
+                boxSizing: 'border-box',
+                transition: 'border-color 0.3s'
+              }}
+              onFocus={(e) => e.target.style.borderColor = '#4caf50'}
+              onBlur={(e) => e.target.style.borderColor = '#e0e0e0'}
+            />
+          </div>
+          
+          <div className="form-group" style={{ flex: '1' }}>
+            <label style={{ 
+              display: 'block', 
+              marginBottom: '8px', 
+              fontWeight: 'bold',
+              color: '#333'
+            }}>
+              メイ（名前ふりがな） <span style={{ color: '#f44336' }}>*</span>
+            </label>
+            <input
+              type="text"
+              name="lastNamePhonetic"
+              value={formData.lastNamePhonetic}
+              onChange={handleInputChange}
+              required
+              placeholder="タロウ"
+              style={{
+                width: '100%',
+                padding: '12px',
+                border: '2px solid #e0e0e0',
+                borderRadius: '8px',
+                fontSize: '16px',
+                boxSizing: 'border-box',
+                transition: 'border-color 0.3s'
+              }}
+              onFocus={(e) => e.target.style.borderColor = '#4caf50'}
+              onBlur={(e) => e.target.style.borderColor = '#e0e0e0'}
+            />
+          </div>
         </div>
 
         <div className="form-group" style={{ marginBottom: '20px' }}>
@@ -272,6 +397,69 @@ const GoogleFormsEmbed = ({ vehicleInfo = null, onClose }) => {
             onFocus={(e) => e.target.style.borderColor = '#4caf50'}
             onBlur={(e) => e.target.style.borderColor = '#e0e0e0'}
           />
+        </div>
+
+        <div className="form-group" style={{ marginBottom: '20px' }}>
+          <label style={{ 
+            display: 'block', 
+            marginBottom: '8px', 
+            fontWeight: 'bold',
+            color: '#333'
+          }}>
+            免許証番号 <span style={{ color: '#f44336' }}>*</span>
+          </label>
+          <input
+            type="text"
+            name="licenseNumber"
+            value={formData.licenseNumber}
+            onChange={handleInputChange}
+            required
+            placeholder="例: 123456789012"
+            style={{
+              width: '100%',
+              padding: '12px',
+              border: '2px solid #e0e0e0',
+              borderRadius: '8px',
+              fontSize: '16px',
+              boxSizing: 'border-box',
+              transition: 'border-color 0.3s'
+            }}
+            onFocus={(e) => e.target.style.borderColor = '#4caf50'}
+            onBlur={(e) => e.target.style.borderColor = '#e0e0e0'}
+          />
+        </div>
+
+        <div className="form-group" style={{ marginBottom: '20px' }}>
+          <label style={{ 
+            display: 'block', 
+            marginBottom: '8px', 
+            fontWeight: 'bold',
+            color: '#333'
+          }}>
+            免許証種類 <span style={{ color: '#f44336' }}>*</span>
+          </label>
+          <select
+            name="licenseType"
+            value={formData.licenseType}
+            onChange={handleInputChange}
+            required
+            style={{
+              width: '100%',
+              padding: '12px',
+              border: '2px solid #e0e0e0',
+              borderRadius: '8px',
+              fontSize: '16px',
+              boxSizing: 'border-box',
+              backgroundColor: '#fff'
+            }}
+          >
+            <option value="regular">普通自動車免許</option>
+            <option value="motorcycle">普通二輪免許</option>
+            <option value="large_motorcycle">大型二輪免許</option>
+            <option value="medium">中型免許</option>
+            <option value="large">大型免許</option>
+            <option value="special">特殊免許</option>
+          </select>
         </div>
 
         <div className="form-group" style={{ marginBottom: '20px' }}>
