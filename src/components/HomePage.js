@@ -321,7 +321,10 @@ function HomePage() {
   // サイト設定の変更を監視してタイルテキストを更新
   useEffect(() => {
     const handleSiteSettingsUpdate = (event) => {
+      console.log('📡 HomePage: siteSettingsUpdate イベントを受信しました');
       const updatedSettings = event.detail;
+      console.log('📋 受信したデータ:', updatedSettings);
+      
       if (updatedSettings?.tiles) {
         console.log('🔄 タイル設定が更新されました:', updatedSettings.tiles);
         
@@ -329,27 +332,38 @@ function HomePage() {
         const carText = updatedSettings.tiles.carText || {};
         const bikeText = updatedSettings.tiles.bikeText || {};
         
+        console.log('🚗 車タイルテキスト:', carText);
+        console.log('🏍️ バイクタイルテキスト:', bikeText);
+        
         setHomeContent(prevContent => {
+          if (!prevContent) {
+            console.log('⚠️ 既存のhomeContentが見つかりません');
+            return prevContent;
+          }
+          
           const newContent = {
             ...prevContent,
             carTile: {
               ...prevContent.carTile,
-              title: carText.title || prevContent.carTile.title,
-              description: `${carText.subtitle || ''}\n${carText.description || ''}\n${carText.details || ''}`.trim()
+              title: carText.title || prevContent.carTile?.title || '車両レンタル',
+              description: `${carText.subtitle || ''}\n${carText.description || ''}\n${carText.details || ''}`.trim() || prevContent.carTile?.description || 'ファミリー向けから\nビジネス用まで\n幅広いラインナップ'
             },
             bikeTile: {
               ...prevContent.bikeTile,
-              title: bikeText.title || prevContent.bikeTile.title,
-              description: `${bikeText.subtitle || ''}\n${bikeText.description || ''}\n${bikeText.details || ''}`.trim()
+              title: bikeText.title || prevContent.bikeTile?.title || 'バイクレンタル',
+              description: `${bikeText.subtitle || ''}\n${bikeText.description || ''}\n${bikeText.details || ''}`.trim() || prevContent.bikeTile?.description || '原付から大型まで\n多様なバイクを\nお手頃価格で提供'
             }
           };
           
           // LocalStorageにも保存してページリロード時も反映されるように
           localStorage.setItem('homeContent', JSON.stringify(newContent));
           console.log('💾 タイルテキスト更新をLocalStorageに保存しました');
+          console.log('✅ 新しいhomeContent:', newContent);
           
           return newContent;
         });
+      } else {
+        console.log('⚠️ updatedSettings.tiles が見つかりません');
       }
       
       // 連絡先情報の更新
@@ -359,8 +373,12 @@ function HomePage() {
       }
     };
 
+    console.log('🎧 HomePage: siteSettingsUpdate イベントリスナーを登録しました');
     window.addEventListener('siteSettingsUpdate', handleSiteSettingsUpdate);
-    return () => window.removeEventListener('siteSettingsUpdate', handleSiteSettingsUpdate);
+    return () => {
+      console.log('🔌 HomePage: siteSettingsUpdate イベントリスナーを削除しました');
+      window.removeEventListener('siteSettingsUpdate', handleSiteSettingsUpdate);
+    };
   }, []);
 
   const getBackgroundImages = () => {

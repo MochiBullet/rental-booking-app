@@ -326,22 +326,28 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
       try {
         await siteSettingsAPI.saveSetting('siteSettings', updatedSettings);
         console.log(`✅ タイル${type}テキスト「${field}」をDBに保存: ${value}`);
+        
+        // DB保存成功後にイベントを発生
+        console.log('🔄 タイル設定更新イベント発生中...', updatedSettings.tiles);
+        
+        // リアルタイム更新の実行
+        if (onSettingsUpdate) {
+          console.log('📤 onSettingsUpdate コールバック実行');
+          onSettingsUpdate(updatedSettings);
+        }
+        
+        // カスタムイベントでホームページに通知
+        window.dispatchEvent(new CustomEvent('siteSettingsUpdate', {
+          detail: updatedSettings
+        }));
+        console.log('📡 siteSettingsUpdate イベント発生完了');
+        
       } catch (error) {
         console.error(`❌ タイル${type}テキスト保存エラー:`, error);
       }
     };
     
     saveToAPI();
-    
-    // リアルタイム更新の実行
-    if (onSettingsUpdate) {
-      onSettingsUpdate(updatedSettings);
-    }
-    
-    // カスタムイベントでホームページに通知
-    window.dispatchEvent(new CustomEvent('siteSettingsUpdate', {
-      detail: updatedSettings
-    }));
   };
 
   // お知らせ関連の関数は管理者ダッシュボードに移行済み
