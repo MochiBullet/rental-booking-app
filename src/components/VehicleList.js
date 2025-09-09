@@ -278,7 +278,20 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
             <div className="vehicle-image-container">
               <img 
                 src={(() => {
-                  const imageUrl = vehicle.image || vehicleImages[vehicle.name] || vehicleImages['Default'];
+                  // Debug: ログ出力で画像データ構造を確認
+                  console.log('🔍 Debug vehicle image data:', {
+                    name: vehicle.name,
+                    image: vehicle.image,
+                    images: vehicle.images,
+                    vehicleImages: vehicle.vehicleImages
+                  });
+                  
+                  // 画像の優先順位を修正: vehicleImages/images配列を優先
+                  const uploadedImage = (vehicle.vehicleImages && vehicle.vehicleImages[0]) || 
+                                       (vehicle.images && vehicle.images[0]) || 
+                                       vehicle.image;
+                                       
+                  const imageUrl = uploadedImage || vehicleImages[vehicle.name] || vehicleImages['Default'];
                   // Allow data: URLs for SVG, but filter out via.placeholder.com and other problematic URLs
                   if (imageUrl && (imageUrl.includes('via.placeholder.com') || (imageUrl.includes('300x200?text=') && !imageUrl.startsWith('data:')))) {
                     console.warn('Invalid image URL detected:', imageUrl, 'for vehicle:', vehicle.name);
@@ -374,7 +387,12 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
                   <div className="vehicle-summary">
                     <img 
                       src={(() => {
-                        const imageUrl = selectedVehicle.image || vehicleImages[selectedVehicle.name] || vehicleImages['Default'];
+                        // 画像の優先順位を修正: vehicleImages/images配列を優先
+                        const uploadedImage = (selectedVehicle.vehicleImages && selectedVehicle.vehicleImages[0]) || 
+                                             (selectedVehicle.images && selectedVehicle.images[0]) || 
+                                             selectedVehicle.image;
+                                             
+                        const imageUrl = uploadedImage || vehicleImages[selectedVehicle.name] || vehicleImages['Default'];
                         // Allow data: URLs for SVG, but filter out via.placeholder.com and other problematic URLs
                         if (imageUrl && (imageUrl.includes('via.placeholder.com') || (imageUrl.includes('300x200?text=') && !imageUrl.startsWith('data:')))) {
                           return vehicleImages['Default'];

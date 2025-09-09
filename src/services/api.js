@@ -98,6 +98,12 @@ class ApiService {
 
       const data = await response.json();
       console.log(`API Response:`, data);
+      
+      // 車両データ取得の場合、詳細構造をログ出力
+      if (endpoint.includes('/vehicles')) {
+        console.log('🔍 車両API詳細レスポンス:', JSON.stringify(data, null, 2));
+      }
+      
       return data;
     } catch (error) {
       console.error(`API Request Failed:`, error);
