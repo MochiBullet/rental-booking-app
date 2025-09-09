@@ -135,82 +135,43 @@ class ApiService {
   }
 
   async createVehicle(vehicleData) {
-    // フロントエンドの形式をDynamoDBの形式に変換
-    const dynamoDBData = {
-      name: vehicleData.name, // APIが'name'フィールドを期待している
-      vehicleName: vehicleData.name,
-      vehicleType: vehicleData.type || vehicleData.vehicleType,
-      vehicleDescription: vehicleData.description || '',
-      pricePerHour: parseFloat(vehicleData.pricePerHour || Math.round((vehicleData.price || vehicleData.pricePerDay || 0) / 8)),
-      pricePerDay: parseFloat(vehicleData.price || vehicleData.pricePerDay || 0),
-      capacity: parseInt(vehicleData.specifications?.seats || vehicleData.passengers || 4), // APIが期待する'capacity'フィールド
-      vehicleCapacity: parseInt(vehicleData.specifications?.seats || vehicleData.passengers || 4),
-      fuelType: vehicleData.specifications?.fuelType || vehicleData.fuelType || 'ガソリン',
-      transmission: vehicleData.specifications?.transmission || vehicleData.transmission || 'AT',
-      vehicleFeatures: vehicleData.features || [],
-      vehicleImages: vehicleData.images || (vehicleData.image ? [vehicleData.image] : []),
-      isAvailable: vehicleData.available !== undefined ? vehicleData.available : (vehicleData.isAvailable !== undefined ? vehicleData.isAvailable : true),
-      vehicleCategory: vehicleData.category || '',
-      vehicleBrand: vehicleData.brand || '',
-      vehicleModel: vehicleData.model || '',
-      vehicleYear: vehicleData.year || new Date().getFullYear(),
-      vehicleLocation: vehicleData.location || '東京都',
-      licensePlate: vehicleData.licensePlate || '',
-      engineSize: vehicleData.specifications?.cc || vehicleData.engineSize || 1500,
-      vehicleInsurance: vehicleData.insurance || {
-        description: '車両・対物・対人保険込み',
-        dailyRate: Math.round((vehicleData.price || vehicleData.pricePerDay || 0) * 0.1)
-      }
-    };
+    const { mapVehicleForAPI, validateVehicleData } = await import('../utils/vehicleMapper.js');
+    
+    // データ検証
+    validateVehicleData(vehicleData);
+    
+    // API形式に変換（1行で完了）
+    const apiData = mapVehicleForAPI(vehicleData);
     
     const response = await this.request('/vehicles', {
       method: 'POST',
-      body: JSON.stringify(dynamoDBData),
+      body: JSON.stringify(apiData),
     });
     
-    // レスポンスをフロントエンドの形式に変換
     return this.transformVehicleData(response);
   }
 
   async updateVehicle(vehicleId, vehicleData) {
-    // フロントエンドの形式をDynamoDBの形式に変換
-    const dynamoDBData = {
-      name: vehicleData.name, // APIが'name'フィールドを期待している
-      vehicleName: vehicleData.name,
-      vehicleType: vehicleData.type || vehicleData.vehicleType,
-      vehicleDescription: vehicleData.description || '',
-      pricePerHour: parseFloat(vehicleData.pricePerHour || Math.round((vehicleData.price || vehicleData.pricePerDay || 0) / 8)),
-      pricePerDay: parseFloat(vehicleData.price || vehicleData.pricePerDay || 0),
-      capacity: parseInt(vehicleData.specifications?.seats || vehicleData.passengers || 4), // APIが期待する'capacity'フィールド
-      vehicleCapacity: parseInt(vehicleData.specifications?.seats || vehicleData.passengers || 4),
-      fuelType: vehicleData.specifications?.fuelType || vehicleData.fuelType || 'ガソリン',
-      transmission: vehicleData.specifications?.transmission || vehicleData.transmission || 'AT',
-      vehicleFeatures: vehicleData.features || [],
-      vehicleImages: vehicleData.images || (vehicleData.image ? [vehicleData.image] : []),
-      isAvailable: vehicleData.available !== undefined ? vehicleData.available : (vehicleData.isAvailable !== undefined ? vehicleData.isAvailable : true),
-      vehicleCategory: vehicleData.category || '',
-      vehicleBrand: vehicleData.brand || '',
-      vehicleModel: vehicleData.model || '',
-      vehicleYear: vehicleData.year || new Date().getFullYear(),
-      vehicleLocation: vehicleData.location || '東京都',
-      licensePlate: vehicleData.licensePlate || '',
-      engineSize: vehicleData.specifications?.cc || vehicleData.engineSize || 1500,
-      vehicleInsurance: vehicleData.insurance
-    };
+    const { mapVehicleForAPI, validateVehicleData } = await import('../utils/vehicleMapper.js');
+    
+    // データ検証
+    validateVehicleData(vehicleData);
+    
+    // API形式に変換（1行で完了）
+    const apiData = mapVehicleForAPI(vehicleData);
 
     // undefinedな値を削除
-    Object.keys(dynamoDBData).forEach(key => {
-      if (dynamoDBData[key] === undefined) {
-        delete dynamoDBData[key];
+    Object.keys(apiData).forEach(key => {
+      if (apiData[key] === undefined) {
+        delete apiData[key];
       }
     });
     
     const response = await this.request(`/vehicles/${vehicleId}`, {
       method: 'PUT',
-      body: JSON.stringify(dynamoDBData),
+      body: JSON.stringify(apiData),
     });
     
-    // レスポンスをフロントエンドの形式に変換
     return this.transformVehicleData(response);
   }
 
