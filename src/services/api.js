@@ -14,7 +14,7 @@ class ApiService {
     return {
       id: vehicle.vehicleId,
       vehicleId: vehicle.vehicleId,
-      name: vehicle.name,
+      name: vehicle.vehicleName || vehicle.name,
       type: vehicle.vehicleType,
       vehicleType: vehicle.vehicleType,
       price: vehicle.pricePerDay,
@@ -24,7 +24,7 @@ class ApiService {
       isAvailable: vehicle.isAvailable,
       category: vehicle.category,
       description: vehicle.description,
-      image: vehicle.images && vehicle.images[0] ? vehicle.images[0] : `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200"><rect width="300" height="200" fill="#f0f0f0"/><text x="150" y="100" font-family="Arial" font-size="14" fill="#999" text-anchor="middle">${vehicle.name || 'Vehicle'}</text></svg>`)}`,
+      image: vehicle.images && vehicle.images[0] ? vehicle.images[0] : `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200"><rect width="300" height="200" fill="#f0f0f0"/><text x="150" y="100" font-family="Arial" font-size="14" fill="#999" text-anchor="middle">${vehicle.vehicleName || vehicle.name || 'Vehicle'}</text></svg>`)}`,
       images: vehicle.images,
       specifications: {
         seats: vehicle.capacity,
@@ -120,7 +120,7 @@ class ApiService {
   async createVehicle(vehicleData) {
     // フロントエンドの形式をDynamoDBの形式に変換
     const dynamoDBData = {
-      name: vehicleData.name,
+      vehicleName: vehicleData.name,
       vehicleType: vehicleData.type || vehicleData.vehicleType,
       description: vehicleData.description || '',
       pricePerHour: parseFloat(vehicleData.pricePerHour || Math.round((vehicleData.price || vehicleData.pricePerDay || 0) / 8)),
@@ -156,7 +156,7 @@ class ApiService {
   async updateVehicle(vehicleId, vehicleData) {
     // フロントエンドの形式をDynamoDBの形式に変換
     const dynamoDBData = {
-      name: vehicleData.name,
+      vehicleName: vehicleData.name,
       vehicleType: vehicleData.type || vehicleData.vehicleType,
       description: vehicleData.description || '',
       pricePerHour: parseFloat(vehicleData.pricePerHour || Math.round((vehicleData.price || vehicleData.pricePerDay || 0) / 8)),
