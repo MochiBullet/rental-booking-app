@@ -232,8 +232,8 @@ function HomePage() {
         }
         
         const defaultContent = {
-          heroTitle: 'M\'s BASE Rental',
-          heroSubtitle: '安心・安全・快適なレンタルサービス',
+          heroTitle: dbSiteSettings.hero?.title || siteSettings.hero?.title || 'M\'s BASE Rental',
+          heroSubtitle: dbSiteSettings.hero?.subtitle || siteSettings.hero?.subtitle || '安心・安全・快適なレンタルサービス',
           carTile: {
             title: carText.shortTitle || carText.title || '車',
             description: `${carText.subtitle}\n${carText.description}\n${carText.details}`,

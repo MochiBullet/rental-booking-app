@@ -414,6 +414,7 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
       {!propActiveSection && (
         <div className="settings-tabs">
           {[
+            { key: 'branding', label: '🏢 ブランディング' },
             { key: 'tile-edit', label: '🎨 タイル編集' },
             { key: 'contact', label: 'お問い合わせ情報' },
             { key: 'googleforms', label: '📝 Google Forms連携' },
@@ -434,8 +435,71 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
 
       <div className="settings-content">
 
-
-
+        {activeSection === 'branding' && (
+          <div className="section">
+            <h3>🏢 ブランディング設定</h3>
+            <div className="form-group">
+              <label>サイト名</label>
+              <input
+                type="text"
+                value={settings.branding?.siteName || ''}
+                onChange={(e) => setSettings(prev => ({
+                  ...prev,
+                  branding: { ...prev.branding, siteName: e.target.value }
+                }))}
+                placeholder="M's BASE Rental"
+              />
+            </div>
+            <div className="form-group">
+              <label>サイトサブタイトル</label>
+              <input
+                type="text"
+                value={settings.branding?.siteSubtitle || ''}
+                onChange={(e) => setSettings(prev => ({
+                  ...prev,
+                  branding: { ...prev.branding, siteSubtitle: e.target.value }
+                }))}
+                placeholder="車・バイクレンタル"
+              />
+            </div>
+            <div className="form-group">
+              <label>ヒーロータイトル（トップページ）</label>
+              <input
+                type="text"
+                value={settings.hero?.title || ''}
+                onChange={(e) => setSettings(prev => ({
+                  ...prev,
+                  hero: { ...prev.hero, title: e.target.value }
+                }))}
+                placeholder="M's BASE Rental"
+              />
+            </div>
+            <div className="form-group">
+              <label>ヒーローサブタイトル（トップページ）</label>
+              <input
+                type="text"
+                value={settings.hero?.subtitle || ''}
+                onChange={(e) => setSettings(prev => ({
+                  ...prev,
+                  hero: { ...prev.hero, subtitle: e.target.value }
+                }))}
+                placeholder="安心・安全・快適なレンタルサービス"
+              />
+            </div>
+            <div className="form-group">
+              <label>コピーライト年</label>
+              <input
+                type="text"
+                value={settings.branding?.copyrightYear || ''}
+                onChange={(e) => setSettings(prev => ({
+                  ...prev,
+                  branding: { ...prev.branding, copyrightYear: e.target.value }
+                }))}
+                placeholder="2024"
+              />
+            </div>
+          </div>
+        )}
 
         {activeSection === 'tile-edit' && (
           <div className="section">
@@ -693,6 +757,67 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
                     />
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeSection === 'page-edit' && (
+          <div className="section">
+            <h3>📄 カード内ページ編集</h3>
+            <p>車両リストページのヘッダー情報を編集できます</p>
+            
+            <div className="page-content-form">
+              <h4>🚗 車両リストページ</h4>
+              <div className="form-group">
+                <label>ページタイトル</label>
+                <input
+                  type="text"
+                  value={settings.pageContent?.carTitle || ''}
+                  onChange={(e) => setSettings(prev => ({
+                    ...prev,
+                    pageContent: { ...prev.pageContent, carTitle: e.target.value }
+                  }))}
+                  placeholder="車のレンタル"
+                />
+              </div>
+              <div className="form-group">
+                <label>ページ説明文</label>
+                <textarea
+                  value={settings.pageContent?.carDescription || ''}
+                  onChange={(e) => setSettings(prev => ({
+                    ...prev,
+                    pageContent: { ...prev.pageContent, carDescription: e.target.value }
+                  }))}
+                  placeholder="ファミリー向けからビジネスまで"
+                  rows="3"
+                />
+              </div>
+              
+              <h4>🏍️ バイクリストページ</h4>
+              <div className="form-group">
+                <label>ページタイトル</label>
+                <input
+                  type="text"
+                  value={settings.pageContent?.bikeTitle || ''}
+                  onChange={(e) => setSettings(prev => ({
+                    ...prev,
+                    pageContent: { ...prev.pageContent, bikeTitle: e.target.value }
+                  }))}
+                  placeholder="バイクのレンタル"
+                />
+              </div>
+              <div className="form-group">
+                <label>ページ説明文</label>
+                <textarea
+                  value={settings.pageContent?.bikeDescription || ''}
+                  onChange={(e) => setSettings(prev => ({
+                    ...prev,
+                    pageContent: { ...prev.pageContent, bikeDescription: e.target.value }
+                  }))}
+                  placeholder="スクーターから大型バイクまで、あなたの目的に合ったバイクを見つけてください。"
+                  rows="3"
+                />
               </div>
             </div>
           </div>

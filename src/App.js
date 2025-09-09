@@ -176,8 +176,8 @@ function AppContent() {
       settings = { ...globalSettings, ...localSettings };
     }
     
-    // M's BASE Rentalを確実に設定
-    if (!settings.branding || !settings.branding.siteName || settings.branding.siteName.includes('RentalEasy')) {
+    // サイト名のデフォルト設定
+    if (!settings.branding || !settings.branding.siteName) {
       settings.branding = { siteName: "M's BASE Rental" };
     }
     
@@ -213,9 +213,10 @@ function AppContent() {
       hover: hoverColor
     });
     
-    // ブランディング設定の適用（M's BASE Rentalを確実に設定）
+    // ブランディング設定の適用
     const siteName = settings.branding?.siteName || "M's BASE Rental";
-    document.title = `${siteName} - 車・バイクレンタル`;
+    const siteSubtitle = settings.branding?.siteSubtitle || "車・バイクレンタル";
+    document.title = `${siteName} - ${siteSubtitle}`;
     console.log('📝 サイトタイトル適用:', siteName);
     
     // カスタムアイコン設定の適用
@@ -340,7 +341,7 @@ function AppContent() {
 
         <footer className="main-footer">
           <div className="footer-container">
-            <p>&copy; 2024 M's BASE Rental</p>
+            <p>&copy; {siteSettings?.branding?.copyrightYear || new Date().getFullYear()} {siteSettings?.branding?.siteName || "M's BASE Rental"}</p>
             <div className="footer-links">
               {/* <Link to="/contact">お問い合わせ</Link> REMOVED: Contact moved to HomePage */}
               <Link to="/terms">利用規約</Link>

@@ -1359,55 +1359,7 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
           )}
           
           {activeSection === 'page-edit' && (
-            <div className="page-edit-section">
-              <div className="section-header">
-                <h2>📄 カード内ページ編集</h2>
-                <p>車両リストページのヘッダー情報を編集できます</p>
-              </div>
-              
-              <div className="page-content-form">
-                <h3>🚗 車両リストページ</h3>
-                <div className="form-group">
-                  <label>タイトル</label>
-                  <input
-                    type="text"
-                    placeholder="車のレンタル"
-                    className="page-input"
-                  />
-                </div>
-                <div className="form-group">
-                  <label>説明文</label>
-                  <textarea
-                    placeholder="ファミリー向けからビジネスまで"
-                    className="page-textarea"
-                    rows="3"
-                  />
-                </div>
-                
-                <h3>🏍️ バイクリストページ</h3>
-                <div className="form-group">
-                  <label>タイトル</label>
-                  <input
-                    type="text"
-                    placeholder="バイクのレンタル"
-                    className="page-input"
-                  />
-                </div>
-                <div className="form-group">
-                  <label>説明文</label>
-                  <textarea
-                    placeholder="スクーターから大型バイクまで、あなたの目的に合ったバイクを見つけてください。"
-                    className="page-textarea"
-                    rows="3"
-                  />
-                </div>
-                
-                <div className="form-actions">
-                  <button className="save-btn">💾 変更を保存</button>
-                  <button className="preview-btn">👁️ プレビュー</button>
-                </div>
-              </div>
-            </div>
+            <SiteSettingsManagement onSettingsUpdate={onSettingsUpdate} activeSection="page-edit" />
           )}
           
           {activeSection === 'contact' && (
