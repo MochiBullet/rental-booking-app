@@ -588,13 +588,37 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
         imageSize: vehicle.image ? Math.round((vehicle.image.length * 3) / 4) : 0
       });
       
-      // ペイロードサイズが大きすぎる場合は画像を除外して送信
+      // デバッグ: 送信するデータ構造を詳細出力
+      console.log('📋 送信データ詳細:', {
+        name: vehicle.name,
+        type: vehicle.type,
+        price: vehicle.price,
+        passengers: vehicle.passengers,
+        features: vehicle.features,
+        hasImage: !!vehicle.image,
+        imageLength: vehicle.image ? vehicle.image.length : 0
+      });
+      
+      // デバッグ用：画像なしバージョンも準備
+      const vehicleWithoutImage = { ...vehicle };
+      delete vehicleWithoutImage.image;
+      delete vehicleWithoutImage.images;
+      
+      // API Gateway制限（6MB）を考慮したサイズ制限
       let vehicleToSend = vehicle;
-      if (dataSize > 5000000) { // 5MB制限
+      if (dataSize > 4000000) { // 4MB制限（安全マージン）
         console.warn('⚠️ ペイロードサイズが大きすぎます。画像を除外して送信します');
-        vehicleToSend = { ...vehicle };
-        delete vehicleToSend.image;
+        vehicleToSend = vehicleWithoutImage;
         showNotification('⚠️ 画像サイズが大きすぎるため、画像なしで車両を追加します', 'warning');
+      } else if (dataSize > 2000000) { // 2MB以上で警告
+        console.warn('⚠️ ペイロードサイズが大きいです:', Math.round(dataSize/1000), 'KB');
+        showNotification('⚠️ データサイズが大きいため処理に時間がかかる可能性があります', 'warning');
+      }
+      
+      // デバッグ：画像なしでもエラーが出るかテスト
+      if (vehicle.image && confirm('デバッグ：画像なしでテストしますか？')) {
+        vehicleToSend = vehicleWithoutImage;
+        console.log('🧪 デバッグモード: 画像なしで送信');
       }
       
       console.log('🔄 データベースに車両を追加中...', vehicleToSend);
