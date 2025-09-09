@@ -203,7 +203,8 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
     type: 'car',
     price: '',
     passengers: '',
-    features: ''
+    features: '',
+    image: '' // 車両画像のBase64データ
   });
   const [siteSettings, setSiteSettings] = useState({
     primaryColor: '#43a047',
@@ -401,6 +402,104 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
     }, 1000);
   };
 
+  // 車両画像圧縮処理関数
+  const compressVehicleImage = (file, maxWidth = 800, maxHeight = 600, quality = 0.8) => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      img.onload = () => {
+        // アスペクト比を保持してリサイズ
+        let { width, height } = img;
+        if (width > height) {
+          if (width > maxWidth) {
+            height = height * (maxWidth / width);
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = width * (maxHeight / height);
+            height = maxHeight;
+          }
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        // 白い背景を追加（透明な背景を避けるため）
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, width, height);
+        
+        // 画像を描画
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // Base64形式で出力
+        const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+        console.log('🖼️ 車両画像圧縮完了:', {
+          originalSize: file.size,
+          compressedSize: Math.round((compressedDataUrl.length * 3) / 4),
+          dimensions: `${width}x${height}`
+        });
+        resolve(compressedDataUrl);
+      };
+      
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
+  // 車両画像アップロード処理
+  const handleVehicleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    if (!file.type.startsWith('image/')) {
+      showNotification('❌ 画像ファイルを選択してください', 'error');
+      return;
+    }
+    
+    try {
+      console.log('🔄 車両画像をアップロード中...', file.name);
+      const compressedImage = await compressVehicleImage(file);
+      
+      setNewVehicle(prev => ({
+        ...prev,
+        image: compressedImage
+      }));
+      
+      showNotification('✅ 車両画像をアップロードしました', 'success');
+    } catch (error) {
+      console.error('❌ 車両画像アップロードエラー:', error);
+      showNotification('❌ 画像のアップロードに失敗しました', 'error');
+    }
+  };
+
+  // 編集中車両の画像アップロード処理
+  const handleEditVehicleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    if (!file.type.startsWith('image/')) {
+      showNotification('❌ 画像ファイルを選択してください', 'error');
+      return;
+    }
+    
+    try {
+      console.log('🔄 編集中車両の画像をアップロード中...', file.name);
+      const compressedImage = await compressVehicleImage(file);
+      
+      setSelectedVehicle(prev => ({
+        ...prev,
+        image: compressedImage
+      }));
+      
+      showNotification('✅ 車両画像を更新しました', 'success');
+    } catch (error) {
+      console.error('❌ 車両画像アップロードエラー:', error);
+      showNotification('❌ 画像のアップロードに失敗しました', 'error');
+    }
+  };
+
   const handleAddVehicle = async () => {
     if (!newVehicle.name || !newVehicle.price) {
       showNotification('❌ 車両名と価格は必須項目です', 'error');
@@ -431,7 +530,8 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
         type: 'car',
         price: '',
         passengers: '',
-        features: ''
+        features: '',
+        image: '' // 画像データもリセット
       });
       setShowAddVehicleModal(false);
       loadDashboardData();
@@ -1908,6 +2008,51 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
                 placeholder="GPS, Bluetooth, Backup Camera"
               />
             </div>
+            
+            {/* 車両画像アップロード */}
+            <div className="form-group">
+              <label>車両画像</label>
+              <input 
+                type="file"
+                id="vehicleImageUpload"
+                accept="image/*"
+                onChange={handleVehicleImageUpload}
+                style={{ display: 'none' }}
+              />
+              <label htmlFor="vehicleImageUpload" className="upload-button" style={{
+                display: 'inline-block',
+                padding: '10px 20px',
+                background: 'linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%)',
+                color: 'white',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                border: 'none',
+                fontSize: '14px',
+                fontWeight: '500',
+                transition: 'transform 0.2s ease',
+                marginBottom: '10px'
+              }}>
+                📷 画像をアップロード
+              </label>
+              {newVehicle.image && (
+                <div style={{ marginTop: '10px' }}>
+                  <img 
+                    src={newVehicle.image}
+                    alt="車両プレビュー"
+                    style={{
+                      maxWidth: '200px',
+                      maxHeight: '150px',
+                      borderRadius: '8px',
+                      objectFit: 'cover',
+                      border: '2px solid #e9ecef'
+                    }}
+                  />
+                  <p style={{ fontSize: '12px', color: '#666', marginTop: '5px' }}>
+                    ✅ 画像がアップロードされました
+                  </p>
+                </div>
+              )}
+            </div>
             <div className="modal-actions">
               <button className="save-btn" onClick={handleAddVehicle}>Save</button>
               <button className="cancel-btn" onClick={() => setShowAddVehicleModal(false)}>Cancel</button>
@@ -1960,6 +2105,56 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
                 value={selectedVehicle.features || ''}
                 onChange={(e) => setSelectedVehicle({...selectedVehicle, features: e.target.value})}
               />
+            </div>
+            
+            {/* 車両画像編集 */}
+            <div className="form-group">
+              <label>車両画像</label>
+              <input 
+                type="file"
+                id="editVehicleImageUpload"
+                accept="image/*"
+                onChange={handleEditVehicleImageUpload}
+                style={{ display: 'none' }}
+              />
+              <label htmlFor="editVehicleImageUpload" className="upload-button" style={{
+                display: 'inline-block',
+                padding: '10px 20px',
+                background: 'linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%)',
+                color: 'white',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                border: 'none',
+                fontSize: '14px',
+                fontWeight: '500',
+                transition: 'transform 0.2s ease',
+                marginBottom: '10px'
+              }}>
+                📷 画像を変更
+              </label>
+              {selectedVehicle.image && (
+                <div style={{ marginTop: '10px' }}>
+                  <img 
+                    src={selectedVehicle.image}
+                    alt="車両プレビュー"
+                    style={{
+                      maxWidth: '200px',
+                      maxHeight: '150px',
+                      borderRadius: '8px',
+                      objectFit: 'cover',
+                      border: '2px solid #e9ecef'
+                    }}
+                  />
+                  <p style={{ fontSize: '12px', color: '#666', marginTop: '5px' }}>
+                    現在の車両画像
+                  </p>
+                </div>
+              )}
+              {!selectedVehicle.image && (
+                <p style={{ fontSize: '12px', color: '#999', marginTop: '5px' }}>
+                  画像がアップロードされていません
+                </p>
+              )}
             </div>
             <div className="modal-actions">
               <button className="save-btn" onClick={handleEditVehicle}>Update</button>

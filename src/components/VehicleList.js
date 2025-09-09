@@ -277,7 +277,7 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
           <div key={vehicle.id} className="vehicle-card">
             <div className="vehicle-image-container">
               <img 
-                src={vehicleImages[vehicle.name] || vehicleImages['Default']} 
+                src={vehicle.image || vehicleImages[vehicle.name] || vehicleImages['Default']} 
                 alt={vehicle.name}
                 className="vehicle-image"
                 loading="lazy"
@@ -365,7 +365,7 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
                 <div className="booking-content">
                   <div className="vehicle-summary">
                     <img 
-                      src={vehicleImages[selectedVehicle.name] || vehicleImages['Default']} 
+                      src={selectedVehicle.image || vehicleImages[selectedVehicle.name] || vehicleImages['Default']} 
                       alt={selectedVehicle.name}
                       className="summary-image"
                       loading="lazy"
