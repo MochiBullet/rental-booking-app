@@ -506,56 +506,28 @@ function HomePage() {
         
         <div className="vehicle-tiles">
           <div className="vehicle-tile car-tile" onClick={() => navigate('/vehicles/car')}>
-            <div className="tile-image">
+            <div className="tile-image-large">
               <img 
                 src={getTileImage('car')} 
                 alt="車レンタル" 
                 className="tile-img"
               />
-            </div>
-            <div className="tile-content">
-              <h3 className="tile-title">{homeContent.carTile.title}</h3>
-              <p className="tile-description">
-                {homeContent.carTile.description.split('\n').map((line, i) => (
-                  <React.Fragment key={i}>
-                    {line}
-                    {i < homeContent.carTile.description.split('\n').length - 1 && <br/>}
-                  </React.Fragment>
-                ))}
-              </p>
-              <div className="tile-features">
-                {homeContent.carTile.features.map((feature, i) => (
-                  <span key={i} className="feature">✓ {feature}</span>
-                ))}
+              <div className="tile-overlay">
+                <h2 className="tile-simple-title">CAR</h2>
               </div>
-              <button className="tile-button">車を見る →</button>
             </div>
           </div>
 
           <div className="vehicle-tile bike-tile" onClick={() => navigate('/vehicles/bike')}>
-            <div className="tile-image">
+            <div className="tile-image-large">
               <img 
                 src={getTileImage('bike')} 
                 alt="バイクレンタル" 
                 className="tile-img"
               />
-            </div>
-            <div className="tile-content">
-              <h3 className="tile-title">{homeContent.bikeTile.title}</h3>
-              <p className="tile-description">
-                {homeContent.bikeTile.description.split('\n').map((line, i) => (
-                  <React.Fragment key={i}>
-                    {line}
-                    {i < homeContent.bikeTile.description.split('\n').length - 1 && <br/>}
-                  </React.Fragment>
-                ))}
-              </p>
-              <div className="tile-features">
-                {homeContent.bikeTile.features.map((feature, i) => (
-                  <span key={i} className="feature">✓ {feature}</span>
-                ))}
+              <div className="tile-overlay">
+                <h2 className="tile-simple-title">MOTORBIKE</h2>
               </div>
-              <button className="tile-button">バイクを見る →</button>
             </div>
           </div>
         </div>
