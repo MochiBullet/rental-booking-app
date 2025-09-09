@@ -5,7 +5,7 @@ import { siteSettingsAPI } from '../services/siteSettingsAPI';
 const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSection }) => {
   // CACHE BUSTING v3.0.2 - Dashboard Overview完全削除 (2025-09-06 15:46)
   const [settings, setSettings] = useState(initialSiteSettings);
-  const [activeSection, setActiveSection] = useState(propActiveSection || 'tile-images');
+  const [activeSection, setActiveSection] = useState(propActiveSection || 'tile-edit');
   const [forceRender, setForceRender] = useState(Date.now() + 1000); // Aggressive cache clear
 
   useEffect(() => {
@@ -234,6 +234,77 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
     }
   };
 
+  // 統合タイル画像アップロード処理
+  const handleTileImageUpload = (event, type) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // ファイルサイズチェック（最大3MB）
+    if (file.size > 3 * 1024 * 1024) {
+      alert('ファイルサイズは3MB以下にしてください。');
+      return;
+    }
+
+    // 画像ファイルかチェック
+    if (!file.type.startsWith('image/')) {
+      alert('画像ファイルを選択してください。');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const base64Data = e.target.result;
+      const imageKey = `${type}Image`;
+      updateTileSettings(imageKey, base64Data);
+      updateTileSettings('useDefaultImages', false);
+      
+      // リアルタイム更新の実行
+      if (onSettingsUpdate) {
+        const updatedSettings = {
+          ...settings,
+          tiles: {
+            ...settings.tiles,
+            [imageKey]: base64Data,
+            useDefaultImages: false
+          }
+        };
+        onSettingsUpdate(updatedSettings);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // 個別タイル画像リセット
+  const resetTileImage = (type) => {
+    const imageKey = `${type}Image`;
+    updateTileSettings(imageKey, null);
+    
+    // 両方の画像がnullの場合のみデフォルトに戻す
+    const otherImageKey = type === 'car' ? 'bikeImage' : 'carImage';
+    if (!settings.tiles?.[otherImageKey]) {
+      updateTileSettings('useDefaultImages', true);
+    }
+    
+    // リアルタイム更新の実行
+    if (onSettingsUpdate) {
+      const updatedTiles = {
+        ...settings.tiles,
+        [imageKey]: null
+      };
+      
+      // 両方の画像がnullの場合のみデフォルトフラグを設定
+      if (!updatedTiles.carImage && !updatedTiles.bikeImage) {
+        updatedTiles.useDefaultImages = true;
+      }
+      
+      const updatedSettings = {
+        ...settings,
+        tiles: updatedTiles
+      };
+      onSettingsUpdate(updatedSettings);
+    }
+  };
+
   // タイルテキスト更新関数
   const updateTileText = (type, field, value) => {
     const textKey = `${type}Text`;
@@ -292,8 +363,7 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
       {!propActiveSection && (
         <div className="settings-tabs">
           {[
-            { key: 'tile-images', label: '🚗 タイル画像' },
-            { key: 'tile-text', label: '📝 タイルテキスト' },
+            { key: 'tile-edit', label: '🎨 タイル編集' },
             { key: 'contact', label: 'お問い合わせ情報' },
             { key: 'googleforms', label: '📝 Google Forms連携' },
             { key: 'terms', label: '📋 利用規約' },
@@ -314,12 +384,15 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
       <div className="settings-content">
 
 
-        {activeSection === 'tile-images' && (
+
+
+        {activeSection === 'tile-edit' && (
           <div className="section">
-            <h3>🚗 車・バイクタイル画像管理</h3>
+            <h3>🎨 タイル編集（画像・テキスト統合管理）</h3>
             
+            {/* タイル画像セクション */}
             <div className="form-group">
-              <label>タイル画像設定</label>
+              <label>🖼️ タイル画像設定</label>
               <div className="tile-image-management">
                 <div className="tile-previews">
                   <div className="tile-preview-section">
@@ -340,26 +413,16 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
                         <div 
                           style={{ 
                             width: '200px', 
-                            height: '150px', 
-                            background: 'url(https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=600&q=80)',
-                            backgroundSize: 'cover',
-                            backgroundPosition: 'center',
+                            height: '150px',
+                            backgroundColor: '#f0f0f0',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
                             borderRadius: '8px',
-                            position: 'relative'
+                            border: '2px dashed #ccc'
                           }}
                         >
-                          <div style={{
-                            position: 'absolute',
-                            bottom: '8px',
-                            left: '8px',
-                            background: 'rgba(0,0,0,0.7)',
-                            color: 'white',
-                            padding: '4px 8px',
-                            borderRadius: '4px',
-                            fontSize: '12px'
-                          }}>
-                            デフォルト画像
-                          </div>
+                          デフォルト車画像
                         </div>
                       )}
                     </div>
@@ -383,26 +446,16 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
                         <div 
                           style={{ 
                             width: '200px', 
-                            height: '150px', 
-                            background: 'url(https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80)',
-                            backgroundSize: 'cover',
-                            backgroundPosition: 'center',
+                            height: '150px',
+                            backgroundColor: '#f0f0f0',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
                             borderRadius: '8px',
-                            position: 'relative'
+                            border: '2px dashed #ccc'
                           }}
                         >
-                          <div style={{
-                            position: 'absolute',
-                            bottom: '8px',
-                            left: '8px',
-                            background: 'rgba(0,0,0,0.7)',
-                            color: 'white',
-                            padding: '4px 8px',
-                            borderRadius: '4px',
-                            fontSize: '12px'
-                          }}>
-                            デフォルト画像
-                          </div>
+                          デフォルトバイク画像
                         </div>
                       )}
                     </div>
@@ -414,38 +467,44 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
                     <h4>車タイル画像をアップロード</h4>
                     <input
                       type="file"
-                      id="carTileUpload"
+                      id="carImageUpload"
                       accept="image/*"
-                      onChange={handleCarTileUpload}
+                      onChange={(e) => handleTileImageUpload(e, 'car')}
                       style={{ display: 'none' }}
                     />
-                    <label htmlFor="carTileUpload" className="upload-button">
-                      🚗 車の画像をアップロード
+                    <label htmlFor="carImageUpload" className="upload-button">
+                      📷 車画像を選択
                     </label>
+                    {settings.tiles?.carImage && (
+                      <button 
+                        type="button" 
+                        onClick={() => resetTileImage('car')}
+                        className="reset-icon-button"
+                      >
+                        🔄 車画像をリセット
+                      </button>
+                    )}
                   </div>
 
                   <div className="upload-section">
                     <h4>バイクタイル画像をアップロード</h4>
                     <input
                       type="file"
-                      id="bikeTileUpload"
+                      id="bikeImageUpload"
                       accept="image/*"
-                      onChange={handleBikeTileUpload}
+                      onChange={(e) => handleTileImageUpload(e, 'bike')}
                       style={{ display: 'none' }}
                     />
-                    <label htmlFor="bikeTileUpload" className="upload-button">
-                      🏍️ バイクの画像をアップロード
+                    <label htmlFor="bikeImageUpload" className="upload-button">
+                      🏍️ バイク画像を選択
                     </label>
-                  </div>
-
-                  <div className="reset-section">
-                    {(!settings.tiles?.useDefaultImages && (settings.tiles?.carImage || settings.tiles?.bikeImage)) && (
+                    {settings.tiles?.bikeImage && (
                       <button 
                         type="button" 
-                        onClick={resetTilesToDefault}
+                        onClick={() => resetTileImage('bike')}
                         className="reset-icon-button"
                       >
-                        🔄 デフォルト画像に戻す
+                        🔄 バイク画像をリセット
                       </button>
                     )}
                   </div>
@@ -459,98 +518,94 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
                 </div>
               </div>
             </div>
-          </div>
-        )}
 
-        {activeSection === 'tile-text' && (
-          <div className="section">
-            <h3>📝 タイルテキスト設定</h3>
-            
-            <div className="tile-text-section">
-              <h4>🚗 車両タイルテキスト設定</h4>
-              <div className="tile-text-grid">
-                <div className="form-group">
-                  <label>タイトル</label>
-                  <input
-                    type="text"
-                    value={settings.tiles?.carText?.title || ''}
-                    onChange={(e) => updateTileText('car', 'title', e.target.value)}
-                    placeholder="車両レンタル"
-                  />
+            {/* タイルテキストセクション */}
+            <div className="form-group" style={{marginTop: '2rem'}}>
+              <label>📝 タイルテキスト設定</label>
+              <div className="tile-text-section">
+                <h4>🚗 車両タイルテキスト設定</h4>
+                <div className="tile-text-grid">
+                  <div className="form-group">
+                    <label>タイトル</label>
+                    <input
+                      type="text"
+                      value={settings.tiles?.carText?.title || ''}
+                      onChange={(e) => updateTileText('car', 'title', e.target.value)}
+                      placeholder="車両レンタル"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>サブタイトル</label>
+                    <input
+                      type="text"
+                      value={settings.tiles?.carText?.subtitle || ''}
+                      onChange={(e) => updateTileText('car', 'subtitle', e.target.value)}
+                      placeholder="ファミリー向けから"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>説明文1</label>
+                    <input
+                      type="text"
+                      value={settings.tiles?.carText?.description || ''}
+                      onChange={(e) => updateTileText('car', 'description', e.target.value)}
+                      placeholder="ビジネス用まで"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>説明文2</label>
+                    <input
+                      type="text"
+                      value={settings.tiles?.carText?.details || ''}
+                      onChange={(e) => updateTileText('car', 'details', e.target.value)}
+                      placeholder="幅広いラインナップ"
+                    />
+                  </div>
                 </div>
-                <div className="form-group">
-                  <label>サブタイトル</label>
-                  <input
-                    type="text"
-                    value={settings.tiles?.carText?.subtitle || ''}
-                    onChange={(e) => updateTileText('car', 'subtitle', e.target.value)}
-                    placeholder="ファミリー向けから"
-                  />
-                </div>
-                <div className="form-group">
-                  <label>説明文1</label>
-                  <input
-                    type="text"
-                    value={settings.tiles?.carText?.description || ''}
-                    onChange={(e) => updateTileText('car', 'description', e.target.value)}
-                    placeholder="ビジネス用まで"
-                  />
-                </div>
-                <div className="form-group">
-                  <label>説明文2</label>
-                  <input
-                    type="text"
-                    value={settings.tiles?.carText?.details || ''}
-                    onChange={(e) => updateTileText('car', 'details', e.target.value)}
-                    placeholder="幅広いラインナップ"
-                  />
-                </div>
-              </div>
 
-              <h4>🏍️ バイクタイルテキスト設定</h4>
-              <div className="tile-text-grid">
-                <div className="form-group">
-                  <label>タイトル</label>
-                  <input
-                    type="text"
-                    value={settings.tiles?.bikeText?.title || ''}
-                    onChange={(e) => updateTileText('bike', 'title', e.target.value)}
-                    placeholder="バイクレンタル"
-                  />
-                </div>
-                <div className="form-group">
-                  <label>サブタイトル</label>
-                  <input
-                    type="text"
-                    value={settings.tiles?.bikeText?.subtitle || ''}
-                    onChange={(e) => updateTileText('bike', 'subtitle', e.target.value)}
-                    placeholder="原付から大型まで"
-                  />
-                </div>
-                <div className="form-group">
-                  <label>説明文1</label>
-                  <input
-                    type="text"
-                    value={settings.tiles?.bikeText?.description || ''}
-                    onChange={(e) => updateTileText('bike', 'description', e.target.value)}
-                    placeholder="多様なバイクを"
-                  />
-                </div>
-                <div className="form-group">
-                  <label>説明文2</label>
-                  <input
-                    type="text"
-                    value={settings.tiles?.bikeText?.details || ''}
-                    onChange={(e) => updateTileText('bike', 'details', e.target.value)}
-                    placeholder="お手頃価格で提供"
-                  />
+                <h4>🏍️ バイクタイルテキスト設定</h4>
+                <div className="tile-text-grid">
+                  <div className="form-group">
+                    <label>タイトル</label>
+                    <input
+                      type="text"
+                      value={settings.tiles?.bikeText?.title || ''}
+                      onChange={(e) => updateTileText('bike', 'title', e.target.value)}
+                      placeholder="バイクレンタル"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>サブタイトル</label>
+                    <input
+                      type="text"
+                      value={settings.tiles?.bikeText?.subtitle || ''}
+                      onChange={(e) => updateTileText('bike', 'subtitle', e.target.value)}
+                      placeholder="原付から大型まで"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>説明文1</label>
+                    <input
+                      type="text"
+                      value={settings.tiles?.bikeText?.description || ''}
+                      onChange={(e) => updateTileText('bike', 'description', e.target.value)}
+                      placeholder="多様なバイクを"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>説明文2</label>
+                    <input
+                      type="text"
+                      value={settings.tiles?.bikeText?.details || ''}
+                      onChange={(e) => updateTileText('bike', 'details', e.target.value)}
+                      placeholder="お手頃価格で提供"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         )}
-
-
 
         {activeSection === 'contact' && (
           <div className="section">
