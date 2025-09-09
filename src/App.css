@@ -86,7 +86,7 @@ body {
   color: white;
   text-align: center;
   overflow: hidden;
-  min-height: 400px; /* 600px → 400px に縮小 */
+  min-height: 250px; /* 400px → 250px にさらに縮小 */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -127,7 +127,7 @@ body {
   
   /* PC用の高さ調整 */
   .hero {
-    min-height: 50vh; /* PCでは50%の高さに縮小 */
+    min-height: 30vh; /* PCでは30%の高さにさらに縮小 */
   }
 }
 
@@ -138,7 +138,7 @@ body {
   }
   
   .hero {
-    min-height: 45vh; /* タブレットでは45%の高さ */
+    min-height: 25vh; /* タブレットでは25%の高さに縮小 */
   }
 }
 
@@ -149,7 +149,7 @@ body {
   }
   
   .hero {
-    min-height: 40vh; /* モバイルでは40%の高さに縮小 */
+    min-height: 20vh; /* モバイルでは20%の高さにさらに縮小 */
   }
 }
 
