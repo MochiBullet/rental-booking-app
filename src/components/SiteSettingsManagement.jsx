@@ -2,16 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { siteSettingsManager, initialSiteSettings } from '../data/siteSettings';
 import { siteSettingsAPI } from '../services/siteSettingsAPI';
 
-const SiteSettingsManagement = ({ onSettingsUpdate }) => {
+const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSection }) => {
   // CACHE BUSTING v3.0.2 - Dashboard Overview完全削除 (2025-09-06 15:46)
   const [settings, setSettings] = useState(initialSiteSettings);
-  const [activeSection, setActiveSection] = useState('branding');
+  const [activeSection, setActiveSection] = useState(propActiveSection || 'branding');
   const [forceRender, setForceRender] = useState(Date.now() + 1000); // Aggressive cache clear
 
   useEffect(() => {
     loadSettings();
     // お知らせ管理は AdminDashboard.js に移行済み
   }, []);
+  
+  useEffect(() => {
+    if (propActiveSection) {
+      setActiveSection(propActiveSection);
+    }
+  }, [propActiveSection]);
 
   const loadSettings = async () => {
     try {
@@ -388,27 +394,30 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
         </div>
       </div>
 
-      <div className="settings-tabs">
-        {[
-          { key: 'branding', label: '🎨 ブランディング' },
-          { key: 'hero-images', label: '🏞️ ヒーロー画像' },
-          { key: 'tile-images', label: '🚗 タイル画像' },
-          { key: 'hero', label: 'ヒーローセクション' },
-          { key: 'contact', label: 'お問い合わせ情報' },
-          { key: 'googleforms', label: '📝 Google Forms連携' },
-          { key: 'terms', label: '📋 利用規約' },
-          { key: 'privacy', label: '🔒 プライバシーポリシー' },
-          { key: 'rental-terms', label: '🚗 レンタカー約款' }
-        ].map(tab => (
-          <button
-            key={tab.key}
-            className={`tab-button ${activeSection === tab.key ? 'active' : ''}`}
-            onClick={() => setActiveSection(tab.key)}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      {!propActiveSection && (
+        <div className="settings-tabs">
+          {[
+            { key: 'branding', label: '🎨 ブランディング' },
+            { key: 'hero-images', label: '🏞️ ヒーロー画像' },
+            { key: 'tile-images', label: '🚗 タイル画像' },
+            { key: 'tile-text', label: '📝 タイルテキスト' },
+            { key: 'hero', label: 'ヒーローセクション' },
+            { key: 'contact', label: 'お問い合わせ情報' },
+            { key: 'googleforms', label: '📝 Google Forms連携' },
+            { key: 'terms', label: '📋 利用規約' },
+            { key: 'privacy', label: '🔒 プライバシーポリシー' },
+            { key: 'rental-terms', label: '🚗 レンタカー約款' }
+          ].map(tab => (
+            <button
+              key={tab.key}
+              className={`tab-button ${activeSection === tab.key ? 'active' : ''}`}
+              onClick={() => setActiveSection(tab.key)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className="settings-content">
         {activeSection === 'branding' && (

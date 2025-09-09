@@ -16,7 +16,7 @@ import VehicleListPage from './components/VehicleListPage';
 // import ResetPassword from './components/ResetPassword';
 import AdminLogin from './components/AdminLogin';
 import AdminDashboard from './components/AdminDashboard';
-import ContactForm from './components/ContactForm';
+// import ContactForm from './components/ContactForm'; // REMOVED: Contact form moved to HomePage
 import Terms from './components/Terms';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import RentalTerms from './components/RentalTerms';
@@ -316,7 +316,7 @@ function AppContent() {
           <Route path="/motorcycles" element={<Navigate to="/vehicles/motorcycle" replace />} />
           
           {/* Static Information Pages */}
-          <Route path="/contact" element={<ContactForm />} />
+          {/* <Route path="/contact" element={<ContactForm />} /> REMOVED: Contact moved to HomePage */}
           <Route path="/terms" element={<Terms />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/rental-terms" element={<RentalTerms />} />
@@ -342,7 +342,7 @@ function AppContent() {
           <div className="footer-container">
             <p>&copy; 2024 M's BASE Rental</p>
             <div className="footer-links">
-              <Link to="/contact">お問い合わせ</Link>
+              {/* <Link to="/contact">お問い合わせ</Link> REMOVED: Contact moved to HomePage */}
               <Link to="/terms">利用規約</Link>
               <Link to="/privacy">プライバシーポリシー</Link>
               <Link to="/rental-terms">レンタカー約款</Link>

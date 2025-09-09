@@ -937,18 +937,60 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
             車両管理
           </button>
           <button 
-            className={activeSection === 'settings' ? 'active' : ''}
-            onClick={() => setActiveSection('settings')}
-          >
-            <span className="nav-icon">⚙️</span>
-            サイト設定
-          </button>
-          <button 
             className={activeSection === 'announcements' ? 'active' : ''}
             onClick={() => setActiveSection('announcements')}
           >
             <span className="nav-icon">📢</span>
             お知らせ管理
+          </button>
+          <button 
+            className={activeSection === 'branding' ? 'active' : ''}
+            onClick={() => setActiveSection('branding')}
+          >
+            <span className="nav-icon">🎨</span>
+            ブランディング
+          </button>
+          <button 
+            className={activeSection === 'hero' ? 'active' : ''}
+            onClick={() => setActiveSection('hero')}
+          >
+            <span className="nav-icon">🏞️</span>
+            ヒーロー設定
+          </button>
+          <button 
+            className={activeSection === 'tile-text' ? 'active' : ''}
+            onClick={() => setActiveSection('tile-text')}
+          >
+            <span className="nav-icon">📝</span>
+            タイルテキスト
+          </button>
+          <button 
+            className={activeSection === 'contact' ? 'active' : ''}
+            onClick={() => setActiveSection('contact')}
+          >
+            <span className="nav-icon">📞</span>
+            連絡先情報
+          </button>
+          <button 
+            className={activeSection === 'terms' ? 'active' : ''}
+            onClick={() => setActiveSection('terms')}
+          >
+            <span className="nav-icon">📋</span>
+            利用規約
+          </button>
+          <button 
+            className={activeSection === 'privacy' ? 'active' : ''}
+            onClick={() => setActiveSection('privacy')}
+          >
+            <span className="nav-icon">🔒</span>
+            プライバシー
+          </button>
+          <button 
+            className={activeSection === 'rental-terms' ? 'active' : ''}
+            onClick={() => setActiveSection('rental-terms')}
+          >
+            <span className="nav-icon">🚙</span>
+            レンタカー約款
           </button>
         </nav>
         
@@ -961,8 +1003,15 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
         <div className="admin-header">
           <h1>
             {activeSection === 'vehicles' && '🚗 車両管理'}
-            {activeSection === 'settings' && '⚙️ サイト設定'}
             {activeSection === 'announcements' && '📢 お知らせ管理'}
+            {activeSection === 'branding' && '🎨 ブランディング設定'}
+            {activeSection === 'hero' && '🏞️ ヒーロー設定'}
+            {activeSection === 'tile-text' && '📝 タイルテキスト設定'}
+            {activeSection === 'contact' && '📞 連絡先情報設定'}
+            {activeSection === 'terms' && '📋 利用規約設定'}
+            {activeSection === 'privacy' && '🔒 プライバシーポリシー設定'}
+            {activeSection === 'rental-terms' && '🚙 レンタカー約款設定'}
+            {activeSection === 'settings' && '⚙️ サイト設定'} {/* 後方互換性のため残す */}
           </h1>
           <div className="admin-header-info">
             <div className="sync-status">
@@ -1320,6 +1369,34 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
           
           {activeSection === 'settings' && (
             <SiteSettingsManagement onSettingsUpdate={onSettingsUpdate} />
+          )}
+          
+          {activeSection === 'branding' && (
+            <SiteSettingsManagement onSettingsUpdate={onSettingsUpdate} activeSection="branding" />
+          )}
+          
+          {activeSection === 'hero' && (
+            <SiteSettingsManagement onSettingsUpdate={onSettingsUpdate} activeSection="hero" />
+          )}
+          
+          {activeSection === 'tile-text' && (
+            <SiteSettingsManagement onSettingsUpdate={onSettingsUpdate} activeSection="tile-text" />
+          )}
+          
+          {activeSection === 'contact' && (
+            <SiteSettingsManagement onSettingsUpdate={onSettingsUpdate} activeSection="contact" />
+          )}
+          
+          {activeSection === 'terms' && (
+            <SiteSettingsManagement onSettingsUpdate={onSettingsUpdate} activeSection="terms" />
+          )}
+          
+          {activeSection === 'privacy' && (
+            <SiteSettingsManagement onSettingsUpdate={onSettingsUpdate} activeSection="privacy" />
+          )}
+          
+          {activeSection === 'rental-terms' && (
+            <SiteSettingsManagement onSettingsUpdate={onSettingsUpdate} activeSection="rental-terms" />
           )}
           
           {activeSection === 'announcements' && (
