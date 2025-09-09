@@ -279,7 +279,8 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
               <img 
                 src={(() => {
                   const imageUrl = vehicle.image || vehicleImages[vehicle.name] || vehicleImages['Default'];
-                  if (imageUrl && (imageUrl.includes('300x200?text=') || !imageUrl.startsWith('http'))) {
+                  // Allow data: URLs for SVG, but filter out via.placeholder.com and other problematic URLs
+                  if (imageUrl && (imageUrl.includes('via.placeholder.com') || (imageUrl.includes('300x200?text=') && !imageUrl.startsWith('data:')))) {
                     console.warn('Invalid image URL detected:', imageUrl, 'for vehicle:', vehicle.name);
                     return vehicleImages['Default'];
                   }
@@ -374,7 +375,8 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
                     <img 
                       src={(() => {
                         const imageUrl = selectedVehicle.image || vehicleImages[selectedVehicle.name] || vehicleImages['Default'];
-                        if (imageUrl && (imageUrl.includes('300x200?text=') || !imageUrl.startsWith('http'))) {
+                        // Allow data: URLs for SVG, but filter out via.placeholder.com and other problematic URLs
+                        if (imageUrl && (imageUrl.includes('via.placeholder.com') || (imageUrl.includes('300x200?text=') && !imageUrl.startsWith('data:')))) {
                           return vehicleImages['Default'];
                         }
                         return imageUrl;
