@@ -551,11 +551,19 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
     
     try {
       const vehicle = {
-        ...newVehicle,
+        name: newVehicle.name,
+        type: newVehicle.type,
+        vehicleType: newVehicle.type, // APIが期待するフィールド名
         price: parseFloat(newVehicle.price),
+        pricePerDay: parseFloat(newVehicle.price), // APIが期待するフィールド名
         passengers: parseInt(newVehicle.passengers) || 4,
+        capacity: parseInt(newVehicle.passengers) || 4, // APIが期待するフィールド名
         available: true,
-        createdAt: new Date().toISOString()
+        isAvailable: true, // APIが期待するフィールド名
+        createdAt: new Date().toISOString(),
+        features: newVehicle.features ? newVehicle.features.split(',').map(f => f.trim()) : [],
+        image: newVehicle.image || null,
+        images: newVehicle.image ? [newVehicle.image] : [] // APIが期待するフィールド名
       };
       
       // デバッグ: 送信データサイズを確認
@@ -613,9 +621,19 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
     
     try {
       const vehicleData = {
-        ...selectedVehicle,
+        name: selectedVehicle.name,
+        type: selectedVehicle.type,
+        vehicleType: selectedVehicle.type,
         price: parseFloat(selectedVehicle.price),
-        passengers: parseInt(selectedVehicle.passengers) || 4
+        pricePerDay: parseFloat(selectedVehicle.price),
+        passengers: parseInt(selectedVehicle.passengers) || 4,
+        capacity: parseInt(selectedVehicle.passengers) || 4,
+        available: selectedVehicle.available,
+        isAvailable: selectedVehicle.available,
+        features: selectedVehicle.features ? 
+          (Array.isArray(selectedVehicle.features) ? selectedVehicle.features : selectedVehicle.features.split(',').map(f => f.trim())) : [],
+        image: selectedVehicle.image || null,
+        images: selectedVehicle.image ? [selectedVehicle.image] : []
       };
       
       console.log('🔄 データベースで車両を更新中...', vehicleData);
