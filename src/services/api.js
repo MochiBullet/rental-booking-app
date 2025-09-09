@@ -135,13 +135,13 @@ class ApiService {
   }
 
   async createVehicle(vehicleData) {
-    const { mapVehicleForAPI, validateVehicleData } = await import('../utils/vehicleMapper.js');
+    const { mapVehicleForCreate, validateVehicleData } = await import('../utils/vehicleMapper.js');
     
     // データ検証
     validateVehicleData(vehicleData);
     
-    // API形式に変換（1行で完了）
-    const apiData = mapVehicleForAPI(vehicleData);
+    // CREATE用API形式に変換（name必須）
+    const apiData = mapVehicleForCreate(vehicleData);
     
     const response = await this.request('/vehicles', {
       method: 'POST',
@@ -152,13 +152,13 @@ class ApiService {
   }
 
   async updateVehicle(vehicleId, vehicleData) {
-    const { mapVehicleForAPI, validateVehicleData } = await import('../utils/vehicleMapper.js');
+    const { mapVehicleForUpdate, validateVehicleData } = await import('../utils/vehicleMapper.js');
     
     // データ検証
     validateVehicleData(vehicleData);
     
-    // API形式に変換（1行で完了）
-    const apiData = mapVehicleForAPI(vehicleData);
+    // UPDATE用API形式に変換（DynamoDB予約語除外）
+    const apiData = mapVehicleForUpdate(vehicleData);
 
     // undefinedな値を削除
     Object.keys(apiData).forEach(key => {
