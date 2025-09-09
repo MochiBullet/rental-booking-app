@@ -268,19 +268,27 @@ function HomePage() {
         const carText = updatedSettings.tiles.carText || {};
         const bikeText = updatedSettings.tiles.bikeText || {};
         
-        setHomeContent(prevContent => ({
-          ...prevContent,
-          carTile: {
-            ...prevContent.carTile,
-            title: carText.title || prevContent.carTile.title,
-            description: `${carText.subtitle || ''}\n${carText.description || ''}\n${carText.details || ''}`.trim()
-          },
-          bikeTile: {
-            ...prevContent.bikeTile,
-            title: bikeText.title || prevContent.bikeTile.title,
-            description: `${bikeText.subtitle || ''}\n${bikeText.description || ''}\n${bikeText.details || ''}`.trim()
-          }
-        }));
+        setHomeContent(prevContent => {
+          const newContent = {
+            ...prevContent,
+            carTile: {
+              ...prevContent.carTile,
+              title: carText.title || prevContent.carTile.title,
+              description: `${carText.subtitle || ''}\n${carText.description || ''}\n${carText.details || ''}`.trim()
+            },
+            bikeTile: {
+              ...prevContent.bikeTile,
+              title: bikeText.title || prevContent.bikeTile.title,
+              description: `${bikeText.subtitle || ''}\n${bikeText.description || ''}\n${bikeText.details || ''}`.trim()
+            }
+          };
+          
+          // LocalStorageにも保存してページリロード時も反映されるように
+          localStorage.setItem('homeContent', JSON.stringify(newContent));
+          console.log('💾 タイルテキスト更新をLocalStorageに保存しました');
+          
+          return newContent;
+        });
       }
       
       // 連絡先情報の更新
