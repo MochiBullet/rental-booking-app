@@ -2,7 +2,7 @@
 // Timestamp: 2025-09-06-17:30 - Google Forms連携機能キャッシュクリア
 // 管理画面簡素化完了: 車両管理・サイト設定・お知らせ管理の3機能のみ
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useNavigate, useLocation, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import './App.css';
 import HomePage from './components/HomePage';
 import VehicleListPage from './components/VehicleListPage';

@@ -12,13 +12,11 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
   const [showSimulationModal, setShowSimulationModal] = useState(false);
   const [showGoogleForms, setShowGoogleForms] = useState(false);
   // Google Forms強制有効化（キャッシュ問題対策）
-  const [siteSettings, setSiteSettings] = useState({
-    googleForms: {
-      enabled: true,
-      formUrl: 'https://docs.google.com/forms/u/0/d/e/1FAIpQLSdM1hGazWWkJJFFbMJBAzl-lEXE20XMtwfO_h-o7hEol8-bpw/formResponse',
-      showEmbedded: true,
-      embedHeight: 800
-    }
+  const [googleFormsSettings] = useState({
+    enabled: true,
+    formUrl: 'https://docs.google.com/forms/u/0/d/e/1FAIpQLSdM1hGazWWkJJFFbMJBAzl-lEXE20XMtwfO_h-o7hEol8-bpw/formResponse',
+    showEmbedded: true,
+    embedHeight: 800
   });
   // DISABLED: Booking functionality replaced with price simulation
   // const [bookingSuccess, setBookingSuccess] = useState(false);
@@ -89,7 +87,7 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
       enabled: settings?.googleForms?.enabled,
       fullSettings: settings?.googleForms
     });
-    setSiteSettings(settings);
+    // setSiteSettings(settings); // 変数名変更のため削除
     
     // propsでvehiclesが渡されている場合はそれを使用（空配列でも使用する）
     if (vehiclesProp !== undefined) {
@@ -259,12 +257,6 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
   };
   */
 
-  const resetSimulationForm = () => {
-    setSelectedDuration(1);
-    setSelectedDate('');
-    setSelectedEndDate('');
-    setInsuranceRequired(false);
-  };
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('ja-JP', {
@@ -288,6 +280,7 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
                 src={vehicleImages[vehicle.name] || vehicleImages['Default']} 
                 alt={vehicle.name}
                 className="vehicle-image"
+                loading="lazy"
               />
               <span className="vehicle-badge">{(vehicle.type === 'car' || vehicle.vehicleType === 'car') ? '車' : (vehicle.type === 'motorcycle' || vehicle.vehicleType === 'motorcycle') ? 'バイク' : vehicle.type || vehicle.vehicleType}</span>
               {/* Vehicle Status Display - Enhanced for Info Site Mode */}
@@ -375,6 +368,7 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
                       src={vehicleImages[selectedVehicle.name] || vehicleImages['Default']} 
                       alt={selectedVehicle.name}
                       className="summary-image"
+                      loading="lazy"
                     />
                     <div className="summary-details">
                       <h3>{selectedVehicle.name}</h3>

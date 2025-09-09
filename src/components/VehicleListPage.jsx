@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import VehicleList from './VehicleList';
 import { vehicleAPI } from '../services/api';
-import { vehicleData } from '../data/vehicleData';
 import { siteSettingsAPI } from '../services/siteSettingsAPI';
 import './VehicleListPage.css';
 
 const VehicleListPage = ({ user }) => {
   const { type } = useParams();
-  const navigate = useNavigate();
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

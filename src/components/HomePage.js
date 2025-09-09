@@ -511,6 +511,7 @@ function HomePage() {
                 src={getTileImage('car')} 
                 alt="車レンタル" 
                 className="tile-img"
+                loading="lazy"
               />
             </div>
             <div className="tile-text-section">
@@ -524,6 +525,7 @@ function HomePage() {
                 src={getTileImage('bike')} 
                 alt="バイクレンタル" 
                 className="tile-img"
+                loading="lazy"
               />
             </div>
             <div className="tile-text-section">
