@@ -402,8 +402,8 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
     }, 1000);
   };
 
-  // 車両画像圧縮処理関数
-  const compressVehicleImage = (file, maxWidth = 800, maxHeight = 600, quality = 0.8) => {
+  // 車両画像圧縮処理関数（APIサイズ制限対応）
+  const compressVehicleImage = (file, maxWidth = 600, maxHeight = 400, quality = 0.6) => {
     return new Promise((resolve) => {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
@@ -435,12 +435,41 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
         ctx.drawImage(img, 0, 0, width, height);
         
         // Base64形式で出力
-        const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+        let compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+        let compressedSize = Math.round((compressedDataUrl.length * 3) / 4);
+        
+        // サイズが200KB超の場合、さらに圧縮
+        if (compressedSize > 200000) {
+          console.log('🔄 画像サイズが大きすぎます。追加圧縮中...', compressedSize);
+          compressedDataUrl = canvas.toDataURL('image/jpeg', 0.4); // より強い圧縮
+          compressedSize = Math.round((compressedDataUrl.length * 3) / 4);
+          
+          // それでも150KB超の場合、さらに小さく
+          if (compressedSize > 150000) {
+            const smallerCanvas = document.createElement('canvas');
+            const smallerCtx = smallerCanvas.getContext('2d');
+            const smallerWidth = width * 0.7;
+            const smallerHeight = height * 0.7;
+            
+            smallerCanvas.width = smallerWidth;
+            smallerCanvas.height = smallerHeight;
+            
+            smallerCtx.fillStyle = '#FFFFFF';
+            smallerCtx.fillRect(0, 0, smallerWidth, smallerHeight);
+            smallerCtx.drawImage(img, 0, 0, smallerWidth, smallerHeight);
+            
+            compressedDataUrl = smallerCanvas.toDataURL('image/jpeg', 0.3);
+            compressedSize = Math.round((compressedDataUrl.length * 3) / 4);
+          }
+        }
+        
         console.log('🖼️ 車両画像圧縮完了:', {
           originalSize: file.size,
-          compressedSize: Math.round((compressedDataUrl.length * 3) / 4),
-          dimensions: `${width}x${height}`
+          compressedSize: compressedSize,
+          dimensions: `${width}x${height}`,
+          compression: `${Math.round((1 - compressedSize / file.size) * 100)}%削減`
         });
+        
         resolve(compressedDataUrl);
       };
       
@@ -462,12 +491,19 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
       console.log('🔄 車両画像をアップロード中...', file.name);
       const compressedImage = await compressVehicleImage(file);
       
+      // 最終サイズチェック
+      const finalSize = Math.round((compressedImage.length * 3) / 4);
+      if (finalSize > 300000) { // 300KB制限
+        showNotification('❌ 画像サイズが大きすぎます。別の画像を選択してください', 'error');
+        return;
+      }
+      
       setNewVehicle(prev => ({
         ...prev,
         image: compressedImage
       }));
       
-      showNotification('✅ 車両画像をアップロードしました', 'success');
+      showNotification(`✅ 車両画像をアップロードしました (${Math.round(finalSize/1000)}KB)`, 'success');
     } catch (error) {
       console.error('❌ 車両画像アップロードエラー:', error);
       showNotification('❌ 画像のアップロードに失敗しました', 'error');
@@ -488,12 +524,19 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
       console.log('🔄 編集中車両の画像をアップロード中...', file.name);
       const compressedImage = await compressVehicleImage(file);
       
+      // 最終サイズチェック
+      const finalSize = Math.round((compressedImage.length * 3) / 4);
+      if (finalSize > 300000) { // 300KB制限
+        showNotification('❌ 画像サイズが大きすぎます。別の画像を選択してください', 'error');
+        return;
+      }
+      
       setSelectedVehicle(prev => ({
         ...prev,
         image: compressedImage
       }));
       
-      showNotification('✅ 車両画像を更新しました', 'success');
+      showNotification(`✅ 車両画像を更新しました (${Math.round(finalSize/1000)}KB)`, 'success');
     } catch (error) {
       console.error('❌ 車両画像アップロードエラー:', error);
       showNotification('❌ 画像のアップロードに失敗しました', 'error');
