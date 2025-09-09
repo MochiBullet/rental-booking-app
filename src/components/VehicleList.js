@@ -22,16 +22,10 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
   });
   // DISABLED: Booking functionality replaced with price simulation
   // const [bookingSuccess, setBookingSuccess] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState('daily');
   const [selectedDuration, setSelectedDuration] = useState(1);
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedEndDate, setSelectedEndDate] = useState('');
-  const [insuranceOptions, setInsuranceOptions] = useState({
-    basic: true,
-    collision: false,
-    comprehensive: false,
-    personal: false
-  });
+  const [insuranceRequired, setInsuranceRequired] = useState(false);
   const [totalPrice, setTotalPrice] = useState(0);
   
   // Vehicle images mapping
@@ -61,26 +55,26 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
     'Default': 'https://images.unsplash.com/photo-1502877338535-766e1452684a?w=400&h=250&fit=crop'
   };
 
-  const plans = {
-    daily: { label: 'デイリープラン', multiplier: 1, unit: '日' },
-    weekly: { label: 'ウィークリープラン', multiplier: 0.85, unit: '週', discount: '15% OFF' },
-    monthly: { label: 'マンスリープラン', multiplier: 0.7, unit: '月', discount: '30% OFF' },
-    purchase: { label: '購入オプション', multiplier: 365, unit: '購入', discount: 'お得' }
+  // 連泊割引システム
+  const getDiscountRate = (days) => {
+    if (days >= 30) return 0.2; // 80%オフ
+    if (days >= 21) return 0.4; // 60%オフ
+    if (days >= 14) return 0.55; // 45%オフ
+    if (days >= 7) return 0.3; // 30%オフ
+    if (days >= 3) return 0.15; // 15%オフ
+    return 0; // 割引なし
   };
 
-  const insurancePrices = {
-    basic: 0,
-    collision: 2000,
-    comprehensive: 3500,
-    personal: 1500
+  const getDiscountLabel = (days) => {
+    if (days >= 30) return '80%オフ';
+    if (days >= 21) return '60%オフ';
+    if (days >= 14) return '45%オフ';
+    if (days >= 7) return '30%オフ';
+    if (days >= 3) return '15%オフ';
+    return '';
   };
 
-  const insuranceNames = {
-    basic: '基本補償',
-    collision: '車両・対物補償',
-    comprehensive: '完全補償',
-    personal: '搭乗者傷害保険'
-  };
+  const insurancePrice = 2000; // 一律2,000円/日
 
   useEffect(() => {
     // Site Settings を読み込み
@@ -131,56 +125,53 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
 
   useEffect(() => {
     calculateTotalPrice();
-  }, [selectedVehicle, selectedPlan, selectedDuration, insuranceOptions]);
-
+  }, [selectedVehicle, selectedDuration, insuranceRequired]);
 
   const calculateTotalPrice = () => {
     if (!selectedVehicle) return;
 
     let basePrice = selectedVehicle.price;
-    const plan = plans[selectedPlan];
     let duration = selectedDuration;
 
-    // Calculate base rental price
-    let rentalPrice = basePrice * plan.multiplier * duration;
+    // 基本料金計算
+    let rentalPrice = basePrice * duration;
     
-    // Add insurance costs
+    // 連泊割引適用
+    const discountRate = getDiscountRate(duration);
+    if (discountRate > 0) {
+      rentalPrice = rentalPrice * (1 - discountRate);
+    }
+    
+    // 保険料金追加
     let insuranceTotal = 0;
-    Object.keys(insuranceOptions).forEach(key => {
-      if (insuranceOptions[key]) {
-        insuranceTotal += insurancePrices[key] * duration;
-      }
-    });
+    if (insuranceRequired) {
+      insuranceTotal = insurancePrice * duration;
+    }
 
     const total = rentalPrice + insuranceTotal;
     setTotalPrice(total);
   };
 
-  const handlePlanChange = (plan) => {
-    setSelectedPlan(plan);
-    // Adjust duration defaults based on plan
-    if (plan === 'weekly') setSelectedDuration(1);
-    else if (plan === 'monthly') setSelectedDuration(1);
-    else if (plan === 'purchase') setSelectedDuration(1);
-    else setSelectedDuration(1);
-  };
 
   const handleDateChange = (date) => {
     setSelectedDate(date);
     
-    // Auto-calculate end date based on plan
+    // Auto-calculate end date based on duration
     if (date) {
       const startDate = new Date(date);
       let endDate = new Date(date);
-      
-      if (selectedPlan === 'daily') {
-        endDate.setDate(startDate.getDate() + selectedDuration);
-      } else if (selectedPlan === 'weekly') {
-        endDate.setDate(startDate.getDate() + (selectedDuration * 7));
-      } else if (selectedPlan === 'monthly') {
-        endDate.setMonth(startDate.getMonth() + selectedDuration);
-      }
-      
+      endDate.setDate(startDate.getDate() + selectedDuration);
+      setSelectedEndDate(endDate.toISOString().split('T')[0]);
+    }
+  };
+
+  // 期間変更時の処理
+  const handleDurationChange = (newDuration) => {
+    setSelectedDuration(newDuration);
+    if (selectedDate) {
+      const startDate = new Date(selectedDate);
+      let endDate = new Date(selectedDate);
+      endDate.setDate(startDate.getDate() + newDuration);
       setSelectedEndDate(endDate.toISOString().split('T')[0]);
     }
   };
@@ -263,16 +254,10 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
   */
 
   const resetSimulationForm = () => {
-    setSelectedPlan('daily');
     setSelectedDuration(1);
     setSelectedDate('');
     setSelectedEndDate('');
-    setInsuranceOptions({
-      basic: true,
-      collision: false,
-      comprehensive: false,
-      personal: false
-    });
+    setInsuranceRequired(false);
   };
 
   const formatCurrency = (amount) => {
@@ -392,21 +377,6 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
                   </div>
 
                   <div className="booking-form">
-                    <div className="form-section">
-                      <h4>プランを選択</h4>
-                      <div className="plan-options">
-                        {Object.entries(plans).map(([key, plan]) => (
-                          <div 
-                            key={key}
-                            className={`plan-card ${selectedPlan === key ? 'selected' : ''}`}
-                            onClick={() => handlePlanChange(key)}
-                          >
-                            <div className="plan-name">{plan.label}</div>
-                            {plan.discount && <div className="plan-discount">{plan.discount}</div>}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
 
                     <div className="form-section">
                       <h4>日程を選択</h4>
@@ -431,75 +401,36 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
                           />
                         </div>
                         <div className="duration-input-group">
-                          <label>期間</label>
+                          <label>レンタル期間</label>
                           <div className="duration-selector">
-                            <button onClick={() => setSelectedDuration(Math.max(1, selectedDuration - 1))}>-</button>
-                            <span>{selectedDuration} {plans[selectedPlan].unit}</span>
-                            <button onClick={() => setSelectedDuration(selectedDuration + 1)}>+</button>
+                            <button onClick={() => handleDurationChange(Math.max(1, selectedDuration - 1))}>-</button>
+                            <span>{selectedDuration} 日間</span>
+                            <button onClick={() => handleDurationChange(selectedDuration + 1)}>+</button>
                           </div>
+                          {getDiscountLabel(selectedDuration) && (
+                            <div className="discount-badge">
+                              {getDiscountLabel(selectedDuration)} 適用！
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
 
                     <div className="form-section">
-                      <h4>保険オプション</h4>
+                      <h4>補償プラン</h4>
                       <div className="insurance-options">
-                        <div className="insurance-item">
+                        <div className="simple-insurance-toggle">
                           <label className="toggle-label">
                             <input 
                               type="checkbox"
-                              checked={insuranceOptions.basic}
-                              disabled
+                              checked={insuranceRequired}
+                              onChange={(e) => setInsuranceRequired(e.target.checked)}
                             />
                             <span className="toggle-slider"></span>
                             <div className="insurance-info">
-                              <span className="insurance-name">基本補償</span>
-                              <span className="insurance-price">含まれています</span>
-                            </div>
-                          </label>
-                        </div>
-                        
-                        <div className="insurance-item">
-                          <label className="toggle-label">
-                            <input 
-                              type="checkbox"
-                              checked={insuranceOptions.collision}
-                              onChange={(e) => setInsuranceOptions({...insuranceOptions, collision: e.target.checked})}
-                            />
-                            <span className="toggle-slider"></span>
-                            <div className="insurance-info">
-                              <span className="insurance-name">車両・対物補償</span>
-                              <span className="insurance-price">+{formatCurrency(insurancePrices.collision)}/day</span>
-                            </div>
-                          </label>
-                        </div>
-
-                        <div className="insurance-item">
-                          <label className="toggle-label">
-                            <input 
-                              type="checkbox"
-                              checked={insuranceOptions.comprehensive}
-                              onChange={(e) => setInsuranceOptions({...insuranceOptions, comprehensive: e.target.checked})}
-                            />
-                            <span className="toggle-slider"></span>
-                            <div className="insurance-info">
-                              <span className="insurance-name">完全補償</span>
-                              <span className="insurance-price">+{formatCurrency(insurancePrices.comprehensive)}/day</span>
-                            </div>
-                          </label>
-                        </div>
-
-                        <div className="insurance-item">
-                          <label className="toggle-label">
-                            <input 
-                              type="checkbox"
-                              checked={insuranceOptions.personal}
-                              onChange={(e) => setInsuranceOptions({...insuranceOptions, personal: e.target.checked})}
-                            />
-                            <span className="toggle-slider"></span>
-                            <div className="insurance-info">
-                              <span className="insurance-name">搭乗者傷害保険</span>
-                              <span className="insurance-price">+{formatCurrency(insurancePrices.personal)}/day</span>
+                              <span className="insurance-name">安心補償プラン</span>
+                              <span className="insurance-price">+{formatCurrency(insurancePrice)}/日</span>
+                              <span className="insurance-description">車両・対物・傷害補償を含む包括的な補償</span>
                             </div>
                           </label>
                         </div>
@@ -508,16 +439,20 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
 
                     <div className="price-breakdown">
                       <div className="price-row">
-                        <span>車両料金 ({selectedDuration} {plans[selectedPlan].unit}間)</span>
-                        <span>{formatCurrency(selectedVehicle.price * plans[selectedPlan].multiplier * selectedDuration)}</span>
+                        <span>基本料金 ({selectedDuration}日間)</span>
+                        <span>{formatCurrency(selectedVehicle.price * selectedDuration)}</span>
                       </div>
-                      {Object.entries(insuranceOptions).map(([key, enabled]) => 
-                        enabled && key !== 'basic' && (
-                          <div key={key} className="price-row">
-                            <span>{insuranceNames[key]}</span>
-                            <span>{formatCurrency(insurancePrices[key] * selectedDuration)}</span>
-                          </div>
-                        )
+                      {getDiscountRate(selectedDuration) > 0 && (
+                        <div className="price-row discount">
+                          <span>連泊割引 ({getDiscountLabel(selectedDuration)})</span>
+                          <span>-{formatCurrency(selectedVehicle.price * selectedDuration * getDiscountRate(selectedDuration))}</span>
+                        </div>
+                      )}
+                      {insuranceRequired && (
+                        <div className="price-row">
+                          <span>安心補償プラン ({selectedDuration}日間)</span>
+                          <span>{formatCurrency(insurancePrice * selectedDuration)}</span>
+                        </div>
                       )}
                       <div className="price-row total">
                         <span>合計金額</span>
@@ -527,9 +462,11 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
 
                     <div className="modal-actions">
                       <div className="simulation-result">
-                        <div className="final-price-display">
+                        <div className="final-price-display sticky-estimate">
                           <h3>見積もり合計: {formatCurrency(totalPrice)}</h3>
-                          <p className="price-note">※実際の料金は条件により変動する場合があります</p>
+                          <p className="estimate-notice">
+                            ※本画面はお見積りのみであり、実際のご予約は画面下部「予約フォームへ進む」よりご予約いただきますよう、お願いいたします。
+                          </p>
                         </div>
                       </div>
                       {/* Google Forms予約ボタンを強制表示 */}

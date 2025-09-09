@@ -762,3 +762,130 @@
 .login-btn:hover {
   background: #388e3c;
 }
+
+/* 新しい料金シミュレーション機能のスタイル */
+
+/* 割引バッジ */
+.discount-badge {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-top: 8px;
+  text-align: center;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* 簡素化された保険トグル */
+.simple-insurance-toggle {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 12px;
+  border: 2px solid #e9ecef;
+  transition: all 0.3s ease;
+}
+
+.simple-insurance-toggle:hover {
+  border-color: #43a047;
+  background: #f1f8e9;
+}
+
+.insurance-description {
+  display: block;
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 4px;
+  font-style: italic;
+}
+
+/* 料金明細の割引行 */
+.price-row.discount {
+  color: #d32f2f;
+  font-weight: 600;
+}
+
+.price-row.discount span:last-child {
+  color: #d32f2f;
+}
+
+/* スクロール追尾する見積もり表示 */
+.sticky-estimate {
+  position: sticky;
+  top: 20px;
+  background: linear-gradient(135deg, #43a047 0%, #66bb6a 100%);
+  color: white;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 8px 32px rgba(67, 160, 71, 0.3);
+  z-index: 100;
+  margin-bottom: 20px;
+}
+
+.sticky-estimate h3 {
+  margin: 0 0 10px 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.estimate-notice {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  margin: 0;
+  border-left: 4px solid rgba(255, 255, 255, 0.5);
+}
+
+/* モーダルのスクロール対応 */
+.modern-modal {
+  max-height: 90vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #43a047 #f1f1f1;
+}
+
+.modern-modal::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modern-modal::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.modern-modal::-webkit-scrollbar-thumb {
+  background: #43a047;
+  border-radius: 10px;
+}
+
+.modern-modal::-webkit-scrollbar-thumb:hover {
+  background: #388e3c;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  .sticky-estimate {
+    position: relative;
+    top: auto;
+    margin: 20px 0;
+  }
+  
+  .discount-badge {
+    font-size: 0.75rem;
+    padding: 3px 10px;
+  }
+  
+  .estimate-notice {
+    font-size: 0.85rem;
+    padding: 10px;
+  }
+}
