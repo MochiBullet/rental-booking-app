@@ -441,6 +441,158 @@
   .info-card {
     padding: 2rem;
   }
+  
+  .contact-section {
+    padding: 0 1rem;
+  }
+  
+  .contact-info-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .contact-section-title {
+    font-size: 1.5rem;
+  }
+}
+
+/* 連絡先セクション */
+.contact-section {
+  margin-top: 4rem;
+  padding: 0 2rem;
+}
+
+.contact-section-title {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2d3436;
+  margin-bottom: 2rem;
+}
+
+.contact-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.info-card {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.info-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+.phone-card {
+  cursor: pointer;
+  background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.phone-card:hover {
+  border-color: #43a047;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e8f5e9 100%);
+  transform: translateY(-8px);
+  box-shadow: 0 25px 70px rgba(67, 160, 71, 0.2);
+}
+
+.location-card {
+  position: relative;
+}
+
+.info-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.info-details h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #2d3436;
+  margin-bottom: 1rem;
+}
+
+.contact-value {
+  font-size: 1.1rem;
+  color: #2d3436;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+.phone-number {
+  font-size: 1.3rem !important;
+  font-weight: 700 !important;
+  color: #43a047 !important;
+  margin-bottom: 0.8rem !important;
+}
+
+.contact-hours {
+  display: block;
+  font-size: 0.9rem;
+  color: #636e72;
+  margin-bottom: 0.3rem;
+}
+
+.address-text {
+  margin-bottom: 1rem;
+}
+
+.click-hint {
+  font-size: 0.8rem;
+  color: #43a047;
+  font-weight: 600;
+  margin-top: 0.5rem;
+  opacity: 0.8;
+}
+
+.map-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.map-button {
+  background: linear-gradient(135deg, #43a047, #66bb6a);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+
+.map-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(67, 160, 71, 0.4);
+  background: linear-gradient(135deg, #388e3c, #43a047);
+}
+
+.route-button {
+  background: linear-gradient(135deg, #2196f3, #42a5f5);
+}
+
+.route-button:hover {
+  background: linear-gradient(135deg, #1976d2, #2196f3);
+  box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4);
 }
 
 @media (max-width: 480px) {

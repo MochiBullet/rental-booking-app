@@ -13,6 +13,12 @@ function HomePage() {
   const [announcementsLoaded, setAnnouncementsLoaded] = useState(false);
   const [homeContent, setHomeContent] = useState(null);
   const [contentLoaded, setContentLoaded] = useState(false);
+  const [contactInfo, setContactInfo] = useState({
+    phone: '',
+    email: '',
+    address: '',
+    businessHours: { weekday: '', weekend: '' }
+  });
 
   // デフォルト背景画像（美しいレンタカー関連の画像URL）
   const defaultImages = [
@@ -223,6 +229,17 @@ function HomePage() {
       if (dynamoSettings.siteSettings) {
         console.log('✅ Site settings loaded from DynamoDB');
         setSiteSettings(dynamoSettings.siteSettings);
+        
+        // 連絡先情報も設定
+        if (dynamoSettings.siteSettings.contact) {
+          setContactInfo(dynamoSettings.siteSettings.contact);
+        }
+      }
+      
+      // 初期設定から連絡先情報を設定
+      const defaultSettings = siteSettingsManager.getSettings();
+      if (!dynamoSettings.siteSettings?.contact) {
+        setContactInfo(defaultSettings.contact);
       }
 
       if (dynamoSettings.homeContent) {
@@ -264,6 +281,12 @@ function HomePage() {
             description: `${bikeText.subtitle || ''}\n${bikeText.description || ''}\n${bikeText.details || ''}`.trim()
           }
         }));
+      }
+      
+      // 連絡先情報の更新
+      if (updatedSettings?.contact) {
+        console.log('🔄 連絡先情報が更新されました:', updatedSettings.contact);
+        setContactInfo(updatedSettings.contact);
       }
     };
 
@@ -440,6 +463,53 @@ function HomePage() {
                 ))}
               </div>
               <button className="tile-button">バイクを見る →</button>
+            </div>
+          </div>
+        </div>
+        
+        {/* 連絡先情報セクション */}
+        <div className="contact-section">
+          <h3 className="contact-section-title">お問い合わせ</h3>
+          <div className="contact-info-grid">
+            <div className="info-card phone-card" onClick={() => window.open(`tel:${contactInfo.phone}`, '_self')}>
+              <div className="info-icon">📞</div>
+              <div className="info-details">
+                <h3>お電話でのお問い合わせ</h3>
+                <p className="contact-value phone-number">{contactInfo.phone}</p>
+                <span className="contact-hours">{contactInfo.businessHours?.weekday}</span>
+                <span className="contact-hours">{contactInfo.businessHours?.weekend}</span>
+                <div className="click-hint">📱 タップして発信</div>
+              </div>
+            </div>
+            
+            <div className="info-card location-card">
+              <div className="info-icon">📍</div>
+              <div className="info-details">
+                <h3>所在地</h3>
+                <p className="contact-value address-text">{contactInfo.address}</p>
+                <div className="map-actions">
+                  <button 
+                    className="map-button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const address = encodeURIComponent(contactInfo.address);
+                      window.open(`https://www.google.com/maps/search/?api=1&query=${address}`, '_blank');
+                    }}
+                  >
+                    🗺️ 地図で見る
+                  </button>
+                  <button 
+                    className="map-button route-button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const address = encodeURIComponent(contactInfo.address);
+                      window.open(`https://www.google.com/maps/dir/?api=1&destination=${address}`, '_blank');
+                    }}
+                  >
+                    🚗 ルート検索
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
