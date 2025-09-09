@@ -223,6 +223,7 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
     content: '',
     published: true
   });
+  const [isSavingVehicle, setIsSavingVehicle] = useState(false); // 重複送信防止
   // Removed hardcoded homeContent - now managed via SiteSettingsManagement
   const [termsContent, setTermsContent] = useState({
     title: 'M\'s BASE Rental 利用規約',
@@ -549,6 +550,14 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
       return;
     }
     
+    // 重複送信を防止
+    if (isSavingVehicle) {
+      console.log('🚫 車両追加処理中です。しばらくお待ちください');
+      return;
+    }
+    
+    setIsSavingVehicle(true);
+    
     try {
       const vehicle = {
         name: newVehicle.name,
@@ -610,6 +619,8 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
     } catch (error) {
       console.error('❌ 車両追加エラー:', error);
       showNotification(`❌ 車両追加に失敗しました: ${error.message}`, 'error');
+    } finally {
+      setIsSavingVehicle(false); // 処理完了時に状態をリセット
     }
   };
 
@@ -2134,7 +2145,17 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
               )}
             </div>
             <div className="modal-actions">
-              <button className="save-btn" onClick={handleAddVehicle}>Save</button>
+              <button 
+                className="save-btn" 
+                onClick={handleAddVehicle}
+                disabled={isSavingVehicle}
+                style={{
+                  opacity: isSavingVehicle ? 0.6 : 1,
+                  cursor: isSavingVehicle ? 'not-allowed' : 'pointer'
+                }}
+              >
+                {isSavingVehicle ? '保存中...' : 'Save'}
+              </button>
               <button className="cancel-btn" onClick={() => setShowAddVehicleModal(false)}>Cancel</button>
             </div>
           </div>
