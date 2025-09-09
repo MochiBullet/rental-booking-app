@@ -31,8 +31,13 @@ const VehicleListPage = ({ user }) => {
           console.log('✅ データベースから取得成功:', apiVehicleData?.length || 0, '件');
           console.log('🔍 詳細車両データ構造確認:', apiVehicleData);
           
-          // データが空でもエラーにしない（在庫なし状態として処理）
-          setVehicles(apiVehicleData || []);
+          // 削除済み車両を除外（ユーザーには稼働中の車両のみ表示）
+          const availableVehicles = (apiVehicleData || []).filter(vehicle => 
+            vehicle.isAvailable !== false && vehicle.available !== false
+          );
+          console.log('🚗 ユーザーに表示する稼働中車両:', availableVehicles.length, '件');
+          
+          setVehicles(availableVehicles);
           
         } catch (apiError) {
           console.warn('⚠️ データベース接続エラー:', apiError.message);

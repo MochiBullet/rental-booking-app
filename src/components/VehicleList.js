@@ -273,7 +273,9 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
       </div>
 
       <div className="vehicles-grid">
-        {vehicles.map(vehicle => (
+        {vehicles.filter(vehicle => 
+          vehicle.isAvailable !== false && vehicle.available !== false
+        ).map(vehicle => (
           <div key={vehicle.id} className="vehicle-card">
             <div className="vehicle-image-container">
               <img 
