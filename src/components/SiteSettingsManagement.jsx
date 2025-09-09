@@ -653,88 +653,94 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
                     • 最大サイズ: 3MB<br/>
                     • 車やバイクがはっきり見える写真を推奨
                   </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
-                  <div className="tile-text-section">
-                    <h4>🚗 車両タイルテキスト設定</h4>
-                    <div className="tile-text-grid">
-                      <div className="form-group">
-                        <label>タイトル</label>
-                        <input
-                          type="text"
-                          value={settings.tiles?.carText?.title || ''}
-                          onChange={(e) => updateTileText('car', 'title', e.target.value)}
-                          placeholder="車両レンタル"
-                        />
-                      </div>
-                      <div className="form-group">
-                        <label>サブタイトル</label>
-                        <input
-                          type="text"
-                          value={settings.tiles?.carText?.subtitle || ''}
-                          onChange={(e) => updateTileText('car', 'subtitle', e.target.value)}
-                          placeholder="ファミリー向けから"
-                        />
-                      </div>
-                      <div className="form-group">
-                        <label>説明文1</label>
-                        <input
-                          type="text"
-                          value={settings.tiles?.carText?.description || ''}
-                          onChange={(e) => updateTileText('car', 'description', e.target.value)}
-                          placeholder="ビジネス用まで"
-                        />
-                      </div>
-                      <div className="form-group">
-                        <label>説明文2</label>
-                        <input
-                          type="text"
-                          value={settings.tiles?.carText?.details || ''}
-                          onChange={(e) => updateTileText('car', 'details', e.target.value)}
-                          placeholder="幅広いラインナップ"
-                        />
-                      </div>
-                    </div>
+        {activeSection === 'tile-text' && (
+          <div className="section">
+            <h3>📝 タイルテキスト設定</h3>
+            
+            <div className="tile-text-section">
+              <h4>🚗 車両タイルテキスト設定</h4>
+              <div className="tile-text-grid">
+                <div className="form-group">
+                  <label>タイトル</label>
+                  <input
+                    type="text"
+                    value={settings.tiles?.carText?.title || ''}
+                    onChange={(e) => updateTileText('car', 'title', e.target.value)}
+                    placeholder="車両レンタル"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>サブタイトル</label>
+                  <input
+                    type="text"
+                    value={settings.tiles?.carText?.subtitle || ''}
+                    onChange={(e) => updateTileText('car', 'subtitle', e.target.value)}
+                    placeholder="ファミリー向けから"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>説明文1</label>
+                  <input
+                    type="text"
+                    value={settings.tiles?.carText?.description || ''}
+                    onChange={(e) => updateTileText('car', 'description', e.target.value)}
+                    placeholder="ビジネス用まで"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>説明文2</label>
+                  <input
+                    type="text"
+                    value={settings.tiles?.carText?.details || ''}
+                    onChange={(e) => updateTileText('car', 'details', e.target.value)}
+                    placeholder="幅広いラインナップ"
+                  />
+                </div>
+              </div>
 
-                    <h4>🏍️ バイクタイルテキスト設定</h4>
-                    <div className="tile-text-grid">
-                      <div className="form-group">
-                        <label>タイトル</label>
-                        <input
-                          type="text"
-                          value={settings.tiles?.bikeText?.title || ''}
-                          onChange={(e) => updateTileText('bike', 'title', e.target.value)}
-                          placeholder="バイクレンタル"
-                        />
-                      </div>
-                      <div className="form-group">
-                        <label>サブタイトル</label>
-                        <input
-                          type="text"
-                          value={settings.tiles?.bikeText?.subtitle || ''}
-                          onChange={(e) => updateTileText('bike', 'subtitle', e.target.value)}
-                          placeholder="原付から大型まで"
-                        />
-                      </div>
-                      <div className="form-group">
-                        <label>説明文1</label>
-                        <input
-                          type="text"
-                          value={settings.tiles?.bikeText?.description || ''}
-                          onChange={(e) => updateTileText('bike', 'description', e.target.value)}
-                          placeholder="多様なバイクを"
-                        />
-                      </div>
-                      <div className="form-group">
-                        <label>説明文2</label>
-                        <input
-                          type="text"
-                          value={settings.tiles?.bikeText?.details || ''}
-                          onChange={(e) => updateTileText('bike', 'details', e.target.value)}
-                          placeholder="お手頃価格で提供"
-                        />
-                      </div>
-                    </div>
-                  </div>
+              <h4>🏍️ バイクタイルテキスト設定</h4>
+              <div className="tile-text-grid">
+                <div className="form-group">
+                  <label>タイトル</label>
+                  <input
+                    type="text"
+                    value={settings.tiles?.bikeText?.title || ''}
+                    onChange={(e) => updateTileText('bike', 'title', e.target.value)}
+                    placeholder="バイクレンタル"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>サブタイトル</label>
+                  <input
+                    type="text"
+                    value={settings.tiles?.bikeText?.subtitle || ''}
+                    onChange={(e) => updateTileText('bike', 'subtitle', e.target.value)}
+                    placeholder="原付から大型まで"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>説明文1</label>
+                  <input
+                    type="text"
+                    value={settings.tiles?.bikeText?.description || ''}
+                    onChange={(e) => updateTileText('bike', 'description', e.target.value)}
+                    placeholder="多様なバイクを"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>説明文2</label>
+                  <input
+                    type="text"
+                    value={settings.tiles?.bikeText?.details || ''}
+                    onChange={(e) => updateTileText('bike', 'details', e.target.value)}
+                    placeholder="お手頃価格で提供"
+                  />
                 </div>
               </div>
             </div>
