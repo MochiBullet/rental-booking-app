@@ -2628,3 +2628,46 @@
   background-size: 200% 100%;
   animation: loading-shimmer 1.5s infinite;
 }
+
+/* 車両カテゴリ分け表示のスタイル */
+.vehicle-category {
+  margin-bottom: 30px;
+}
+
+.category-title {
+  color: #2e7d32;
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 15px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #e8f5e8 0%, #f1f8e9 100%);
+  border: 2px solid #e8f5e8;
+  border-radius: 12px;
+  border-left: 5px solid #43a047;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.category-title:hover {
+  background: linear-gradient(135deg, #e1f5e1 0%, #eaf7eb 100%);
+  border-color: #c8e6c9;
+  transform: translateY(-1px);
+  transition: all 0.3s ease;
+}
+
+.no-vehicles-message {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+  font-style: italic;
+  background: #f9f9f9;
+  border-radius: 8px;
+  border: 2px dashed #ddd;
+  margin-top: 10px;
+}
+
+.no-vehicles-message p {
+  margin: 0;
+  font-size: 1.1rem;
+}

@@ -1007,46 +1007,108 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
                 </button>
               </div>
               
-              <div className="vehicles-grid">
-                {vehicles.map(vehicle => (
-                  <div key={vehicle.id} className="vehicle-admin-card">
-                    <div className="vehicle-admin-header">
-                      <h3>{vehicle.name}</h3>
-                      <span className={`availability-badge ${vehicle.available ? 'available' : 'unavailable'}`}>
-                        {vehicle.available ? 'Available' : 'Unavailable'}
-                      </span>
+              {/* 車 (Car) セクション */}
+              <div className="vehicle-category">
+                <h3 className="category-title">🚗 車 ({vehicles.filter(v => v.type === 'car').length}台)</h3>
+                <div className="vehicles-grid">
+                  {vehicles.filter(vehicle => vehicle.type === 'car').map(vehicle => (
+                    <div key={vehicle.id} className="vehicle-admin-card">
+                      <div className="vehicle-admin-header">
+                        <h3>{vehicle.name}</h3>
+                        <span className={`availability-badge ${vehicle.available ? 'available' : 'unavailable'}`}>
+                          {vehicle.available ? 'Available' : 'Unavailable'}
+                        </span>
+                      </div>
+                      <div className="vehicle-admin-details">
+                        <p><strong>Type:</strong> {vehicle.type}</p>
+                        <p><strong>Price:</strong> {formatCurrency(vehicle.price)}/day</p>
+                        <p><strong>Capacity:</strong> {vehicle.passengers} passengers</p>
+                        <p><strong>Features:</strong> {vehicle.features || 'None'}</p>
+                      </div>
+                      <div className="vehicle-admin-actions">
+                        <button 
+                          className="edit-btn"
+                          onClick={() => {
+                            setSelectedVehicle(vehicle);
+                            setShowEditVehicleModal(true);
+                          }}
+                        >
+                          Edit
+                        </button>
+                        <button 
+                          className={`toggle-btn ${vehicle.available ? 'disable' : 'enable'}`}
+                          onClick={() => handleToggleVehicleAvailability(vehicle.id)}
+                        >
+                          {vehicle.available ? 'Disable' : 'Enable'}
+                        </button>
+                        <button 
+                          className="delete-btn"
+                          onClick={() => handleDeleteVehicle(vehicle.id)}
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </div>
-                    <div className="vehicle-admin-details">
-                      <p><strong>Type:</strong> {vehicle.type}</p>
-                      <p><strong>Price:</strong> {formatCurrency(vehicle.price)}/day</p>
-                      <p><strong>Capacity:</strong> {vehicle.passengers} passengers</p>
-                      <p><strong>Features:</strong> {vehicle.features || 'None'}</p>
-                    </div>
-                    <div className="vehicle-admin-actions">
-                      <button 
-                        className="edit-btn"
-                        onClick={() => {
-                          setSelectedVehicle(vehicle);
-                          setShowEditVehicleModal(true);
-                        }}
-                      >
-                        Edit
-                      </button>
-                      <button 
-                        className={`toggle-btn ${vehicle.available ? 'disable' : 'enable'}`}
-                        onClick={() => handleToggleVehicleAvailability(vehicle.id)}
-                      >
-                        {vehicle.available ? 'Disable' : 'Enable'}
-                      </button>
-                      <button 
-                        className="delete-btn"
-                        onClick={() => handleDeleteVehicle(vehicle.id)}
-                      >
-                        Delete
-                      </button>
-                    </div>
+                  ))}
+                </div>
+                
+                {vehicles.filter(v => v.type === 'car').length === 0 && (
+                  <div className="no-vehicles-message">
+                    <p>車が登録されていません</p>
                   </div>
-                ))}
+                )}
+              </div>
+
+              {/* バイク (Bike) セクション */}
+              <div className="vehicle-category">
+                <h3 className="category-title">🏍️ バイク ({vehicles.filter(v => v.type === 'bike' || v.type === 'motorcycle').length}台)</h3>
+                <div className="vehicles-grid">
+                  {vehicles.filter(vehicle => vehicle.type === 'bike' || vehicle.type === 'motorcycle').map(vehicle => (
+                    <div key={vehicle.id} className="vehicle-admin-card">
+                      <div className="vehicle-admin-header">
+                        <h3>{vehicle.name}</h3>
+                        <span className={`availability-badge ${vehicle.available ? 'available' : 'unavailable'}`}>
+                          {vehicle.available ? 'Available' : 'Unavailable'}
+                        </span>
+                      </div>
+                      <div className="vehicle-admin-details">
+                        <p><strong>Type:</strong> {vehicle.type}</p>
+                        <p><strong>Price:</strong> {formatCurrency(vehicle.price)}/day</p>
+                        <p><strong>Capacity:</strong> {vehicle.passengers} passengers</p>
+                        <p><strong>Features:</strong> {vehicle.features || 'None'}</p>
+                      </div>
+                      <div className="vehicle-admin-actions">
+                        <button 
+                          className="edit-btn"
+                          onClick={() => {
+                            setSelectedVehicle(vehicle);
+                            setShowEditVehicleModal(true);
+                          }}
+                        >
+                          Edit
+                        </button>
+                        <button 
+                          className={`toggle-btn ${vehicle.available ? 'disable' : 'enable'}`}
+                          onClick={() => handleToggleVehicleAvailability(vehicle.id)}
+                        >
+                          {vehicle.available ? 'Disable' : 'Enable'}
+                        </button>
+                        <button 
+                          className="delete-btn"
+                          onClick={() => handleDeleteVehicle(vehicle.id)}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                {vehicles.filter(v => v.type === 'bike' || v.type === 'motorcycle').length === 0 && (
+                  <div className="no-vehicles-message">
+                    <p>バイクが登録されていません</p>
+                  </div>
+                )}
               </div>
             </div>
           )}
