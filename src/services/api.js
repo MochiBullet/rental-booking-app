@@ -24,7 +24,18 @@ class ApiService {
       isAvailable: vehicle.isAvailable,
       category: vehicle.vehicleCategory || vehicle.category,
       description: vehicle.vehicleDescription || vehicle.description,
-      image: (vehicle.vehicleImages && vehicle.vehicleImages[0]) || (vehicle.images && vehicle.images[0]) ? (vehicle.vehicleImages && vehicle.vehicleImages[0]) || (vehicle.images && vehicle.images[0]) : `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200"><rect width="300" height="200" fill="#f0f0f0"/><text x="150" y="100" font-family="Arial" font-size="14" fill="#999" text-anchor="middle">${vehicle.vehicleName || vehicle.name || 'Vehicle'}</text></svg>`)}`,
+      image: (() => {
+        // 優先順位: vehicleImages[0] > images[0] > デフォルトSVG
+        const primaryImage = (vehicle.vehicleImages && vehicle.vehicleImages[0]) || (vehicle.images && vehicle.images[0]);
+        
+        // placeholder URLをフィルタリング
+        if (primaryImage && !primaryImage.includes('via.placeholder.com') && !primaryImage.includes('placeholder.com')) {
+          return primaryImage;
+        }
+        
+        // SVGデフォルト画像を生成
+        return `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200"><rect width="300" height="200" fill="#f0f0f0"/><text x="150" y="100" font-family="Arial" font-size="14" fill="#999" text-anchor="middle">${vehicle.vehicleName || vehicle.name || 'Vehicle'}</text></svg>`)}`;
+      })(),
       images: vehicle.vehicleImages || vehicle.images,
       specifications: {
         seats: vehicle.vehicleCapacity || vehicle.capacity,

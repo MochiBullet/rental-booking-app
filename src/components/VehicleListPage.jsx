@@ -29,6 +29,7 @@ const VehicleListPage = ({ user }) => {
           // データベースから車両データを取得
           const apiVehicleData = await vehicleAPI.getByType(type);
           console.log('✅ データベースから取得成功:', apiVehicleData?.length || 0, '件');
+          console.log('🔍 詳細車両データ構造確認:', apiVehicleData);
           
           // データが空でもエラーにしない（在庫なし状態として処理）
           setVehicles(apiVehicleData || []);
