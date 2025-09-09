@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import LoadingWheel from './LoadingWheel';
 import './ForgotPassword.css';
 
 const ForgotPassword = () => {
@@ -116,10 +117,10 @@ const ForgotPassword = () => {
             disabled={isLoading || !email}
           >
             {isLoading ? (
-              <>
-                <span className="loading-spinner">🔄</span>
+              <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                <LoadingWheel size={20} />
                 送信中...
-              </>
+              </div>
             ) : (
               'リセットリンクを送信'
             )}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import LoadingWheel from './LoadingWheel';
 import './HomePage.css';
 import { siteSettingsManager } from '../data/siteSettings';
 import { siteSettingsAPI } from '../services/siteSettingsAPI';
@@ -255,7 +256,7 @@ function HomePage() {
     return (
       <div className="home-page">
         <div className="hero-section" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ color: 'white', fontSize: '24px' }}>読み込み中...</div>
+          <LoadingWheel size={100} message="ホームページを読み込み中..." />
         </div>
       </div>
     );

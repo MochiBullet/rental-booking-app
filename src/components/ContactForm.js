@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import LoadingWheel from './LoadingWheel';
 import './ContactForm.css';
 import dataSyncService from '../services/dataSync';
 
@@ -232,10 +233,10 @@ const ContactForm = () => {
               disabled={isSubmitting}
             >
               {isSubmitting ? (
-                <>
-                  <span className="spinner">🔄</span>
+                <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                  <LoadingWheel size={20} />
                   送信中...
-                </>
+                </div>
               ) : (
                 '送信する'
               )}

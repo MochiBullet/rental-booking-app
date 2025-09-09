@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import LoadingWheel from './LoadingWheel';
 import './AdminDashboard.css';
 import dataSyncService from '../services/dataSync';
 import SiteSettingsManagement from './SiteSettingsManagement';
@@ -911,7 +912,7 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
     return (
       <div className="admin-dashboard">
         <div className="auth-loading">
-          <div className="auth-spinner"></div>
+          <LoadingWheel size={100} message="" />
           <h2>認証確認中...</h2>
           <p>管理者権限を確認しています</p>
         </div>

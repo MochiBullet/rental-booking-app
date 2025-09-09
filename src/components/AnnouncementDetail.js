@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import LoadingWheel from './LoadingWheel';
 import { announcementsAPI } from '../services/announcementsAPI';
 import './AnnouncementDetail.css';
 
@@ -94,7 +95,7 @@ function AnnouncementDetail() {
     return (
       <div className="announcement-detail-page">
         <div className="announcement-container">
-          <div className="loading-message">読み込み中...</div>
+          <LoadingWheel size={80} message="お知らせを読み込み中..." />
         </div>
       </div>
     );

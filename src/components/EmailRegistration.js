@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import LoadingWheel from './LoadingWheel';
 import './EmailRegistration.css';
 
 const EmailRegistration = () => {
@@ -325,8 +326,9 @@ const EmailRegistration = () => {
             disabled={isLoading || !passwordValidation.isValid || formData.password !== formData.confirmPassword || formData.licenseNumber.length < 4 || !formData.email}
           >
             {isLoading ? (
-              <div className="loading-spinner">
-                🔄 登録中...
+              <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                <LoadingWheel size={20} />
+                登録中...
               </div>
             ) : (
               '会員登録する'
