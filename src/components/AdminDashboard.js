@@ -224,6 +224,7 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
     published: true
   });
   const [isSavingVehicle, setIsSavingVehicle] = useState(false); // 重複送信防止
+  const [lastSaveTime, setLastSaveTime] = useState(0); // デバウンス用
   // Removed hardcoded homeContent - now managed via SiteSettingsManagement
   const [termsContent, setTermsContent] = useState({
     title: 'M\'s BASE Rental 利用規約',
@@ -550,13 +551,15 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
       return;
     }
     
-    // 重複送信を防止
-    if (isSavingVehicle) {
+    // 重複送信を防止（デバウンス機能付き）
+    const now = Date.now();
+    if (isSavingVehicle || (now - lastSaveTime < 2000)) {
       console.log('🚫 車両追加処理中です。しばらくお待ちください');
       return;
     }
     
     setIsSavingVehicle(true);
+    setLastSaveTime(now);
     
     try {
       const vehicle = {
@@ -2054,6 +2057,10 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
         <div className="modal-overlay">
           <div className="modal-content">
             <h2>Add New Vehicle</h2>
+            <form onSubmit={(e) => {
+              e.preventDefault(); // フォーム送信を防止
+              handleAddVehicle();
+            }}>
             <div className="form-group">
               <label>Vehicle Name</label>
               <input 
@@ -2146,8 +2153,8 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
             </div>
             <div className="modal-actions">
               <button 
+                type="submit"
                 className="save-btn" 
-                onClick={handleAddVehicle}
                 disabled={isSavingVehicle}
                 style={{
                   opacity: isSavingVehicle ? 0.6 : 1,
@@ -2156,8 +2163,9 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
               >
                 {isSavingVehicle ? '保存中...' : 'Save'}
               </button>
-              <button className="cancel-btn" onClick={() => setShowAddVehicleModal(false)}>Cancel</button>
+              <button type="button" className="cancel-btn" onClick={() => setShowAddVehicleModal(false)}>Cancel</button>
             </div>
+            </form>
           </div>
         </div>
       )}
