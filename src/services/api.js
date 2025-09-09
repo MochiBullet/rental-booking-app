@@ -65,6 +65,15 @@ class ApiService {
 
     try {
       console.log(`API Request: ${options.method || 'GET'} ${url}`);
+      
+      // ペイロードサイズをログ出力（POST/PUTの場合）
+      if (config.body && (options.method === 'POST' || options.method === 'PUT')) {
+        const payloadSize = new Blob([config.body]).size;
+        console.log(`📦 Payload size: ${Math.round(payloadSize / 1000)}KB (${payloadSize} bytes)`);
+        if (payloadSize > 5000000) {
+          console.warn('⚠️ Large payload detected! May cause API Gateway timeout.');
+        }
+      }
       const response = await Promise.race([
         fetch(url, config),
         timeoutPromise

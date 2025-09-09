@@ -558,10 +558,29 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
         createdAt: new Date().toISOString()
       };
       
-      console.log('🔄 データベースに車両を追加中...', vehicle);
+      // デバッグ: 送信データサイズを確認
+      const jsonString = JSON.stringify(vehicle);
+      const dataSize = new Blob([jsonString]).size;
+      console.log('🔍 送信データサイズ:', {
+        size: dataSize,
+        sizeKB: Math.round(dataSize / 1000),
+        hasImage: !!vehicle.image,
+        imageSize: vehicle.image ? Math.round((vehicle.image.length * 3) / 4) : 0
+      });
+      
+      // ペイロードサイズが大きすぎる場合は画像を除外して送信
+      let vehicleToSend = vehicle;
+      if (dataSize > 5000000) { // 5MB制限
+        console.warn('⚠️ ペイロードサイズが大きすぎます。画像を除外して送信します');
+        vehicleToSend = { ...vehicle };
+        delete vehicleToSend.image;
+        showNotification('⚠️ 画像サイズが大きすぎるため、画像なしで車両を追加します', 'warning');
+      }
+      
+      console.log('🔄 データベースに車両を追加中...', vehicleToSend);
       
       // データベースに直接保存
-      const savedVehicle = await vehicleAPI.create(vehicle);
+      const savedVehicle = await vehicleAPI.create(vehicleToSend);
       console.log('✅ データベースに車両追加完了:', savedVehicle);
       
       // ローカル状態も更新（UIの即時反映のため）
