@@ -222,20 +222,7 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
     content: '',
     published: true
   });
-  const [homeContent, setHomeContent] = useState({
-    heroTitle: 'M\'s BASE Rental',
-    heroSubtitle: '安心・安全・快適なレンタルサービス',
-    carTile: {
-      title: '車',
-      description: 'ファミリー向けから\nビジネスまで幅広く対応',
-      features: ['最新モデル', '保険完備', '24時間サポート']
-    },
-    bikeTile: {
-      title: 'バイク',
-      description: '街乗りから\nツーリングまで対応',
-      features: ['ヘルメット付', '整備済み', 'ロードサービス']
-    }
-  });
+  // Removed hardcoded homeContent - now managed via SiteSettingsManagement
   const [termsContent, setTermsContent] = useState({
     title: 'M\'s BASE Rental 利用規約',
     sections: []
@@ -304,11 +291,7 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
       }
     }
     
-    // ホームコンテンツも読み込み
-    const savedContent = localStorage.getItem('homeContent');
-    if (savedContent) {
-      setHomeContent(JSON.parse(savedContent));
-    }
+    // Removed hardcoded homeContent loading - now managed via SiteSettingsManagement
     
     // 約款コンテンツも読み込み
     const savedTerms = localStorage.getItem('termsContent');
@@ -1479,105 +1462,7 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
           )}
           
           {/* CONTENT SECTION REMOVED - SIMPLIFIED ADMIN PANEL */}
-          {false && activeSection === 'content' && (
-            <div className="content-section">
-              <div className="content-editor">
-                <h2>ホームページコンテンツ編集</h2>
-                
-                <div className="editor-section">
-                  <h3>ヒーローセクション</h3>
-                  <div className="form-group">
-                    <label>メインタイトル</label>
-                    <input 
-                      type="text"
-                      value={homeContent.heroTitle}
-                      onChange={(e) => setHomeContent({...homeContent, heroTitle: e.target.value})}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>サブタイトル</label>
-                    <input 
-                      type="text"
-                      value={homeContent.heroSubtitle}
-                      onChange={(e) => setHomeContent({...homeContent, heroSubtitle: e.target.value})}
-                    />
-                  </div>
-                </div>
-                
-                <div className="editor-section">
-                  <h3>車タイル設定</h3>
-                  <div className="form-group">
-                    <label>タイトル</label>
-                    <input 
-                      type="text"
-                      value={homeContent.carTile.title}
-                      onChange={(e) => setHomeContent({...homeContent, carTile: {...homeContent.carTile, title: e.target.value}})}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>説明文</label>
-                    <textarea 
-                      value={homeContent.carTile.description}
-                      onChange={(e) => setHomeContent({...homeContent, carTile: {...homeContent.carTile, description: e.target.value}})}
-                      rows="3"
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>特徴（カンマ区切り）</label>
-                    <input 
-                      type="text"
-                      value={homeContent.carTile.features.join(', ')}
-                      onChange={(e) => setHomeContent({...homeContent, carTile: {...homeContent.carTile, features: e.target.value.split(', ')}})}
-                    />
-                  </div>
-                </div>
-                
-                <div className="editor-section">
-                  <h3>バイクタイル設定</h3>
-                  <div className="form-group">
-                    <label>タイトル</label>
-                    <input 
-                      type="text"
-                      value={homeContent.bikeTile.title}
-                      onChange={(e) => setHomeContent({...homeContent, bikeTile: {...homeContent.bikeTile, title: e.target.value}})}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>説明文</label>
-                    <textarea 
-                      value={homeContent.bikeTile.description}
-                      onChange={(e) => setHomeContent({...homeContent, bikeTile: {...homeContent.bikeTile, description: e.target.value}})}
-                      rows="3"
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>特徴（カンマ区切り）</label>
-                    <input 
-                      type="text"
-                      value={homeContent.bikeTile.features.join(', ')}
-                      onChange={(e) => setHomeContent({...homeContent, bikeTile: {...homeContent.bikeTile, features: e.target.value.split(', ')}})}
-                    />
-                  </div>
-                </div>
-                
-                <div className="form-actions">
-                  <button className="save-btn" onClick={() => {
-                    localStorage.setItem('homeContent', JSON.stringify(homeContent));
-                    
-                    // Sync to cloud
-                    dataSyncService.saveToCloud('homeContent', homeContent).catch(console.error);
-                    
-                    // ホームページに変更を即座に反映
-                    window.dispatchEvent(new CustomEvent('homeContentUpdate'));
-                    
-                    showNotification('📝 ホームページコンテンツが正常に保存され、即座に反映されました！', 'save', 5000);
-                  }}>
-                    コンテンツを保存
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
+          {/* Removed hardcoded content editor - now managed via SiteSettingsManagement */}
 
           {/* DETAILS SECTION REMOVED - SIMPLIFIED ADMIN PANEL */}
           {false && activeSection === 'details' && detailsType && (

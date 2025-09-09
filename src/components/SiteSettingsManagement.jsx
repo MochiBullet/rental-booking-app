@@ -350,6 +350,51 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
     saveToAPI();
   };
 
+  // タイル特徴（features）更新関数
+  const updateTileFeatures = (type, features) => {
+    const textKey = `${type}Text`;
+    const updatedSettings = {
+      ...settings,
+      tiles: {
+        ...settings.tiles,
+        [textKey]: {
+          ...settings.tiles?.[textKey],
+          features: features
+        }
+      }
+    };
+    
+    setSettings(updatedSettings);
+    
+    // DB（siteSettingsAPI）に保存
+    const saveToAPI = async () => {
+      try {
+        await siteSettingsAPI.saveSetting('siteSettings', updatedSettings);
+        console.log(`✅ タイル${type}特徴をDBに保存:`, features);
+        
+        // DB保存成功後にイベントを発生
+        console.log('🔄 タイル特徴更新イベント発生中...', updatedSettings.tiles);
+        
+        // リアルタイム更新の実行
+        if (onSettingsUpdate) {
+          console.log('📤 onSettingsUpdate コールバック実行');
+          onSettingsUpdate(updatedSettings);
+        }
+        
+        // カスタムイベントでホームページに通知
+        window.dispatchEvent(new CustomEvent('siteSettingsUpdate', {
+          detail: updatedSettings
+        }));
+        console.log('📡 siteSettingsUpdate イベント発生完了');
+        
+      } catch (error) {
+        console.error(`❌ タイル${type}特徴保存エラー:`, error);
+      }
+    };
+    
+    saveToAPI();
+  };
+
   // お知らせ関連の関数は管理者ダッシュボードに移行済み
 
   return (
@@ -567,6 +612,15 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
                       placeholder="幅広いラインナップ"
                     />
                   </div>
+                  <div className="form-group">
+                    <label>特徴（カンマ区切り）</label>
+                    <input
+                      type="text"
+                      value={settings.tiles?.carText?.features?.join(', ') || ''}
+                      onChange={(e) => updateTileFeatures('car', e.target.value.split(', ').filter(f => f.trim()))}
+                      placeholder="最新モデル, 保険完備, 24時間サポート"
+                    />
+                  </div>
                 </div>
 
                 <h4>🏍️ バイクタイルテキスト設定</h4>
@@ -605,6 +659,15 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
                       value={settings.tiles?.bikeText?.details || ''}
                       onChange={(e) => updateTileText('bike', 'details', e.target.value)}
                       placeholder="お手頃価格で提供"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>特徴（カンマ区切り）</label>
+                    <input
+                      type="text"
+                      value={settings.tiles?.bikeText?.features?.join(', ') || ''}
+                      onChange={(e) => updateTileFeatures('bike', e.target.value.split(', ').filter(f => f.trim()))}
+                      placeholder="ヘルメット付, 整備済み, ロードサービス"
                     />
                   </div>
                 </div>

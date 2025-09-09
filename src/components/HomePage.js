@@ -237,12 +237,12 @@ function HomePage() {
           carTile: {
             title: carText.title,
             description: `${carText.subtitle}\n${carText.description}\n${carText.details}`,
-            features: ['最新モデル', '保険完備', '24時間サポート']
+            features: carText.features || ['最新モデル', '保険完備', '24時間サポート']
           },
           bikeTile: {
             title: bikeText.title,
             description: `${bikeText.subtitle}\n${bikeText.description}\n${bikeText.details}`,
-            features: ['ヘルメット付', '整備済み', 'ロードサービス']
+            features: bikeText.features || ['ヘルメット付', '整備済み', 'ロードサービス']
           }
         };
         localStorage.setItem('homeContent', JSON.stringify(defaultContent));
@@ -346,12 +346,14 @@ function HomePage() {
             carTile: {
               ...prevContent.carTile,
               title: carText.title || prevContent.carTile?.title || '車両レンタル',
-              description: `${carText.subtitle || ''}\n${carText.description || ''}\n${carText.details || ''}`.trim() || prevContent.carTile?.description || 'ファミリー向けから\nビジネス用まで\n幅広いラインナップ'
+              description: `${carText.subtitle || ''}\n${carText.description || ''}\n${carText.details || ''}`.trim() || prevContent.carTile?.description || 'ファミリー向けから\nビジネス用まで\n幅広いラインナップ',
+              features: carText.features || prevContent.carTile?.features || ['最新モデル', '保険完備', '24時間サポート']
             },
             bikeTile: {
               ...prevContent.bikeTile,
               title: bikeText.title || prevContent.bikeTile?.title || 'バイクレンタル',
-              description: `${bikeText.subtitle || ''}\n${bikeText.description || ''}\n${bikeText.details || ''}`.trim() || prevContent.bikeTile?.description || '原付から大型まで\n多様なバイクを\nお手頃価格で提供'
+              description: `${bikeText.subtitle || ''}\n${bikeText.description || ''}\n${bikeText.details || ''}`.trim() || prevContent.bikeTile?.description || '原付から大型まで\n多様なバイクを\nお手頃価格で提供',
+              features: bikeText.features || prevContent.bikeTile?.features || ['ヘルメット付', '整備済み', 'ロードサービス']
             }
           };
           

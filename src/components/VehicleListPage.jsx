@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import VehicleList from './VehicleList';
 import { vehicleAPI } from '../services/api';
 import { vehicleData } from '../data/vehicleData';
+import { siteSettingsAPI } from '../services/siteSettingsAPI';
 import './VehicleListPage.css';
 
 const VehicleListPage = ({ user }) => {
@@ -11,6 +12,12 @@ const VehicleListPage = ({ user }) => {
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [pageContent, setPageContent] = useState({
+    carTitle: '車のレンタル',
+    carDescription: 'ファミリー向けからビジネスまで、幅広い用途に対応した車両をご用意しています。',
+    bikeTitle: 'バイクのレンタル', 
+    bikeDescription: 'スクーターから大型バイクまで、あなたの目的に合ったバイクを見つけてください。'
+  });
 
   useEffect(() => {
     const fetchVehicles = async () => {
@@ -50,6 +57,70 @@ const VehicleListPage = ({ user }) => {
     }
   }, [type]);
 
+  // ページコンテンツをDBから読み込み
+  useEffect(() => {
+    const loadPageContent = async () => {
+      try {
+        console.log('🔄 車両リストページコンテンツをDBから読み込み中...');
+        const dynamoSettings = await siteSettingsAPI.getAllSettings();
+        
+        if (dynamoSettings.siteSettings?.tiles) {
+          const carText = dynamoSettings.siteSettings.tiles.carText || {};
+          const bikeText = dynamoSettings.siteSettings.tiles.bikeText || {};
+          
+          const newPageContent = {
+            carTitle: carText.title || '車のレンタル',
+            carDescription: carText.subtitle && carText.description ? 
+              `${carText.subtitle}${carText.description}、幅広い用途に対応した車両をご用意しています。` :
+              'ファミリー向けからビジネスまで、幅広い用途に対応した車両をご用意しています。',
+            bikeTitle: bikeText.title || 'バイクのレンタル',
+            bikeDescription: bikeText.subtitle && bikeText.description ?
+              `${bikeText.subtitle}${bikeText.description}、あなたの目的に合ったバイクを見つけてください。` :
+              'スクーターから大型バイクまで、あなたの目的に合ったバイクを見つけてください。'
+          };
+          
+          setPageContent(newPageContent);
+          console.log('✅ 車両リストページコンテンツ更新完了:', newPageContent);
+        }
+      } catch (error) {
+        console.error('⚠️ 車両リストページコンテンツ読み込みエラー:', error);
+        // エラー時はデフォルト値を使用（既に設定済み）
+      }
+    };
+
+    loadPageContent();
+  }, []);
+
+  // リアルタイム更新を監視
+  useEffect(() => {
+    const handleSiteSettingsUpdate = (event) => {
+      console.log('📡 VehicleListPage: siteSettingsUpdate イベントを受信');
+      const updatedSettings = event.detail;
+      
+      if (updatedSettings?.tiles) {
+        const carText = updatedSettings.tiles.carText || {};
+        const bikeText = updatedSettings.tiles.bikeText || {};
+        
+        const newPageContent = {
+          carTitle: carText.title || '車のレンタル',
+          carDescription: carText.subtitle && carText.description ? 
+            `${carText.subtitle}${carText.description}、幅広い用途に対応した車両をご用意しています。` :
+            'ファミリー向けからビジネスまで、幅広い用途に対応した車両をご用意しています。',
+          bikeTitle: bikeText.title || 'バイクのレンタル',
+          bikeDescription: bikeText.subtitle && bikeText.description ?
+            `${bikeText.subtitle}${bikeText.description}、あなたの目的に合ったバイクを見つけてください。` :
+            'スクーターから大型バイクまで、あなたの目的に合ったバイクを見つけてください。'
+        };
+        
+        setPageContent(newPageContent);
+        console.log('✅ 車両リストページ リアルタイム更新完了');
+      }
+    };
+
+    window.addEventListener('siteSettingsUpdate', handleSiteSettingsUpdate);
+    return () => window.removeEventListener('siteSettingsUpdate', handleSiteSettingsUpdate);
+  }, []);
+
   const handleVehicleSelect = (vehicle) => {
     // INFO SITE MODE: 情報表示のみ（予約機能は無効）
     console.log('選択された車両:', vehicle);
@@ -59,11 +130,26 @@ const VehicleListPage = ({ user }) => {
   const getPageTitle = () => {
     switch (type) {
       case 'car':
-        return '車のレンタル';
+        return pageContent.carTitle;
+      case 'bike':
+        return pageContent.bikeTitle;
       case 'motorcycle':
-        return 'バイクのレンタル';
+        return pageContent.bikeTitle;
       default:
         return '車両レンタル';
+    }
+  };
+
+  const getPageDescription = () => {
+    switch (type) {
+      case 'car':
+        return pageContent.carDescription;
+      case 'bike':
+        return pageContent.bikeDescription;
+      case 'motorcycle':
+        return pageContent.bikeDescription;
+      default:
+        return '幅広い車両をご用意しています。';
     }
   };
 
@@ -88,10 +174,7 @@ const VehicleListPage = ({ user }) => {
       <div className="page-header">
         <h1>{getPageTitle()}</h1>
         <p className="page-description">
-          {type === 'car' 
-            ? 'ファミリー向けからビジネスまで、幅広い用途に対応した車両をご用意しています。'
-            : 'スクーターから大型バイクまで、あなたの目的に合ったバイクを見つけてください。'
-          }
+          {getPageDescription()}
         </p>
       </div>
       
