@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import LoadingWheel from './LoadingWheel';
 import './MyPage.css';
 import dataSyncService from '../services/dataSync';
 
@@ -213,7 +214,7 @@ const MyPage = ({ user, setUser }) => {
   if (isLoading) {
     return (
       <div className="mypage-container">
-        <div className="loading-spinner">読み込み中...</div>
+        <LoadingWheel size={80} message="マイページを読み込み中..." />
       </div>
     );
   }

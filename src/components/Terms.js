@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import LoadingWheel from './LoadingWheel';
 import './Terms.css';
 
 const Terms = () => {
@@ -104,10 +105,7 @@ const Terms = () => {
   if (loading) {
     return (
       <div className="terms-container">
-        <div className="loading-spinner">
-          <div className="spinner">🔄</div>
-          <p>約款を読み込み中...</p>
-        </div>
+        <LoadingWheel size={80} message="約款を読み込み中..." />
       </div>
     );
   }

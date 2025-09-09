@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import LoadingWheel from './LoadingWheel';
 import { siteSettingsManager } from '../data/siteSettings';
 import { siteSettingsAPI } from '../services/siteSettingsAPI';
 import './Terms.css';
@@ -35,7 +36,7 @@ const RentalTerms = () => {
   if (loading) {
     return (
       <div className="static-page loading">
-        <div className="loading-spinner">読み込み中...</div>
+        <LoadingWheel size={80} message="レンタカー約款を読み込み中..." />
       </div>
     );
   }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import LoadingWheel from './LoadingWheel';
 import './PrivacyPolicy.css';
 
 const PrivacyPolicy = () => {
@@ -79,10 +80,7 @@ const PrivacyPolicy = () => {
   if (loading) {
     return (
       <div className="privacy-container">
-        <div className="loading-spinner">
-          <div className="spinner">🔄</div>
-          <p>プライバシーポリシーを読み込み中...</p>
-        </div>
+        <LoadingWheel size={80} message="プライバシーポリシーを読み込み中..." />
       </div>
     );
   }
