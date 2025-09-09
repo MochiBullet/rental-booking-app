@@ -277,7 +277,14 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
           <div key={vehicle.id} className="vehicle-card">
             <div className="vehicle-image-container">
               <img 
-                src={vehicle.image || vehicleImages[vehicle.name] || vehicleImages['Default']} 
+                src={(() => {
+                  const imageUrl = vehicle.image || vehicleImages[vehicle.name] || vehicleImages['Default'];
+                  if (imageUrl && (imageUrl.includes('300x200?text=') || !imageUrl.startsWith('http'))) {
+                    console.warn('Invalid image URL detected:', imageUrl, 'for vehicle:', vehicle.name);
+                    return vehicleImages['Default'];
+                  }
+                  return imageUrl;
+                })()} 
                 alt={vehicle.name}
                 className="vehicle-image"
                 loading="lazy"
@@ -365,7 +372,13 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
                 <div className="booking-content">
                   <div className="vehicle-summary">
                     <img 
-                      src={selectedVehicle.image || vehicleImages[selectedVehicle.name] || vehicleImages['Default']} 
+                      src={(() => {
+                        const imageUrl = selectedVehicle.image || vehicleImages[selectedVehicle.name] || vehicleImages['Default'];
+                        if (imageUrl && (imageUrl.includes('300x200?text=') || !imageUrl.startsWith('http'))) {
+                          return vehicleImages['Default'];
+                        }
+                        return imageUrl;
+                      })()} 
                       alt={selectedVehicle.name}
                       className="summary-image"
                       loading="lazy"
