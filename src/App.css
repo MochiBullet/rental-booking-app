@@ -113,9 +113,40 @@ body {
 .slide {
   width: 20%;
   height: 100%;
-  background-size: cover;
+  background-size: cover; /* デフォルトはcover */
   background-position: center;
   background-repeat: no-repeat;
+  background-color: #000; /* 画像の余白部分を黒で埋める */
+}
+
+/* PCでは画像全体が見えるように調整 */
+@media (min-width: 1024px) {
+  .slide {
+    background-size: contain; /* PCでは全体表示 */
+  }
+  
+  /* PC用の高さ調整 */
+  .hero {
+    min-height: 70vh; /* PCでは70%の高さに調整 */
+  }
+}
+
+/* タブレット用調整 */
+@media (max-width: 1023px) and (min-width: 768px) {
+  .slide {
+    background-size: cover; /* タブレットではカバー */
+  }
+}
+
+/* モバイル用調整 */
+@media (max-width: 767px) {
+  .slide {
+    background-size: cover; /* モバイルではカバー */
+  }
+  
+  .hero {
+    min-height: 50vh; /* モバイルでは50%の高さ */
+  }
 }
 
 /* Overlay for better text readability */
@@ -125,10 +156,7 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, 
-    rgba(78, 205, 196, 0.85) 0%, 
-    rgba(68, 160, 141, 0.85) 50%, 
-    rgba(46, 139, 139, 0.85) 100%);
+  background: rgba(0, 0, 0, 0.4); /* 薄い黒フィルター（40%透明度） */
   z-index: -1;
 }
 
