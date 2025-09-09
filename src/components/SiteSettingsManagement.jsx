@@ -358,7 +358,7 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
     // DB（siteSettingsAPI）に保存
     const saveToAPI = async () => {
       try {
-        await siteSettingsAPI.saveSettings('siteSettings', updatedSettings);
+        await siteSettingsAPI.saveSetting('siteSettings', updatedSettings);
         console.log(`✅ タイル${type}テキスト「${field}」をDBに保存: ${value}`);
       } catch (error) {
         console.error(`❌ タイル${type}テキスト保存エラー:`, error);
