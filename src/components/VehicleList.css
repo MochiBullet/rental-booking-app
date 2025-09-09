@@ -806,6 +806,12 @@
   font-style: italic;
 }
 
+.insurance-discount {
+  color: #d32f2f;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
 /* 料金明細の割引行 */
 .price-row.discount {
   color: #d32f2f;

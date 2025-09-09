@@ -74,7 +74,13 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
     return '';
   };
 
-  const insurancePrice = 2000; // 一律2,000円/日
+  // 期間に応じた保険料金システム
+  const getInsurancePrice = (days) => {
+    if (days >= 21) return 500;  // 21日以上: 500円/日
+    if (days >= 14) return 700;  // 14日以上: 700円/日
+    if (days >= 7) return 1000;  // 7日以上: 1,000円/日
+    return 2000; // 7日未満: 2,000円/日（デフォルト）
+  };
 
   useEffect(() => {
     // Site Settings を読み込み
@@ -142,10 +148,10 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
       rentalPrice = rentalPrice * (1 - discountRate);
     }
     
-    // 保険料金追加
+    // 保険料金追加（期間に応じた料金）
     let insuranceTotal = 0;
     if (insuranceRequired) {
-      insuranceTotal = insurancePrice * duration;
+      insuranceTotal = getInsurancePrice(duration) * duration;
     }
 
     const total = rentalPrice + insuranceTotal;
@@ -429,8 +435,13 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
                             <span className="toggle-slider"></span>
                             <div className="insurance-info">
                               <span className="insurance-name">安心補償プラン</span>
-                              <span className="insurance-price">+{formatCurrency(insurancePrice)}/日</span>
-                              <span className="insurance-description">車両・対物・傷害補償を含む包括的な補償</span>
+                              <span className="insurance-price">+{formatCurrency(getInsurancePrice(selectedDuration))}/日</span>
+                              <span className="insurance-description">
+                                車両・対物・傷害補償を含む包括的な補償
+                                {selectedDuration >= 7 && (
+                                  <span className="insurance-discount"> (長期割引適用)</span>
+                                )}
+                              </span>
                             </div>
                           </label>
                         </div>
@@ -450,8 +461,8 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
                       )}
                       {insuranceRequired && (
                         <div className="price-row">
-                          <span>安心補償プラン ({selectedDuration}日間)</span>
-                          <span>{formatCurrency(insurancePrice * selectedDuration)}</span>
+                          <span>安心補償プラン ({selectedDuration}日間 × {formatCurrency(getInsurancePrice(selectedDuration))}/日)</span>
+                          <span>{formatCurrency(getInsurancePrice(selectedDuration) * selectedDuration)}</span>
                         </div>
                       )}
                       <div className="price-row total">
