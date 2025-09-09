@@ -86,7 +86,7 @@ body {
   color: white;
   text-align: center;
   overflow: hidden;
-  min-height: 250px; /* 400px → 250px にさらに縮小 */
+  min-height: 350px; /* 画像全体表示のため高さを戻す */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -127,7 +127,7 @@ body {
   
   /* PC用の高さ調整 */
   .hero {
-    min-height: 30vh; /* PCでは30%の高さにさらに縮小 */
+    min-height: 45vh; /* PCでは画像全体表示のため高さを戻す */
   }
 }
 
@@ -138,7 +138,7 @@ body {
   }
   
   .hero {
-    min-height: 25vh; /* タブレットでは25%の高さに縮小 */
+    min-height: 35vh; /* タブレットでは画像全体表示のため高さを戻す */
   }
 }
 
@@ -149,7 +149,7 @@ body {
   }
   
   .hero {
-    min-height: 20vh; /* モバイルでは20%の高さにさらに縮小 */
+    min-height: 30vh; /* モバイルでは画像全体表示のため高さを戻す */
   }
 }
 
