@@ -927,6 +927,13 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
             お知らせ管理
           </button>
           <button 
+            className={activeSection === 'branding' ? 'active' : ''}
+            onClick={() => setActiveSection('branding')}
+          >
+            <span className="nav-icon">🏢</span>
+            ブランディング
+          </button>
+          <button 
             className={activeSection === 'tile-edit' ? 'active' : ''}
             onClick={() => setActiveSection('tile-edit')}
           >
@@ -980,6 +987,7 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
           <h1>
             {activeSection === 'vehicles' && '🚗 車両管理'}
             {activeSection === 'announcements' && '📢 お知らせ管理'}
+            {activeSection === 'branding' && '🏢 ブランディング設定'}
             {activeSection === 'tile-edit' && '🎨 カード編集'}
             {activeSection === 'page-edit' && '📄 カード内ページ編集'}
             {activeSection === 'contact' && '📞 連絡先情報設定'}
