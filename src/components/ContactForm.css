@@ -78,6 +78,52 @@
   margin-bottom: 0.3rem;
 }
 
+.address-text {
+  margin-bottom: 1rem;
+}
+
+.location-card {
+  position: relative;
+}
+
+.map-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.map-button {
+  background: linear-gradient(135deg, #43a047, #66bb6a);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+
+.map-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(67, 160, 71, 0.4);
+  background: linear-gradient(135deg, #388e3c, #43a047);
+}
+
+.route-button {
+  background: linear-gradient(135deg, #2196f3, #42a5f5);
+}
+
+.route-button:hover {
+  background: linear-gradient(135deg, #1976d2, #2196f3);
+  box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4);
+}
+
 .contact-note {
   background: white;
   border-radius: 20px;

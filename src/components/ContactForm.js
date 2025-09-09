@@ -74,11 +74,31 @@ const ContactForm = () => {
             </div>
           </div>
           
-          <div className="info-card">
+          <div className="info-card location-card">
             <div className="info-icon">📍</div>
             <div className="info-details">
               <h3>所在地</h3>
-              <p className="contact-value">{contactInfo.address}</p>
+              <p className="contact-value address-text">{contactInfo.address}</p>
+              <div className="map-actions">
+                <button 
+                  className="map-button"
+                  onClick={() => {
+                    const address = encodeURIComponent(contactInfo.address);
+                    window.open(`https://www.google.com/maps/search/?api=1&query=${address}`, '_blank');
+                  }}
+                >
+                  🗺️ 地図で見る
+                </button>
+                <button 
+                  className="map-button route-button"
+                  onClick={() => {
+                    const address = encodeURIComponent(contactInfo.address);
+                    window.open(`https://www.google.com/maps/dir/?api=1&destination=${address}`, '_blank');
+                  }}
+                >
+                  🚗 ルート検索
+                </button>
+              </div>
             </div>
           </div>
         </div>
