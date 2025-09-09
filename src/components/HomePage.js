@@ -512,9 +512,9 @@ function HomePage() {
                 alt="車レンタル" 
                 className="tile-img"
               />
-              <div className="tile-overlay">
-                <h2 className="tile-simple-title">CAR</h2>
-              </div>
+            </div>
+            <div className="tile-text-section">
+              <h2 className="tile-title-large">CAR</h2>
             </div>
           </div>
 
@@ -525,9 +525,9 @@ function HomePage() {
                 alt="バイクレンタル" 
                 className="tile-img"
               />
-              <div className="tile-overlay">
-                <h2 className="tile-simple-title">MOTORBIKE</h2>
-              </div>
+            </div>
+            <div className="tile-text-section">
+              <h2 className="tile-title-large">MOTORBIKE</h2>
             </div>
           </div>
         </div>

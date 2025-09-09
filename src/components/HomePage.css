@@ -290,33 +290,35 @@
   transform: scale(1.1);
 }
 
-.tile-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.4);
+.tile-text-section {
+  padding: 1.5rem;
+  background: white;
   display: flex;
   align-items: center;
   justify-content: center;
+  min-height: 80px;
   transition: background 0.3s ease;
 }
 
-.vehicle-tile:hover .tile-overlay {
-  background: rgba(0, 0, 0, 0.6);
+.vehicle-tile:hover .tile-text-section {
+  background: var(--green-pale);
 }
 
-.tile-simple-title {
-  color: white;
-  font-size: 3.5rem;
+.tile-title-large {
+  color: var(--green);
+  font-size: 2.5rem;
   font-weight: 900;
-  letter-spacing: 0.2em;
-  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+  letter-spacing: 0.15em;
   margin: 0;
   text-align: center;
   font-family: 'Arial', sans-serif;
   text-transform: uppercase;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.vehicle-tile:hover .tile-title-large {
+  color: var(--green-dark);
+  transform: scale(1.05);
 }
 
 .tile-content {
@@ -464,12 +466,17 @@
   }
   
   .tile-image-large {
-    height: 300px;
+    height: 250px;
   }
   
-  .tile-simple-title {
-    font-size: 2.5rem;
-    letter-spacing: 0.15em;
+  .tile-title-large {
+    font-size: 2rem;
+    letter-spacing: 0.1em;
+  }
+  
+  .tile-text-section {
+    padding: 1rem;
+    min-height: 60px;
   }
   
   .info-cards {
@@ -658,6 +665,20 @@
   
   .tile-content {
     padding: 1rem;
+  }
+  
+  .tile-image-large {
+    height: 200px;
+  }
+  
+  .tile-title-large {
+    font-size: 1.8rem;
+    letter-spacing: 0.08em;
+  }
+  
+  .tile-text-section {
+    padding: 0.8rem;
+    min-height: 50px;
   }
   
   .announcement-item {
