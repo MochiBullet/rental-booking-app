@@ -55,22 +55,14 @@ const ContactForm = () => {
 
       <div className="contact-content">
         <div className="contact-info-grid">
-          <div className="info-card">
+          <div className="info-card phone-card" onClick={() => window.open(`tel:${contactInfo.phone}`, '_self')}>
             <div className="info-icon">📞</div>
             <div className="info-details">
               <h3>お電話でのお問い合わせ</h3>
-              <p className="contact-value">{contactInfo.phone}</p>
+              <p className="contact-value phone-number">{contactInfo.phone}</p>
               <span className="contact-hours">{contactInfo.businessHours?.weekday}</span>
               <span className="contact-hours">{contactInfo.businessHours?.weekend}</span>
-            </div>
-          </div>
-          
-          <div className="info-card">
-            <div className="info-icon">📧</div>
-            <div className="info-details">
-              <h3>メールでのお問い合わせ</h3>
-              <p className="contact-value">{contactInfo.email}</p>
-              <span className="contact-hours">24時間受付</span>
+              <div className="click-hint">📱 タップして発信</div>
             </div>
           </div>
           
@@ -82,7 +74,8 @@ const ContactForm = () => {
               <div className="map-actions">
                 <button 
                   className="map-button"
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     const address = encodeURIComponent(contactInfo.address);
                     window.open(`https://www.google.com/maps/search/?api=1&query=${address}`, '_blank');
                   }}
@@ -91,7 +84,8 @@ const ContactForm = () => {
                 </button>
                 <button 
                   className="map-button route-button"
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     const address = encodeURIComponent(contactInfo.address);
                     window.open(`https://www.google.com/maps/dir/?api=1&destination=${address}`, '_blank');
                   }}
@@ -101,11 +95,6 @@ const ContactForm = () => {
               </div>
             </div>
           </div>
-        </div>
-        
-        <div className="contact-note">
-          <p>お問い合わせは上記の電話番号またはメールアドレスまでお気軽にご連絡ください。</p>
-          <p>スタッフが丁寧に対応いたします。</p>
         </div>
       </div>
     </div>

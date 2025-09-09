@@ -31,7 +31,7 @@
 /* お問い合わせ情報グリッド */
 .contact-info-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   gap: 2rem;
   margin-bottom: 2rem;
 }
@@ -84,6 +84,35 @@
 
 .location-card {
   position: relative;
+}
+
+.phone-card {
+  cursor: pointer;
+  background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.phone-card:hover {
+  border-color: #43a047;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e8f5e9 100%);
+  transform: translateY(-8px);
+  box-shadow: 0 25px 70px rgba(67, 160, 71, 0.2);
+}
+
+.phone-number {
+  font-size: 1.3rem !important;
+  font-weight: 700 !important;
+  color: #43a047 !important;
+  margin-bottom: 0.8rem !important;
+}
+
+.click-hint {
+  font-size: 0.8rem;
+  color: #43a047;
+  font-weight: 600;
+  margin-top: 0.5rem;
+  opacity: 0.8;
 }
 
 .map-actions {
