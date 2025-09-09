@@ -296,15 +296,9 @@ function AppContent() {
             </Link>
             
             <nav className="header-nav">
-              {location.pathname === '/admin' || location.pathname === '/admin-login' ? (
-                // 管理者画面では認証ボタンを非表示
+              {(location.pathname === '/admin' || location.pathname === '/admin-login') && isAdmin && (
                 <div className="admin-indicator">
-                  {isAdmin && <span className="admin-badge">管理者モード</span>}
-                </div>
-              ) : (
-                // INFO SITE MODE: Clean header without navigation
-                <div className="info-site-nav">
-                  <span className="site-mode-indicator">車両情報サイト</span>
+                  <span className="admin-badge">管理者モード</span>
                 </div>
               )}
             </nav>
@@ -344,9 +338,8 @@ function AppContent() {
 
         <footer className="main-footer">
           <div className="footer-container">
-            <p>&copy; 2024 M's BASE Rental - 車両情報サイト</p>
+            <p>&copy; 2024 M's BASE Rental</p>
             <div className="footer-links">
-              <Link to="/vehicles/car">車両一覧</Link>
               <Link to="/contact">お問い合わせ</Link>
               <Link to="/terms">利用規約</Link>
               <Link to="/privacy">プライバシーポリシー</Link>
