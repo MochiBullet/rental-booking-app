@@ -616,7 +616,7 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
       }
       
       // デバッグ：画像なしでもエラーが出るかテスト
-      if (vehicle.image && confirm('デバッグ：画像なしでテストしますか？')) {
+      if (vehicle.image && window.confirm('デバッグ：画像なしでテストしますか？')) {
         vehicleToSend = vehicleWithoutImage;
         console.log('🧪 デバッグモード: 画像なしで送信');
       }
