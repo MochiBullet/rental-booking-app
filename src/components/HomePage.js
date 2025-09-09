@@ -190,11 +190,12 @@ function HomePage() {
         console.log('📝 LocalStorageにhomeContentがないため、DynamoDBから最新設定を取得中...');
         
         let carText, bikeText;
+        let dbSiteSettings = {};
         
         try {
           // DynamoDBから最新の設定を取得
           const dynamoSettings = await siteSettingsAPI.getAllSettings();
-          const dbSiteSettings = dynamoSettings.siteSettings || {};
+          dbSiteSettings = dynamoSettings.siteSettings || {};
           
           console.log('🗃️ DynamoDBから取得した設定:', dbSiteSettings.tiles);
           
@@ -216,14 +217,15 @@ function HomePage() {
         } catch (error) {
           console.error('⚠️ DynamoDB取得エラー、LocalStorage設定を使用:', error);
           // フォールバック: LocalStorage設定を使用
-          const siteSettings = siteSettingsManager.getSettings();
-          carText = siteSettings.tiles?.carText || {
+          const localSettings = siteSettingsManager.getSettings();
+          dbSiteSettings = localSettings;
+          carText = localSettings.tiles?.carText || {
             title: "車両レンタル",
             subtitle: "ファミリー向けから", 
             description: "ビジネス用まで",
             details: "幅広いラインナップ"
           };
-          bikeText = siteSettings.tiles?.bikeText || {
+          bikeText = localSettings.tiles?.bikeText || {
             title: "バイクレンタル",
             subtitle: "原付から大型まで",
             description: "多様なバイクを", 
