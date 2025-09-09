@@ -575,7 +575,9 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
         createdAt: new Date().toISOString(),
         features: newVehicle.features ? newVehicle.features.split(',').map(f => f.trim()) : [],
         image: newVehicle.image || null,
-        images: newVehicle.image ? [newVehicle.image] : [] // APIが期待するフィールド名
+        images: newVehicle.image ? [newVehicle.image] : [], // APIが期待するフィールド名
+        // 複数フィールドで画像データを送信（確実な保存のため）
+        vehicleImages: newVehicle.image ? [newVehicle.image] : []
       };
       
       // デバッグ: 送信データサイズを確認
@@ -671,7 +673,9 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
         features: selectedVehicle.features ? 
           (Array.isArray(selectedVehicle.features) ? selectedVehicle.features : selectedVehicle.features.split(',').map(f => f.trim())) : [],
         image: selectedVehicle.image || null,
-        images: selectedVehicle.image ? [selectedVehicle.image] : []
+        images: selectedVehicle.image ? [selectedVehicle.image] : [],
+        // 複数フィールドで画像データを送信（確実な保存のため）
+        vehicleImages: selectedVehicle.image ? [selectedVehicle.image] : []
       };
       
       console.log('🔄 データベースで車両を更新中...', vehicleData);
