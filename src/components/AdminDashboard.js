@@ -617,11 +617,6 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
         showNotification('⚠️ データサイズが大きいため処理に時間がかかる可能性があります', 'warning');
       }
       
-      // デバッグ：画像なしでもエラーが出るかテスト
-      if (vehicle.image && window.confirm('デバッグ：画像なしでテストしますか？')) {
-        vehicleToSend = vehicleWithoutImage;
-        console.log('🧪 デバッグモード: 画像なしで送信');
-      }
       
       console.log('🔄 データベースに車両を追加中...', vehicleToSend);
       

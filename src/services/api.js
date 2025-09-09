@@ -143,6 +143,7 @@ class ApiService {
       vehicleDescription: vehicleData.description || '',
       pricePerHour: parseFloat(vehicleData.pricePerHour || Math.round((vehicleData.price || vehicleData.pricePerDay || 0) / 8)),
       pricePerDay: parseFloat(vehicleData.price || vehicleData.pricePerDay || 0),
+      capacity: parseInt(vehicleData.specifications?.seats || vehicleData.passengers || 4), // APIが期待する'capacity'フィールド
       vehicleCapacity: parseInt(vehicleData.specifications?.seats || vehicleData.passengers || 4),
       fuelType: vehicleData.specifications?.fuelType || vehicleData.fuelType || 'ガソリン',
       transmission: vehicleData.specifications?.transmission || vehicleData.transmission || 'AT',
@@ -180,6 +181,7 @@ class ApiService {
       vehicleDescription: vehicleData.description || '',
       pricePerHour: parseFloat(vehicleData.pricePerHour || Math.round((vehicleData.price || vehicleData.pricePerDay || 0) / 8)),
       pricePerDay: parseFloat(vehicleData.price || vehicleData.pricePerDay || 0),
+      capacity: parseInt(vehicleData.specifications?.seats || vehicleData.passengers || 4), // APIが期待する'capacity'フィールド
       vehicleCapacity: parseInt(vehicleData.specifications?.seats || vehicleData.passengers || 4),
       fuelType: vehicleData.specifications?.fuelType || vehicleData.fuelType || 'ガソリン',
       transmission: vehicleData.specifications?.transmission || vehicleData.transmission || 'AT',
