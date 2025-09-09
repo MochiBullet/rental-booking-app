@@ -54,6 +54,14 @@ jobs:
         echo "🚀 Starting deployment to S3..."
         aws s3 sync build/ s3://${{ secrets.S3_BUCKET_NAME }} --delete
         echo "✅ Deployment completed successfully!"
+        
+    - name: Configure S3 Website Settings (Fix SPA 404 errors)
+      run: |
+        echo "🔧 Configuring S3 website settings for SPA routing..."
+        aws s3 website s3://${{ secrets.S3_BUCKET_NAME }} \
+          --index-document index.html \
+          --error-document index.html
+        echo "✅ S3 website settings configured - SPA routing fixed"
     
     - name: Invalidate CloudFront Cache (CRITICAL for https://ms-base-rental.com/)
       run: |
