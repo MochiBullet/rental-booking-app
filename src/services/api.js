@@ -24,7 +24,7 @@ class ApiService {
       isAvailable: vehicle.isAvailable,
       category: vehicle.category,
       description: vehicle.description,
-      image: vehicle.images && vehicle.images[0] ? vehicle.images[0] : `https://via.placeholder.com/300x200?text=${encodeURIComponent(vehicle.name || 'Vehicle')}`,
+      image: vehicle.images && vehicle.images[0] ? vehicle.images[0] : `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200"><rect width="300" height="200" fill="#f0f0f0"/><text x="150" y="100" font-family="Arial" font-size="14" fill="#999" text-anchor="middle">${vehicle.name || 'Vehicle'}</text></svg>`)}`,
       images: vehicle.images,
       specifications: {
         seats: vehicle.capacity,

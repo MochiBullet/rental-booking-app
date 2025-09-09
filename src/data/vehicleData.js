@@ -5,7 +5,7 @@ export const vehicleData = [
     type: "car",
     category: "エコカー",
     price: 8000,
-    image: "https://via.placeholder.com/300x200?text=%E3%83%97%E3%83%AA%E3%82%A6%E3%82%B9",
+    image: "https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?w=300&h=200&fit=crop",
     description: "燃費抜群のハイブリッドカー。街乗りから長距離まで快適。",
     specifications: {
       seats: 5,
@@ -25,7 +25,7 @@ export const vehicleData = [
     type: "car",
     category: "ミニバン",
     price: 9500,
-    image: "https://via.placeholder.com/300x200?text=%E3%83%95%E3%83%AA%E3%83%BC%E3%83%89",
+    image: "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=300&h=200&fit=crop",
     description: "コンパクトなミニバン。家族での移動に最適。",
     specifications: {
       seats: 6,
@@ -45,7 +45,7 @@ export const vehicleData = [
     type: "car",
     category: "軽自動車",
     price: 6000,
-    image: "https://via.placeholder.com/300x200?text=%E8%BB%BD%E8%87%AA%E5%8B%95%E8%BB%8A",
+    image: "https://images.unsplash.com/photo-1590362891991-f776e747a588?w=300&h=200&fit=crop&sig=%E8%BB%BD%E8%87%AA%E5%8B%95%E8%BB%8A",
     description: "小回りが利いて運転しやすい軽自動車。",
     specifications: {
       seats: 4,
@@ -65,7 +65,7 @@ export const vehicleData = [
     type: "car",
     category: "SUV",
     price: 15000,
-    image: "https://via.placeholder.com/300x200?text=BMW+X3",
+    image: "https://images.unsplash.com/photo-1590362891991-f776e747a588?w=300&h=200&fit=crop&sig=BMW+X3",
     description: "高級SUV。快適な乗り心地と上質な内装。",
     specifications: {
       seats: 5,
@@ -85,7 +85,7 @@ export const vehicleData = [
     type: "motorcycle",
     category: "スポーツバイク",
     price: 4000,
-    image: "https://via.placeholder.com/300x200?text=MT-07",
+    image: "https://images.unsplash.com/photo-1590362891991-f776e747a588?w=300&h=200&fit=crop&sig=MT-07",
     description: "扱いやすいスポーツバイク。初心者から上級者まで。",
     specifications: {
       seats: 2,
@@ -105,7 +105,7 @@ export const vehicleData = [
     type: "motorcycle",
     category: "スクーター",
     price: 3000,
-    image: "https://via.placeholder.com/300x200?text=PCX160",
+    image: "https://images.unsplash.com/photo-1590362891991-f776e747a588?w=300&h=200&fit=crop&sig=PCX160",
     description: "通勤や街乗りに最適なスクーター。",
     specifications: {
       seats: 2,
@@ -125,7 +125,7 @@ export const vehicleData = [
     type: "motorcycle",
     category: "スポーツバイク",
     price: 5000,
-    image: "https://via.placeholder.com/300x200?text=Ninja+400",
+    image: "https://images.unsplash.com/photo-1590362891991-f776e747a588?w=300&h=200&fit=crop&sig=Ninja+400",
     description: "本格的なスポーツバイク。爽快な走りを楽しめます。",
     specifications: {
       seats: 2,
@@ -145,7 +145,7 @@ export const vehicleData = [
     type: "motorcycle",
     category: "クルーザー",
     price: 8000,
-    image: "https://via.placeholder.com/300x200?text=%E3%83%8F%E3%83%BC%E3%83%AC%E3%83%BC",
+    image: "https://images.unsplash.com/photo-1590362891991-f776e747a588?w=300&h=200&fit=crop&sig=%E3%83%8F%E3%83%BC%E3%83%AC%E3%83%BC",
     description: "アメリカンバイクの代表格。独特の乗り味。",
     specifications: {
       seats: 2,
