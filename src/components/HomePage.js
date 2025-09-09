@@ -274,12 +274,14 @@ function HomePage() {
               carTile: {
                 ...prevContent.carTile,
                 title: dbCarText.title || prevContent.carTile.title,
-                description: `${dbCarText.subtitle || ''}\n${dbCarText.description || ''}\n${dbCarText.details || ''}`.trim()
+                description: `${dbCarText.subtitle || ''}\n${dbCarText.description || ''}\n${dbCarText.details || ''}`.trim(),
+                features: dbCarText.features || prevContent.carTile.features || ['最新モデル', '保険完備', '24時間サポート']
               },
               bikeTile: {
                 ...prevContent.bikeTile,
                 title: dbBikeText.title || prevContent.bikeTile.title,
-                description: `${dbBikeText.subtitle || ''}\n${dbBikeText.description || ''}\n${dbBikeText.details || ''}`.trim()
+                description: `${dbBikeText.subtitle || ''}\n${dbBikeText.description || ''}\n${dbBikeText.details || ''}`.trim(),
+                features: dbBikeText.features || prevContent.bikeTile.features || ['ヘルメット付', '整備済み', 'ロードサービス']
               }
             };
             
