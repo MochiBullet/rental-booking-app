@@ -52,28 +52,77 @@ class SiteSettingsAPI {
 
   async saveSetting(settingKey, settingValue) {
     try {
+      // データサイズを計算
+      const dataSize = JSON.stringify(settingValue).length;
+      const dataSizeKB = Math.round(dataSize / 1024);
+      
+      console.log(`📊 データサイズ: ${dataSizeKB}KB (${dataSize} bytes)`);
+      
+      // 大きすぎる場合は警告
+      if (dataSizeKB > 500) {
+        console.warn(`⚠️ データサイズが大きすぎます: ${dataSizeKB}KB`);
+        throw new Error(`データサイズが制限を超えています: ${dataSizeKB}KB > 500KB`);
+      }
+      
+      // Lambda関数で期待される可能性のある異なるペイロード形式を試す
+      const requestBody = {
+        settingKey: settingKey,
+        settingValue: settingValue,
+        value: settingValue // 既存の形式も残す
+      };
+
+      console.log('🔄 API Request:', {
+        url: `${this.baseUrl}/${settingKey}`,
+        method: 'PUT',
+        bodySize: `${Math.round(JSON.stringify(requestBody).length / 1024)}KB`
+      });
+
       const response = await fetch(`${this.baseUrl}/${settingKey}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          value: settingValue
-        }),
+        body: JSON.stringify(requestBody),
       });
 
+      console.log('📡 API Response status:', response.status);
+      
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        let errorDetails = {};
+        try {
+          const errorText = await response.text();
+          console.error('❌ API Error Response Body:', errorText);
+          
+          // JSONパースを試行
+          try {
+            errorDetails = JSON.parse(errorText);
+          } catch (parseError) {
+            errorDetails = { rawError: errorText };
+          }
+        } catch (textError) {
+          console.error('❌ Failed to read error response:', textError);
+        }
+        
+        console.error('❌ Complete Error Details:', {
+          status: response.status,
+          statusText: response.statusText,
+          url: response.url,
+          headers: Object.fromEntries([...response.headers]),
+          errorDetails
+        });
+        
+        throw new Error(`HTTP ${response.status} ${response.statusText}: ${JSON.stringify(errorDetails)}`);
       }
 
       const data = await response.json();
+      console.log('✅ API Success Response:', data);
       
       // LocalStorageにもバックアップ保存
       this.saveToLocalStorage(settingKey, settingValue);
       
       return data;
     } catch (error) {
-      console.error(`Failed to save setting ${settingKey}:`, error);
+      console.error(`❌ Failed to save setting ${settingKey}:`, error);
       // フォールバック: LocalStorageに保存
       this.saveToLocalStorage(settingKey, settingValue);
       throw error;

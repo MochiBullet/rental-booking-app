@@ -8,6 +8,66 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
   const [activeSection, setActiveSection] = useState(propActiveSection || 'tile-edit');
   const [forceRender, setForceRender] = useState(Date.now() + 1000); // Aggressive cache clear
 
+  // 画像圧縮関数 - API Gateway制限に対応（超小さく圧縮）
+  const compressImage = (file, maxSizeKB = 200) => { // 200KBに大幅削減
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      img.onload = () => {
+        // 最大解像度をさらに制限 (400x400px)
+        let { width, height } = img;
+        const maxDimension = 400; // 800から400に削減
+        
+        if (width > maxDimension || height > maxDimension) {
+          if (width > height) {
+            height = (height * maxDimension) / width;
+            width = maxDimension;
+          } else {
+            width = (width * maxDimension) / height;
+            height = maxDimension;
+          }
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        // 画像を描画
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // より厳しい圧縮品質調整
+        let quality = 0.7; // 0.9から0.7に削減
+        let compressedDataURL;
+        let iterations = 0;
+        const maxIterations = 10;
+        
+        do {
+          compressedDataURL = canvas.toDataURL('image/jpeg', quality);
+          const sizeKB = compressedDataURL.length * 0.75 / 1024; // Base64のサイズ推定
+          
+          console.log(`🔄 圧縮試行 ${iterations + 1}: ${Math.round(sizeKB)}KB (品質: ${Math.round(quality * 100)}%)`);
+          
+          if (sizeKB <= maxSizeKB) {
+            console.log(`✅ 目標サイズ達成: ${Math.round(sizeKB)}KB`);
+            break;
+          }
+          
+          quality -= 0.05; // より細かい調整
+          iterations++;
+        } while (quality > 0.1 && iterations < maxIterations);
+        
+        // 最終確認
+        const finalSizeKB = compressedDataURL.length * 0.75 / 1024;
+        console.log(`📸 最終圧縮結果: ${Math.round(finalSizeKB)}KB (解像度: ${width}x${height}, 品質: ${Math.round(quality * 100)}%)`);
+        
+        resolve(compressedDataURL);
+      };
+      
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
   useEffect(() => {
     loadSettings();
     // お知らせ管理は AdminDashboard.js に移行済み
@@ -158,7 +218,7 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
   };
 
   // 統合タイル画像アップロード処理
-  const handleTileImageUpload = (event, type) => {
+  const handleTileImageUpload = async (event, type) => {
     const file = event.target.files[0];
     if (!file) return;
 
@@ -174,16 +234,22 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      const base64Data = e.target.result;
+    // 画像圧縮を実行
+    try {
+      alert('🔄 画像を圧縮中です。しばらくお待ちください...');
+      
+      const compressedDataURL = await compressImage(file);
+      const sizeKB = Math.round(compressedDataURL.length * 0.75 / 1024);
+      
+      console.log(`📸 画像圧縮完了: ${type} 画像 (約${sizeKB}KB)`);
+      
       const imageKey = `${type}Image`;
       
       const updatedSettings = {
         ...settings,
         tiles: {
           ...settings.tiles,
-          [imageKey]: base64Data,
+          [imageKey]: compressedDataURL,
           useDefaultImages: false
         }
       };
@@ -194,7 +260,7 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
       // DB（siteSettingsAPI）に保存
       try {
         await siteSettingsAPI.saveSetting('siteSettings', updatedSettings);
-        console.log(`✅ タイル${type}画像をDBに保存完了`);
+        console.log(`✅ タイル${type}画像をDBに保存完了 (${sizeKB}KB)`);
         
         // LocalStorageにもバックアップ保存
         siteSettingsManager.saveSettings(updatedSettings);
@@ -209,7 +275,7 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
           detail: updatedSettings
         }));
         
-        alert(`✅ ${type === 'car' ? '車' : 'バイク'}画像をアップロードしました`);
+        alert(`✅ ${type === 'car' ? '車' : 'バイク'}画像をアップロードしました (${sizeKB}KB)`);
         
       } catch (error) {
         console.error(`❌ タイル${type}画像のDB保存エラー:`, error);
@@ -224,8 +290,10 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
         
         alert(`⚠️ ${type === 'car' ? '車' : 'バイク'}画像をアップロードしました（DB接続エラーのためローカル保存）`);
       }
-    };
-    reader.readAsDataURL(file);
+    } catch (error) {
+      console.error('❌ 画像圧縮エラー:', error);
+      alert('⚠️ 画像の圧縮に失敗しました。別の画像をお試しください。');
+    }
   };
 
   // 個別タイル画像リセット
@@ -376,6 +444,205 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
     saveToAPI();
   };
 
+  // 背景画像アップロード処理
+  const handleBackgroundImageUpload = async (event, index) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // ファイルサイズチェック（最大3MB）
+    if (file.size > 3 * 1024 * 1024) {
+      alert('ファイルサイズは3MB以下にしてください。');
+      return;
+    }
+
+    // 画像ファイルかチェック
+    if (!file.type.startsWith('image/')) {
+      alert('画像ファイルを選択してください。');
+      return;
+    }
+
+    try {
+      alert('🔄 背景画像を圧縮中です。しばらくお待ちください...');
+      
+      // 背景画像用により大きいサイズで圧縮 (横長画像対応)
+      const compressedDataURL = await compressBackgroundImage(file);
+      const sizeKB = Math.round(compressedDataURL.length * 0.75 / 1024);
+      
+      console.log(`📸 背景画像圧縮完了 (位置${index}): 約${sizeKB}KB`);
+      
+      // 背景画像配列を更新
+      const newBackgroundImages = [...(settings.hero?.backgroundImages || [])];
+      while (newBackgroundImages.length <= index) {
+        newBackgroundImages.push(null);
+      }
+      newBackgroundImages[index] = compressedDataURL;
+      
+      const updatedSettings = {
+        ...settings,
+        hero: {
+          ...settings.hero,
+          backgroundImages: newBackgroundImages,
+          useDefaultImages: false
+        }
+      };
+
+      setSettings(updatedSettings);
+      
+      try {
+        await siteSettingsAPI.saveSetting('siteSettings', updatedSettings);
+        console.log(`✅ 背景画像${index + 1}をDBに保存完了 (${sizeKB}KB)`);
+        
+        // LocalStorageにもバックアップ保存
+        siteSettingsManager.saveSettings(updatedSettings);
+        
+        // リアルタイム更新
+        if (onSettingsUpdate) {
+          onSettingsUpdate(updatedSettings);
+        }
+        
+        window.dispatchEvent(new CustomEvent('siteSettingsUpdate', {
+          detail: updatedSettings
+        }));
+        
+        alert(`✅ 背景画像${index + 1}をアップロードしました (${sizeKB}KB)`);
+        
+      } catch (error) {
+        console.error(`❌ 背景画像${index + 1}のDB保存エラー:`, error);
+        alert(`⚠️ 背景画像${index + 1}をアップロードしました（DB接続エラーのためローカル保存）`);
+      }
+    } catch (error) {
+      console.error('❌ 背景画像圧縮エラー:', error);
+      alert('⚠️ 背景画像の圧縮に失敗しました。別の画像をお試しください。');
+    }
+  };
+
+  // 背景画像専用圧縮関数（横長に最適化）
+  const compressBackgroundImage = (file, maxSizeKB = 300) => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      img.onload = () => {
+        // 背景画像用の解像度設定 (横長フォーマット)
+        let { width, height } = img;
+        const maxWidth = 1200;
+        const maxHeight = 600;
+        
+        // アスペクト比を維持しつつリサイズ
+        if (width > maxWidth || height > maxHeight) {
+          const widthRatio = maxWidth / width;
+          const heightRatio = maxHeight / height;
+          const ratio = Math.min(widthRatio, heightRatio);
+          
+          width = Math.round(width * ratio);
+          height = Math.round(height * ratio);
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // 圧縮品質調整
+        let quality = 0.8;
+        let compressedDataURL;
+        let iterations = 0;
+        const maxIterations = 10;
+        
+        do {
+          compressedDataURL = canvas.toDataURL('image/jpeg', quality);
+          const sizeKB = compressedDataURL.length * 0.75 / 1024;
+          
+          console.log(`🔄 背景画像圧縮試行 ${iterations + 1}: ${Math.round(sizeKB)}KB (品質: ${Math.round(quality * 100)}%)`);
+          
+          if (sizeKB <= maxSizeKB) {
+            console.log(`✅ 背景画像目標サイズ達成: ${Math.round(sizeKB)}KB`);
+            break;
+          }
+          
+          quality -= 0.05;
+          iterations++;
+        } while (quality > 0.1 && iterations < maxIterations);
+        
+        const finalSizeKB = compressedDataURL.length * 0.75 / 1024;
+        console.log(`📸 背景画像最終圧縮結果: ${Math.round(finalSizeKB)}KB (解像度: ${width}x${height})`);
+        
+        resolve(compressedDataURL);
+      };
+      
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
+  // 背景画像リセット
+  const resetBackgroundImage = async (index) => {
+    const newBackgroundImages = [...(settings.hero?.backgroundImages || [])];
+    newBackgroundImages[index] = null;
+    
+    const updatedSettings = {
+      ...settings,
+      hero: {
+        ...settings.hero,
+        backgroundImages: newBackgroundImages,
+        useDefaultImages: newBackgroundImages.every(img => img === null)
+      }
+    };
+    
+    setSettings(updatedSettings);
+    
+    try {
+      await siteSettingsAPI.saveSetting('siteSettings', updatedSettings);
+      siteSettingsManager.saveSettings(updatedSettings);
+      
+      if (onSettingsUpdate) {
+        onSettingsUpdate(updatedSettings);
+      }
+      
+      window.dispatchEvent(new CustomEvent('siteSettingsUpdate', {
+        detail: updatedSettings
+      }));
+      
+      alert(`✅ 背景画像${index + 1}をリセットしました`);
+      
+    } catch (error) {
+      console.error(`❌ 背景画像${index + 1}リセットエラー:`, error);
+      alert(`⚠️ 背景画像${index + 1}をリセットしました（DB接続エラー）`);
+    }
+  };
+
+  // 全背景画像をデフォルトに戻す
+  const resetAllBackgroundImages = async () => {
+    const updatedSettings = {
+      ...settings,
+      hero: {
+        ...settings.hero,
+        backgroundImages: [],
+        useDefaultImages: true
+      }
+    };
+    
+    setSettings(updatedSettings);
+    
+    try {
+      await siteSettingsAPI.saveSetting('siteSettings', updatedSettings);
+      siteSettingsManager.saveSettings(updatedSettings);
+      
+      if (onSettingsUpdate) {
+        onSettingsUpdate(updatedSettings);
+      }
+      
+      window.dispatchEvent(new CustomEvent('siteSettingsUpdate', {
+        detail: updatedSettings
+      }));
+      
+      alert('✅ 全背景画像をデフォルトに戻しました');
+      
+    } catch (error) {
+      console.error('❌ 背景画像一括リセットエラー:', error);
+      alert('⚠️ 全背景画像をデフォルトに戻しました（DB接続エラー）');
+    }
+  };
+
   // お知らせ関連の関数は管理者ダッシュボードに移行済み
 
   return (
@@ -397,6 +664,7 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
           {[
             { key: 'branding', label: '🏢 ブランディング' },
             { key: 'tile-edit', label: '🎨 タイル編集' },
+            { key: 'background-edit', label: '🌄 背景画像編集' },
             { key: 'contact', label: 'お問い合わせ情報' },
             { key: 'googleforms', label: '📝 Google Forms連携' },
             { key: 'terms', label: '📋 利用規約' },
@@ -799,6 +1067,130 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
                   placeholder=""
                   rows="3"
                 />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeSection === 'background-edit' && (
+          <div className="section">
+            <h3>🌄 Hero背景画像編集</h3>
+            <div className="background-info">
+              <p>ホームページのヒーローセクションで流れる背景画像を管理できます。</p>
+              <p>推奨サイズ: 横1200px × 縦600px以下 | 自動圧縮: 300KB以下</p>
+            </div>
+            
+            {/* 背景画像管理セクション */}
+            <div className="form-group">
+              <label>🖼️ 背景画像設定</label>
+              <div className="background-image-management">
+                
+                {/* 現在の状態表示 */}
+                <div className="background-status">
+                  {settings.hero?.useDefaultImages ? (
+                    <div className="status-info default">
+                      <span>📷 現在: デフォルト画像を使用中</span>
+                    </div>
+                  ) : (
+                    <div className="status-info custom">
+                      <span>🎨 現在: カスタム画像を使用中</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* 5つの背景画像スロット */}
+                <div className="background-slots">
+                  {[0, 1, 2, 3, 4].map(index => {
+                    const backgroundImage = settings.hero?.backgroundImages?.[index];
+                    const hasCustomImage = backgroundImage && !settings.hero?.useDefaultImages;
+                    
+                    return (
+                      <div key={index} className="background-slot">
+                        <h4>背景画像 {index + 1}</h4>
+                        
+                        {/* プレビュー */}
+                        <div className="background-preview">
+                          {hasCustomImage ? (
+                            <img 
+                              src={backgroundImage} 
+                              alt={`背景画像${index + 1}`}
+                              style={{ 
+                                width: '300px', 
+                                height: '150px', 
+                                objectFit: 'cover',
+                                borderRadius: '8px',
+                                border: '2px solid #4CAF50'
+                              }}
+                            />
+                          ) : (
+                            <div style={{
+                              width: '300px', 
+                              height: '150px',
+                              backgroundColor: '#f5f5f5',
+                              border: '2px dashed #ccc',
+                              borderRadius: '8px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              color: '#666',
+                              fontSize: '14px'
+                            }}>
+                              デフォルト画像または未設定
+                            </div>
+                          )}
+                        </div>
+
+                        {/* アップロードボタン */}
+                        <div className="background-controls">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            id={`backgroundUpload${index}`}
+                            onChange={(e) => handleBackgroundImageUpload(e, index)}
+                            style={{ display: 'none' }}
+                          />
+                          <label htmlFor={`backgroundUpload${index}`} className="upload-button">
+                            📷 画像を選択
+                          </label>
+                          
+                          {hasCustomImage && (
+                            <button 
+                              type="button" 
+                              onClick={() => resetBackgroundImage(index)}
+                              className="reset-button"
+                            >
+                              🔄 リセット
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* 一括操作 */}
+                <div className="background-bulk-actions">
+                  <button 
+                    type="button" 
+                    onClick={resetAllBackgroundImages}
+                    className="bulk-reset-button"
+                    disabled={settings.hero?.useDefaultImages}
+                  >
+                    🔄 全背景画像をデフォルトに戻す
+                  </button>
+                </div>
+
+                {/* 使用方法の説明 */}
+                <div className="background-usage-info">
+                  <h4>📖 使用方法</h4>
+                  <ul>
+                    <li>各スロットに横長の画像をアップロードできます</li>
+                    <li>画像は自動でリサイズ・圧縮されます（1200×600px以下、300KB以下）</li>
+                    <li>設定した画像は自動でスライドします</li>
+                    <li>未設定のスロットはデフォルト画像が使用されます</li>
+                    <li>全てリセットするとUnsplashのデフォルト画像に戻ります</li>
+                  </ul>
+                </div>
               </div>
             </div>
           </div>

@@ -21,6 +21,38 @@ const Hero = ({ onViewChange }) => {
     };
   }, []);
 
+  // デフォルト背景画像URL
+  const defaultBackgroundImages = [
+    'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1920&q=80',
+    'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1920&q=80',
+    'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=1920&q=80',
+    'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=1920&q=80',
+    'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1920&q=80'
+  ];
+
+  // 表示する背景画像を決定
+  const getBackgroundImages = () => {
+    if (!settings) return defaultBackgroundImages;
+    
+    if (settings.hero?.useDefaultImages || !settings.hero?.backgroundImages?.length) {
+      return defaultBackgroundImages;
+    }
+    
+    // カスタム画像とデフォルト画像を混合
+    const customImages = settings.hero.backgroundImages;
+    const backgroundImages = [];
+    
+    for (let i = 0; i < 5; i++) {
+      if (customImages[i]) {
+        backgroundImages.push(customImages[i]);
+      } else {
+        backgroundImages.push(defaultBackgroundImages[i]);
+      }
+    }
+    
+    return backgroundImages;
+  };
+
   if (!settings) {
     return <div>Loading...</div>;
   }
@@ -30,11 +62,13 @@ const Hero = ({ onViewChange }) => {
       {/* 背景スライダー */}
       <div className="background-slider">
         <div className="slider-track">
-          <div className="slide" style={{backgroundImage: 'url(https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1920&q=80)'}}></div>
-          <div className="slide" style={{backgroundImage: 'url(https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1920&q=80)'}}></div>
-          <div className="slide" style={{backgroundImage: 'url(https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=1920&q=80)'}}></div>
-          <div className="slide" style={{backgroundImage: 'url(https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=1920&q=80)'}}></div>
-          <div className="slide" style={{backgroundImage: 'url(https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1920&q=80)'}}></div>
+          {getBackgroundImages().map((imageUrl, index) => (
+            <div 
+              key={index} 
+              className="slide" 
+              style={{backgroundImage: `url(${imageUrl})`}}
+            ></div>
+          ))}
         </div>
       </div>
       <div className="hero-overlay"></div>
