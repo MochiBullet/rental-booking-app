@@ -57,9 +57,9 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
 
   // 連泊割引システム
   const getDiscountRate = (days) => {
-    if (days >= 30) return 0.2; // 80%オフ
-    if (days >= 21) return 0.4; // 60%オフ
-    if (days >= 14) return 0.55; // 45%オフ
+    if (days >= 30) return 0.8; // 80%オフ
+    if (days >= 21) return 0.6; // 60%オフ
+    if (days >= 14) return 0.45; // 45%オフ
     if (days >= 7) return 0.3; // 30%オフ
     if (days >= 3) return 0.15; // 15%オフ
     return 0; // 割引なし
