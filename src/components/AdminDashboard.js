@@ -4,6 +4,7 @@ import LoadingWheel from './LoadingWheel';
 import './AdminDashboard.css';
 import dataSyncService from '../services/dataSync';
 import SiteSettingsManagement from './SiteSettingsManagement';
+import DeletedVehiclesManagement from './DeletedVehiclesManagement';
 import { vehicleAPI } from '../services/api';
 import { announcementsAPI } from '../services/announcementsAPI';
 
@@ -1137,6 +1138,13 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
             車両管理
           </button>
           <button 
+            className={activeSection === 'deleted-vehicles' ? 'active' : ''}
+            onClick={() => setActiveSection('deleted-vehicles')}
+          >
+            <span className="nav-icon">🗑️</span>
+            削除済み車両
+          </button>
+          <button 
             className={activeSection === 'announcements' ? 'active' : ''}
             onClick={() => setActiveSection('announcements')}
           >
@@ -1210,6 +1218,7 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
         <div className="admin-header">
           <h1>
             {activeSection === 'vehicles' && '🚗 車両管理'}
+            {activeSection === 'deleted-vehicles' && '🗑️ 削除済み車両管理'}
             {activeSection === 'announcements' && '📢 お知らせ管理'}
             {activeSection === 'branding' && '🏢 ブランディング設定'}
             {activeSection === 'tile-edit' && '🎨 カード編集'}
@@ -1267,9 +1276,9 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
               
               {/* 車 (Car) セクション */}
               <div className="vehicle-category">
-                <h3 className="category-title">🚗 車 ({vehicles.filter(v => v.type === 'car').length}台)</h3>
+                <h3 className="category-title">🚗 稼働中の車 ({vehicles.filter(v => v.type === 'car' && v.isAvailable !== false).length}台)</h3>
                 <div className="vehicles-grid">
-                  {vehicles.filter(vehicle => vehicle.type === 'car').map(vehicle => (
+                  {vehicles.filter(vehicle => vehicle.type === 'car' && vehicle.isAvailable !== false).map(vehicle => (
                     <div key={vehicle.id} className="vehicle-admin-card">
                       <div className="vehicle-admin-header">
                         <h3>{vehicle.name}</h3>
@@ -1319,9 +1328,9 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
 
               {/* バイク (Bike) セクション */}
               <div className="vehicle-category">
-                <h3 className="category-title">🏍️ バイク ({vehicles.filter(v => v.type === 'bike' || v.type === 'motorcycle').length}台)</h3>
+                <h3 className="category-title">🏍️ 稼働中のバイク ({vehicles.filter(v => (v.type === 'bike' || v.type === 'motorcycle') && v.isAvailable !== false).length}台)</h3>
                 <div className="vehicles-grid">
-                  {vehicles.filter(vehicle => vehicle.type === 'bike' || vehicle.type === 'motorcycle').map(vehicle => (
+                  {vehicles.filter(vehicle => (vehicle.type === 'bike' || vehicle.type === 'motorcycle') && vehicle.isAvailable !== false).map(vehicle => (
                     <div key={vehicle.id} className="vehicle-admin-card">
                       <div className="vehicle-admin-header">
                         <h3>{vehicle.name}</h3>
@@ -1368,6 +1377,13 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
                   </div>
                 )}
               </div>
+            </div>
+          )}
+          
+          {/* 削除済み車両管理セクション */}
+          {activeSection === 'deleted-vehicles' && (
+            <div className="deleted-vehicles-section">
+              <DeletedVehiclesManagement />
             </div>
           )}
           
@@ -1539,7 +1555,7 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
                 <div className="analytics-card">
                   <h3>Vehicle Popularity</h3>
                   <div className="popularity-list">
-                    {vehicles.slice(0, 5).map((vehicle, index) => (
+                    {vehicles.filter(v => v.isAvailable !== false).slice(0, 5).map((vehicle, index) => (
                       <div key={vehicle.id} className="popularity-item">
                         <span className="rank">{index + 1}</span>
                         <span className="vehicle-name">{vehicle.name}</span>
