@@ -235,12 +235,12 @@ function HomePage() {
           heroTitle: 'M\'s BASE Rental',
           heroSubtitle: '安心・安全・快適なレンタルサービス',
           carTile: {
-            title: carText.title,
+            title: carText.shortTitle || carText.title || '車',
             description: `${carText.subtitle}\n${carText.description}\n${carText.details}`,
             features: carText.features || ['最新モデル', '保険完備', '24時間サポート']
           },
           bikeTile: {
-            title: bikeText.title,
+            title: bikeText.shortTitle || bikeText.title || 'バイク',
             description: `${bikeText.subtitle}\n${bikeText.description}\n${bikeText.details}`,
             features: bikeText.features || ['ヘルメット付', '整備済み', 'ロードサービス']
           }
@@ -273,13 +273,13 @@ function HomePage() {
               ...prevContent,
               carTile: {
                 ...prevContent.carTile,
-                title: dbCarText.title || prevContent.carTile.title,
+                title: dbCarText.shortTitle || dbCarText.title || prevContent.carTile.title || '車',
                 description: `${dbCarText.subtitle || ''}\n${dbCarText.description || ''}\n${dbCarText.details || ''}`.trim(),
                 features: dbCarText.features || prevContent.carTile.features || ['最新モデル', '保険完備', '24時間サポート']
               },
               bikeTile: {
                 ...prevContent.bikeTile,
-                title: dbBikeText.title || prevContent.bikeTile.title,
+                title: dbBikeText.shortTitle || dbBikeText.title || prevContent.bikeTile.title || 'バイク',
                 description: `${dbBikeText.subtitle || ''}\n${dbBikeText.description || ''}\n${dbBikeText.details || ''}`.trim(),
                 features: dbBikeText.features || prevContent.bikeTile.features || ['ヘルメット付', '整備済み', 'ロードサービス']
               }
@@ -347,13 +347,13 @@ function HomePage() {
             ...prevContent,
             carTile: {
               ...prevContent.carTile,
-              title: carText.title || prevContent.carTile?.title || '車両レンタル',
+              title: carText.shortTitle || carText.title || prevContent.carTile?.title || '車',
               description: `${carText.subtitle || ''}\n${carText.description || ''}\n${carText.details || ''}`.trim() || prevContent.carTile?.description || 'ファミリー向けから\nビジネス用まで\n幅広いラインナップ',
               features: carText.features || prevContent.carTile?.features || ['最新モデル', '保険完備', '24時間サポート']
             },
             bikeTile: {
               ...prevContent.bikeTile,
-              title: bikeText.title || prevContent.bikeTile?.title || 'バイクレンタル',
+              title: bikeText.shortTitle || bikeText.title || prevContent.bikeTile?.title || 'バイク',
               description: `${bikeText.subtitle || ''}\n${bikeText.description || ''}\n${bikeText.details || ''}`.trim() || prevContent.bikeTile?.description || '原付から大型まで\n多様なバイクを\nお手頃価格で提供',
               features: bikeText.features || prevContent.bikeTile?.features || ['ヘルメット付', '整備済み', 'ロードサービス']
             }

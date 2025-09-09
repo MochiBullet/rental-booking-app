@@ -577,13 +577,24 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
                 <h4>🚗 車両タイルテキスト設定</h4>
                 <div className="tile-text-grid">
                   <div className="form-group">
-                    <label>タイトル</label>
+                    <label>短縮タイトル（ホームページ表示用）</label>
+                    <input
+                      type="text"
+                      value={settings.tiles?.carText?.shortTitle || ''}
+                      onChange={(e) => updateTileText('car', 'shortTitle', e.target.value)}
+                      placeholder="車"
+                    />
+                    <small style={{color: '#666', fontSize: '0.8em'}}>ホームページのタイルに表示される短いタイトル</small>
+                  </div>
+                  <div className="form-group">
+                    <label>タイトル（詳細ページ用）</label>
                     <input
                       type="text"
                       value={settings.tiles?.carText?.title || ''}
                       onChange={(e) => updateTileText('car', 'title', e.target.value)}
                       placeholder="車両レンタル"
                     />
+                    <small style={{color: '#666', fontSize: '0.8em'}}>車両リストページなどで使用される詳細タイトル</small>
                   </div>
                   <div className="form-group">
                     <label>サブタイトル</label>
@@ -626,13 +637,24 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
                 <h4>🏍️ バイクタイルテキスト設定</h4>
                 <div className="tile-text-grid">
                   <div className="form-group">
-                    <label>タイトル</label>
+                    <label>短縮タイトル（ホームページ表示用）</label>
+                    <input
+                      type="text"
+                      value={settings.tiles?.bikeText?.shortTitle || ''}
+                      onChange={(e) => updateTileText('bike', 'shortTitle', e.target.value)}
+                      placeholder="バイク"
+                    />
+                    <small style={{color: '#666', fontSize: '0.8em'}}>ホームページのタイルに表示される短いタイトル</small>
+                  </div>
+                  <div className="form-group">
+                    <label>タイトル（詳細ページ用）</label>
                     <input
                       type="text"
                       value={settings.tiles?.bikeText?.title || ''}
                       onChange={(e) => updateTileText('bike', 'title', e.target.value)}
                       placeholder="バイクレンタル"
                     />
+                    <small style={{color: '#666', fontSize: '0.8em'}}>車両リストページなどで使用される詳細タイトル</small>
                   </div>
                   <div className="form-group">
                     <label>サブタイトル</label>
