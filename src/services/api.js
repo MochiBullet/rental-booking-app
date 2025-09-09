@@ -137,6 +137,7 @@ class ApiService {
   async createVehicle(vehicleData) {
     // フロントエンドの形式をDynamoDBの形式に変換
     const dynamoDBData = {
+      name: vehicleData.name, // APIが'name'フィールドを期待している
       vehicleName: vehicleData.name,
       vehicleType: vehicleData.type || vehicleData.vehicleType,
       vehicleDescription: vehicleData.description || '',
@@ -173,6 +174,7 @@ class ApiService {
   async updateVehicle(vehicleId, vehicleData) {
     // フロントエンドの形式をDynamoDBの形式に変換
     const dynamoDBData = {
+      name: vehicleData.name, // APIが'name'フィールドを期待している
       vehicleName: vehicleData.name,
       vehicleType: vehicleData.type || vehicleData.vehicleType,
       vehicleDescription: vehicleData.description || '',
