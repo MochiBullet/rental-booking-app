@@ -82,15 +82,6 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
     }));
   };
 
-  const updateFeature = (index, field, value) => {
-    setSettings(prev => ({
-      ...prev,
-      features: prev.features.map((feature, i) => 
-        i === index ? { ...feature, [field]: value } : feature
-      )
-    }));
-  };
-
   const updateContactSettings = (field, value) => {
     if (field === 'weekday' || field === 'weekend') {
       setSettings(prev => ({
@@ -364,11 +355,11 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
           { key: 'hero-images', label: '🏞️ ヒーロー画像' },
           { key: 'tile-images', label: '🚗 タイル画像' },
           { key: 'hero', label: 'ヒーローセクション' },
-          { key: 'features', label: '特徴・機能' },
           { key: 'contact', label: 'お問い合わせ情報' },
           { key: 'googleforms', label: '📝 Google Forms連携' },
           { key: 'terms', label: '📋 利用規約' },
-          { key: 'privacy', label: '🔒 プライバシーポリシー' }
+          { key: 'privacy', label: '🔒 プライバシーポリシー' },
+          { key: 'rental-terms', label: '🚗 レンタカー約款' }
         ].map(tab => (
           <button
             key={tab.key}
@@ -653,36 +644,6 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
           </div>
         )}
 
-        {activeSection === 'features' && (
-          <div className="section">
-            <h3>特徴・機能設定</h3>
-            {settings.features.map((feature, index) => (
-              <div key={index} className="feature-item">
-                <h4>特徴 {index + 1}</h4>
-                <div className="form-row">
-                  <div className="form-group">
-                    <label>タイトル（絵文字含む）</label>
-                    <input
-                      type="text"
-                      value={feature.title}
-                      onChange={(e) => updateFeature(index, 'title', e.target.value)}
-                      placeholder="🚗 多彩な車両"
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>説明</label>
-                    <input
-                      type="text"
-                      value={feature.description}
-                      onChange={(e) => updateFeature(index, 'description', e.target.value)}
-                      placeholder="軽自動車からSUVまで"
-                    />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
 
         {activeSection === 'contact' && (
           <div className="section">
@@ -906,6 +867,31 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
                 value={settings.privacy?.content || ''}
                 onChange={(e) => updateTermsSettings('privacy', 'content', e.target.value)}
                 placeholder="プライバシーポリシーの内容を入力してください..."
+                rows={15}
+                className="terms-textarea"
+              />
+            </div>
+          </div>
+        )}
+
+        {activeSection === 'rental-terms' && (
+          <div className="section">
+            <h3>レンタカー約款設定</h3>
+            <div className="form-group">
+              <label>タイトル</label>
+              <input
+                type="text"
+                value={settings.rentalTerms?.title || ''}
+                onChange={(e) => updateTermsSettings('rentalTerms', 'title', e.target.value)}
+                placeholder="レンタカー約款"
+              />
+            </div>
+            <div className="form-group">
+              <label>内容</label>
+              <textarea
+                value={settings.rentalTerms?.content || ''}
+                onChange={(e) => updateTermsSettings('rentalTerms', 'content', e.target.value)}
+                placeholder="レンタカー約款の内容を入力してください..."
                 rows={15}
                 className="terms-textarea"
               />

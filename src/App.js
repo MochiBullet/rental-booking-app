@@ -19,6 +19,7 @@ import AdminDashboard from './components/AdminDashboard';
 import ContactForm from './components/ContactForm';
 import Terms from './components/Terms';
 import PrivacyPolicy from './components/PrivacyPolicy';
+import RentalTerms from './components/RentalTerms';
 import AnnouncementDetail from './components/AnnouncementDetail';
 import { getGlobalSettings, updateGlobalSettings } from './data/globalSettings';
 
@@ -318,6 +319,7 @@ function AppContent() {
           <Route path="/contact" element={<ContactForm />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/rental-terms" element={<RentalTerms />} />
           
           {/* Admin Routes (Hidden from main navigation) */}
           <Route path="/admin-login" element={<AdminLogin setIsAdmin={setIsAdmin} onSuccess={() => window.location.href = '/admin'} />} />
@@ -343,6 +345,7 @@ function AppContent() {
               <Link to="/contact">お問い合わせ</Link>
               <Link to="/terms">利用規約</Link>
               <Link to="/privacy">プライバシーポリシー</Link>
+              <Link to="/rental-terms">レンタカー約款</Link>
             </div>
           </div>
         </footer>
