@@ -14,9 +14,9 @@ const VehicleListPage = ({ user }) => {
   const [error, setError] = useState(null);
   const [pageContent, setPageContent] = useState({
     carTitle: '車のレンタル',
-    carDescription: 'ファミリー向けからビジネスまで',
+    carDescription: '',
     bikeTitle: 'バイクのレンタル', 
-    bikeDescription: 'スクーターから大型バイクまで、あなたの目的に合ったバイクを見つけてください。'
+    bikeDescription: ''
   });
 
   useEffect(() => {
@@ -72,11 +72,11 @@ const VehicleListPage = ({ user }) => {
             carTitle: carText.title || '車のレンタル',
             carDescription: carText.subtitle && carText.description ? 
               `${carText.subtitle}${carText.description}` :
-              'ファミリー向けからビジネスまで',
+              '',
             bikeTitle: bikeText.title || 'バイクのレンタル',
             bikeDescription: bikeText.subtitle && bikeText.description ?
-              `${bikeText.subtitle}${bikeText.description}、あなたの目的に合ったバイクを見つけてください。` :
-              'スクーターから大型バイクまで、あなたの目的に合ったバイクを見つけてください。'
+              `${bikeText.subtitle}${bikeText.description}` :
+              ''
           };
           
           setPageContent(newPageContent);
@@ -105,11 +105,11 @@ const VehicleListPage = ({ user }) => {
           carTitle: carText.title || '車のレンタル',
           carDescription: carText.subtitle && carText.description ? 
             `${carText.subtitle}${carText.description}` :
-            'ファミリー向けからビジネスまで',
+            '',
           bikeTitle: bikeText.title || 'バイクのレンタル',
           bikeDescription: bikeText.subtitle && bikeText.description ?
-            `${bikeText.subtitle}${bikeText.description}、あなたの目的に合ったバイクを見つけてください。` :
-            'スクーターから大型バイクまで、あなたの目的に合ったバイクを見つけてください。'
+            `${bikeText.subtitle}${bikeText.description}` :
+            ''
         };
         
         setPageContent(newPageContent);
@@ -136,7 +136,7 @@ const VehicleListPage = ({ user }) => {
       case 'motorcycle':
         return pageContent.bikeTitle;
       default:
-        return '車両レンタル';
+        return '車両一覧';
     }
   };
 

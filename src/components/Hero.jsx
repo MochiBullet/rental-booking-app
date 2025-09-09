@@ -63,7 +63,7 @@ const Hero = ({ onViewChange }) => {
             >
               <div className="tile-icon">🚗</div>
               <div className="tile-content">
-                <h4>車両レンタル</h4>
+                <h4>カーレンタル</h4>
                 <p>軽自動車からSUVまで<br/>豊富な車種をご用意</p>
                 <div className="tile-features">
                   <span>• 軽自動車</span>

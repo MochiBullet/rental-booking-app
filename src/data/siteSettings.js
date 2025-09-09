@@ -16,10 +16,10 @@ export const initialSiteSettings = {
     bikeImage: null, // カスタムバイクタイル画像（Base64形式）
     useDefaultImages: true, // デフォルト画像を使用するか
     carText: {
-      title: "車両レンタル",
-      subtitle: "ファミリー向けから",
-      description: "ビジネス用まで",
-      details: "幅広いラインナップ"
+      title: "車",
+      subtitle: "",
+      description: "",
+      details: ""
     },
     bikeText: {
       title: "バイクレンタル", 
@@ -67,7 +67,7 @@ export const initialSiteSettings = {
     }
   },
   services: [
-    "・車両レンタル",
+    "・カーレンタル",
     "・バイクレンタル",
     "・配車サービス",
     "・24時間サポート"

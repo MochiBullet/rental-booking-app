@@ -656,7 +656,7 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
                       type="text"
                       value={settings.tiles?.carText?.title || ''}
                       onChange={(e) => updateTileText('car', 'title', e.target.value)}
-                      placeholder="車両レンタル"
+                      placeholder="車"
                     />
                     <small style={{color: '#666', fontSize: '0.8em'}}>車両リストページなどで使用される詳細タイトル</small>
                   </div>
@@ -666,7 +666,7 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
                       type="text"
                       value={settings.tiles?.carText?.subtitle || ''}
                       onChange={(e) => updateTileText('car', 'subtitle', e.target.value)}
-                      placeholder="ファミリー向けから"
+                      placeholder=""
                     />
                   </div>
                   <div className="form-group">
@@ -789,7 +789,7 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
                     ...prev,
                     pageContent: { ...prev.pageContent, carDescription: e.target.value }
                   }))}
-                  placeholder="ファミリー向けからビジネスまで"
+                  placeholder=""
                   rows="3"
                 />
               </div>
@@ -815,7 +815,7 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
                     ...prev,
                     pageContent: { ...prev.pageContent, bikeDescription: e.target.value }
                   }))}
-                  placeholder="スクーターから大型バイクまで、あなたの目的に合ったバイクを見つけてください。"
+                  placeholder=""
                   rows="3"
                 />
               </div>
@@ -887,7 +887,7 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
                   type="text"
                   value={service}
                   onChange={(e) => updateService(index, e.target.value)}
-                  placeholder="・車両レンタル"
+                  placeholder="・カーレンタル"
                 />
               </div>
             ))}

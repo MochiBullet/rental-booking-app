@@ -277,7 +277,7 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
     <div className="vehicle-list-container">
       <div className="vehicle-list-header">
         <h1>{type === 'car' ? '車両一覧' : type === 'bike' ? 'バイク一覧' : '全車両'}</h1>
-        <p>プレミアムな車両ラインナップからお選びください</p>
+        <p>お好みの車両をお選びください</p>
       </div>
 
       <div className="vehicles-grid">

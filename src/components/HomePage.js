@@ -200,10 +200,10 @@ function HomePage() {
           console.log('🗃️ DynamoDBから取得した設定:', dbSiteSettings.tiles);
           
           carText = dbSiteSettings.tiles?.carText || {
-            title: "車両レンタル",
-            subtitle: "ファミリー向けから",
-            description: "ビジネス用まで", 
-            details: "幅広いラインナップ"
+            title: "車",
+            subtitle: "",
+            description: "", 
+            details: ""
           };
           bikeText = dbSiteSettings.tiles?.bikeText || {
             title: "バイクレンタル",
@@ -220,10 +220,10 @@ function HomePage() {
           const localSettings = siteSettingsManager.getSettings();
           dbSiteSettings = localSettings;
           carText = localSettings.tiles?.carText || {
-            title: "車両レンタル",
-            subtitle: "ファミリー向けから", 
-            description: "ビジネス用まで",
-            details: "幅広いラインナップ"
+            title: "車",
+            subtitle: "", 
+            description: "",
+            details: ""
           };
           bikeText = localSettings.tiles?.bikeText || {
             title: "バイクレンタル",
@@ -350,7 +350,7 @@ function HomePage() {
             carTile: {
               ...prevContent.carTile,
               title: carText.shortTitle || carText.title || prevContent.carTile?.title || '車',
-              description: `${carText.subtitle || ''}\n${carText.description || ''}\n${carText.details || ''}`.trim() || prevContent.carTile?.description || 'ファミリー向けから\nビジネス用まで\n幅広いラインナップ',
+              description: `${carText.subtitle || ''}\n${carText.description || ''}\n${carText.details || ''}`.trim() || prevContent.carTile?.description || '',
               features: carText.features || prevContent.carTile?.features || ['最新モデル', '保険完備', '24時間サポート']
             },
             bikeTile: {
