@@ -941,6 +941,13 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
             カード編集
           </button>
           <button 
+            className={activeSection === 'background-edit' ? 'active' : ''}
+            onClick={() => setActiveSection('background-edit')}
+          >
+            <span className="nav-icon">🌄</span>
+            背景画像編集
+          </button>
+          <button 
             className={activeSection === 'page-edit' ? 'active' : ''}
             onClick={() => setActiveSection('page-edit')}
           >
@@ -989,6 +996,7 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
             {activeSection === 'announcements' && '📢 お知らせ管理'}
             {activeSection === 'branding' && '🏢 ブランディング設定'}
             {activeSection === 'tile-edit' && '🎨 カード編集'}
+            {activeSection === 'background-edit' && '🌄 背景画像編集'}
             {activeSection === 'page-edit' && '📄 カード内ページ編集'}
             {activeSection === 'contact' && '📞 連絡先情報設定'}
             {activeSection === 'terms' && '📋 利用規約設定'}
@@ -1364,6 +1372,10 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
           
           {activeSection === 'tile-edit' && (
             <SiteSettingsManagement onSettingsUpdate={onSettingsUpdate} activeSection="tile-edit" />
+          )}
+          
+          {activeSection === 'background-edit' && (
+            <SiteSettingsManagement onSettingsUpdate={onSettingsUpdate} activeSection="background-edit" />
           )}
           
           {activeSection === 'page-edit' && (
