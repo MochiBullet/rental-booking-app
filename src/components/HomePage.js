@@ -181,17 +181,32 @@ function HomePage() {
         setHomeContent(JSON.parse(savedContent));
       } else {
         // LocalStorageにない場合はデフォルト値を設定して保存
+        // サイト設定からタイルテキストを取得
+        const siteSettings = siteSettingsManager.getSettings();
+        const carText = siteSettings.tiles?.carText || {
+          title: "車両レンタル",
+          subtitle: "ファミリー向けから",
+          description: "ビジネス用まで",
+          details: "幅広いラインナップ"
+        };
+        const bikeText = siteSettings.tiles?.bikeText || {
+          title: "バイクレンタル", 
+          subtitle: "原付から大型まで",
+          description: "多様なバイクを",
+          details: "お手頃価格で提供"
+        };
+        
         const defaultContent = {
           heroTitle: 'M\'s BASE Rental',
           heroSubtitle: '安心・安全・快適なレンタルサービス',
           carTile: {
-            title: '車',
-            description: 'ファミリー向けから\nビジネスまで幅広く対応',
+            title: carText.title,
+            description: `${carText.subtitle}\n${carText.description}\n${carText.details}`,
             features: ['最新モデル', '保険完備', '24時間サポート']
           },
           bikeTile: {
-            title: 'バイク',
-            description: '街乗りから\nツーリングまで対応',
+            title: bikeText.title,
+            description: `${bikeText.subtitle}\n${bikeText.description}\n${bikeText.details}`,
             features: ['ヘルメット付', '整備済み', 'ロードサービス']
           }
         };
@@ -224,6 +239,37 @@ function HomePage() {
       setContentLoaded(true);
     }
   };
+
+  // サイト設定の変更を監視してタイルテキストを更新
+  useEffect(() => {
+    const handleSiteSettingsUpdate = (event) => {
+      const updatedSettings = event.detail;
+      if (updatedSettings?.tiles) {
+        console.log('🔄 タイル設定が更新されました:', updatedSettings.tiles);
+        
+        // タイルテキストをリアルタイム更新
+        const carText = updatedSettings.tiles.carText || {};
+        const bikeText = updatedSettings.tiles.bikeText || {};
+        
+        setHomeContent(prevContent => ({
+          ...prevContent,
+          carTile: {
+            ...prevContent.carTile,
+            title: carText.title || prevContent.carTile.title,
+            description: `${carText.subtitle || ''}\n${carText.description || ''}\n${carText.details || ''}`.trim()
+          },
+          bikeTile: {
+            ...prevContent.bikeTile,
+            title: bikeText.title || prevContent.bikeTile.title,
+            description: `${bikeText.subtitle || ''}\n${bikeText.description || ''}\n${bikeText.details || ''}`.trim()
+          }
+        }));
+      }
+    };
+
+    window.addEventListener('siteSettingsUpdate', handleSiteSettingsUpdate);
+    return () => window.removeEventListener('siteSettingsUpdate', handleSiteSettingsUpdate);
+  }, []);
 
   const getBackgroundImages = () => {
     if (siteSettings?.hero?.backgroundImages?.length > 0 && !siteSettings.hero.useDefaultImages) {

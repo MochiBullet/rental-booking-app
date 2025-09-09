@@ -14,7 +14,19 @@ export const initialSiteSettings = {
   tiles: {
     carImage: null, // カスタム車タイル画像（Base64形式）
     bikeImage: null, // カスタムバイクタイル画像（Base64形式）
-    useDefaultImages: true // デフォルト画像を使用するか
+    useDefaultImages: true, // デフォルト画像を使用するか
+    carText: {
+      title: "車両レンタル",
+      subtitle: "ファミリー向けから",
+      description: "ビジネス用まで",
+      details: "幅広いラインナップ"
+    },
+    bikeText: {
+      title: "バイクレンタル", 
+      subtitle: "原付から大型まで",
+      description: "多様なバイクを",
+      details: "お手頃価格で提供"
+    }
   },
   googleForms: {
     enabled: true, // テスト用に有効化

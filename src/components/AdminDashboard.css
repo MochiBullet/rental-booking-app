@@ -2671,3 +2671,55 @@
   margin: 0;
   font-size: 1.1rem;
 }
+
+/* タイルテキスト編集セクション */
+.tile-text-section {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.tile-text-section h4 {
+  color: #2e7d32;
+  font-size: 1.1rem;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tile-text-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.tile-text-grid .form-group {
+  margin-bottom: 0;
+}
+
+.tile-text-grid .form-group label {
+  font-size: 0.9rem;
+  color: #555;
+  font-weight: 500;
+}
+
+.tile-text-grid .form-group input {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  transition: border-color 0.2s ease;
+}
+
+.tile-text-grid .form-group input:focus {
+  outline: none;
+  border-color: #43a047;
+  box-shadow: 0 0 0 2px rgba(67, 160, 71, 0.1);
+}
+
+.tile-text-grid .form-group input::placeholder {
+  color: #999;
+  font-style: italic;
+}
