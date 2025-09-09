@@ -186,21 +186,50 @@ function HomePage() {
       if (savedContent) {
         setHomeContent(JSON.parse(savedContent));
       } else {
-        // LocalStorageにない場合はデフォルト値を設定して保存
-        // サイト設定からタイルテキストを取得
-        const siteSettings = siteSettingsManager.getSettings();
-        const carText = siteSettings.tiles?.carText || {
-          title: "車両レンタル",
-          subtitle: "ファミリー向けから",
-          description: "ビジネス用まで",
-          details: "幅広いラインナップ"
-        };
-        const bikeText = siteSettings.tiles?.bikeText || {
-          title: "バイクレンタル", 
-          subtitle: "原付から大型まで",
-          description: "多様なバイクを",
-          details: "お手頃価格で提供"
-        };
+        // LocalStorageにない場合はDynamoDBから設定を取得してデフォルト値を設定
+        console.log('📝 LocalStorageにhomeContentがないため、DynamoDBから最新設定を取得中...');
+        
+        let carText, bikeText;
+        
+        try {
+          // DynamoDBから最新の設定を取得
+          const dynamoSettings = await siteSettingsAPI.getAllSettings();
+          const dbSiteSettings = dynamoSettings.siteSettings || {};
+          
+          console.log('🗃️ DynamoDBから取得した設定:', dbSiteSettings.tiles);
+          
+          carText = dbSiteSettings.tiles?.carText || {
+            title: "車両レンタル",
+            subtitle: "ファミリー向けから",
+            description: "ビジネス用まで", 
+            details: "幅広いラインナップ"
+          };
+          bikeText = dbSiteSettings.tiles?.bikeText || {
+            title: "バイクレンタル",
+            subtitle: "原付から大型まで",
+            description: "多様なバイクを",
+            details: "お手頃価格で提供"
+          };
+          
+          console.log('🚗 Car Text from DB:', carText);
+          console.log('🏍️ Bike Text from DB:', bikeText);
+        } catch (error) {
+          console.error('⚠️ DynamoDB取得エラー、LocalStorage設定を使用:', error);
+          // フォールバック: LocalStorage設定を使用
+          const siteSettings = siteSettingsManager.getSettings();
+          carText = siteSettings.tiles?.carText || {
+            title: "車両レンタル",
+            subtitle: "ファミリー向けから", 
+            description: "ビジネス用まで",
+            details: "幅広いラインナップ"
+          };
+          bikeText = siteSettings.tiles?.bikeText || {
+            title: "バイクレンタル",
+            subtitle: "原付から大型まで",
+            description: "多様なバイクを", 
+            details: "お手頃価格で提供"
+          };
+        }
         
         const defaultContent = {
           heroTitle: 'M\'s BASE Rental',
@@ -229,6 +258,38 @@ function HomePage() {
       if (dynamoSettings.siteSettings) {
         console.log('✅ Site settings loaded from DynamoDB');
         setSiteSettings(dynamoSettings.siteSettings);
+        
+        // タイルテキスト設定をDynamoDBの最新値で更新
+        if (dynamoSettings.siteSettings.tiles) {
+          console.log('🔄 DynamoDBからタイル設定を更新中:', dynamoSettings.siteSettings.tiles);
+          
+          const dbCarText = dynamoSettings.siteSettings.tiles.carText || {};
+          const dbBikeText = dynamoSettings.siteSettings.tiles.bikeText || {};
+          
+          setHomeContent(prevContent => {
+            if (!prevContent) return prevContent;
+            
+            const updatedContent = {
+              ...prevContent,
+              carTile: {
+                ...prevContent.carTile,
+                title: dbCarText.title || prevContent.carTile.title,
+                description: `${dbCarText.subtitle || ''}\n${dbCarText.description || ''}\n${dbCarText.details || ''}`.trim()
+              },
+              bikeTile: {
+                ...prevContent.bikeTile,
+                title: dbBikeText.title || prevContent.bikeTile.title,
+                description: `${dbBikeText.subtitle || ''}\n${dbBikeText.description || ''}\n${dbBikeText.details || ''}`.trim()
+              }
+            };
+            
+            // LocalStorageに保存
+            localStorage.setItem('homeContent', JSON.stringify(updatedContent));
+            console.log('🔄 DynamoDBタイル設定をhomeContentに反映完了');
+            
+            return updatedContent;
+          });
+        }
         
         // 連絡先情報も設定
         if (dynamoSettings.siteSettings.contact) {
