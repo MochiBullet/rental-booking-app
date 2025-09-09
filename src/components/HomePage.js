@@ -28,10 +28,10 @@ function HomePage() {
     'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=1920&q=80', // バイク
   ];
 
-  // デフォルトタイル画像
+  // デフォルトタイル画像（カード目いっぱいサイズ800x800px高品質）
   const defaultTileImages = {
-    car: 'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=600&q=80', // 美しい車
-    bike: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80' // スポーツバイク
+    car: 'https://images.unsplash.com/photo-1619362280288-fcd718c30cd1?w=800&h=800&fit=crop&crop=center&q=95', // モダンな黒い車
+    bike: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?w=800&h=800&fit=crop&crop=center&q=95' // かっこいいバイク
   };
 
   useEffect(() => {
