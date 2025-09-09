@@ -136,83 +136,6 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
     }));
   };
 
-  // タイル画像のアップロード処理（車用）
-  const handleCarTileUpload = (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    // ファイルサイズチェック（最大3MB）
-    if (file.size > 3 * 1024 * 1024) {
-      alert('ファイルサイズは3MB以下にしてください。');
-      return;
-    }
-
-    // 画像ファイルかチェック
-    if (!file.type.startsWith('image/')) {
-      alert('画像ファイルを選択してください。');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const base64Data = e.target.result;
-      updateTileSettings('carImage', base64Data);
-      updateTileSettings('useDefaultImages', false);
-      
-      // リアルタイム更新の実行
-      if (onSettingsUpdate) {
-        const updatedSettings = {
-          ...settings,
-          tiles: {
-            ...settings.tiles,
-            carImage: base64Data,
-            useDefaultImages: false
-          }
-        };
-        onSettingsUpdate(updatedSettings);
-      }
-    };
-    reader.readAsDataURL(file);
-  };
-
-  // タイル画像のアップロード処理（バイク用）
-  const handleBikeTileUpload = (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    // ファイルサイズチェック（最大3MB）
-    if (file.size > 3 * 1024 * 1024) {
-      alert('ファイルサイズは3MB以下にしてください。');
-      return;
-    }
-
-    // 画像ファイルかチェック
-    if (!file.type.startsWith('image/')) {
-      alert('画像ファイルを選択してください。');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const base64Data = e.target.result;
-      updateTileSettings('bikeImage', base64Data);
-      updateTileSettings('useDefaultImages', false);
-      
-      // リアルタイム更新の実行
-      if (onSettingsUpdate) {
-        const updatedSettings = {
-          ...settings,
-          tiles: {
-            ...settings.tiles,
-            bikeImage: base64Data,
-            useDefaultImages: false
-          }
-        };
-        onSettingsUpdate(updatedSettings);
-      }
-    };
-    reader.readAsDataURL(file);
-  };
 
   // タイル画像をデフォルトに戻す
   const resetTilesToDefault = () => {
@@ -252,56 +175,114 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
     }
 
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
       const base64Data = e.target.result;
       const imageKey = `${type}Image`;
-      updateTileSettings(imageKey, base64Data);
-      updateTileSettings('useDefaultImages', false);
       
-      // リアルタイム更新の実行
-      if (onSettingsUpdate) {
-        const updatedSettings = {
-          ...settings,
-          tiles: {
-            ...settings.tiles,
-            [imageKey]: base64Data,
-            useDefaultImages: false
-          }
-        };
-        onSettingsUpdate(updatedSettings);
+      const updatedSettings = {
+        ...settings,
+        tiles: {
+          ...settings.tiles,
+          [imageKey]: base64Data,
+          useDefaultImages: false
+        }
+      };
+
+      // 状態を更新
+      setSettings(updatedSettings);
+      
+      // DB（siteSettingsAPI）に保存
+      try {
+        await siteSettingsAPI.saveSetting('siteSettings', updatedSettings);
+        console.log(`✅ タイル${type}画像をDBに保存完了`);
+        
+        // LocalStorageにもバックアップ保存
+        siteSettingsManager.saveSettings(updatedSettings);
+        
+        // リアルタイム更新の実行
+        if (onSettingsUpdate) {
+          onSettingsUpdate(updatedSettings);
+        }
+        
+        // カスタムイベントでホームページに通知
+        window.dispatchEvent(new CustomEvent('siteSettingsUpdate', {
+          detail: updatedSettings
+        }));
+        
+        alert(`✅ ${type === 'car' ? '車' : 'バイク'}画像をアップロードしました`);
+        
+      } catch (error) {
+        console.error(`❌ タイル${type}画像のDB保存エラー:`, error);
+        
+        // エラー時もLocalStorageに保存
+        siteSettingsManager.saveSettings(updatedSettings);
+        
+        // リアルタイム更新は実行
+        if (onSettingsUpdate) {
+          onSettingsUpdate(updatedSettings);
+        }
+        
+        alert(`⚠️ ${type === 'car' ? '車' : 'バイク'}画像をアップロードしました（DB接続エラーのためローカル保存）`);
       }
     };
     reader.readAsDataURL(file);
   };
 
   // 個別タイル画像リセット
-  const resetTileImage = (type) => {
+  const resetTileImage = async (type) => {
     const imageKey = `${type}Image`;
-    updateTileSettings(imageKey, null);
-    
-    // 両方の画像がnullの場合のみデフォルトに戻す
     const otherImageKey = type === 'car' ? 'bikeImage' : 'carImage';
-    if (!settings.tiles?.[otherImageKey]) {
-      updateTileSettings('useDefaultImages', true);
+    
+    const updatedTiles = {
+      ...settings.tiles,
+      [imageKey]: null
+    };
+    
+    // 両方の画像がnullの場合のみデフォルトフラグを設定
+    if (!updatedTiles.carImage && !updatedTiles.bikeImage) {
+      updatedTiles.useDefaultImages = true;
     }
     
-    // リアルタイム更新の実行
-    if (onSettingsUpdate) {
-      const updatedTiles = {
-        ...settings.tiles,
-        [imageKey]: null
-      };
+    const updatedSettings = {
+      ...settings,
+      tiles: updatedTiles
+    };
+
+    // 状態を更新
+    setSettings(updatedSettings);
+    
+    // DB（siteSettingsAPI）に保存
+    try {
+      await siteSettingsAPI.saveSetting('siteSettings', updatedSettings);
+      console.log(`✅ タイル${type}画像リセットをDBに保存完了`);
       
-      // 両方の画像がnullの場合のみデフォルトフラグを設定
-      if (!updatedTiles.carImage && !updatedTiles.bikeImage) {
-        updatedTiles.useDefaultImages = true;
+      // LocalStorageにもバックアップ保存
+      siteSettingsManager.saveSettings(updatedSettings);
+      
+      // リアルタイム更新の実行
+      if (onSettingsUpdate) {
+        onSettingsUpdate(updatedSettings);
       }
       
-      const updatedSettings = {
-        ...settings,
-        tiles: updatedTiles
-      };
-      onSettingsUpdate(updatedSettings);
+      // カスタムイベントでホームページに通知
+      window.dispatchEvent(new CustomEvent('siteSettingsUpdate', {
+        detail: updatedSettings
+      }));
+      
+      alert(`✅ ${type === 'car' ? '車' : 'バイク'}画像をリセットしました`);
+      
+    } catch (error) {
+      console.error(`❌ タイル${type}画像リセットのDB保存エラー:`, error);
+      
+      // エラー時もLocalStorageに保存
+      siteSettingsManager.saveSettings(updatedSettings);
+      
+      // リアルタイム更新は実行
+      if (onSettingsUpdate) {
+        onSettingsUpdate(updatedSettings);
+      }
+      
+      alert(`⚠️ ${type === 'car' ? '車' : 'バイク'}画像をリセットしました（DB接続エラーのためローカル保存）`);
     }
   };
 
