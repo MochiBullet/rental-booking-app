@@ -55,7 +55,7 @@ const RentalTerms = () => {
           ))}
         </div>
         <div className="last-updated">
-          最終更新日: 2024年12月1日
+          最終更新日: {rentalTerms.lastUpdated || '2024年12月1日'}
         </div>
       </div>
     </div>

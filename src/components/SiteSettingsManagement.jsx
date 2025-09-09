@@ -739,6 +739,15 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
                 className="terms-textarea"
               />
             </div>
+            <div className="form-group">
+              <label>最終更新日</label>
+              <input
+                type="text"
+                value={settings.terms?.lastUpdated || ''}
+                onChange={(e) => updateTermsSettings('terms', 'lastUpdated', e.target.value)}
+                placeholder="2024年12月1日"
+              />
+            </div>
           </div>
         )}
 
@@ -871,6 +880,15 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
                 className="terms-textarea"
               />
             </div>
+            <div className="form-group">
+              <label>最終更新日</label>
+              <input
+                type="text"
+                value={settings.privacy?.lastUpdated || ''}
+                onChange={(e) => updateTermsSettings('privacy', 'lastUpdated', e.target.value)}
+                placeholder="2024年12月1日"
+              />
+            </div>
           </div>
         )}
 
@@ -894,6 +912,15 @@ const SiteSettingsManagement = ({ onSettingsUpdate }) => {
                 placeholder="レンタカー約款の内容を入力してください..."
                 rows={15}
                 className="terms-textarea"
+              />
+            </div>
+            <div className="form-group">
+              <label>最終更新日</label>
+              <input
+                type="text"
+                value={settings.rentalTerms?.lastUpdated || ''}
+                onChange={(e) => updateTermsSettings('rentalTerms', 'lastUpdated', e.target.value)}
+                placeholder="2024年12月1日"
               />
             </div>
           </div>
