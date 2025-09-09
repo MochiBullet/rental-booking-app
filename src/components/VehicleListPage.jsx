@@ -14,7 +14,7 @@ const VehicleListPage = ({ user }) => {
   const [error, setError] = useState(null);
   const [pageContent, setPageContent] = useState({
     carTitle: '車のレンタル',
-    carDescription: 'ファミリー向けからビジネスまで、幅広い用途に対応した車両をご用意しています。',
+    carDescription: 'ファミリー向けからビジネスまで',
     bikeTitle: 'バイクのレンタル', 
     bikeDescription: 'スクーターから大型バイクまで、あなたの目的に合ったバイクを見つけてください。'
   });
@@ -71,8 +71,8 @@ const VehicleListPage = ({ user }) => {
           const newPageContent = {
             carTitle: carText.title || '車のレンタル',
             carDescription: carText.subtitle && carText.description ? 
-              `${carText.subtitle}${carText.description}、幅広い用途に対応した車両をご用意しています。` :
-              'ファミリー向けからビジネスまで、幅広い用途に対応した車両をご用意しています。',
+              `${carText.subtitle}${carText.description}` :
+              'ファミリー向けからビジネスまで',
             bikeTitle: bikeText.title || 'バイクのレンタル',
             bikeDescription: bikeText.subtitle && bikeText.description ?
               `${bikeText.subtitle}${bikeText.description}、あなたの目的に合ったバイクを見つけてください。` :
@@ -104,8 +104,8 @@ const VehicleListPage = ({ user }) => {
         const newPageContent = {
           carTitle: carText.title || '車のレンタル',
           carDescription: carText.subtitle && carText.description ? 
-            `${carText.subtitle}${carText.description}、幅広い用途に対応した車両をご用意しています。` :
-            'ファミリー向けからビジネスまで、幅広い用途に対応した車両をご用意しています。',
+            `${carText.subtitle}${carText.description}` :
+            'ファミリー向けからビジネスまで',
           bikeTitle: bikeText.title || 'バイクのレンタル',
           bikeDescription: bikeText.subtitle && bikeText.description ?
             `${bikeText.subtitle}${bikeText.description}、あなたの目的に合ったバイクを見つけてください。` :

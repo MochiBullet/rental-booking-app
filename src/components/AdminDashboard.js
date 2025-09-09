@@ -931,7 +931,14 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
             onClick={() => setActiveSection('tile-edit')}
           >
             <span className="nav-icon">🎨</span>
-            タイル編集
+            カード編集
+          </button>
+          <button 
+            className={activeSection === 'page-edit' ? 'active' : ''}
+            onClick={() => setActiveSection('page-edit')}
+          >
+            <span className="nav-icon">📄</span>
+            カード内ページ編集
           </button>
           <button 
             className={activeSection === 'contact' ? 'active' : ''}
@@ -973,7 +980,8 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
           <h1>
             {activeSection === 'vehicles' && '🚗 車両管理'}
             {activeSection === 'announcements' && '📢 お知らせ管理'}
-            {activeSection === 'tile-edit' && '🎨 タイル編集'}
+            {activeSection === 'tile-edit' && '🎨 カード編集'}
+            {activeSection === 'page-edit' && '📄 カード内ページ編集'}
             {activeSection === 'contact' && '📞 連絡先情報設定'}
             {activeSection === 'terms' && '📋 利用規約設定'}
             {activeSection === 'privacy' && '🔒 プライバシーポリシー設定'}
@@ -1348,6 +1356,58 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
           
           {activeSection === 'tile-edit' && (
             <SiteSettingsManagement onSettingsUpdate={onSettingsUpdate} activeSection="tile-edit" />
+          )}
+          
+          {activeSection === 'page-edit' && (
+            <div className="page-edit-section">
+              <div className="section-header">
+                <h2>📄 カード内ページ編集</h2>
+                <p>車両リストページのヘッダー情報を編集できます</p>
+              </div>
+              
+              <div className="page-content-form">
+                <h3>🚗 車両リストページ</h3>
+                <div className="form-group">
+                  <label>タイトル</label>
+                  <input
+                    type="text"
+                    placeholder="車のレンタル"
+                    className="page-input"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>説明文</label>
+                  <textarea
+                    placeholder="ファミリー向けからビジネスまで"
+                    className="page-textarea"
+                    rows="3"
+                  />
+                </div>
+                
+                <h3>🏍️ バイクリストページ</h3>
+                <div className="form-group">
+                  <label>タイトル</label>
+                  <input
+                    type="text"
+                    placeholder="バイクのレンタル"
+                    className="page-input"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>説明文</label>
+                  <textarea
+                    placeholder="スクーターから大型バイクまで、あなたの目的に合ったバイクを見つけてください。"
+                    className="page-textarea"
+                    rows="3"
+                  />
+                </div>
+                
+                <div className="form-actions">
+                  <button className="save-btn">💾 変更を保存</button>
+                  <button className="preview-btn">👁️ プレビュー</button>
+                </div>
+              </div>
+            </div>
           )}
           
           {activeSection === 'contact' && (
