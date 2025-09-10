@@ -190,15 +190,31 @@ function HomePage() {
     try {
       console.log('🔄 DB優先ホームページデータ読み込み開始...');
       
-      // DB から設定読み込み（最優先）
-      try {
-        const dynamoSettings = await siteSettingsAPI.getAllSettings();
-        console.log('📊 DB設定取得:', dynamoSettings);
+      // 並列でDB設定と車両データを取得
+      const [dynamoSettings, vehicleData] = await Promise.all([
+        siteSettingsAPI.getAllSettings(),
+        fetch(`${process.env.REACT_APP_API_BASE_URL || 'https://kgkjjv0rik.execute-api.ap-southeast-2.amazonaws.com/prod'}/vehicles`)
+          .then(res => res.json())
+          .catch(err => {
+            console.error('⚠️ 車両データ取得失敗:', err);
+            return { vehicles: [] };
+          })
+      ]);
+      
+      console.log('📊 DB設定取得:', dynamoSettings);
+      console.log('🚗 車両データ取得:', vehicleData?.vehicles?.length || 0, '台');
+      
+      const dbSiteSettings = dynamoSettings.siteSettings || dynamoSettings;
+      setSiteSettings(dbSiteSettings);
+      
+      // 車両データから統計を生成
+      const vehicles = vehicleData?.vehicles || [];
+      const carCount = vehicles.filter(v => v.vehicleType === 'car').length;
+      const bikeCount = vehicles.filter(v => v.vehicleType === 'motorcycle' || v.vehicleType === 'bike').length;
+      
+      console.log(`🚗 車両統計: 車${carCount}台、バイク${bikeCount}台`);
         
-        const dbSiteSettings = dynamoSettings.siteSettings || dynamoSettings;
-        setSiteSettings(dbSiteSettings);
-        
-        // homeContentの生成
+        // homeContentの生成（車両データベース連携）
         const carText = dbSiteSettings.tiles?.carText || {
           title: "車",
           subtitle: "",
@@ -212,19 +228,32 @@ function HomePage() {
           details: "お手頃価格で提供"
         };
         
+        // 車両データベースから動的な説明文を生成（DB連携強化版）
+        const generateVehicleDescription = (type, count, customText) => {
+          // 常にDB車両数を使用した動的説明文を生成（カスタムテキスト無視）
+          if (count === 0) {
+            return `現在準備中です\nしばらくお待ちください`;
+          } else {
+            return type === 'car' 
+              ? `豊富な${count}台の車両\n最新モデルから軽自動車まで\nお客様のニーズに合わせて`
+              : `${count}台のバイクをご用意\n原付から大型まで対応\n手軽で便利な移動手段`;
+          }
+        };
         
         const homeContent = {
           heroTitle: dbSiteSettings.hero?.title || 'M\'s BASE Rental',
           heroSubtitle: dbSiteSettings.hero?.subtitle || '安心・安全・快適なレンタルサービス',
           carTile: {
             title: carText.shortTitle || carText.title || '車',
-            description: `${carText.subtitle || ''}\n${carText.description || ''}\n${carText.details || ''}`.trim(),
-            features: carText.features || ['最新モデル', '保険完備', '24時間サポート']
+            description: generateVehicleDescription('car', carCount, carText),
+            features: [`${carCount}台の車両`, '保険完備', '24時間サポート'],
+            vehicleCount: carCount
           },
           bikeTile: {
             title: bikeText.shortTitle || bikeText.title || 'バイク',
-            description: `${bikeText.subtitle || ''}\n${bikeText.description || ''}\n${bikeText.details || ''}`.trim(),
-            features: bikeText.features || ['ヘルメット付', '整備済み', 'ロードサービス']
+            description: generateVehicleDescription('bike', bikeCount, bikeText),
+            features: [`${bikeCount}台のバイク`, 'ヘルメット付', 'ロードサービス'],
+            vehicleCount: bikeCount
           }
         };
         
@@ -235,23 +264,18 @@ function HomePage() {
         localStorage.setItem('homeContent', JSON.stringify(homeContent));
         console.log('✅ DB設定からhomeContent生成完了');
         
-      } catch (dbError) {
-        console.error('❌ DB読み込みエラー - LocalStorageフォールバック:', dbError);
-        
-        // LocalStorageフォールバック
-        const savedContent = localStorage.getItem('homeContent');
-        if (savedContent) {
-          setHomeContent(JSON.parse(savedContent));
-        }
-        
-        const localSettings = siteSettingsManager.getSettings();
-        setSiteSettings(localSettings);
-        setContactInfo(localSettings.contact || {});
+    } catch (error) {
+      console.error('❌ DB読み込みエラー - LocalStorageフォールバック:', error);
+      
+      // LocalStorageフォールバック
+      const savedContent = localStorage.getItem('homeContent');
+      if (savedContent) {
+        setHomeContent(JSON.parse(savedContent));
       }
       
-    } catch (error) {
-      console.error('❌ Failed to load data from DynamoDB:', error);
-      // エラーの場合もLocalStorageのデータを使用（既に設定済み）
+      const localSettings = siteSettingsManager.getSettings();
+      setSiteSettings(localSettings);
+      setContactInfo(localSettings.contact || {});
     } finally {
       setContentLoaded(true);
     }
