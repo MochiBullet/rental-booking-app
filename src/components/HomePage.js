@@ -47,7 +47,16 @@ function HomePage() {
     initializeHomePage();
 
     // カスタムイベントリスナーを追加（管理者画面からの更新を受け取る）
-    const handleSettingsUpdate = () => {
+    const handleSettingsUpdate = (event) => {
+      console.log('📡 HomePage: siteSettingsUpdate イベント受信', event.detail);
+      
+      // 即座に設定を更新
+      if (event.detail) {
+        setSiteSettings(event.detail);
+        console.log('🔄 HomePage: サイト設定即座更新完了');
+      }
+      
+      // ホームページデータも再読み込み
       loadHomePageData();
     };
     

@@ -269,7 +269,7 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
         const response = await siteSettingsAPI.saveSetting('siteSettings', updatedSettings);
         console.log(`✅ DB保存成功: ${type}Image (${sizeKB}KB)`, response);
         
-        // 成功後の処理
+        // 成功後の処理 - 即座に画面更新
         setSettings(updatedSettings);
         siteSettingsManager.saveSettings(updatedSettings); // バックアップ
         
@@ -283,7 +283,21 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
           detail: updatedSettings
         }));
         
-        alert(`✅ ${type === 'car' ? '車' : 'バイク'}のタイル画像をDBに保存しました！\n\n保存完了: ${sizeKB}KB`);
+        // 強制再レンダー（確実な表示更新）
+        setForceRender(Date.now());
+        
+        // 管理画面プレビューを即座更新
+        setTimeout(() => {
+          const previewImages = document.querySelectorAll('.tile-preview img');
+          previewImages.forEach(img => {
+            if (img.alt.includes(type === 'car' ? 'カスタム車画像' : 'カスタムバイク画像')) {
+              img.src = compressedDataURL;
+              console.log(`🖼️ プレビュー画像更新: ${type}`);
+            }
+          });
+        }, 100);
+        
+        alert(`✅ ${type === 'car' ? '車' : 'バイク'}のタイル画像をDBに保存しました！\n\n保存完了: ${sizeKB}KB\n\n🔄 プレビューを即座更新中...`);
         
         // 保存後にDB確認
         setTimeout(async () => {
@@ -787,6 +801,7 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
                     <div className="tile-preview">
                       {!settings.tiles?.useDefaultImages && settings.tiles?.carImage ? (
                         <img 
+                          key={`car-${forceRender}-${settings.tiles.carImage?.slice(-20)}`}
                           src={settings.tiles.carImage} 
                           alt="カスタム車画像"
                           style={{ 
@@ -798,6 +813,7 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
                         />
                       ) : (
                         <div 
+                          key={`car-default-${forceRender}`}
                           style={{ 
                             width: '200px', 
                             height: '150px',
@@ -820,6 +836,7 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
                     <div className="tile-preview">
                       {!settings.tiles?.useDefaultImages && settings.tiles?.bikeImage ? (
                         <img 
+                          key={`bike-${forceRender}-${settings.tiles.bikeImage?.slice(-20)}`}
                           src={settings.tiles.bikeImage} 
                           alt="カスタムバイク画像"
                           style={{ 
@@ -831,6 +848,7 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
                         />
                       ) : (
                         <div 
+                          key={`bike-default-${forceRender}`}
                           style={{ 
                             width: '200px', 
                             height: '150px',
