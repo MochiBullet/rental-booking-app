@@ -843,10 +843,37 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
                     border: 'none', 
                     borderRadius: '5px',
                     cursor: 'pointer',
-                    fontWeight: 'bold'
+                    fontWeight: 'bold',
+                    marginRight: '10px'
                   }}
                 >
                   🔧 データベース初期化
+                </button>
+                
+                <button 
+                  onClick={async () => {
+                    if (window.confirm('不要なcampSpaceSettingsを削除しますか？')) {
+                      try {
+                        await siteSettingsAPI.deleteSetting('campSpaceSettings');
+                        alert('✅ campSpaceSettings削除完了！ページをリロードして確認してください。');
+                        window.location.reload();
+                      } catch (error) {
+                        console.error('削除エラー:', error);
+                        alert('❌ 削除に失敗しました: ' + error.message);
+                      }
+                    }
+                  }}
+                  style={{ 
+                    padding: '10px 20px', 
+                    backgroundColor: '#ff8800', 
+                    color: 'white', 
+                    border: 'none', 
+                    borderRadius: '5px',
+                    cursor: 'pointer',
+                    fontWeight: 'bold'
+                  }}
+                >
+                  🗑️ campSpaceSettings削除
                 </button>
               </div>
             </div>
