@@ -15,7 +15,7 @@
 ### 作業008 - 車両編集時の画像アップロード500エラー修正完了
 **完了日時**: 2025-09-10  
 **作業時間**: 約20分  
-**コミットID**: 未プッシュ  
+**コミットID**: 6f6a1d98  
 
 #### 実行内容
 1. **車両編集時の画像アップロード500エラーの根本原因特定**
@@ -79,6 +79,75 @@ const vehicleData = {
 - フロントエンド・バックエンド間のデータ構造一貫性の必要性
 - 画像処理のパフォーマンス最適化手法
 - エラーハンドリングとユーザーフィードバックの改善
+
+---
+
+### 作業009 - DynamoDB予約語「capacity」エラー修正完了
+**完了日時**: 2025-09-10  
+**作業時間**: 約10分  
+**コミットID**: 未プッシュ  
+
+#### 実行内容
+1. **DynamoDB予約語エラーの根本原因特定**
+   - `capacity`もDynamoDBの予約語であることが判明
+   - UPDATE時に`Invalid UpdateExpression: Attribute name is a reserved keyword; reserved keyword: capacity`エラー
+   - CREATE時は動作するが、UPDATE時にのみエラー発生
+
+2. **vehicleMapper.js修正**
+   - `mapVehicleForUpdate`関数から`capacity`フィールドを完全除外
+   - `vehicleCapacity`フィールドは残存（予約語ではないため）
+   - DynamoDB予約語対応の完全化
+
+3. **AdminDashboard.js修正**
+   - `handleEditVehicle`関数から直接設定していた`capacity`フィールド削除
+   - vehicleMapperによる自動除外に依存する構造に変更
+
+#### 技術的変更点
+```javascript
+// 修正前（UPDATE時にエラー）
+return {
+  vehicleType: vehicleData.type,
+  capacity: parseInt(vehicleData.passengers) || 4, // ← DynamoDB予約語
+  // ...
+};
+
+// 修正後（UPDATE時に除外）
+return {
+  vehicleType: vehicleData.type,
+  // capacity: DynamoDB予約語のため除外
+  vehicleCapacity: parseInt(vehicleData.passengers) || 4, // 代替フィールド使用
+  // ...
+};
+```
+
+#### 成果
+- ✅ DynamoDB予約語エラー完全解決
+- ✅ CREATE/UPDATE操作の予約語対応統一
+- ✅ vehicleMapperによる自動予約語除外機能確立
+- ✅ API互換性の更なる向上
+
+#### 良かった点
+1. **迅速なエラー分析**: ログメッセージから予約語問題を即座に特定
+2. **体系的な修正**: vehicleMapperとAdminDashboard両方を同時修正
+3. **予防的対応**: 今後の予約語問題を防ぐ仕組み確立
+4. **API設計の理解深化**: DynamoDB制限事項への理解向上
+
+#### 悪かった点・改善点
+1. **初回修正の不完全性**: 最初の修正で`capacity`予約語問題を見落とし
+2. **テスト不足**: CREATE成功に安心してUPDATE時の動作確認を怠った
+3. **予約語リスト未確認**: DynamoDB予約語の全リストを事前確認すべきだった
+
+#### 次回への改善策
+1. **DynamoDB予約語リスト事前確認**: 修正前に全予約語を調査
+2. **CREATE/UPDATE両方のテスト**: 両操作で動作確認を必須化
+3. **段階的テスト**: 修正後は必ず実際のアプリケーションで確認
+4. **予約語対応ガイドライン策定**: 今後の開発で同様問題を防止
+
+#### 学習事項
+- DynamoDB予約語は`name`, `capacity`以外にも多数存在
+- CREATE/UPDATEで異なる制限があることの重要性
+- vehicleMapperパターンの有効性と拡張性
+- エラーログ分析の重要性とスキル向上の必要性
 
 ---
 

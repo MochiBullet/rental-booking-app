@@ -34,15 +34,15 @@ export const mapVehicleForCreate = (vehicleData) => {
   };
 };
 
-// 車両データのAPI変換ヘルパー - UPDATE用（name除外）
+// 車両データのAPI変換ヘルパー - UPDATE用（DynamoDB予約語除外）
 export const mapVehicleForUpdate = (vehicleData) => {
   console.log('🔄 車両データをUPDATE API形式に変換中（DynamoDB予約語除外）...', vehicleData);
   
   return {
-    // UPDATE時は予約語「name」を除外
+    // UPDATE時は予約語「name」「capacity」を除外
     vehicleType: vehicleData.type || vehicleData.vehicleType,
     pricePerHour: parseFloat(vehicleData.pricePerHour || Math.round((vehicleData.price || vehicleData.pricePerDay || 0) / 8)),
-    capacity: parseInt(vehicleData.specifications?.seats || vehicleData.passengers || 4),
+    // capacity: DynamoDB予約語のため除外
     
     // オプションフィールド（nameは除外）
     vehicleName: vehicleData.name, // こちらは予約語ではない

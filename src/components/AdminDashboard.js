@@ -656,18 +656,14 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
     }
     
     try {
-      // 新規登録と全く同じ形式でデータを構築
+      // vehicleMapperを使用してUPDATE用のデータを構築（DynamoDB予約語を自動除外）
       const vehicleData = {
         name: selectedVehicle.name,
         type: selectedVehicle.type,
-        vehicleType: selectedVehicle.type, // APIが期待するフィールド名
         price: parseFloat(selectedVehicle.price),
-        pricePerDay: parseFloat(selectedVehicle.price), // APIが期待するフィールド名
         pricePerHour: parseFloat(selectedVehicle.pricePerHour || Math.round(selectedVehicle.price / 8)),
         passengers: parseInt(selectedVehicle.passengers) || 4,
-        capacity: parseInt(selectedVehicle.passengers) || 4, // APIが期待するフィールド名（重要！）
         available: selectedVehicle.available,
-        isAvailable: selectedVehicle.available, // APIが期待するフィールド名
         features: selectedVehicle.features ? 
           (Array.isArray(selectedVehicle.features) ? selectedVehicle.features : selectedVehicle.features.split(',').map(f => f.trim())) : [],
         specifications: {
@@ -676,6 +672,7 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
           fuelType: selectedVehicle.fuelType || 'ガソリン',
           cc: selectedVehicle.engineSize || 1500
         }
+        // 注意: capacityはDynamoDB予約語のため、vehicleMapperでUPDATE時は自動除外される
       };
 
       // 画像データがある場合は追加（新規登録と同じ処理）
