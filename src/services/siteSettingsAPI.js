@@ -95,9 +95,24 @@ class SiteSettingsAPI {
       const data = await response.json();
       console.log(`📊 個別設定応答 ${settingKey}:`, data);
       
-      // settingValueを返す
-      const result = data.settingValue;
-      console.log(`📋 個別設定結果 ${settingKey}:`, result);
+      // 複数の応答形式に対応
+      let result;
+      if (data.settingValue !== undefined) {
+        result = data.settingValue;
+        console.log(`📋 settingValue形式で取得: ${settingKey}`, result);
+      } else if (data.siteSettings && settingKey === 'tiles') {
+        // tilesの場合、siteSettingsの中を検索
+        result = data.siteSettings.tiles || data.siteSettings;
+        console.log(`📋 siteSettings.tiles形式で取得: ${settingKey}`, result);
+      } else if (data[settingKey]) {
+        result = data[settingKey];
+        console.log(`📋 直接キー形式で取得: ${settingKey}`, result);
+      } else {
+        result = data;
+        console.log(`📋 直接データとして取得: ${settingKey}`, result);
+      }
+      
+      console.log(`📋 個別設定最終結果 ${settingKey}:`, result);
       return result;
     } catch (error) {
       console.error(`❌ Failed to fetch setting ${settingKey}:`, error);
