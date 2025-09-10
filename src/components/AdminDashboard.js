@@ -1294,6 +1294,26 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
                           {vehicle.available ? 'Available' : 'Unavailable'}
                         </span>
                       </div>
+                      {/* 車両画像表示 */}
+                      {(vehicle.image || vehicle.images?.[0] || vehicle.vehicleImages?.[0]) && (
+                        <div className="vehicle-admin-image" style={{
+                          width: '100%',
+                          height: '150px',
+                          overflow: 'hidden',
+                          borderRadius: '8px',
+                          marginBottom: '10px'
+                        }}>
+                          <img 
+                            src={vehicle.image || vehicle.images?.[0] || vehicle.vehicleImages?.[0]}
+                            alt={vehicle.name}
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'cover'
+                            }}
+                          />
+                        </div>
+                      )}
                       <div className="vehicle-admin-details">
                         <p><strong>Type:</strong> {vehicle.type}</p>
                         <p><strong>Price:</strong> {formatCurrency(vehicle.price)}/day</p>
@@ -2124,7 +2144,7 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
                 onChange={(e) => setNewVehicle({...newVehicle, type: e.target.value})}
               >
                 <option value="car">Car</option>
-                <option value="bike">Bike</option>
+                <option value="motorcycle">Motorcycle</option>
               </select>
             </div>
             <div className="form-group">
@@ -2236,7 +2256,7 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
                 onChange={(e) => setSelectedVehicle({...selectedVehicle, type: e.target.value})}
               >
                 <option value="car">Car</option>
-                <option value="bike">Bike</option>
+                <option value="motorcycle">Motorcycle</option>
               </select>
             </div>
             <div className="form-group">

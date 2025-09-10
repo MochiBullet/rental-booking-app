@@ -280,18 +280,29 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
             <div className="vehicle-image-container">
               <img 
                 src={(() => {
-                  // Debug: ログ出力で画像データ構造を確認
+                  // Debug: ログ出力で画像データ構造を確認（車とバイクの違いを確認）
                   console.log('🔍 Debug vehicle image data:', {
                     name: vehicle.name,
+                    type: vehicle.type,
+                    vehicleType: vehicle.vehicleType,
                     image: vehicle.image,
                     images: vehicle.images,
-                    vehicleImages: vehicle.vehicleImages
+                    vehicleImages: vehicle.vehicleImages,
+                    isBike: vehicle.type === 'bike' || vehicle.type === 'motorcycle' || vehicle.vehicleType === 'bike' || vehicle.vehicleType === 'motorcycle'
                   });
                   
                   // 画像の優先順位を修正: vehicleImages/images配列を優先
                   const uploadedImage = (vehicle.vehicleImages && vehicle.vehicleImages[0]) || 
                                        (vehicle.images && vehicle.images[0]) || 
                                        vehicle.image;
+                  
+                  // バイクの場合の特別処理
+                  const isBike = vehicle.type === 'bike' || vehicle.type === 'motorcycle' || 
+                                vehicle.vehicleType === 'bike' || vehicle.vehicleType === 'motorcycle';
+                  
+                  if (isBike && uploadedImage) {
+                    console.log('🏍️ バイク画像検出:', vehicle.name, uploadedImage.substring(0, 100));
+                  }
                                        
                   const imageUrl = uploadedImage || vehicleImages[vehicle.name] || vehicleImages['Default'];
                   // Allow data: URLs for SVG, but filter out via.placeholder.com and other problematic URLs
@@ -305,7 +316,7 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
                 className="vehicle-image"
                 loading="lazy"
               />
-              <span className="vehicle-badge">{(vehicle.type === 'car' || vehicle.vehicleType === 'car') ? '車' : (vehicle.type === 'motorcycle' || vehicle.vehicleType === 'motorcycle') ? 'バイク' : vehicle.type || vehicle.vehicleType}</span>
+              <span className="vehicle-badge">{(vehicle.type === 'car' || vehicle.vehicleType === 'car') ? '車' : (vehicle.type === 'bike' || vehicle.type === 'motorcycle' || vehicle.vehicleType === 'bike' || vehicle.vehicleType === 'motorcycle') ? 'バイク' : vehicle.type || vehicle.vehicleType}</span>
               {/* Vehicle Status Display - Enhanced for Info Site Mode */}
               {vehicle.available || vehicle.isAvailable ? (
                 <span className="status-badge available">利用可能</span>
