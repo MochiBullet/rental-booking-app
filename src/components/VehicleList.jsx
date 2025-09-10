@@ -10,8 +10,8 @@ const VehicleList = ({ vehicles = [], onVehicleSelect, initialFilter = 'all', hi
 
   // 初期フィルターに基づいて車両をフィルタリング
   const filteredVehicles = safeVehicles.filter(vehicle => {
-    if (initialFilter === 'car') return vehicle.category === 'car';
-    if (initialFilter === 'motorcycle') return vehicle.category === 'motorcycle';
+    if (initialFilter === 'car') return vehicle.vehicleType === 'car';
+    if (initialFilter === 'motorcycle') return vehicle.vehicleType === 'bike';
     if (filterType === 'all') return true;
     return vehicle.vehicleType === filterType;
   });
