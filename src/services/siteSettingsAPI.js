@@ -27,12 +27,20 @@ class SiteSettingsAPI {
       const { initialSiteSettings } = await import('../data/siteSettings.js');
       let combinedSettings = { ...initialSiteSettings };
       
-      // siteSettingsがあるが、campSpaceSettingsが含まれている場合は無視
+      // siteSettingsがあるが、campSpaceSettingsが含まれている場合は除外してマージ
       if (data.siteSettings) {
         if (data.siteSettings.campSpaceSettings) {
-          console.log('🗑️ campSpaceSettings検出 - 完全無視してCommit 512a7b3構造を使用');
-          // campSpaceSettingsが含まれている場合は初期設定を使用
-          combinedSettings = { ...initialSiteSettings };
+          console.log('🗑️ campSpaceSettings検出 - 除去してクリーンデータをマージ');
+          
+          // campSpaceSettingsを除いた他のデータをマージ
+          const cleanSiteSettings = { ...data.siteSettings };
+          delete cleanSiteSettings.campSpaceSettings;
+          
+          combinedSettings = {
+            ...initialSiteSettings,
+            ...cleanSiteSettings
+          };
+          console.log('📋 クリーンなsiteSettings使用:', Object.keys(cleanSiteSettings));
         } else {
           // 正常なsiteSettingsのみをマージ
           combinedSettings = {
@@ -43,26 +51,9 @@ class SiteSettingsAPI {
         }
       }
       
-      // タイル設定を個別取得または初期設定を使用
-      if (data.tiles) {
-        combinedSettings.tiles = data.tiles;
-        console.log('🎨 DB tiles設定使用:', Object.keys(data.tiles));
-      } else {
-        // tilesが直接レスポンスに含まれていない場合は個別取得を試行
-        try {
-          const tilesData = await this.getSetting('tiles');
-          console.log('🔍 tiles個別取得レスポンス:', tilesData);
-          
-          if (tilesData && Object.keys(tilesData).length > 0) {
-            combinedSettings.tiles = tilesData;
-            console.log('🔄 tiles個別取得成功:', Object.keys(tilesData));
-          } else {
-            console.log('⚠️ tilesデータが空または存在しない - 初期設定使用');
-          }
-        } catch (tilesError) {
-          console.log('⚠️ tiles個別取得失敗:', tilesError.message);
-        }
-      }
+      // タイル設定は初期設定を使用（過去の成功実装では個別取得不要だった）
+      // siteSettingsに全て含まれているため、追加取得は不要
+      console.log('🎨 初期tiles設定使用 - siteSettingsから全データ取得済み');
       
       console.log('✅ Commit 512a7b3構造で統合完了:', Object.keys(combinedSettings));
       console.log('🎨 タイル設定詳細:', combinedSettings.tiles);

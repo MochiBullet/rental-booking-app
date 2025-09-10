@@ -290,8 +290,8 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
       console.log(`🔄 DB保存開始: ${type}Image`);
       
       try {
-        // DB保存 - tilesキーで個別保存
-        const response = await siteSettingsAPI.saveSetting('tiles', updatedSettings.tiles);
+        // DB保存 - 過去の成功実装に戻す（siteSettingsキーで全体保存）
+        const response = await siteSettingsAPI.saveSetting('siteSettings', updatedSettings);
         console.log(`✅ DB保存成功: ${type}Image (${sizeKB}KB)`, response);
         
         // 成功後の処理 - 即座に画面更新
