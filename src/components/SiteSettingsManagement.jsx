@@ -253,6 +253,9 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
       
       // 設定オブジェクト作成
       const imageKey = `${type}Image`;
+      console.log(`🔑 保存キー: "${imageKey}"`);
+      console.log(`📊 現在のsettings.tiles:`, settings.tiles);
+      
       const updatedSettings = {
         ...settings,
         tiles: {
@@ -261,6 +264,14 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
           useDefaultImages: false
         }
       };
+      
+      console.log(`💾 保存予定データ:`, {
+        imageKey,
+        hasImage: !!compressedDataURL,
+        imageSize: compressedDataURL.length,
+        useDefaultImages: updatedSettings.tiles.useDefaultImages,
+        tilesKeys: Object.keys(updatedSettings.tiles)
+      });
 
       console.log(`🔄 DB保存開始: ${type}Image`);
       

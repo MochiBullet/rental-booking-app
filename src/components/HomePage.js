@@ -335,27 +335,45 @@ function HomePage() {
     return [...images, ...images]; // 画像を2回繰り返す
   };
 
-  // 完璧なDB管理タイル画像取得関数
+  // デバッグ強化タイル画像取得関数
   const getTileImage = (type) => {
     try {
+      console.log(`🔍 ${type}タイル画像取得開始`);
+      console.log('📊 現在のsiteSettings:', siteSettings);
+      
       // 1. 状態（DBから読み込んだデータ）を最優先
-      if (siteSettings?.tiles && !siteSettings.tiles.useDefaultImages) {
-        const imageKey = `${type}Image`;
-        if (siteSettings.tiles[imageKey]) {
-          return siteSettings.tiles[imageKey];
+      if (siteSettings?.tiles) {
+        console.log(`📋 siteSettings.tiles:`, siteSettings.tiles);
+        console.log(`🎯 useDefaultImages: ${siteSettings.tiles.useDefaultImages}`);
+        
+        if (!siteSettings.tiles.useDefaultImages) {
+          const imageKey = `${type}Image`;
+          console.log(`🔑 検索キー: "${imageKey}"`);
+          console.log(`🖼️ 画像データ存在: ${!!siteSettings.tiles[imageKey]}`);
+          
+          if (siteSettings.tiles[imageKey]) {
+            console.log(`✅ 状態から${type}タイル画像を取得 (${siteSettings.tiles[imageKey].length}文字)`);
+            return siteSettings.tiles[imageKey];
+          }
         }
       }
       
       // 2. LocalStorageフォールバック（DB読み込み失敗時）
       const localSettings = siteSettingsManager.getSettings();
+      console.log(`📦 LocalStorage設定:`, localSettings);
+      
       if (localSettings?.tiles && !localSettings.tiles.useDefaultImages) {
         const imageKey = `${type}Image`;
+        console.log(`🔑 LocalStorage検索キー: "${imageKey}"`);
+        
         if (localSettings.tiles[imageKey]) {
+          console.log(`✅ LocalStorageから${type}タイル画像を取得`);
           return localSettings.tiles[imageKey];
         }
       }
       
       // 3. デフォルト画像
+      console.log(`📷 ${type}タイル画像: デフォルト使用`);
       return defaultTileImages[type];
     } catch (error) {
       console.error(`❌ ${type}タイル画像取得エラー:`, error);
