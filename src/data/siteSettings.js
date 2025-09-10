@@ -178,21 +178,38 @@ export const initialSiteSettings = {
 export const siteSettingsManager = {
   // 設定を取得 - LocalStorage無効化、初期設定のみ使用
   getSettings: () => {
-    // LocalStorage使用禁止 - DB統合まで初期設定を返す
-    console.log('📋 Site Settings loaded (DB integration pending):', initialSiteSettings);
+    try {
+      const saved = localStorage.getItem('rentalEasySiteSettings');
+      if (saved) {
+        const parsedSettings = JSON.parse(saved);
+        console.log('📋 Site Settings loaded from LocalStorage');
+        return parsedSettings;
+      }
+    } catch (error) {
+      console.error('❌ LocalStorage読み込みエラー:', error);
+    }
+    
+    console.log('📋 Site Settings using initial values');
     return initialSiteSettings;
   },
 
-  // 設定を保存 - 現在は何もしない（DB統合待ち）
+  // 設定を保存 - LocalStorageに確実に保存
   saveSettings: (settings) => {
-    console.log('⚠️ Save skipped - DB integration pending:', settings);
-    // LocalStorage使用禁止 - DynamoDB統合予定
-    // localStorage.setItem('rentalEasySiteSettings', JSON.stringify(settings));
+    try {
+      localStorage.setItem('rentalEasySiteSettings', JSON.stringify(settings));
+      console.log('✅ Settings saved to LocalStorage:', Object.keys(settings));
+    } catch (error) {
+      console.error('❌ LocalStorage保存エラー:', error);
+    }
   },
 
   // 設定をリセット
   resetSettings: () => {
-    // LocalStorage使用禁止
+    try {
+      localStorage.removeItem('rentalEasySiteSettings');
+    } catch (error) {
+      console.error('❌ LocalStorage削除エラー:', error);
+    }
     console.log('🔄 Settings reset to initial values');
     return initialSiteSettings;
   }
