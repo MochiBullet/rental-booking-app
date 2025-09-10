@@ -335,11 +335,13 @@ function HomePage() {
     return [...images, ...images]; // 画像を2回繰り返す
   };
 
-  // デバッグ強化タイル画像取得関数
+  // デバッグ強化タイル画像取得関数（モバイル対応）
   const getTileImage = (type) => {
     try {
-      console.log(`🔍 ${type}タイル画像取得開始`);
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      console.log(`🔍 ${type}タイル画像取得開始 ${isMobile ? '📱' : '💻'}`);
       console.log('📊 現在のsiteSettings:', siteSettings);
+      console.log('📱 モバイルデバイス:', isMobile);
       
       // 1. 状態（DBから読み込んだデータ）を最優先
       if (siteSettings?.tiles) {
