@@ -656,23 +656,34 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
     }
     
     try {
+      // 新規登録と全く同じ形式でデータを構築
       const vehicleData = {
         name: selectedVehicle.name,
         type: selectedVehicle.type,
-        vehicleType: selectedVehicle.type,
+        vehicleType: selectedVehicle.type, // APIが期待するフィールド名
         price: parseFloat(selectedVehicle.price),
-        pricePerDay: parseFloat(selectedVehicle.price),
+        pricePerDay: parseFloat(selectedVehicle.price), // APIが期待するフィールド名
+        pricePerHour: parseFloat(selectedVehicle.pricePerHour || Math.round(selectedVehicle.price / 8)),
         passengers: parseInt(selectedVehicle.passengers) || 4,
-        capacity: parseInt(selectedVehicle.passengers) || 4,
+        capacity: parseInt(selectedVehicle.passengers) || 4, // APIが期待するフィールド名（重要！）
         available: selectedVehicle.available,
-        isAvailable: selectedVehicle.available,
+        isAvailable: selectedVehicle.available, // APIが期待するフィールド名
         features: selectedVehicle.features ? 
           (Array.isArray(selectedVehicle.features) ? selectedVehicle.features : selectedVehicle.features.split(',').map(f => f.trim())) : [],
-        image: selectedVehicle.image || null,
-        images: selectedVehicle.image ? [selectedVehicle.image] : [],
-        // 複数フィールドで画像データを送信（確実な保存のため）
-        vehicleImages: selectedVehicle.image ? [selectedVehicle.image] : []
+        specifications: {
+          seats: parseInt(selectedVehicle.passengers) || 4,
+          transmission: selectedVehicle.transmission || 'AT',
+          fuelType: selectedVehicle.fuelType || 'ガソリン',
+          cc: selectedVehicle.engineSize || 1500
+        }
       };
+
+      // 画像データがある場合は追加（新規登録と同じ処理）
+      if (selectedVehicle.image) {
+        vehicleData.image = selectedVehicle.image;
+        vehicleData.images = [selectedVehicle.image]; // APIが期待するフィールド名
+        vehicleData.vehicleImages = [selectedVehicle.image]; // APIが期待するフィールド名
+      }
       
       console.log('🔄 データベースで車両を更新中...', vehicleData);
       
