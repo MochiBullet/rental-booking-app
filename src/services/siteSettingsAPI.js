@@ -23,63 +23,56 @@ class SiteSettingsAPI {
       const data = await response.json();
       console.log('📊 DB応答データ:', data);
       
-      // campSpaceSettings は無視して、正しい設定構造を構築
-      let combinedSettings = {};
+      // 🚨 COMMIT 512a7b3 復元: campSpaceSettingsを完全に無視して正しい構造を強制
+      const { initialSiteSettings } = await import('../data/siteSettings.js');
+      let combinedSettings = { ...initialSiteSettings };
       
+      // siteSettingsがあるが、campSpaceSettingsが含まれている場合は無視
       if (data.siteSettings) {
-        combinedSettings = { ...data.siteSettings };
-        console.log('📋 siteSettings取得:', Object.keys(combinedSettings));
-      } else {
-        // 初期設定をセット
-        const { initialSiteSettings } = await import('../data/siteSettings.js');
-        combinedSettings = { ...initialSiteSettings };
-        console.log('📋 初期設定使用');
+        if (data.siteSettings.campSpaceSettings) {
+          console.log('🗑️ campSpaceSettings検出 - 完全無視してCommit 512a7b3構造を使用');
+          // campSpaceSettingsが含まれている場合は初期設定を使用
+          combinedSettings = { ...initialSiteSettings };
+        } else {
+          // 正常なsiteSettingsのみをマージ
+          combinedSettings = {
+            ...initialSiteSettings,
+            ...data.siteSettings
+          };
+          console.log('📋 正常なsiteSettings使用:', Object.keys(data.siteSettings));
+        }
       }
       
-      // タイル設定を個別取得
+      // タイル設定を個別取得または初期設定を使用
       if (data.tiles) {
         combinedSettings.tiles = data.tiles;
-        console.log('🎨 tiles設定統合:', Object.keys(data.tiles));
+        console.log('🎨 DB tiles設定使用:', Object.keys(data.tiles));
       } else {
         // tilesが直接レスポンスに含まれていない場合は個別取得を試行
         try {
           const tilesData = await this.getSetting('tiles');
-          if (tilesData) {
+          if (tilesData && Object.keys(tilesData).length > 0) {
             combinedSettings.tiles = tilesData;
             console.log('🔄 tiles個別取得成功:', Object.keys(tilesData));
           } else {
-            // tilesが存在しない場合は初期設定を使用
-            combinedSettings.tiles = combinedSettings.tiles || {
-              carImage: null,
-              bikeImage: null,
-              useDefaultImages: true,
-              carText: { title: "車", subtitle: "", description: "", details: "" },
-              bikeText: { title: "バイクレンタル", subtitle: "原付から大型まで", description: "多様なバイクを", details: "お手頃価格で提供" }
-            };
+            // tilesが存在しないか空の場合は初期設定を使用
             console.log('🎨 初期tiles設定使用');
           }
         } catch (tilesError) {
-          console.log('⚠️ tiles個別取得失敗 - デフォルト使用');
-          combinedSettings.tiles = {
-            carImage: null,
-            bikeImage: null,
-            useDefaultImages: true,
-            carText: { title: "車", subtitle: "", description: "", details: "" },
-            bikeText: { title: "バイクレンタル", subtitle: "原付から大型まで", description: "多様なバイクを", details: "お手頃価格で提供" }
-          };
+          console.log('⚠️ tiles個別取得失敗 - 初期設定使用');
         }
       }
       
-      console.log('✅ 統合設定完了:', Object.keys(combinedSettings));
+      console.log('✅ Commit 512a7b3構造で統合完了:', Object.keys(combinedSettings));
       console.log('🎨 タイル設定詳細:', combinedSettings.tiles);
       return combinedSettings;
       
     } catch (error) {
       console.error('❌ DB取得失敗:', error);
-      // フォールバック: LocalStorageから取得
-      const localSettings = this.getLocalStorageSettings();
-      console.log('📦 LocalStorageフォールバック使用');
-      return localSettings;
+      // フォールバック: 初期設定を使用
+      const { initialSiteSettings } = await import('../data/siteSettings.js');
+      console.log('📦 初期設定フォールバック使用');
+      return initialSiteSettings;
     }
   }
 
