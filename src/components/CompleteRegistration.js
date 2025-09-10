@@ -502,7 +502,7 @@ const CompleteRegistration = () => {
                     disabled={formData.postalCode.length !== 7 || isAddressLoading}
                   >
                     {isAddressLoading ? (
-                      <span className="loading-spinner">🔄</span>
+                      <span className="car-wheel-spinner small">🔄</span>
                     ) : (
                       '住所検索'
                     )}

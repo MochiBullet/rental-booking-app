@@ -227,7 +227,7 @@ const PasswordReset = () => {
               disabled={isLoading}
             >
               {isLoading ? (
-                <div className="loading-spinner">
+                <div className="car-wheel-spinner small">
                   🔄 確認中...
                 </div>
               ) : (
@@ -302,7 +302,7 @@ const PasswordReset = () => {
             disabled={isLoading || !passwordValidation.isValid || formData.newPassword !== formData.confirmPassword}
           >
             {isLoading ? (
-              <div className="loading-spinner">
+              <div className="car-wheel-spinner small">
                 🔄 更新中...
               </div>
             ) : (

@@ -234,7 +234,7 @@ const ResetPassword = () => {
           >
             {isLoading ? (
               <>
-                <span className="loading-spinner">🔄</span>
+                <span className="car-wheel-spinner small">🔄</span>
                 変更中...
               </>
             ) : (

@@ -2047,6 +2047,160 @@ body {
   color: #666;
 }
 
+/* ========================================
+   🚗 グローバル車のホイール風ローディングスピナー
+   ======================================== */
+
+/* 共通のまんまるホイールスタイル */
+.car-wheel-spinner {
+  width: 120px;
+  height: 120px;
+  position: relative;
+  margin: 20px auto;
+  border-radius: 50%; /* 完全にまんまる */
+  background: 
+    radial-gradient(circle at center, #1a1a1a 20%, #333 35%, #555 50%, #333 65%, #1a1a1a 80%),
+    conic-gradient(from 0deg, #2a2a2a 0deg, #444 45deg, #2a2a2a 90deg, #444 135deg, #2a2a2a 180deg, #444 225deg, #2a2a2a 270deg, #444 315deg);
+  border: 8px solid #0f0f0f;
+  box-shadow: 
+    0 0 25px rgba(0,0,0,0.8),
+    inset 0 0 20px rgba(0,0,0,0.6);
+  animation: perfectWheelSpin 0.8s linear infinite;
+}
+
+/* まんまるリム（内側の金属部分） */
+.car-wheel-spinner::before {
+  content: '';
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  top: 20px;
+  left: 20px;
+  border-radius: 50%; /* 完全にまんまる */
+  background: 
+    radial-gradient(circle at 30% 30%, #f5f5f5, #d0d0d0 30%, #a0a0a0 60%, #777 90%),
+    conic-gradient(from 0deg, 
+      transparent 8deg, #ccc 12deg, transparent 16deg,
+      transparent 68deg, #ccc 72deg, transparent 76deg,
+      transparent 128deg, #ccc 132deg, transparent 136deg,
+      transparent 188deg, #ccc 192deg, transparent 196deg,
+      transparent 248deg, #ccc 252deg, transparent 256deg,
+      transparent 308deg, #ccc 312deg, transparent 316deg);
+  border: 3px solid #999;
+  box-shadow: 
+    inset 0 0 15px rgba(0,0,0,0.3),
+    0 0 8px rgba(255,255,255,0.4);
+}
+
+/* まんまるセンターキャップ */
+.car-wheel-spinner::after {
+  content: '🚗';
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  top: 40px;
+  left: 40px;
+  border-radius: 50%; /* 完全にまんまる */
+  background: 
+    radial-gradient(circle at 30% 30%, #555, #222);
+  border: 2px solid #000;
+  box-shadow: 
+    inset 0 0 8px rgba(0,0,0,0.7),
+    0 0 6px rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  z-index: 10;
+}
+
+/* 完璧なまんまる回転アニメーション */
+@keyframes perfectWheelSpin {
+  0% { 
+    transform: rotate(0deg);
+    box-shadow: 
+      0 0 25px rgba(0,0,0,0.8),
+      inset 0 0 20px rgba(0,0,0,0.6),
+      0 6px 12px rgba(0,0,0,0.4);
+  }
+  25% { 
+    transform: rotate(90deg);
+    box-shadow: 
+      0 0 25px rgba(0,0,0,0.8),
+      inset 0 0 20px rgba(0,0,0,0.6),
+      6px 0 12px rgba(0,0,0,0.4);
+  }
+  50% { 
+    transform: rotate(180deg);
+    box-shadow: 
+      0 0 25px rgba(0,0,0,0.8),
+      inset 0 0 20px rgba(0,0,0,0.6),
+      0 -6px 12px rgba(0,0,0,0.4);
+  }
+  75% { 
+    transform: rotate(270deg);
+    box-shadow: 
+      0 0 25px rgba(0,0,0,0.8),
+      inset 0 0 20px rgba(0,0,0,0.6),
+      -6px 0 12px rgba(0,0,0,0.4);
+  }
+  100% { 
+    transform: rotate(360deg);
+    box-shadow: 
+      0 0 25px rgba(0,0,0,0.8),
+      inset 0 0 20px rgba(0,0,0,0.6),
+      0 6px 12px rgba(0,0,0,0.4);
+  }
+}
+
+/* 小さいサイズのホイール */
+.car-wheel-spinner.small {
+  width: 80px;
+  height: 80px;
+  margin: 15px auto;
+  border: 5px solid #0f0f0f;
+}
+
+.car-wheel-spinner.small::before {
+  width: 50px;
+  height: 50px;
+  top: 15px;
+  left: 15px;
+  border: 2px solid #999;
+}
+
+.car-wheel-spinner.small::after {
+  width: 28px;
+  height: 28px;
+  top: 26px;
+  left: 26px;
+  font-size: 14px;
+}
+
+/* 大きいサイズのホイール */
+.car-wheel-spinner.large {
+  width: 150px;
+  height: 150px;
+  margin: 30px auto;
+  border: 10px solid #0f0f0f;
+}
+
+.car-wheel-spinner.large::before {
+  width: 100px;
+  height: 100px;
+  top: 25px;
+  left: 25px;
+  border: 4px solid #999;
+}
+
+.car-wheel-spinner.large::after {
+  width: 50px;
+  height: 50px;
+  top: 50px;
+  left: 50px;
+  font-size: 20px;
+}
+
 /* Analytics */
 .analytics-section h2 {
   color: #333;

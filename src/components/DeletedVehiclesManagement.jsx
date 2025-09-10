@@ -98,7 +98,7 @@ const DeletedVehiclesManagement = () => {
     return (
       <div className="deleted-vehicles-management">
         <div className="loading-container">
-          <div className="loading-spinner"></div>
+          <div className="car-wheel-spinner loading-spinner"></div>
           <p>削除済み車両を読み込んでいます...</p>
         </div>
       </div>

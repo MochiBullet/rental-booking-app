@@ -164,7 +164,7 @@ const VehicleListPage = ({ user }) => {
           <h1>{getPageTitle()}</h1>
         </div>
         <div className="loading-container">
-          <div className="loading-spinner"></div>
+          <div className="car-wheel-spinner large"></div>
           <p>車両情報を読み込んでいます...</p>
         </div>
       </div>
