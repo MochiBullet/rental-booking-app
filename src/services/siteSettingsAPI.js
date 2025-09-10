@@ -51,15 +51,16 @@ class SiteSettingsAPI {
         // tilesが直接レスポンスに含まれていない場合は個別取得を試行
         try {
           const tilesData = await this.getSetting('tiles');
+          console.log('🔍 tiles個別取得レスポンス:', tilesData);
+          
           if (tilesData && Object.keys(tilesData).length > 0) {
             combinedSettings.tiles = tilesData;
             console.log('🔄 tiles個別取得成功:', Object.keys(tilesData));
           } else {
-            // tilesが存在しないか空の場合は初期設定を使用
-            console.log('🎨 初期tiles設定使用');
+            console.log('⚠️ tilesデータが空または存在しない - 初期設定使用');
           }
         } catch (tilesError) {
-          console.log('⚠️ tiles個別取得失敗 - 初期設定使用');
+          console.log('⚠️ tiles個別取得失敗:', tilesError.message);
         }
       }
       
@@ -78,6 +79,7 @@ class SiteSettingsAPI {
 
   async getSetting(settingKey) {
     try {
+      console.log(`🔍 個別設定取得開始: ${settingKey}`);
       const response = await fetch(`${this.baseUrl}/${settingKey}`, {
         method: 'GET',
         headers: {
@@ -86,16 +88,24 @@ class SiteSettingsAPI {
       });
 
       if (!response.ok) {
+        console.log(`❌ 個別設定取得失敗: ${settingKey} - HTTP ${response.status}`);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
-      return data.settingValue;
+      console.log(`📊 個別設定応答 ${settingKey}:`, data);
+      
+      // settingValueを返す
+      const result = data.settingValue;
+      console.log(`📋 個別設定結果 ${settingKey}:`, result);
+      return result;
     } catch (error) {
-      console.error(`Failed to fetch setting ${settingKey}:`, error);
+      console.error(`❌ Failed to fetch setting ${settingKey}:`, error);
       // フォールバック: LocalStorageから取得
       const localSettings = this.getLocalStorageSettings();
-      return localSettings[settingKey];
+      const fallbackValue = localSettings[settingKey];
+      console.log(`📦 LocalStorageフォールバック ${settingKey}:`, fallbackValue);
+      return fallbackValue;
     }
   }
 
