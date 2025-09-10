@@ -23,20 +23,57 @@ class SiteSettingsAPI {
       const data = await response.json();
       console.log('📊 DB応答データ:', data);
       
-      // 様々な応答形式に対応
-      if (data.settings) {
-        console.log('✅ settings形式でDB取得完了');
-        return data.settings;
-      } else if (data.siteSettings) {
-        console.log('✅ siteSettings形式でDB取得完了');
-        return { siteSettings: data.siteSettings };
-      } else if (Object.keys(data).length > 0) {
-        console.log('✅ 直接形式でDB取得完了');
-        return data;
+      // campSpaceSettings は無視して、正しい設定構造を構築
+      let combinedSettings = {};
+      
+      if (data.siteSettings) {
+        combinedSettings = { ...data.siteSettings };
+        console.log('📋 siteSettings取得:', Object.keys(combinedSettings));
       } else {
-        console.log('⚠️ DB空応答');
-        return {};
+        // 初期設定をセット
+        const { initialSiteSettings } = await import('../data/siteSettings.js');
+        combinedSettings = { ...initialSiteSettings };
+        console.log('📋 初期設定使用');
       }
+      
+      // タイル設定を個別取得
+      if (data.tiles) {
+        combinedSettings.tiles = data.tiles;
+        console.log('🎨 tiles設定統合:', Object.keys(data.tiles));
+      } else {
+        // tilesが直接レスポンスに含まれていない場合は個別取得を試行
+        try {
+          const tilesData = await this.getSetting('tiles');
+          if (tilesData) {
+            combinedSettings.tiles = tilesData;
+            console.log('🔄 tiles個別取得成功:', Object.keys(tilesData));
+          } else {
+            // tilesが存在しない場合は初期設定を使用
+            combinedSettings.tiles = combinedSettings.tiles || {
+              carImage: null,
+              bikeImage: null,
+              useDefaultImages: true,
+              carText: { title: "車", subtitle: "", description: "", details: "" },
+              bikeText: { title: "バイクレンタル", subtitle: "原付から大型まで", description: "多様なバイクを", details: "お手頃価格で提供" }
+            };
+            console.log('🎨 初期tiles設定使用');
+          }
+        } catch (tilesError) {
+          console.log('⚠️ tiles個別取得失敗 - デフォルト使用');
+          combinedSettings.tiles = {
+            carImage: null,
+            bikeImage: null,
+            useDefaultImages: true,
+            carText: { title: "車", subtitle: "", description: "", details: "" },
+            bikeText: { title: "バイクレンタル", subtitle: "原付から大型まで", description: "多様なバイクを", details: "お手頃価格で提供" }
+          };
+        }
+      }
+      
+      console.log('✅ 統合設定完了:', Object.keys(combinedSettings));
+      console.log('🎨 タイル設定詳細:', combinedSettings.tiles);
+      return combinedSettings;
+      
     } catch (error) {
       console.error('❌ DB取得失敗:', error);
       // フォールバック: LocalStorageから取得
@@ -211,6 +248,39 @@ class SiteSettingsAPI {
       console.log('✅ Migration completed successfully');
     } catch (error) {
       console.error('❌ Migration failed:', error);
+    }
+  }
+
+  // DB初期化ツール: M's BASE Rental の正しい設定でDBを初期化
+  async initializeDatabase() {
+    try {
+      console.log('🔄 DB初期化開始...');
+      
+      // 初期設定をインポート
+      const { initialSiteSettings } = await import('../data/siteSettings.js');
+      
+      // 重要な設定をDBに保存
+      await this.saveSetting('siteSettings', {
+        branding: initialSiteSettings.branding,
+        hero: initialSiteSettings.hero,
+        contact: initialSiteSettings.contact,
+        services: initialSiteSettings.services,
+        terms: initialSiteSettings.terms,
+        privacy: initialSiteSettings.privacy,
+        rentalTerms: initialSiteSettings.rentalTerms,
+        announcements: initialSiteSettings.announcements,
+        googleForms: initialSiteSettings.googleForms
+      });
+
+      // タイル設定を個別保存
+      await this.saveSetting('tiles', initialSiteSettings.tiles);
+      
+      console.log('✅ DB初期化完了');
+      return true;
+      
+    } catch (error) {
+      console.error('❌ DB初期化失敗:', error);
+      return false;
     }
   }
 }
