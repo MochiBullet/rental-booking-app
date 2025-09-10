@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>LocalStorage クリア</title>
+</head>
+<body>
+    <h1>LocalStorage クリア</h1>
+    <button onclick="clearStorage()">LocalStorage完全クリア</button>
+    <div id="status"></div>
+
+    <script>
+        function clearStorage() {
+            // 関連するキーを全て削除
+            const keys = ['siteSettings', 'campSpaceSettings', 'tiles', 'rentalEasySiteSettings', 'homeContent'];
+            
+            keys.forEach(key => {
+                localStorage.removeItem(key);
+                console.log(`削除: ${key}`);
+            });
+            
+            document.getElementById('status').innerHTML = '✅ LocalStorage完全クリア完了！<br>開発サーバーをリロードしてください。';
+        }
+    </script>
+</body>
+</html>
