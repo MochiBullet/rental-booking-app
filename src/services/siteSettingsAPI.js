@@ -22,11 +22,16 @@ class SiteSettingsAPI {
       const data = await response.json();
       console.log('📊 DB設定応答:', data);
       
-      if (data.siteSettings) {
-        console.log('✅ DB設定使用');
+      // APIが{settings: {siteSettings: ...}}形式で返す場合に対応
+      if (data.settings && data.settings.siteSettings) {
+        console.log('✅ DB設定使用 (settings.siteSettings)');
+        return data.settings.siteSettings;
+      } else if (data.siteSettings) {
+        console.log('✅ DB設定使用 (直接siteSettings)');
         return data.siteSettings;
       } else {
         console.log('📋 初期設定使用');
+        console.log('🔍 利用可能なキー:', Object.keys(data));
         const { initialSiteSettings } = await import('../data/siteSettings.js');
         return initialSiteSettings;
       }
