@@ -179,139 +179,65 @@ function HomePage() {
 
   const loadHomePageData = async () => {
     try {
-      console.log('🔄 Loading homepage data...');
+      console.log('🔄 DB優先ホームページデータ読み込み開始...');
       
-      // まずLocalStorageから即座に読み込み（チラつき防止）
-      const savedContent = localStorage.getItem('homeContent');
-      if (savedContent) {
-        setHomeContent(JSON.parse(savedContent));
-      } else {
-        // LocalStorageにない場合はDynamoDBから設定を取得してデフォルト値を設定
-        console.log('📝 LocalStorageにhomeContentがないため、DynamoDBから最新設定を取得中...');
+      // DB から設定読み込み（最優先）
+      try {
+        const dynamoSettings = await siteSettingsAPI.getAllSettings();
+        console.log('📊 DB設定取得:', dynamoSettings);
         
-        let carText, bikeText;
-        let dbSiteSettings = {};
+        const dbSiteSettings = dynamoSettings.siteSettings || dynamoSettings;
+        setSiteSettings(dbSiteSettings);
         
-        try {
-          // DynamoDBから最新の設定を取得
-          const dynamoSettings = await siteSettingsAPI.getAllSettings();
-          dbSiteSettings = dynamoSettings.siteSettings || {};
-          
-          console.log('🗃️ DynamoDBから取得した設定:', dbSiteSettings.tiles);
-          
-          carText = dbSiteSettings.tiles?.carText || {
-            title: "車",
-            subtitle: "",
-            description: "", 
-            details: ""
-          };
-          bikeText = dbSiteSettings.tiles?.bikeText || {
-            title: "バイクレンタル",
-            subtitle: "原付から大型まで",
-            description: "多様なバイクを",
-            details: "お手頃価格で提供"
-          };
-          
-          console.log('🚗 Car Text from DB:', carText);
-          console.log('🏍️ Bike Text from DB:', bikeText);
-        } catch (error) {
-          console.error('⚠️ DynamoDB取得エラー、LocalStorage設定を使用:', error);
-          // フォールバック: LocalStorage設定を使用
-          const localSettings = siteSettingsManager.getSettings();
-          dbSiteSettings = localSettings;
-          carText = localSettings.tiles?.carText || {
-            title: "車",
-            subtitle: "", 
-            description: "",
-            details: ""
-          };
-          bikeText = localSettings.tiles?.bikeText || {
-            title: "バイクレンタル",
-            subtitle: "原付から大型まで",
-            description: "多様なバイクを", 
-            details: "お手頃価格で提供"
-          };
-        }
+        // homeContentの生成
+        const carText = dbSiteSettings.tiles?.carText || {
+          title: "車",
+          subtitle: "",
+          description: "", 
+          details: ""
+        };
+        const bikeText = dbSiteSettings.tiles?.bikeText || {
+          title: "バイクレンタル",
+          subtitle: "原付から大型まで",
+          description: "多様なバイクを",
+          details: "お手頃価格で提供"
+        };
         
-        const defaultContent = {
-          heroTitle: dbSiteSettings.hero?.title || siteSettings.hero?.title || 'M\'s BASE Rental',
-          heroSubtitle: dbSiteSettings.hero?.subtitle || siteSettings.hero?.subtitle || '安心・安全・快適なレンタルサービス',
+        
+        const homeContent = {
+          heroTitle: dbSiteSettings.hero?.title || 'M\'s BASE Rental',
+          heroSubtitle: dbSiteSettings.hero?.subtitle || '安心・安全・快適なレンタルサービス',
           carTile: {
             title: carText.shortTitle || carText.title || '車',
-            description: `${carText.subtitle}\n${carText.description}\n${carText.details}`,
+            description: `${carText.subtitle || ''}\n${carText.description || ''}\n${carText.details || ''}`.trim(),
             features: carText.features || ['最新モデル', '保険完備', '24時間サポート']
           },
           bikeTile: {
             title: bikeText.shortTitle || bikeText.title || 'バイク',
-            description: `${bikeText.subtitle}\n${bikeText.description}\n${bikeText.details}`,
+            description: `${bikeText.subtitle || ''}\n${bikeText.description || ''}\n${bikeText.details || ''}`.trim(),
             features: bikeText.features || ['ヘルメット付', '整備済み', 'ロードサービス']
           }
         };
-        localStorage.setItem('homeContent', JSON.stringify(defaultContent));
-        setHomeContent(defaultContent);
-      }
-      
-      // サイト設定も同様に処理
-      setSiteSettings(siteSettingsManager.getSettings());
-      
-      // DynamoDBからの取得を試みる（バックグラウンド）
-      const dynamoSettings = await siteSettingsAPI.getAllSettings();
-      
-      if (dynamoSettings.siteSettings) {
-        console.log('✅ Site settings loaded from DynamoDB');
-        setSiteSettings(dynamoSettings.siteSettings);
         
-        // タイルテキスト設定をDynamoDBの最新値で更新
-        if (dynamoSettings.siteSettings.tiles) {
-          console.log('🔄 DynamoDBからタイル設定を更新中:', dynamoSettings.siteSettings.tiles);
-          
-          const dbCarText = dynamoSettings.siteSettings.tiles.carText || {};
-          const dbBikeText = dynamoSettings.siteSettings.tiles.bikeText || {};
-          
-          setHomeContent(prevContent => {
-            if (!prevContent) return prevContent;
-            
-            const updatedContent = {
-              ...prevContent,
-              carTile: {
-                ...prevContent.carTile,
-                title: dbCarText.shortTitle || dbCarText.title || prevContent.carTile.title || '車',
-                description: `${dbCarText.subtitle || ''}\n${dbCarText.description || ''}\n${dbCarText.details || ''}`.trim(),
-                features: dbCarText.features || prevContent.carTile.features || ['最新モデル', '保険完備', '24時間サポート']
-              },
-              bikeTile: {
-                ...prevContent.bikeTile,
-                title: dbBikeText.shortTitle || dbBikeText.title || prevContent.bikeTile.title || 'バイク',
-                description: `${dbBikeText.subtitle || ''}\n${dbBikeText.description || ''}\n${dbBikeText.details || ''}`.trim(),
-                features: dbBikeText.features || prevContent.bikeTile.features || ['ヘルメット付', '整備済み', 'ロードサービス']
-              }
-            };
-            
-            // LocalStorageに保存
-            localStorage.setItem('homeContent', JSON.stringify(updatedContent));
-            console.log('🔄 DynamoDBタイル設定をhomeContentに反映完了');
-            
-            return updatedContent;
-          });
+        setHomeContent(homeContent);
+        setContactInfo(dbSiteSettings.contact || {});
+        
+        // LocalStorageにバックアップ保存
+        localStorage.setItem('homeContent', JSON.stringify(homeContent));
+        console.log('✅ DB設定からhomeContent生成完了');
+        
+      } catch (dbError) {
+        console.error('❌ DB読み込みエラー - LocalStorageフォールバック:', dbError);
+        
+        // LocalStorageフォールバック
+        const savedContent = localStorage.getItem('homeContent');
+        if (savedContent) {
+          setHomeContent(JSON.parse(savedContent));
         }
         
-        // 連絡先情報も設定
-        if (dynamoSettings.siteSettings.contact) {
-          setContactInfo(dynamoSettings.siteSettings.contact);
-        }
-      }
-      
-      // 初期設定から連絡先情報を設定
-      const defaultSettings = siteSettingsManager.getSettings();
-      if (!dynamoSettings.siteSettings?.contact) {
-        setContactInfo(defaultSettings.contact);
-      }
-
-      if (dynamoSettings.homeContent) {
-        console.log('✅ Home content loaded from DynamoDB');
-        setHomeContent(dynamoSettings.homeContent);
-        // DynamoDBのデータをLocalStorageにも保存
-        localStorage.setItem('homeContent', JSON.stringify(dynamoSettings.homeContent));
+        const localSettings = siteSettingsManager.getSettings();
+        setSiteSettings(localSettings);
+        setContactInfo(localSettings.contact || {});
       }
       
     } catch (error) {
@@ -400,17 +326,32 @@ function HomePage() {
     return [...images, ...images]; // 画像を2回繰り返す
   };
 
-  // タイル画像を取得する関数
+  // 完璧なDB管理タイル画像取得関数
   const getTileImage = (type) => {
-    if (siteSettings?.tiles?.useDefaultImages === false) {
-      if (type === 'car' && siteSettings?.tiles?.carImage) {
-        return siteSettings.tiles.carImage;
+    try {
+      // 1. 状態（DBから読み込んだデータ）を最優先
+      if (siteSettings?.tiles && !siteSettings.tiles.useDefaultImages) {
+        const imageKey = `${type}Image`;
+        if (siteSettings.tiles[imageKey]) {
+          return siteSettings.tiles[imageKey];
+        }
       }
-      if (type === 'bike' && siteSettings?.tiles?.bikeImage) {
-        return siteSettings.tiles.bikeImage;
+      
+      // 2. LocalStorageフォールバック（DB読み込み失敗時）
+      const localSettings = siteSettingsManager.getSettings();
+      if (localSettings?.tiles && !localSettings.tiles.useDefaultImages) {
+        const imageKey = `${type}Image`;
+        if (localSettings.tiles[imageKey]) {
+          return localSettings.tiles[imageKey];
+        }
       }
+      
+      // 3. デフォルト画像
+      return defaultTileImages[type];
+    } catch (error) {
+      console.error(`❌ ${type}タイル画像取得エラー:`, error);
+      return defaultTileImages[type];
     }
-    return defaultTileImages[type];
   };
 
   // コンテンツが読み込まれるまで何も表示しない（チラつき防止）

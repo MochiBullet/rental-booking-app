@@ -81,22 +81,30 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
 
   const loadSettings = async () => {
     try {
-      console.log('🔄 Loading settings from DynamoDB...');
-      const dynamoSettings = await siteSettingsAPI.getAllSettings();
+      console.log('🔄 DB設定読み込み開始...');
       
-      if (Object.keys(dynamoSettings).length > 0) {
-        console.log('✅ Settings loaded from DynamoDB');
-        setSettings(dynamoSettings.siteSettings || initialSiteSettings);
+      const dynamoSettings = await siteSettingsAPI.getAllSettings();
+      console.log('📊 DB応答:', dynamoSettings);
+      
+      if (dynamoSettings && dynamoSettings.siteSettings) {
+        console.log('✅ DB設定読み込み完了');
+        setSettings(dynamoSettings.siteSettings);
+        siteSettingsManager.saveSettings(dynamoSettings.siteSettings);
+      } else if (Object.keys(dynamoSettings).length > 0) {
+        // 旧形式対応
+        console.log('✅ DB設定読み込み完了（直接形式）');
+        setSettings(dynamoSettings);
+        siteSettingsManager.saveSettings(dynamoSettings);
       } else {
-        console.log('⚠️ No settings in DynamoDB, using LocalStorage');
-        setSettings(siteSettingsManager.getSettings());
-        // 移行実行
-        await siteSettingsAPI.migrateFromLocalStorage();
+        console.log('⚠️ DBに設定なし - 初期設定使用');
+        setSettings(initialSiteSettings);
+        await siteSettingsAPI.saveSetting('siteSettings', initialSiteSettings);
       }
+      
     } catch (error) {
-      console.error('❌ Failed to load settings:', error);
-      // フォールバック: LocalStorageから読み込み
-      setSettings(siteSettingsManager.getSettings());
+      console.error('❌ DB読み込みエラー:', error);
+      const localSettings = siteSettingsManager.getSettings();
+      setSettings(localSettings);
     }
   };
 
@@ -217,7 +225,7 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
     }
   };
 
-  // 統合タイル画像アップロード処理
+  // 完璧なDB管理タイル画像アップロード処理
   const handleTileImageUpload = async (event, type) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -234,17 +242,17 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
       return;
     }
 
-    // 画像圧縮を実行
     try {
-      alert('🔄 画像を圧縮中です。しばらくお待ちください...');
+      console.log(`🔄 ${type}タイル画像アップロード開始`);
+      alert('🔄 画像を処理中です...');
       
+      // 画像圧縮
       const compressedDataURL = await compressImage(file);
       const sizeKB = Math.round(compressedDataURL.length * 0.75 / 1024);
+      console.log(`📸 画像圧縮完了: ${sizeKB}KB`);
       
-      console.log(`📸 画像圧縮完了: ${type} 画像 (約${sizeKB}KB)`);
-      
+      // 設定オブジェクト作成
       const imageKey = `${type}Image`;
-      
       const updatedSettings = {
         ...settings,
         tiles: {
@@ -254,45 +262,29 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
         }
       };
 
-      // 状態を更新
-      setSettings(updatedSettings);
+      // DB保存
+      const response = await siteSettingsAPI.saveSetting('siteSettings', updatedSettings);
+      console.log(`✅ DB保存成功: ${type}Image (${sizeKB}KB)`, response);
       
-      // DB（siteSettingsAPI）に保存
-      try {
-        await siteSettingsAPI.saveSetting('siteSettings', updatedSettings);
-        console.log(`✅ タイル${type}画像をDBに保存完了 (${sizeKB}KB)`);
-        
-        // LocalStorageにもバックアップ保存
-        siteSettingsManager.saveSettings(updatedSettings);
-        
-        // リアルタイム更新の実行
-        if (onSettingsUpdate) {
-          onSettingsUpdate(updatedSettings);
-        }
-        
-        // カスタムイベントでホームページに通知
-        window.dispatchEvent(new CustomEvent('siteSettingsUpdate', {
-          detail: updatedSettings
-        }));
-        
-        alert(`✅ ${type === 'car' ? '車' : 'バイク'}画像をアップロードしました (${sizeKB}KB)`);
-        
-      } catch (error) {
-        console.error(`❌ タイル${type}画像のDB保存エラー:`, error);
-        
-        // エラー時もLocalStorageに保存
-        siteSettingsManager.saveSettings(updatedSettings);
-        
-        // リアルタイム更新は実行
-        if (onSettingsUpdate) {
-          onSettingsUpdate(updatedSettings);
-        }
-        
-        alert(`⚠️ ${type === 'car' ? '車' : 'バイク'}画像をアップロードしました（DB接続エラーのためローカル保存）`);
+      // 成功後の処理
+      setSettings(updatedSettings);
+      siteSettingsManager.saveSettings(updatedSettings); // バックアップ
+      
+      // リアルタイム更新
+      if (onSettingsUpdate) {
+        onSettingsUpdate(updatedSettings);
       }
+      
+      // イベント発行でホームページ更新
+      window.dispatchEvent(new CustomEvent('siteSettingsUpdate', {
+        detail: updatedSettings
+      }));
+      
+      alert(`✅ ${type === 'car' ? '車' : 'バイク'}のタイル画像を変更しました！\n\nページをリロードして確認してください。`);
+      
     } catch (error) {
-      console.error('❌ 画像圧縮エラー:', error);
-      alert('⚠️ 画像の圧縮に失敗しました。別の画像をお試しください。');
+      console.error('❌ タイル画像アップロードエラー:', error);
+      alert(`❌ ${type === 'car' ? '車' : 'バイク'}のタイル画像変更に失敗しました。\n\nエラー: ${error.message}`);
     }
   };
 
