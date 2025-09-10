@@ -816,42 +816,6 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
           <div className="section">
             <h3>🎨 タイル編集（画像・テキスト統合管理）</h3>
             
-            {/* DB初期化ボタン */}
-            <div className="form-group" style={{ marginBottom: '20px', padding: '15px', border: '2px solid #ff4444', borderRadius: '8px', backgroundColor: '#fff5f5' }}>
-              <label style={{ color: '#ff4444', fontWeight: 'bold' }}>⚠️ データベース修復</label>
-              <div style={{ margin: '10px 0' }}>
-                <p style={{ fontSize: '14px', color: '#666' }}>
-                  下のボタンでデータベースを正しい状態に初期化できます。
-                </p>
-                <button 
-                  onClick={async () => {
-                    if (window.confirm('データベースを初期化しますか？\n（注意：既存の設定がリセットされます）')) {
-                      const success = await siteSettingsAPI.initializeDatabase();
-                      if (success) {
-                        alert('✅ データベース初期化完了！ページをリロードして確認してください。');
-                        window.location.reload();
-                      } else {
-                        alert('❌ データベース初期化に失敗しました。');
-                      }
-                    }
-                  }}
-                  style={{ 
-                    padding: '10px 20px', 
-                    backgroundColor: '#ff4444', 
-                    color: 'white', 
-                    border: 'none', 
-                    borderRadius: '5px',
-                    cursor: 'pointer',
-                    fontWeight: 'bold',
-                    marginRight: '10px'
-                  }}
-                >
-                  🔧 データベース初期化
-                </button>
-                
-              </div>
-            </div>
-            
             {/* タイル画像セクション */}
             <div className="form-group">
               <label>🖼️ タイル画像設定</label>
