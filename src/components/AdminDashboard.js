@@ -758,6 +758,29 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
     }
   };
 
+  // 全車両を利用可能にする緊急機能
+  const handleMakeAllVehiclesAvailable = async () => {
+    if (!window.confirm('全ての車両を利用可能にしますか？')) return;
+    
+    try {
+      console.log('🔄 全車両を利用可能に変更中...');
+      const promises = vehicles.map(vehicle => 
+        vehicleAPI.update(vehicle.id, { ...vehicle, available: true })
+      );
+      
+      await Promise.all(promises);
+      
+      // ローカル状態更新
+      const updatedVehicles = vehicles.map(v => ({ ...v, available: true }));
+      setVehicles(updatedVehicles);
+      
+      loadDashboardData();
+      showNotification(`✅ 全${vehicles.length}台の車両をデータベースで利用可能に変更しました！`, 'success');
+    } catch (error) {
+      console.error('❌ 一括可用性変更エラー:', error);
+      showNotification(`❌ 一括変更に失敗しました: ${error.message}`, 'error');
+    }
+  };
 
   const handleColorChange = (colorType, value) => {
     const newSettings = { ...siteSettings, [colorType]: value };
@@ -1271,12 +1294,21 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
             <div className="vehicles-section">
               <div className="section-header">
                 <h2>Vehicle List</h2>
-                <button 
-                  className="add-btn"
-                  onClick={() => setShowAddVehicleModal(true)}
-                >
-                  + Add New Vehicle
-                </button>
+                <div className="header-buttons">
+                  <button 
+                    className="emergency-btn"
+                    onClick={handleMakeAllVehiclesAvailable}
+                    style={{ backgroundColor: '#28a745', marginRight: '10px' }}
+                  >
+                    🚀 全車両を利用可能に
+                  </button>
+                  <button 
+                    className="add-btn"
+                    onClick={() => setShowAddVehicleModal(true)}
+                  >
+                    + Add New Vehicle
+                  </button>
+                </div>
               </div>
               
               {/* 車 (Car) セクション */}
