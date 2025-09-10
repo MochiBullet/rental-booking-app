@@ -7,6 +7,7 @@ class SiteSettingsAPI {
 
   async getAllSettings() {
     try {
+      console.log('🔄 DB全設定取得開始...');
       const response = await fetch(this.baseUrl, {
         method: 'GET',
         headers: {
@@ -15,15 +16,33 @@ class SiteSettingsAPI {
       });
 
       if (!response.ok) {
+        console.error(`❌ DB取得エラー ${response.status}`);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
-      return data.settings || {};
+      console.log('📊 DB応答データ:', data);
+      
+      // 様々な応答形式に対応
+      if (data.settings) {
+        console.log('✅ settings形式でDB取得完了');
+        return data.settings;
+      } else if (data.siteSettings) {
+        console.log('✅ siteSettings形式でDB取得完了');
+        return { siteSettings: data.siteSettings };
+      } else if (Object.keys(data).length > 0) {
+        console.log('✅ 直接形式でDB取得完了');
+        return data;
+      } else {
+        console.log('⚠️ DB空応答');
+        return {};
+      }
     } catch (error) {
-      console.error('Failed to fetch site settings:', error);
+      console.error('❌ DB取得失敗:', error);
       // フォールバック: LocalStorageから取得
-      return this.getLocalStorageSettings();
+      const localSettings = this.getLocalStorageSettings();
+      console.log('📦 LocalStorageフォールバック使用');
+      return localSettings;
     }
   }
 

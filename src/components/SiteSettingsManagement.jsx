@@ -262,29 +262,60 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
         }
       };
 
-      // DB保存
-      const response = await siteSettingsAPI.saveSetting('siteSettings', updatedSettings);
-      console.log(`✅ DB保存成功: ${type}Image (${sizeKB}KB)`, response);
+      console.log(`🔄 DB保存開始: ${type}Image`);
       
-      // 成功後の処理
-      setSettings(updatedSettings);
-      siteSettingsManager.saveSettings(updatedSettings); // バックアップ
-      
-      // リアルタイム更新
-      if (onSettingsUpdate) {
-        onSettingsUpdate(updatedSettings);
+      try {
+        // DB保存
+        const response = await siteSettingsAPI.saveSetting('siteSettings', updatedSettings);
+        console.log(`✅ DB保存成功: ${type}Image (${sizeKB}KB)`, response);
+        
+        // 成功後の処理
+        setSettings(updatedSettings);
+        siteSettingsManager.saveSettings(updatedSettings); // バックアップ
+        
+        // リアルタイム更新
+        if (onSettingsUpdate) {
+          onSettingsUpdate(updatedSettings);
+        }
+        
+        // イベント発行でホームページ更新
+        window.dispatchEvent(new CustomEvent('siteSettingsUpdate', {
+          detail: updatedSettings
+        }));
+        
+        alert(`✅ ${type === 'car' ? '車' : 'バイク'}のタイル画像をDBに保存しました！\n\n保存完了: ${sizeKB}KB`);
+        
+        // 保存後にDB確認
+        setTimeout(async () => {
+          try {
+            const checkSettings = await siteSettingsAPI.getAllSettings();
+            console.log('🔍 保存後DB確認:', checkSettings);
+          } catch (error) {
+            console.error('⚠️ 保存後確認エラー:', error);
+          }
+        }, 1000);
+        
+      } catch (dbError) {
+        console.error('❌ DB保存エラー:', dbError);
+        
+        // DB保存失敗でもLocalStorageとUI更新は実行
+        setSettings(updatedSettings);
+        siteSettingsManager.saveSettings(updatedSettings);
+        
+        if (onSettingsUpdate) {
+          onSettingsUpdate(updatedSettings);
+        }
+        
+        window.dispatchEvent(new CustomEvent('siteSettingsUpdate', {
+          detail: updatedSettings
+        }));
+        
+        alert(`⚠️ ${type === 'car' ? '車' : 'バイク'}画像をLocalStorageに保存しました\n\nDB保存エラー: ${dbError.message}\n\n一時的にローカルで表示されます。`);
       }
       
-      // イベント発行でホームページ更新
-      window.dispatchEvent(new CustomEvent('siteSettingsUpdate', {
-        detail: updatedSettings
-      }));
-      
-      alert(`✅ ${type === 'car' ? '車' : 'バイク'}のタイル画像を変更しました！\n\nページをリロードして確認してください。`);
-      
     } catch (error) {
-      console.error('❌ タイル画像アップロードエラー:', error);
-      alert(`❌ ${type === 'car' ? '車' : 'バイク'}のタイル画像変更に失敗しました。\n\nエラー: ${error.message}`);
+      console.error('❌ タイル画像処理エラー:', error);
+      alert(`❌ ${type === 'car' ? '車' : 'バイク'}のタイル画像処理に失敗しました。\n\nエラー: ${error.message}`);
     }
   };
 
