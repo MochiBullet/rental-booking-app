@@ -196,8 +196,26 @@ export const siteSettingsManager = {
   // 設定を保存 - LocalStorageに確実に保存
   saveSettings: (settings) => {
     try {
+      console.log('📥 LocalStorage保存開始:', settings);
+      console.log('🔑 保存するキー:', Object.keys(settings));
+      
+      if (settings.tiles) {
+        console.log('🖼️ タイル設定:', settings.tiles);
+        console.log('🎯 タイル画像キー:', Object.keys(settings.tiles));
+      }
+      
       localStorage.setItem('rentalEasySiteSettings', JSON.stringify(settings));
       console.log('✅ Settings saved to LocalStorage:', Object.keys(settings));
+      
+      // 保存後即座確認
+      const saved = localStorage.getItem('rentalEasySiteSettings');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        console.log('🔍 保存確認:', Object.keys(parsed));
+        if (parsed.tiles) {
+          console.log('🖼️ 保存されたタイル:', Object.keys(parsed.tiles));
+        }
+      }
     } catch (error) {
       console.error('❌ LocalStorage保存エラー:', error);
     }

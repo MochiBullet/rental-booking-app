@@ -88,8 +88,22 @@ const SiteSettingsManagement = ({ onSettingsUpdate, activeSection: propActiveSec
       
       if (dynamoSettings && dynamoSettings.siteSettings) {
         console.log('✅ DB設定読み込み完了');
-        setSettings(dynamoSettings.siteSettings);
-        siteSettingsManager.saveSettings(dynamoSettings.siteSettings);
+        const dbSettings = dynamoSettings.siteSettings;
+        
+        console.log('🔍 DB設定詳細:', dbSettings);
+        console.log('🔍 タイル設定:', dbSettings.tiles);
+        
+        setSettings(dbSettings);
+        
+        // LocalStorageに確実に保存
+        console.log('💾 LocalStorage保存実行中...');
+        siteSettingsManager.saveSettings(dbSettings);
+        
+        // 保存後確認
+        setTimeout(() => {
+          const saved = siteSettingsManager.getSettings();
+          console.log('✅ LocalStorage保存確認:', Object.keys(saved));
+        }, 100);
       } else if (Object.keys(dynamoSettings).length > 0) {
         // 旧形式対応
         console.log('✅ DB設定読み込み完了（直接形式）');

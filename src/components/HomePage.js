@@ -476,7 +476,10 @@ function HomePage() {
           <div className="vehicle-tile car-tile" onClick={() => navigate('/vehicles/car')}>
             <div className="tile-image-large">
               <img 
-                src={getTileImage('car')} 
+                src={(() => {
+                  console.log('🚗 車タイル画像取得呼び出し');
+                  return getTileImage('car');
+                })()} 
                 alt="車レンタル" 
                 className="tile-img"
                 loading="lazy"
@@ -490,7 +493,10 @@ function HomePage() {
           <div className="vehicle-tile bike-tile" onClick={() => navigate('/vehicles/bike')}>
             <div className="tile-image-large">
               <img 
-                src={getTileImage('bike')} 
+                src={(() => {
+                  console.log('🏍️ バイクタイル画像取得呼び出し');
+                  return getTileImage('bike');
+                })()} 
                 alt="バイクレンタル" 
                 className="tile-img"
                 loading="lazy"
