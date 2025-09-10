@@ -2,7 +2,32 @@
 
 このファイルはClaude Code (claude.ai/code)がこのリポジトリのコードを操作する際のガイダンスを提供します。
 
-## 🔥 最新作業記録 (2025年9月10日)
+## 🔥 最新作業記録 (2025年9月11日)
+
+### タイル画像永続化問題の完全解決
+
+**問題発生の経緯:**
+- **原因:** 過去のDB移行作業による設定データ汚染
+- **症状:** タイル画像が「保存されていない」「画面上で確認できない」「リロードすると消える」問題
+- **根本原因:** Lambda関数のPUT処理で`body.get('value', {})`が使用され、`settingValue`パラメータが無視されていた
+
+**解決作業実施内容:**
+1. ✅ Deploy to AWS S3 #337 (Commit 512a7b3)への完全ロールバック
+2. ✅ siteSettingsAPI.jsをDB優先の正常モードに復元
+3. ✅ SiteSettingsManagement.jsxを`siteSettings`全体保存方式に復元
+4. ✅ Lambda関数のPUT処理修正（`settingValue`パラメータ対応）
+5. ✅ CDKによる修正版Lambda関数の本番デプロイ
+6. ✅ クリーンな初期データでのDB完全復元
+
+**技術的成果:**
+- Lambda関数PUT処理の完全修復（`body.get('settingValue', body.get('value', {}))`対応）
+- API Gateway経由でのsettingValue正常保存・読み込み確認
+- DynamoDBへの確実なデータ永続化機能復活
+- タイル画像アップロード→DB保存→リロード後復元の完全動作確認
+
+**デプロイ:** cf97406d（最終クリーンアップ） → GitHub Actions自動実行完了
+
+## 🔥 過去作業記録 (2025年9月10日)
 
 ### DynamoDB予約語「capacity」エラー修正完了
 

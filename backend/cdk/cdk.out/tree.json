@@ -730,7 +730,7 @@
                   "aws:cdk:cloudformation:props": {
                     "code": {
                       "s3Bucket": "cdk-hnb659fds-assets-276291855506-ap-southeast-2",
-                      "s3Key": "80d980449eb663961a25ee606c7ad02852e267a630fc71190e9dfab13cf9f4fa.zip"
+                      "s3Key": "59f3c82d48cac139d4346e19a1133681e7b8b46bf32baab4c93b61f73e84fe10.zip"
                     },
                     "environment": {
                       "variables": {

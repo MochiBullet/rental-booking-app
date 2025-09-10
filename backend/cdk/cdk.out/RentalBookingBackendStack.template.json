@@ -427,7 +427,7 @@
    "Properties": {
     "Code": {
      "S3Bucket": "cdk-hnb659fds-assets-276291855506-ap-southeast-2",
-     "S3Key": "80d980449eb663961a25ee606c7ad02852e267a630fc71190e9dfab13cf9f4fa.zip"
+     "S3Key": "59f3c82d48cac139d4346e19a1133681e7b8b46bf32baab4c93b61f73e84fe10.zip"
     },
     "Environment": {
      "Variables": {
@@ -459,7 +459,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "RentalBookingBackendStack/SiteSettingsFunction/Resource",
-    "aws:asset:path": "asset.80d980449eb663961a25ee606c7ad02852e267a630fc71190e9dfab13cf9f4fa",
+    "aws:asset:path": "asset.59f3c82d48cac139d4346e19a1133681e7b8b46bf32baab4c93b61f73e84fe10",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
    }
