@@ -565,8 +565,8 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
     try {
       const vehicle = {
         name: newVehicle.name,
-        type: newVehicle.type,
-        vehicleType: newVehicle.type, // APIが期待するフィールド名
+        type: newVehicle.type === 'motorcycle' ? 'bike' : newVehicle.type,
+        vehicleType: newVehicle.type === 'motorcycle' ? 'bike' : newVehicle.type, // APIが期待するフィールド名
         price: parseFloat(newVehicle.price),
         pricePerDay: parseFloat(newVehicle.price), // APIが期待するフィールド名
         passengers: parseInt(newVehicle.passengers) || 4,
@@ -659,7 +659,7 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
       // vehicleMapperを使用してUPDATE用のデータを構築（DynamoDB予約語を自動除外）
       const vehicleData = {
         name: selectedVehicle.name,
-        type: selectedVehicle.type,
+        type: selectedVehicle.type === 'motorcycle' ? 'bike' : selectedVehicle.type,
         price: parseFloat(selectedVehicle.price),
         pricePerHour: parseFloat(selectedVehicle.pricePerHour || Math.round(selectedVehicle.price / 8)),
         passengers: parseInt(selectedVehicle.passengers) || 4,
