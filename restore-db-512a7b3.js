@@ -15,7 +15,7 @@ const client = new DynamoDBClient({
 });
 const docClient = DynamoDBDocumentClient.from(client);
 
-const TABLE_NAME = 'site-settings-table'; // テーブル名を確認要
+const TABLE_NAME = 'SiteSettings'; // テーブル名を確認要
 
 // Commit 512a7b3時点の正確なデータ
 const correctData = {

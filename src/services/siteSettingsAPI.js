@@ -6,33 +6,42 @@ class SiteSettingsAPI {
   }
 
   async getAllSettings() {
-    console.log('⚠️ DB破綻のため緊急LocalStorage優先モードに切替');
-    
-    // 緊急措置: DBが破綻しているのでLocalStorage最優先
-    const { initialSiteSettings } = await import('../data/siteSettings.js');
-    const localSettings = this.getLocalStorageSettings();
-    
-    // LocalStorageにsiteSettingsがある場合はそれを使用
-    if (localSettings.siteSettings) {
-      console.log('📦 LocalStorage siteSettings使用');
-      return localSettings.siteSettings;
-    }
-    
-    // LocalStorageにrentalEasySiteSettingsがある場合はそれを使用  
-    const directSettings = localStorage.getItem('rentalEasySiteSettings');
-    if (directSettings) {
-      try {
-        const parsed = JSON.parse(directSettings);
-        console.log('📦 LocalStorage直接設定使用:', Object.keys(parsed));
-        return parsed;
-      } catch (e) {
-        console.error('LocalStorage解析エラー:', e);
+    try {
+      console.log('🌐 DB設定取得開始');
+      const response = await fetch(`${this.baseUrl}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+
+      const data = await response.json();
+      console.log('📊 DB設定応答:', data);
+      
+      if (data.siteSettings) {
+        console.log('✅ DB設定使用');
+        return data.siteSettings;
+      } else {
+        console.log('📋 初期設定使用');
+        const { initialSiteSettings } = await import('../data/siteSettings.js');
+        return initialSiteSettings;
+      }
+    } catch (error) {
+      console.error('❌ DB設定取得失敗:', error);
+      // フォールバック: LocalStorageから取得
+      const localSettings = this.getLocalStorageSettings();
+      if (localSettings.siteSettings) {
+        console.log('📦 LocalStorageフォールバック使用');
+        return localSettings.siteSettings;
+      }
+      // 最終フォールバック: 初期設定
+      const { initialSiteSettings } = await import('../data/siteSettings.js');
+      return initialSiteSettings;
     }
-    
-    // 何もない場合は初期設定
-    console.log('📋 初期設定使用（DB破綻により）');
-    return initialSiteSettings;
   }
 
   async getSetting(settingKey) {
@@ -83,23 +92,9 @@ class SiteSettingsAPI {
   }
 
   async saveSetting(settingKey, settingValue) {
-    console.log(`⚠️ DB破綻のため ${settingKey} を LocalStorage 優先保存`);
-    
-    const dataSize = JSON.stringify(settingValue).length;
-    const dataSizeKB = Math.round(dataSize / 1024);
-    console.log(`📊 データサイズ: ${dataSizeKB}KB`);
-    
-    // 確実にLocalStorageに保存（メイン）
-    this.saveToLocalStorage(settingKey, settingValue);
-    
-    // siteSettingsの場合は直接キーでも保存
-    if (settingKey === 'siteSettings') {
-      localStorage.setItem('rentalEasySiteSettings', JSON.stringify(settingValue));
-      console.log(`✅ LocalStorage確実保存: ${settingKey} (${dataSizeKB}KB)`);
-    }
-    
-    // DBは一応試すが、失敗しても無視
     try {
+      console.log(`💾 ${settingKey} DB保存開始`);
+      
       const requestBody = {
         settingKey: settingKey,
         settingValue: settingValue,
@@ -112,19 +107,25 @@ class SiteSettingsAPI {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(requestBody),
-        timeout: 5000
       });
 
-      if (response.ok) {
-        console.log(`📤 DB保存も成功: ${settingKey}`);
-      } else {
-        console.log(`⚠️ DB保存失敗だがLocalStorageで継続: ${settingKey}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+
+      const result = await response.json();
+      console.log(`✅ ${settingKey} DB保存成功:`, result);
+      
+      // DB保存成功後にLocalStorageにも保存（バックアップ）
+      this.saveToLocalStorage(settingKey, settingValue);
+      
+      return result;
     } catch (error) {
-      console.log(`⚠️ DB接続失敗だがLocalStorageで継続: ${settingKey}`);
+      console.error(`❌ ${settingKey} DB保存失敗:`, error);
+      // フォールバック: LocalStorageに保存
+      this.saveToLocalStorage(settingKey, settingValue);
+      throw error;
     }
-    
-    return { success: true, source: 'localStorage' };
   }
 
   async saveAllSettings(settings) {

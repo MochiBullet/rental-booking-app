@@ -4,6 +4,8 @@
   "description": "車・バイクレンタル予約サイト",
   "private": true,
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.883.0",
+    "@aws-sdk/lib-dynamodb": "^3.883.0",
     "aws-sdk": "^2.1691.0",
     "axios": "^1.6.0",
     "date-fns": "^2.30.0",
