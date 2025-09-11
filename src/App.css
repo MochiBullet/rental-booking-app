@@ -3050,7 +3050,7 @@ body {
 .car-wheel-spinner {
   width: 80px;
   height: 80px;
-  background-image: url('/wheel-spinner.svg');
+  background-image: url('../public/wheel-spinner.svg');
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
