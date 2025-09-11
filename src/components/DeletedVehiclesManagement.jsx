@@ -99,7 +99,7 @@ const DeletedVehiclesManagement = () => {
       <div className="deleted-vehicles-management">
         <div className="loading-container">
           <div className="car-wheel-spinner loading-spinner"></div>
-          <p>削除済み車両を読み込んでいます...</p>
+          <p>少々お待ちください</p>
         </div>
       </div>
     );

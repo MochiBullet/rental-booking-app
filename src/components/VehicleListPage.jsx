@@ -165,7 +165,7 @@ const VehicleListPage = ({ user }) => {
         </div>
         <div className="loading-container">
           <div className="car-wheel-spinner large"></div>
-          <p>車両情報を読み込んでいます...</p>
+          <p>少々お待ちください</p>
         </div>
       </div>
     );

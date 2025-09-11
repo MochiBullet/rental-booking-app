@@ -104,7 +104,7 @@ const ResetPassword = () => {
       <div className="reset-password-container">
         <div className="reset-password-card">
           <div className="spinner"></div>
-          <p>リンクを確認中...</p>
+          <p>少々お待ちください</p>
         </div>
       </div>
     );

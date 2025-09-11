@@ -157,7 +157,7 @@ const ReservationManagement = ({ onReservationUpdate }) => {
       <div className="reservation-management">
         <div className="loading-container">
           <div className="car-wheel-spinner"></div>
-          <p>予約データを読み込んでいます...</p>
+          <p>少々お待ちください</p>
         </div>
       </div>
     );
