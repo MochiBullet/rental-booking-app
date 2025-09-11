@@ -1,42 +1,5 @@
-.loading-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
-
-.wheel-spinner {
-  animation: spin 2s linear infinite;
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-.loading-message {
-  margin-top: 15px;
-  font-size: 1rem;
-  color: #43a047;
-  font-weight: 500;
-  text-align: center;
-  animation: pulse 1.5s ease-in-out infinite alternate;
-}
-
-@keyframes pulse {
-  0% {
-    opacity: 0.7;
-  }
-  100% {
-    opacity: 1;
-  }
-}
+/* LoadingWheelコンポーネント用のスタイル */
+/* App.cssのcar-wheel-spinnerとloading-containerを使用するため、独自定義は最小限に */
 
 /* レスポンシブ対応 */
 @media (max-width: 768px) {
