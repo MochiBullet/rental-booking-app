@@ -3048,32 +3048,32 @@ body {
 
 /* 車のホイール回転アニメーション */
 .car-wheel-spinner {
-  width: 80px;
-  height: 80px;
+  width: 200px;
+  height: 200px;
   background-image: url('../public/wheel-spinner.svg');
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
   animation: wheelSpin 1s linear infinite;
   display: inline-block;
-  margin: 20px auto;
+  margin: 40px auto;
 }
 
 .car-wheel-spinner.small {
-  width: 40px;
-  height: 40px;
-  margin: 10px auto;
+  width: 100px;
+  height: 100px;
+  margin: 20px auto;
 }
 
 .car-wheel-spinner.large {
-  width: 120px;
-  height: 120px;
-  margin: 30px auto;
+  width: 300px;
+  height: 300px;
+  margin: 50px auto;
 }
 
 .car-wheel-spinner.loading-spinner {
-  width: 80px;
-  height: 80px;
+  width: 200px;
+  height: 200px;
 }
 
 /* 回転アニメーション */
@@ -3097,8 +3097,9 @@ body {
 }
 
 .loading-container p {
-  margin-top: 20px;
-  font-size: 16px;
+  margin-top: 30px;
+  font-size: 24px;
   color: #666;
-  font-weight: 500;
+  font-weight: 600;
+  letter-spacing: 0.5px;
 }

@@ -1,12 +1,12 @@
 import React from 'react';
 import './LoadingWheel.css';
 
-const LoadingWheel = ({ size = 60, message = "少々お待ちください" }) => {
+const LoadingWheel = ({ size = 200, message = "少々お待ちください" }) => {
   // sizeに応じてクラスを決定
   let sizeClass = '';
-  if (size <= 50) {
+  if (size <= 100) {
     sizeClass = 'small';
-  } else if (size >= 100) {
+  } else if (size >= 200) {
     sizeClass = 'large';
   }
   

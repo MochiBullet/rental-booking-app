@@ -412,7 +412,7 @@ function HomePage() {
     return (
       <div className="home-page">
         <div className="hero-section" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <LoadingWheel size={100} message="少々お待ちください" />
+          <LoadingWheel size={300} message="少々お待ちください" />
         </div>
       </div>
     );
