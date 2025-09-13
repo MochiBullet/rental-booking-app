@@ -1,23 +1,53 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LoadingWheel from './LoadingWheel';
+import { siteSettingsAPI } from '../services/siteSettingsAPI';
 import './PrivacyPolicy.css';
 
 const PrivacyPolicy = () => {
   const navigate = useNavigate();
   const [policyContent, setPolicyContent] = useState(null);
+  const [settings, setSettings] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // プライバシーポリシー内容をlocalStorageから取得
-    const savedPolicy = localStorage.getItem('privacyPolicyContent');
-    if (savedPolicy) {
-      setPolicyContent(JSON.parse(savedPolicy));
-    } else {
-      // デフォルトプライバシーポリシーを設定
-      const defaultPolicy = {
+    loadPrivacyPolicy();
+  }, []);
+
+  const loadPrivacyPolicy = async () => {
+    try {
+      // DBからプライバシーポリシー内容を取得
+      const allSettings = await siteSettingsAPI.getAllSettings();
+      console.log('📋 プライバシーポリシー設定取得:', allSettings);
+      
+      setSettings(allSettings); // 設定を保存
+      
+      if (allSettings?.privacy && allSettings.privacy.content) {
+        // DB設定からプライバシーポリシー内容を使用
+        const dbPolicy = {
+          title: allSettings.privacy.title || 'M\'s BASE Rental プライバシーポリシー',
+          lastUpdated: allSettings.privacy.lastUpdated || new Date().toLocaleDateString('ja-JP'),
+          content: allSettings.privacy.content
+        };
+        setPolicyContent(dbPolicy);
+        console.log('✅ DBプライバシーポリシーを使用');
+      } else {
+        // デフォルトプライバシーポリシーを設定
+        const defaultPolicy = {
+          title: 'M\'s BASE Rental プライバシーポリシー',
+          lastUpdated: new Date().toLocaleDateString('ja-JP'),
+          content: 'プライバシーポリシーが設定されていません。管理画面から設定してください。'
+        };
+        setPolicyContent(defaultPolicy);
+        console.log('⚠️ デフォルトプライバシーポリシーを使用');
+      }
+    } catch (error) {
+      console.error('❌ プライバシーポリシー取得エラー:', error);
+      // エラー時はデフォルトプライバシーポリシー
+      const fallbackPolicy = {
         title: 'M\'s BASE Rental プライバシーポリシー',
-        lastUpdated: new Date().toISOString(),
+        lastUpdated: new Date().toLocaleDateString('ja-JP'),
+        content: 'プライバシーポリシーの読み込みに失敗しました。しばらく後に再度お試しください。',
         sections: [
           {
             id: 1,
@@ -71,11 +101,11 @@ const PrivacyPolicy = () => {
           }
         ]
       };
-      setPolicyContent(defaultPolicy);
-      localStorage.setItem('privacyPolicyContent', JSON.stringify(defaultPolicy));
+      setPolicyContent(fallbackPolicy);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
-  }, []);
+  };
 
   if (loading) {
     return (
@@ -90,7 +120,7 @@ const PrivacyPolicy = () => {
       <div className="privacy-header">
         <h1>{policyContent.title}</h1>
         <p className="last-updated">
-          最終更新日: {new Date(policyContent.lastUpdated).toLocaleDateString('ja-JP')}
+          最終更新日: {policyContent.lastUpdated}
         </p>
         <button 
           className="back-btn"
@@ -109,30 +139,72 @@ const PrivacyPolicy = () => {
         </div>
 
         <div className="privacy-sections">
-          {policyContent.sections.map((section) => (
-            <div key={section.id} className="privacy-section">
-              <h2>{section.title}</h2>
-              <div className="privacy-text">
-                {section.content.split('\\n').map((line, index) => (
-                  <p key={index}>{line}</p>
-                ))}
+          {policyContent.sections ? (
+            policyContent.sections.map((section) => (
+              <div key={section.id} className="privacy-section">
+                <h2>{section.title}</h2>
+                <div className="privacy-text">
+                  {section.content.split('\\n').map((line, index) => (
+                    <p key={index}>{line}</p>
+                  ))}
+                </div>
               </div>
+            ))
+          ) : (
+            <div className="privacy-text">
+              {policyContent.content && policyContent.content.split('\n').map((line, index) => (
+                <p key={index}>{line}</p>
+              ))}
             </div>
-          ))}
+          )}
         </div>
 
-        <div className="privacy-footer">
-          <div className="contact-info">
-            <h3>お問い合わせ先</h3>
-            <p>
-              本ポリシーに関するお問い合わせは、以下までご連絡ください。<br />
-              M's BASE Rental<br />
-              住所: 東京都渋谷区道玄坂1-2-3 M's BASE ビル 5階<br />
-              電話: 03-1234-5678<br />
-              メール: privacy@msbase-rental.com
-            </p>
+        {/* お問い合わせセクション */}
+        <div className="contact-section" style={{marginTop: '40px', padding: '30px', backgroundColor: '#f5f5f5', borderRadius: '10px'}}>
+          <h3 style={{fontSize: '24px', marginBottom: '20px', textAlign: 'center'}}>お問い合わせ</h3>
+          <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px'}}>
+            <div className="info-card" style={{backgroundColor: 'white', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', cursor: 'pointer'}} 
+                 onClick={() => window.open(`tel:${settings?.contact?.phone || '03-1234-5678'}`, '_self')}>
+              <div style={{fontSize: '30px', marginBottom: '10px'}}>📞</div>
+              <h4 style={{fontSize: '18px', marginBottom: '10px'}}>お電話でのお問い合わせ</h4>
+              <p style={{fontSize: '20px', fontWeight: 'bold', color: '#2e7d32'}}>{settings?.contact?.phone || '03-1234-5678'}</p>
+              <p style={{fontSize: '14px', color: '#666', marginTop: '10px'}}>
+                {settings?.contact?.businessHours?.weekday || '平日 9:00-18:00'}<br/>
+                {settings?.contact?.businessHours?.weekend || '土日祝 10:00-17:00'}
+              </p>
+            </div>
+            
+            <div className="info-card" style={{backgroundColor: 'white', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)'}}>
+              <div style={{fontSize: '30px', marginBottom: '10px'}}>📍</div>
+              <h4 style={{fontSize: '18px', marginBottom: '10px'}}>所在地</h4>
+              <p style={{fontSize: '16px', lineHeight: '1.6'}}>{settings?.contact?.address || '岐阜県岐阜市光町1-67'}</p>
+              <div style={{marginTop: '15px', display: 'flex', gap: '10px'}}>
+                <button 
+                  style={{padding: '8px 16px', backgroundColor: '#2e7d32', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer'}}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const address = encodeURIComponent(settings?.contact?.address || '岐阜県岐阜市光町1-67');
+                    window.open(`https://www.google.com/maps/search/?api=1&query=${address}`, '_blank');
+                  }}
+                >
+                  🗺️ 地図で見る
+                </button>
+                <button 
+                  style={{padding: '8px 16px', backgroundColor: '#1976d2', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer'}}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const address = encodeURIComponent(settings?.contact?.address || '岐阜県岐阜市光町1-67');
+                    window.open(`https://www.google.com/maps/dir/?api=1&destination=${address}`, '_blank');
+                  }}
+                >
+                  🚗 ルート検索
+                </button>
+              </div>
+            </div>
           </div>
-          
+        </div>
+        
+        <div className="privacy-footer">
           <div className="privacy-actions">
             <button 
               className="btn-primary"

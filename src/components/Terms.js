@@ -12,36 +12,36 @@ const Terms = () => {
   useEffect(() => {
     const loadTermsContent = async () => {
       try {
-        // DBから約款内容を取得
+        // DBから利用規約内容を取得
         const settings = await siteSettingsAPI.getAllSettings();
-        console.log('📋 約款設定取得:', settings);
+        console.log('📋 利用規約設定取得:', settings);
         
-        if (settings?.rentalTerms && settings.rentalTerms.content) {
-          // DB設定から約款内容を使用
+        if (settings?.terms && settings.terms.content) {
+          // DB設定から利用規約内容を使用
           const dbTerms = {
-            title: settings.rentalTerms.title || 'M\'s BASEレンタカー貸渡約款',
-            lastUpdated: settings.rentalTerms.lastUpdated || new Date().toLocaleDateString('ja-JP'),
-            content: settings.rentalTerms.content
+            title: settings.terms.title || 'M\'s BASE Rental 利用規約',
+            lastUpdated: settings.terms.lastUpdated || new Date().toLocaleDateString('ja-JP'),
+            content: settings.terms.content
           };
           setTermsContent(dbTerms);
-          console.log('✅ DB約款を使用');
+          console.log('✅ DB利用規約を使用');
         } else {
-          // デフォルト約款を設定
+          // デフォルト利用規約を設定
           const defaultTerms = {
-            title: 'M\'s BASEレンタカー貸渡約款',
+            title: 'M\'s BASE Rental 利用規約',
             lastUpdated: new Date().toLocaleDateString('ja-JP'),
-            content: 'レンタカー約款が設定されていません。管理画面から設定してください。'
+            content: '利用規約が設定されていません。管理画面から設定してください。'
           };
           setTermsContent(defaultTerms);
-          console.log('⚠️ デフォルト約款を使用');
+          console.log('⚠️ デフォルト利用規約を使用');
         }
       } catch (error) {
-        console.error('❌ 約款取得エラー:', error);
-        // エラー時はデフォルト約款
+        console.error('❌ 利用規約取得エラー:', error);
+        // エラー時はデフォルト利用規約
         const fallbackTerms = {
-          title: 'M\'s BASEレンタカー貸渡約款',
+          title: 'M\'s BASE Rental 利用規約',
           lastUpdated: new Date().toLocaleDateString('ja-JP'),
-          content: 'レンタカー約款の読み込みに失敗しました。しばらく後に再度お試しください。'
+          content: '利用規約の読み込みに失敗しました。しばらく後に再度お試しください。'
         };
         setTermsContent(fallbackTerms);
       } finally {
@@ -55,7 +55,7 @@ const Terms = () => {
   if (loading) {
     return (
       <div className="terms-container">
-        <LoadingWheel size={80} message="約款を読み込み中..." />
+        <LoadingWheel size={80} message="利用規約を読み込み中..." />
       </div>
     );
   }
