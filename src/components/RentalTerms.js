@@ -17,9 +17,9 @@ const RentalTerms = () => {
       console.log('🔄 Loading rental terms from DynamoDB...');
       const dynamoSettings = await siteSettingsAPI.getAllSettings();
       
-      if (Object.keys(dynamoSettings).length > 0) {
-        console.log('✅ Rental terms loaded from DynamoDB');
-        setSettings(dynamoSettings.siteSettings || {});
+      if (dynamoSettings && Object.keys(dynamoSettings).length > 0) {
+        console.log('✅ Rental terms loaded from DynamoDB:', dynamoSettings);
+        setSettings(dynamoSettings);
       } else {
         console.log('⚠️ No settings in DynamoDB, using LocalStorage');
         setSettings(siteSettingsManager.getSettings());
