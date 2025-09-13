@@ -4,12 +4,23 @@
 
 ## 🚨 開発再開時の必須手順
 
-**このプロジェクトパスが指定された場合、必ず以下を実行:**
+### デスクトップの「開発環境必須要件.txt」がドラッグ＆ドロップされた場合
+**または「C:\Users\hiyok\rental-booking-app」が指定された場合:**
+
 1. **このCLAUDE.mdファイルを最初に読む**
-2. **DEVELOPMENT_REQUIREMENTS.mdを読む**
+2. **DEVELOPMENT_REQUIREMENTS.mdを読む**  
 3. **git statusで現在状態確認**
 4. **npm startで開発サーバー起動**
 5. **最新作業記録を確認して、前回の続きから作業**
+
+**自動実行コマンド:**
+```bash
+cd C:\Users\hiyok\rental-booking-app
+cat CLAUDE.md | head -50
+cat DEVELOPMENT_REQUIREMENTS.md | head -50
+git status
+npm start
+```
 
 ## 🔥 最新作業記録 (2025年9月12日)
 
