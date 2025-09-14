@@ -22,7 +22,43 @@ git status
 npm start
 ```
 
-## 🔥 最新作業記録 (2025年9月13日)
+## 🔥 最新作業記録 (2025年9月14日)
+
+### Webikeバナー追加とiOS対応完了
+
+**実装内容:**
+- **Webikeバナー追加:** ホームページのお問い合わせセクション上部に中古バイクWidget追加
+- **iOS完全対応:** iPhone 15/SE/全機種でお問い合わせタイルの中央配置修正
+- **背景パターン実装・削除:** M'S BASEパターン背景のテスト実装後、元の緑色背景に復元
+
+**技術的詳細:**
+1. ✅ HomePage.jsにWebikeバナーセクション追加（iframe widget）
+2. ✅ 「中古バイクも取り扱っております」ヘッダー追加
+3. ✅ iOS Safari対応：FlexboxレイアウトでGrid問題解決
+4. ✅ iPhone各機種対応：15 Pro Max(430px)、15/14(390px)、SE(375px)
+5. ✅ !important追加でiOS特有のCSS問題を強制解決
+6. ✅ M'S BASEテキストパターン背景の実装・テスト・削除
+7. ✅ SVGファイル削除と元の緑色グラデーション背景復元
+
+**修正箇所:**
+- `src/components/HomePage.js`: Webikeバナーセクション追加（lines 537-566）
+- `src/components/HomePage.css`: Webike関連スタイル追加、背景設定復元
+- `src/App.css`: iOS対応レスポンシブデザイン強化、背景設定復元
+- `public/index.html`: 背景パターンの追加・削除
+- 削除: `public/msbase-pattern-bg.svg`, `src/msbase-pattern-bg.svg`
+
+**現在の状態:**
+- ✅ Webikeバナー表示中（https://moto.webike.net/widget）
+- ✅ iOS全機種でお問い合わせタイル正常表示（中央配置）
+- ✅ 元の緑色グラデーション背景に復元
+- ⚠️ CloudflareInsightsエラー確認済み（広告ブロッカー影響、対処不要）
+
+**コミット履歴:**
+- 1359f78c（iOS完全対応）
+- 1dfd7fc9（iPhone中央配置修正）
+- 88f845bb（Webikeバナー・背景実装）
+
+## 🔥 過去作業記録 (2025年9月13日)
 
 ### 利用規約・プライバシーポリシーのDB連携修正完了
 

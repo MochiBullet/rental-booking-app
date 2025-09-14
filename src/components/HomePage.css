@@ -36,7 +36,7 @@
 
 .home-page {
   min-height: 100vh;
-  background: transparent;
+  background: var(--gradient-soft);
   font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   width: 100%;
   overflow-x: hidden;
