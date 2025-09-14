@@ -22,7 +22,25 @@ git status
 npm start
 ```
 
-## 🔥 最新作業記録 (2025年9月12日)
+## 🔥 最新作業記録 (2025年9月13日)
+
+### 利用規約・プライバシーポリシーのDB連携修正完了
+
+**実装内容:**
+- **利用規約修正:** Terms.jsが誤ってレンタカー約款を表示していた問題を修正
+- **3つの規約を正しく分離:** terms（利用規約）/ privacy（プライバシーポリシー）/ rentalTerms（レンタカー約款）
+- **プライバシーポリシー改善:** 第10条削除・お問い合わせセクションをホームページと統合
+- **完全DB管理:** 管理画面から3つの規約すべて編集可能
+
+**技術的詳細:**
+1. ✅ Terms.js修正: `settings.rentalTerms` → `settings.terms` に変更
+2. ✅ PrivacyPolicy.jsにDB連携実装・Contact Section統合
+3. ✅ 管理画面SiteSettingsManagement.jsxは既存機能活用
+4. ✅ 相対パス（package.json homepage: "."）でJavaScript読み込み問題解決
+
+**デプロイ:** 62c6a7fc（利用規約・プライバシー修正）、f29a4096（RentalTerms修正）、87a1cc98（JS読み込み修正）
+
+## 🔥 過去作業記録 (2025年9月12日)
 
 ### ローディングアニメーション完全改修 - リアルホイール画像実装
 

@@ -91,17 +91,6 @@ const Terms = () => {
         </div>
 
         <div className="terms-footer">
-          <div className="contact-info">
-            <h3>お問い合わせ先</h3>
-            <p>
-              本規約に関するお問い合わせは、以下までご連絡ください。<br />
-              M's BASE Rental<br />
-              住所: 東京都渋谷区道玄坂1-2-3 M's BASE ビル 5階<br />
-              電話: 03-1234-5678<br />
-              メール: legal@msbase-rental.com
-            </p>
-          </div>
-          
           <div className="terms-actions">
             <button 
               className="btn-primary"
