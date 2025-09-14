@@ -92,13 +92,7 @@ const Terms = () => {
 
         <div className="terms-footer">
           <div className="terms-actions">
-            <button 
-              className="btn-primary"
-              onClick={() => navigate('/')}
-            >
-              理解しました
-            </button>
-            <button 
+            <button
               className="btn-secondary"
               onClick={() => window.print()}
             >

@@ -206,13 +206,7 @@ const PrivacyPolicy = () => {
         
         <div className="privacy-footer">
           <div className="privacy-actions">
-            <button 
-              className="btn-primary"
-              onClick={() => navigate('/')}
-            >
-              理解しました
-            </button>
-            <button 
+            <button
               className="btn-secondary"
               onClick={() => window.print()}
             >
