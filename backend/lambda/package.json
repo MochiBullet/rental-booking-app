@@ -1,0 +1,17 @@
+{
+  "name": "msbase-rental-auth-lambda",
+  "version": "1.0.0",
+  "description": "M's BASE Rental セキュア管理者認証 Lambda関数",
+  "main": "auth.js",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "scripts": {
+    "test": "node -e \"console.log('Lambda関数テスト用')\"",
+    "zip": "zip -r msbase-rental-auth.zip ."
+  },
+  "keywords": ["aws", "lambda", "authentication", "bcrypt", "jwt"],
+  "author": "M's BASE Rental",
+  "license": "MIT"
+}

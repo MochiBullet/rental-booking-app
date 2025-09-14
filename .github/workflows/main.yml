@@ -28,6 +28,11 @@ jobs:
       run: npm run build
       env:
         CI: false
+        REACT_APP_JWT_SECRET: ${{ secrets.REACT_APP_JWT_SECRET }}
+        REACT_APP_ENCRYPTION_KEY: ${{ secrets.REACT_APP_ENCRYPTION_KEY }}
+        REACT_APP_ADMIN_USERNAME: ${{ secrets.REACT_APP_ADMIN_USERNAME }}
+        REACT_APP_ADMIN_PASSWORD: ${{ secrets.REACT_APP_ADMIN_PASSWORD }}
+        REACT_APP_ENVIRONMENT: production
     
     - name: Check GitHub Secrets
       run: |
