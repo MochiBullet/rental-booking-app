@@ -706,8 +706,17 @@
   padding: 40px 20px;
   background-color: #f8f9fa;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+
+.webike-banner-section h2 {
+  font-size: 28px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 25px;
+  text-align: center;
 }
 
 .webike-banner-container {
@@ -729,6 +738,11 @@
 @media (max-width: 576px) {
   .webike-banner-section {
     padding: 20px 10px;
+  }
+
+  .webike-banner-section h2 {
+    font-size: 22px;
+    margin-bottom: 20px;
   }
 
   .webike-banner-container {

@@ -539,9 +539,19 @@ function HomePage() {
           padding: '40px 20px',
           backgroundColor: '#f8f9fa',
           display: 'flex',
+          flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center'
         }}>
+          <h2 style={{
+            fontSize: '28px',
+            fontWeight: 'bold',
+            color: '#333',
+            marginBottom: '25px',
+            textAlign: 'center'
+          }}>
+            中古バイクも取り扱っております
+          </h2>
           <div className="webike-banner-container" style={{
             maxWidth: '100%',
             width: '540px',
