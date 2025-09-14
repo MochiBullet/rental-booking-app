@@ -365,7 +365,66 @@ export const securityLogger = {
 };
 
 // 本番環境用管理者認証関数（ハッシュ化対応）
+// バックエンドAPI認証（セキュアモード）
+export const authenticateWithBackend = async (username, password) => {
+  try {
+    const API_URL = process.env.REACT_APP_API_URL;
+    if (!API_URL) {
+      console.error('API URL が設定されていません');
+      return { success: false, error: 'API_URL_MISSING' };
+    }
+
+    const response = await fetch(`${API_URL}/auth`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username: sanitizeInput(username),
+        password: sanitizeInput(password)
+      })
+    });
+
+    const result = await response.json();
+
+    if (result.success && result.data && result.data.token) {
+      // JWT トークンをセッションに保存
+      sessionStorage.setItem('authToken', result.data.token);
+      sessionStorage.setItem('authUser', JSON.stringify(result.data.user));
+
+      return {
+        success: true,
+        user: result.data.user,
+        token: result.data.token
+      };
+    } else {
+      return {
+        success: false,
+        error: result.message || 'Authentication failed'
+      };
+    }
+  } catch (error) {
+    console.error('バックエンド認証エラー:', error);
+    return {
+      success: false,
+      error: 'NETWORK_ERROR'
+    };
+  }
+};
+
 export const validateAdminCredentials = async (username, password) => {
+  // バックエンド認証を優先
+  const backendAuth = await authenticateWithBackend(username, password);
+  if (backendAuth.success) {
+    return {
+      valid: true,
+      user: backendAuth.user,
+      token: backendAuth.token,
+      mode: 'backend'
+    };
+  }
+
+  // フォールバック: フロントエンド認証
   try {
     const { username: adminUser, passwordHash, password: devPassword } = SECURITY_CONFIG.ADMIN_CREDENTIALS;
 

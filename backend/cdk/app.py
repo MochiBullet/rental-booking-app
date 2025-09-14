@@ -224,6 +224,26 @@ class RentalBookingBackendStack(Stack):
         site_setting_resource.add_method("PUT", apigateway.LambdaIntegration(site_settings_lambda))
         site_setting_resource.add_method("DELETE", apigateway.LambdaIntegration(site_settings_lambda))
 
+        # 🔐 Authentication Lambda Function
+        auth_lambda = lambda_.Function(
+            self, "AuthFunction",
+            runtime=lambda_.Runtime.NODEJS_18_X,
+            handler="auth.handler",
+            code=lambda_.Code.from_asset("../lambda"),
+            environment={
+                "ADMIN_USERNAME": "admin",
+                "ADMIN_PASSWORD_HASH": "$2b$12$PpFPRCh4tpglSUYBSymtROuFjGCKNpmK02yMM7zlqMeLsqyT9MzVG",  # msbase7032
+                "JWT_SECRET": "msbase-rental-production-jwt-secret-2025",
+            },
+            timeout=cdk.Duration.seconds(30),
+            memory_size=256,
+            description="M's BASE Rental セキュア管理者認証 Lambda関数"
+        )
+
+        # Authentication API Resource
+        auth_resource = api.root.add_resource("auth")
+        auth_resource.add_method("POST", apigateway.LambdaIntegration(auth_lambda))
+
         # Outputs
         cdk.CfnOutput(
             self, "APIEndpoint",
