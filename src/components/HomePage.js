@@ -533,7 +533,38 @@ function HomePage() {
             </div>
           </div>
         </div>
-        
+
+        {/* Webikeバナーセクション */}
+        <div className="webike-banner-section" style={{
+          padding: '40px 20px',
+          backgroundColor: '#f8f9fa',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center'
+        }}>
+          <div className="webike-banner-container" style={{
+            maxWidth: '100%',
+            width: '540px',
+            boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+            borderRadius: '10px',
+            overflow: 'hidden',
+            backgroundColor: 'white'
+          }}>
+            <iframe
+              src="https://moto.webike.net/widget_bike_list.html?dlr=25604&wvc=3&per=9&srt=15"
+              width="540"
+              height="400"
+              scrolling="auto"
+              style={{
+                width: '100%',
+                border: 'none',
+                display: 'block'
+              }}
+              title="Webike Bike List"
+            ></iframe>
+          </div>
+        </div>
+
         {/* 連絡先情報セクション */}
         <div className="contact-section">
           <h3 className="contact-section-title">お問い合わせ</h3>

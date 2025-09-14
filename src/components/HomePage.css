@@ -700,3 +700,39 @@
     padding: 1.5rem;
   }
 }
+
+/* Webikeバナーセクションのレスポンシブ対応 */
+.webike-banner-section {
+  padding: 40px 20px;
+  background-color: #f8f9fa;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.webike-banner-container {
+  max-width: 100%;
+  width: 540px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: white;
+}
+
+.webike-banner-container iframe {
+  width: 100%;
+  border: none;
+  display: block;
+}
+
+/* モバイル対応 */
+@media (max-width: 576px) {
+  .webike-banner-section {
+    padding: 20px 10px;
+  }
+
+  .webike-banner-container {
+    width: 100%;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+}
