@@ -697,29 +697,65 @@ body::before {
   text-decoration: underline;
 }
 
-/* iPhone・スマートフォン対応 */
+/* iPhone・スマートフォン対応 - 全iOSデバイス */
 @media screen and (max-width: 480px) {
   .contact-info {
-    grid-template-columns: 1fr;
-    padding: 0 0.5rem;
-    gap: 1.5rem;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    padding: 0 1rem !important;
+    gap: 1.5rem !important;
+    width: 100% !important;
   }
 
   .contact-card {
-    width: 100%;
-    max-width: 350px;
-    margin: 0 auto;
-    padding: 1.5rem;
+    width: 100% !important;
+    max-width: 320px !important;
+    margin: 0 auto !important;
+    padding: 1.5rem !important;
+    box-sizing: border-box !important;
   }
 
   .contact-section {
-    padding: 2rem 0;
+    padding: 2rem 0 !important;
+    width: 100% !important;
   }
 
   .contact-section h2 {
-    font-size: 2rem;
-    margin-bottom: 2rem;
-    padding: 0 1rem;
+    font-size: 2rem !important;
+    margin-bottom: 2rem !important;
+    padding: 0 1rem !important;
+    text-align: center !important;
+  }
+}
+
+/* iPhone 15 Pro Max (430px幅) 対応 */
+@media screen and (max-width: 430px) and (min-width: 391px) {
+  .contact-card {
+    max-width: 350px !important;
+  }
+}
+
+/* iPhone 15/14 (390px幅) 対応 */
+@media screen and (max-width: 390px) and (min-width: 376px) {
+  .contact-card {
+    max-width: 330px !important;
+  }
+}
+
+/* iPhone SE (375px幅) 専用対応 */
+@media screen and (max-width: 375px) {
+  .contact-info {
+    padding: 0 0.5rem !important;
+  }
+
+  .contact-card {
+    max-width: 300px !important;
+    padding: 1rem !important;
+  }
+
+  .contact-section h2 {
+    font-size: 1.8rem !important;
   }
 }
 
