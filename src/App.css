@@ -30,13 +30,40 @@
 }
 
 body {
-  background: var(--extra-light-gray);
+  background: #5a5a5a !important;
+  background-image:
+    linear-gradient(45deg, rgba(255,255,255,0.05) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(255,255,255,0.05) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(255,255,255,0.05) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(255,255,255,0.05) 75%) !important;
+  background-size: 60px 60px !important;
+  background-position: 0 0, 0 30px, 30px -30px, -30px 0px !important;
+  position: relative;
   color: var(--dark-gray);
   font-family: 'Segoe UI', 'Roboto', 'Noto Sans JP', 'Arial', sans-serif;
   font-weight: 400;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+body::before {
+  content: "M'S BASE M'S BASE M'S BASE M'S BASE M'S BASE M'S BASE M'S BASE M'S BASE M'S BASE M'S BASE M'S BASE M'S BASE M'S BASE M'S BASE M'S BASE M'S BASE M'S BASE M'S BASE M'S BASE M'S BASE M'S BASE M'S BASE M'S BASE M'S BASE M'S BASE M'S BASE M'S BASE M'S BASE M'S BASE M'S BASE M'S BASE M'S BASE M'S BASE M'S BASE M'S BASE M'S BASE ";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 120%;
+  height: 120%;
+  font-size: 32px;
+  font-weight: bold;
+  color: rgba(255,255,255,0.15);
+  transform: rotate(-30deg) translate(-10%, -10%);
+  line-height: 100px;
+  word-spacing: 60px;
+  z-index: -1;
+  overflow: hidden;
+  white-space: pre-wrap;
+  pointer-events: none;
 }
 
 .App {
@@ -635,6 +662,10 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  justify-items: center;
 }
 
 .contact-card {
@@ -664,6 +695,45 @@ body {
 .contact-card a:hover {
   color: #5a6fd8;
   text-decoration: underline;
+}
+
+/* iPhone・スマートフォン対応 */
+@media screen and (max-width: 480px) {
+  .contact-info {
+    grid-template-columns: 1fr;
+    padding: 0 0.5rem;
+    gap: 1.5rem;
+  }
+
+  .contact-card {
+    width: 100%;
+    max-width: 350px;
+    margin: 0 auto;
+    padding: 1.5rem;
+  }
+
+  .contact-section {
+    padding: 2rem 0;
+  }
+
+  .contact-section h2 {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    padding: 0 1rem;
+  }
+}
+
+/* iPad・タブレット対応 */
+@media screen and (max-width: 768px) and (min-width: 481px) {
+  .contact-info {
+    grid-template-columns: 1fr;
+    max-width: 600px;
+    padding: 0 2rem;
+  }
+
+  .contact-card {
+    max-width: 400px;
+  }
 }
 
 /* Member System Styles */
