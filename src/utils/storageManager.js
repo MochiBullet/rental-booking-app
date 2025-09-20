@@ -106,7 +106,8 @@ export const storageManager = {
 
         // 再試行
         try {
-          storage.setItem(key, stringValue);
+          const retryValue = typeof value === 'string' ? value : JSON.stringify(value);
+          storage.setItem(key, retryValue);
         } catch (retryError) {
           console.error('Failed to save even after emergency cleanup:', retryError);
           throw retryError;
