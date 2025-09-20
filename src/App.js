@@ -22,6 +22,7 @@ import PrivacyPolicy from './components/PrivacyPolicy';
 import RentalTerms from './components/RentalTerms';
 import AnnouncementDetail from './components/AnnouncementDetail';
 import { getGlobalSettings, updateGlobalSettings } from './data/globalSettings';
+import storageManager from './utils/storageManager';
 
 function AppContent() {
   // INFO SITE MODE: Simplified state management
@@ -55,6 +56,18 @@ function AppContent() {
   const location = useLocation();
 
   useEffect(() => {
+    // ストレージのクリーンアップとデバッグ
+    try {
+      storageManager.initializeStorage();
+
+      // デバッグモードの場合は詳細情報を出力
+      if (process.env.NODE_ENV === 'development') {
+        storageManager.debugStorage();
+      }
+    } catch (error) {
+      console.error('Storage initialization error:', error);
+    }
+
     // DISABLED: User authentication features
     /*
     const savedUser = localStorage.getItem('currentUser');
@@ -62,7 +75,7 @@ function AppContent() {
       setUser(JSON.parse(savedUser));
     }
     */
-    
+
     // 管理者ログイン状態を復元（リロード対応強化版）
     const checkAdminLogin = () => {
       const adminUser = localStorage.getItem('adminUser');

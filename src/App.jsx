@@ -14,6 +14,7 @@ import MemberRegistration from './components/MemberRegistration';
 import MemberMyPage from './components/MemberMyPage';
 import TermsPage from './components/TermsPage';
 import PrivacyPage from './components/PrivacyPage';
+import SecurityTest from './SecurityTest';
 import './App.css';
 
 function App() {
@@ -449,6 +450,29 @@ function App() {
         
         {currentView === 'privacy' && (
           <PrivacyPage onBack={() => setCurrentView('home')} />
+        )}
+
+        {currentView === 'security-test' && (
+          <div>
+            <button
+              onClick={() => setCurrentView('home')}
+              style={{
+                position: 'absolute',
+                top: '20px',
+                left: '20px',
+                padding: '0.5rem 1rem',
+                backgroundColor: '#2e7d32',
+                color: 'white',
+                border: 'none',
+                borderRadius: '5px',
+                cursor: 'pointer',
+                zIndex: 1000
+              }}
+            >
+              ← ホームに戻る
+            </button>
+            <SecurityTest />
+          </div>
         )}
       </main>
       

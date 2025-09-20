@@ -87,10 +87,21 @@ class SessionManager {
 
 export const sessionManager = new SessionManager();
 
-// セッションクリーンアップを定期実行
-setInterval(() => {
-  sessionManager.cleanupExpiredSessions();
-}, 5 * 60 * 1000); // 5分ごと
+// セッションクリーンアップを定期実行（適切なクリーンアップ付き）
+if (typeof window !== 'undefined') {
+  const cleanupInterval = setInterval(() => {
+    try {
+      sessionManager.cleanupExpiredSessions();
+    } catch (error) {
+      console.error('Session cleanup error:', error);
+    }
+  }, 5 * 60 * 1000); // 5分ごと
+
+  // ページアンロード時にインターバルをクリア
+  window.addEventListener('beforeunload', () => {
+    clearInterval(cleanupInterval);
+  });
+}
 
 // 認証ヘルパー関数
 export const authenticateUser = async (email, password, members) => {
