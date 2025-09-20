@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8" />
+    <title>M's BASE Rental - Loading...</title>
+    <script>
+        // SPAのルーティングサポート
+        // 404エラー時にindex.htmlにリダイレクトして、React Routerにルーティングを任せる
+        const path = window.location.pathname;
+        const search = window.location.search;
+        const hash = window.location.hash;
+
+        // パスを保持したまま、index.htmlを読み込む
+        // GitHub Pages や S3 の静的ホスティングでのSPAサポート
+        sessionStorage.setItem('redirectPath', path + search + hash);
+        window.location.replace('/');
+    </script>
+</head>
+<body>
+    <noscript>
+        <meta http-equiv="refresh" content="0; URL='/'">
+    </noscript>
+</body>
+</html>

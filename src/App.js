@@ -56,6 +56,13 @@ function AppContent() {
   const location = useLocation();
 
   useEffect(() => {
+    // 404.htmlからのリダイレクト処理
+    const redirectPath = sessionStorage.getItem('redirectPath');
+    if (redirectPath) {
+      sessionStorage.removeItem('redirectPath');
+      window.history.replaceState(null, '', redirectPath);
+    }
+
     // ストレージのクリーンアップとデバッグ
     try {
       storageManager.initializeStorage();
