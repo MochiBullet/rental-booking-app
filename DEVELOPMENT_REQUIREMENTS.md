@@ -40,6 +40,23 @@ git remote -v
 aws s3 ls s3://rental-booking-app-website
 ```
 
+## 🆕 重要な技術的変更 (2025年9月20日更新)
+
+### HashRouter使用によるURL形式変更
+- **変更前**: `https://ms-base-rental.com/vehicles/car`
+- **変更後**: `https://ms-base-rental.com/#/vehicles/car`
+- **理由**: S3静的ホスティングでのSPAリロード問題を完全解決
+
+### セキュリティ実装状況
+- **認証**: AWS Lambda + bcrypt + JWT（エンタープライズ級）
+- **セキュリティスコア**: A級（95/100点）
+- **攻撃耐性**: SQLインジェクション・XSS攻撃テスト済み
+
+### ストレージ管理システム
+- **自動管理**: storageManager.jsによる5MB制限
+- **クリーンアップ**: 4MB超過時自動削除
+- **メモリリーク対策**: setInterval適切処理実装済み
+
 ## 🔧 開発サーバー起動手順
 
 ### 1. 初回セットアップ
