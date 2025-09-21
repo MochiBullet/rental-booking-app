@@ -45,7 +45,6 @@ const Spaciva = () => {
       <header className="spaciva-header">
         <div className="header-content">
           <img src={spacivaLogo} alt="SPACIVA エステティックサロン スパシーバ" className="spaciva-logo" />
-          <p className="spaciva-subtitle">美容と癒しのエステサロン</p>
         </div>
       </header>
 
