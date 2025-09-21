@@ -108,6 +108,11 @@ const Spaciva = () => {
               <div className="price">¥4,400〜</div>
               <p className="price-period">/ 30分〜</p>
             </div>
+            <div className="pricing-card">
+              <h3>ホワイトニング</h3>
+              <div className="price">¥5,500</div>
+              <p className="price-period">/ 1回（30-40分程度）</p>
+            </div>
           </div>
           <div className="pricing-cards">
             <div className="pricing-card featured">
