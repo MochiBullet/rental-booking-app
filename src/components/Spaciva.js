@@ -142,6 +142,16 @@ const Spaciva = () => {
               </div>
             </div>
 
+            <div className="info-card instagram-card" onClick={() => window.open('https://www.instagram.com/spaciva_gujo/', '_blank')}>
+              <div className="info-icon">📷</div>
+              <div className="info-details">
+                <h3>公式Instagram</h3>
+                <p className="contact-value instagram-text">@spaciva_gujo</p>
+                <span className="contact-hours">最新情報・美容情報を配信中</span>
+                <div className="click-hint">📱 タップしてInstagramを開く</div>
+              </div>
+            </div>
+
             <div className="info-card location-card">
               <div className="info-icon">📍</div>
               <div className="info-details">
