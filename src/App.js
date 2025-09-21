@@ -2,7 +2,7 @@
 // Timestamp: 2025-09-06-17:30 - Google Forms連携機能キャッシュクリア
 // 管理画面簡素化完了: 車両管理・サイト設定・お知らせ管理の3機能のみ
 import React, { useState, useEffect } from 'react';
-import { HashRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Link, useLocation, Navigate, useNavigate } from 'react-router-dom';
 import './App.css';
 import HomePage from './components/HomePage';
 import VehicleListPage from './components/VehicleListPage';
@@ -27,10 +27,12 @@ import { getGlobalSettings, updateGlobalSettings } from './data/globalSettings';
 import storageManager from './utils/storageManager';
 
 function AppContent() {
+  const navigate = useNavigate();
+
   // INFO SITE MODE: Simplified state management
   // DISABLED: User authentication state
   // const [user, setUser] = useState(null);
-  
+
   // 初期状態で管理者認証をチェック
   const checkInitialAdminAuth = () => {
     const adminUser = localStorage.getItem('adminUser');
@@ -352,8 +354,8 @@ function AppContent() {
           <Route path="/spaciva" element={<Spaciva />} />
           
           {/* Admin Routes (Hidden from main navigation) */}
-          <Route path="/admin-login" element={<AdminLogin setIsAdmin={setIsAdmin} onSuccess={() => window.location.href = '/admin'} />} />
-          <Route path="/admin" element={<AdminDashboard onSettingsUpdate={handleSiteSettingsUpdate} />} />
+          <Route path="/admin-login" element={<AdminLogin setIsAdmin={setIsAdmin} onSuccess={() => navigate('/admin')} />} />
+          <Route path="/admin" element={isAdmin ? <AdminDashboard onSettingsUpdate={handleSiteSettingsUpdate} /> : <Navigate to="/admin-login" replace />} />
           
           {/* Legacy/Optional Routes */}
           <Route path="/announcement/:id" element={<AnnouncementDetail />} />

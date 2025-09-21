@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Login Test</title>
+</head>
+<body>
+    <h1>Admin Login Test</h1>
+    <p>Testing admin login functionality:</p>
+
+    <script>
+        // Test if we can navigate to admin-login
+        console.log('Current URL:', window.location.href);
+        console.log('Hash:', window.location.hash);
+
+        // Navigate to admin-login
+        window.location.hash = '#/admin-login';
+
+        setTimeout(() => {
+            console.log('After navigation - URL:', window.location.href);
+            console.log('After navigation - Hash:', window.location.hash);
+        }, 1000);
+    </script>
+</body>
+</html>

@@ -36,6 +36,9 @@ const AdminLogin = ({ setIsAdmin, onSuccess }) => {
     setIsLogging(false);
   };
 
+  // デバッグ用のログ
+  console.log('AdminLogin component is rendering');
+
   return (
     <div className="admin-login-wrapper">
       <div className="admin-login-card">
