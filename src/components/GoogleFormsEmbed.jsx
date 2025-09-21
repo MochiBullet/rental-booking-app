@@ -25,7 +25,7 @@ const GoogleFormsEmbed = ({ vehicleInfo = null, onClose }) => {
     );
   }
 
-  const formUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSdM1hGazWWkJJFFbMJBAzl-lEXE20XMtwfO_h-o7hEol8-bpw/viewform?embedded=true';
+  const formUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSdM1hGazWWkJJFFbMJBAzl-lEXE20XMtwfO_h-o7hEol8-bpw/viewform';
   const embedHeight = settings?.googleForms?.embedHeight || 800;
 
   return (
@@ -60,28 +60,50 @@ const GoogleFormsEmbed = ({ vehicleInfo = null, onClose }) => {
         )}
       </div>
 
-      <div className="google-forms-embed" style={{ 
+      <div className="google-forms-button-container" style={{
         width: '100%',
-        height: `${embedHeight}px`,
-        border: '1px solid #ddd',
-        borderRadius: '8px',
-        overflow: 'hidden'
+        textAlign: 'center',
+        padding: '3rem',
+        background: '#f8f9fa',
+        border: '2px solid #4caf50',
+        borderRadius: '12px',
+        margin: '2rem 0'
       }}>
-        <iframe
-          src={formUrl}
-          width="100%"
-          height={embedHeight}
-          frameBorder="0"
-          marginHeight="0"
-          marginWidth="0"
-          title="M's BASE レンタル予約フォーム"
-          style={{ width: '100%', height: '100%' }}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
-          loading="lazy"
+        <h3 style={{ color: '#2e7d32', marginBottom: '1rem' }}>
+          📋 予約フォームへ進む
+        </h3>
+        <p style={{ color: '#666', marginBottom: '2rem' }}>
+          Googleフォームが新しいタブで開きます。<br/>
+          安全で確実な予約手続きのため、外部サイトに移動します。
+        </p>
+        <button
+          onClick={() => window.open(formUrl, '_blank', 'noopener,noreferrer')}
+          style={{
+            background: 'linear-gradient(135deg, #4caf50 0%, #2e7d32 100%)',
+            color: 'white',
+            border: 'none',
+            padding: '1rem 2rem',
+            fontSize: '1.1rem',
+            fontWeight: 'bold',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            boxShadow: '0 4px 15px rgba(76, 175, 80, 0.3)',
+            transition: 'all 0.3s ease'
+          }}
+          onMouseOver={(e) => {
+            e.target.style.transform = 'translateY(-2px)';
+            e.target.style.boxShadow = '0 6px 20px rgba(76, 175, 80, 0.4)';
+          }}
+          onMouseOut={(e) => {
+            e.target.style.transform = 'translateY(0)';
+            e.target.style.boxShadow = '0 4px 15px rgba(76, 175, 80, 0.3)';
+          }}
         >
-          読み込み中...
-        </iframe>
+          🔗 予約フォームを開く
+        </button>
+        <div style={{ marginTop: '1rem', fontSize: '0.9rem', color: '#888' }}>
+          ※ポップアップがブロックされた場合は、ブラウザの設定でポップアップを許可してください
+        </div>
       </div>
 
       <div className="google-forms-footer" style={{
