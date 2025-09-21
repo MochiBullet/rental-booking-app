@@ -35,18 +35,9 @@ const Spaciva = () => {
       <div
         className="spaciva-background"
         style={{
-          backgroundImage: `
-            linear-gradient(-45deg,
-              rgba(255, 107, 157, 0.8),
-              rgba(196, 69, 105, 0.8),
-              rgba(248, 181, 0, 0.7),
-              rgba(255, 107, 157, 0.8)
-            ),
-            url(${spacivaBg})
-          `
+          backgroundImage: `url(${spacivaBg})`
         }}
       >
-        <div className="flowing-overlay"></div>
       </div>
 
       {/* ヘッダー */}
