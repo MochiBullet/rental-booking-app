@@ -534,9 +534,9 @@
 
 .contact-info-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 2rem;
-  max-width: 800px;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
@@ -755,4 +755,35 @@
     width: 100%;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   }
+}
+
+/* 車中泊スペースタイル */
+.camping-card {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.camping-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(102, 126, 234, 0.3);
+}
+
+.camping-card .info-icon {
+  font-size: 3rem;
+}
+
+.camping-card .info-details h3 {
+  color: white;
+}
+
+.camping-card .info-details p,
+.camping-card .info-details span {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.camping-card .click-hint {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+  margin-top: 10px;
 }

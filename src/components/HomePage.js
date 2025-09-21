@@ -619,6 +619,16 @@ function HomePage() {
                 </div>
               </div>
             </div>
+
+            <div className="info-card camping-card" onClick={() => window.location.href = '/#/camping-space'}>
+              <div className="info-icon">🏕️</div>
+              <div className="info-details">
+                <h3>車中泊スペース</h3>
+                <p className="contact-value">快適な車中泊をサポート</p>
+                <span className="contact-hours">24時間利用可能</span>
+                <div className="click-hint">詳細を見る →</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
