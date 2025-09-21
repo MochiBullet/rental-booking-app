@@ -1,0 +1,344 @@
+/* 車中泊スペースページ */
+.camping-space-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* ヘッダー */
+.camping-header {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  padding: 80px 20px 40px;
+  text-align: center;
+  color: white;
+}
+
+.header-content h1 {
+  font-size: 4rem;
+  margin-bottom: 2rem;
+  font-weight: bold;
+  letter-spacing: 0.2rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.header-image {
+  max-width: 1200px;
+  margin: 0 auto;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.header-image img {
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+  display: block;
+}
+
+/* コンテナ */
+.camping-container {
+  max-width: 1200px;
+  margin: -20px auto 0;
+  padding: 0 20px 40px;
+}
+
+/* セクション共通 */
+.camping-container section {
+  background: white;
+  border-radius: 20px;
+  padding: 3rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.camping-container h2 {
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 2rem;
+  text-align: center;
+  position: relative;
+  padding-bottom: 1rem;
+}
+
+.camping-container h2::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* 紹介セクション */
+.intro-section {
+  text-align: center;
+}
+
+.intro-section p {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: #666;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* 施設グリッド */
+.facilities-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.facility-card {
+  text-align: center;
+  padding: 1.5rem;
+  border-radius: 15px;
+  background: #f8f9fa;
+  transition: transform 0.3s ease;
+}
+
+.facility-card:hover {
+  transform: translateY(-5px);
+}
+
+.facility-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.facility-card h3 {
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.facility-card p {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* 料金カード */
+.pricing-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.pricing-card {
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 20px;
+  padding: 2rem;
+  text-align: center;
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.pricing-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+}
+
+.pricing-card.featured {
+  border-color: #667eea;
+  transform: scale(1.05);
+}
+
+.featured-badge {
+  position: absolute;
+  top: -10px;
+  right: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+}
+
+.pricing-card h3 {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.price {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #667eea;
+  margin: 1rem 0 0.5rem;
+}
+
+.price-period {
+  color: #999;
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+
+.pricing-card ul {
+  list-style: none;
+  padding: 0;
+  text-align: left;
+}
+
+.pricing-card li {
+  padding: 0.5rem 0;
+  color: #666;
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+.pricing-card li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: #667eea;
+  font-weight: bold;
+}
+
+/* 利用規約 */
+.rules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.rule-item {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 10px;
+}
+
+.rule-icon {
+  font-size: 1.5rem;
+  margin-right: 1rem;
+}
+
+.rule-item p {
+  color: #666;
+  margin: 0;
+  flex: 1;
+}
+
+/* アクセス情報 */
+.access-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 3rem;
+  margin-top: 2rem;
+}
+
+.access-info h3,
+.reservation-info h3 {
+  font-size: 1.3rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.phone-number {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #667eea;
+  margin: 1rem 0;
+}
+
+.business-hours {
+  color: #666;
+  margin-bottom: 1.5rem;
+}
+
+.map-button,
+.call-button {
+  padding: 12px 30px;
+  border: none;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.map-button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.call-button {
+  background: linear-gradient(135deg, #43a047 0%, #66bb6a 100%);
+  color: white;
+}
+
+.map-button:hover,
+.call-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* 周辺施設 */
+.nearby-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.nearby-item {
+  text-align: center;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 15px;
+}
+
+.nearby-icon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.nearby-item h4 {
+  font-size: 1.1rem;
+  color: #333;
+  margin: 0.5rem 0;
+}
+
+.nearby-item p {
+  color: #999;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  .header-content h1 {
+    font-size: 2.5rem;
+    letter-spacing: 0.1rem;
+  }
+
+  .header-image img {
+    height: 250px;
+  }
+
+  .camping-container section {
+    padding: 2rem 1.5rem;
+  }
+
+  .facilities-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+  }
+
+  .pricing-card.featured {
+    transform: scale(1);
+  }
+
+  .rules-grid {
+    grid-template-columns: 1fr;
+  }
+}

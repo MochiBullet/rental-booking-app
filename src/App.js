@@ -21,6 +21,7 @@ import Terms from './components/Terms';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import RentalTerms from './components/RentalTerms';
 import AnnouncementDetail from './components/AnnouncementDetail';
+import CampingSpace from './components/CampingSpace';
 import { getGlobalSettings, updateGlobalSettings } from './data/globalSettings';
 import storageManager from './utils/storageManager';
 
@@ -341,6 +342,7 @@ function AppContent() {
           <Route path="/terms" element={<Terms />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/rental-terms" element={<RentalTerms />} />
+          <Route path="/camping-space" element={<CampingSpace />} />
           
           {/* Admin Routes (Hidden from main navigation) */}
           <Route path="/admin-login" element={<AdminLogin setIsAdmin={setIsAdmin} onSuccess={() => window.location.href = '/admin'} />} />
