@@ -92,7 +92,7 @@ const Spaciva = () => {
           <div className="pricing-cards">
             <div className="pricing-card">
               <h3>全身ボディケア</h3>
-              <div className="price">¥3,300〜</div>
+              <div className="price">¥4,400〜</div>
               <p className="price-period">/ 30分〜</p>
               <ul>
                 <li>🌿アロマオイルリンパトリートメント</li>
@@ -100,31 +100,39 @@ const Spaciva = () => {
             </div>
             <div className="pricing-card">
               <h3>ヘッドマッサージ</h3>
-              <div className="price">¥3,300〜</div>
+              <div className="price">¥4,400〜</div>
               <p className="price-period">/ 30分〜</p>
             </div>
-            <div className="pricing-card featured">
-              <div className="featured-badge">人気</div>
-              <h3>フェイシャルエステ</h3>
-              <div className="price">¥6,600〜</div>
-              <p className="price-period">/ 60分</p>
-              <ul>
-                <li>🌿エイジングケア Rコース ¥8,800</li>
-                <li>🌿美白ケア Aコース ¥7,700</li>
-                <li>🌿リフレッシュ Uコース ¥6,600</li>
-              </ul>
+            <div className="pricing-card">
+              <h3>ハンドマッサージ</h3>
+              <div className="price">¥4,400〜</div>
+              <p className="price-period">/ 30分〜</p>
             </div>
           </div>
           <div className="pricing-cards">
-            <div className="pricing-card outdoor-therapy">
-              <h3>アウトドアセラピー</h3>
-              <div className="price">¥3,300〜</div>
-              <p className="price-period">木音-ボディケア / 30分〜</p>
+            <div className="pricing-card featured">
+              <div className="featured-badge">人気</div>
+              <h3>フェイシャルエステ60分</h3>
+              <div className="price">¥8,800〜</div>
+              <p className="price-period">/ 60分</p>
               <ul>
-                <li>🌿木音-ボディケア 30分〜 ¥3,300</li>
-                <li>🌿木音-ボディ＆フェイシャルケア 90分〜 ¥9,900〜</li>
+                <li>🌿エイジングケア Rコース ¥13,400</li>
+                <li>🌿美白ケア Aコース ¥11,000</li>
+                <li>🌿リフレッシュ Uコース ¥8,800</li>
               </ul>
             </div>
+            <div className="pricing-card outdoor-therapy">
+              <h3>アウトドアセラピー</h3>
+              <div className="price">¥4,400〜</div>
+              <p className="price-period">/ 30分〜</p>
+              <ul>
+                <li>🌿木音-ボディケア 30分〜 ¥4,400</li>
+                <li>🌿木音-ボディ＆フェイシャルケア 90分〜 ¥13,400</li>
+              </ul>
+            </div>
+          </div>
+          <div className="pricing-note">
+            <p>⭐メニューの組み合わせも可能です</p>
           </div>
         </section>
 

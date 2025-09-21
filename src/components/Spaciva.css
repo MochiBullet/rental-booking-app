@@ -285,6 +285,23 @@
   font-size: 1.2rem;
 }
 
+/* 料金注記 */
+.pricing-note {
+  text-align: center;
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, rgba(255, 107, 157, 0.1) 0%, rgba(196, 69, 105, 0.1) 100%);
+  border-radius: 15px;
+  border: 2px solid rgba(255, 107, 157, 0.2);
+}
+
+.pricing-note p {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #ff6b9d;
+  margin: 0;
+}
+
 /* アクセス情報 - ホームページと統一 */
 .contact-info-grid {
   display: grid;
