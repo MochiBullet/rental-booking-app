@@ -787,3 +787,34 @@
   font-size: 0.9rem;
   margin-top: 10px;
 }
+
+/* SPACIVAエステタイル */
+.spaciva-card {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
+}
+
+.spaciva-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(255, 107, 157, 0.3);
+}
+
+.spaciva-card .info-icon {
+  font-size: 3rem;
+}
+
+.spaciva-card .info-details h3 {
+  color: white;
+}
+
+.spaciva-card .info-details p,
+.spaciva-card .info-details span {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.spaciva-card .click-hint {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+  margin-top: 10px;
+}

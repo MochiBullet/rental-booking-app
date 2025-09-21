@@ -629,6 +629,16 @@ function HomePage() {
                 <div className="click-hint">詳細を見る →</div>
               </div>
             </div>
+
+            <div className="info-card spaciva-card" onClick={() => window.location.href = '/#/spaciva'}>
+              <div className="info-icon">💆‍♀️</div>
+              <div className="info-details">
+                <h3>SPACIVA</h3>
+                <p className="contact-value">美容と癒しのエステサロン</p>
+                <span className="contact-hours">完全予約制</span>
+                <div className="click-hint">詳細を見る →</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
