@@ -23,7 +23,7 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
   const [selectedDuration, setSelectedDuration] = useState(1);
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedEndDate, setSelectedEndDate] = useState('');
-  const [insuranceRequired, setInsuranceRequired] = useState(false);
+  const [insuranceRequired, setInsuranceRequired] = useState(true); // 強制適用
   const [totalPrice, setTotalPrice] = useState(0);
   
   // Vehicle images mapping
@@ -129,28 +129,19 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
 
   useEffect(() => {
     calculateTotalPrice();
-  }, [selectedVehicle, selectedDuration, insuranceRequired]);
+  }, [selectedVehicle, selectedDuration]); // insuranceRequiredは固定なので依存関係から削除
 
   const calculateTotalPrice = () => {
     if (!selectedVehicle) return;
 
     let basePrice = selectedVehicle.price;
-    let duration = selectedDuration;
+    let duration = Math.min(selectedDuration, 7); // 最大7日まで
 
-    // 基本料金計算
+    // 基本料金計算（割引なし）
     let rentalPrice = basePrice * duration;
-    
-    // 連泊割引適用
-    const discountRate = getDiscountRate(duration);
-    if (discountRate > 0) {
-      rentalPrice = rentalPrice * (1 - discountRate);
-    }
-    
-    // 保険料金追加（期間に応じた料金）
-    let insuranceTotal = 0;
-    if (insuranceRequired) {
-      insuranceTotal = getInsurancePrice(duration) * duration;
-    }
+
+    // 保険料金追加（強制適用・固定料金）
+    let insuranceTotal = 1000 * duration; // 1,000円/日 固定
 
     const total = rentalPrice + insuranceTotal;
     setTotalPrice(total);
@@ -447,15 +438,15 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
                           />
                         </div>
                         <div className="duration-input-group">
-                          <label>レンタル期間</label>
+                          <label>レンタル期間（最大7日間）</label>
                           <div className="duration-selector">
                             <button onClick={() => handleDurationChange(Math.max(1, selectedDuration - 1))}>-</button>
                             <span>{selectedDuration} 日間</span>
-                            <button onClick={() => handleDurationChange(selectedDuration + 1)}>+</button>
+                            <button onClick={() => handleDurationChange(Math.min(7, selectedDuration + 1))}>+</button>
                           </div>
-                          {getDiscountLabel(selectedDuration) && (
-                            <div className="discount-badge">
-                              {getDiscountLabel(selectedDuration)} 適用！
+                          {selectedDuration >= 7 && (
+                            <div className="long-term-notice">
+                              7日を超える長期レンタルをご希望の場合は、直接お問い合わせください。
                             </div>
                           )}
                         </div>
@@ -463,48 +454,32 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
                     </div>
 
                     <div className="form-section">
-                      <h4>補償プラン</h4>
+                      <h4>補償プラン（必須）</h4>
                       <div className="insurance-options">
-                        <div className="simple-insurance-toggle">
-                          <label className="toggle-label">
-                            <input 
-                              type="checkbox"
-                              checked={insuranceRequired}
-                              onChange={(e) => setInsuranceRequired(e.target.checked)}
-                            />
-                            <span className="toggle-slider"></span>
-                            <div className="insurance-info">
-                              <span className="insurance-name">安心補償プラン</span>
-                              <span className="insurance-price">+{formatCurrency(getInsurancePrice(selectedDuration))}/日</span>
-                              <span className="insurance-description">
-                                車両・対物・傷害補償を含む包括的な補償
-                                {selectedDuration >= 7 && (
-                                  <span className="insurance-discount"> (長期割引適用)</span>
-                                )}
-                              </span>
+                        <div className="insurance-fixed">
+                          <div className="insurance-info">
+                            <span className="insurance-name">安心補償プラン（強制加入）</span>
+                            <span className="insurance-price">¥1,000/日</span>
+                            <span className="insurance-description">
+                              車両・対物・傷害補償を含む包括的な補償
+                            </span>
+                            <div className="insurance-note">
+                              ※全てのレンタルに安心補償プランが含まれています
                             </div>
-                          </label>
+                          </div>
                         </div>
                       </div>
                     </div>
 
                     <div className="price-breakdown">
                       <div className="price-row">
-                        <span>基本料金 ({selectedDuration}日間)</span>
-                        <span>{formatCurrency(selectedVehicle.price * selectedDuration)}</span>
+                        <span>基本料金 ({Math.min(selectedDuration, 7)}日間)</span>
+                        <span>{formatCurrency(selectedVehicle.price * Math.min(selectedDuration, 7))}</span>
                       </div>
-                      {getDiscountRate(selectedDuration) > 0 && (
-                        <div className="price-row discount">
-                          <span>連泊割引 ({getDiscountLabel(selectedDuration)})</span>
-                          <span>-{formatCurrency(selectedVehicle.price * selectedDuration * getDiscountRate(selectedDuration))}</span>
-                        </div>
-                      )}
-                      {insuranceRequired && (
-                        <div className="price-row">
-                          <span>安心補償プラン ({selectedDuration}日間 × {formatCurrency(getInsurancePrice(selectedDuration))}/日)</span>
-                          <span>{formatCurrency(getInsurancePrice(selectedDuration) * selectedDuration)}</span>
-                        </div>
-                      )}
+                      <div className="price-row">
+                        <span>安心補償プラン ({Math.min(selectedDuration, 7)}日間 × ¥1,000/日)</span>
+                        <span>{formatCurrency(1000 * Math.min(selectedDuration, 7))}</span>
+                      </div>
                       <div className="price-row total">
                         <span>合計金額</span>
                         <span className="total-amount">{formatCurrency(totalPrice)}</span>
