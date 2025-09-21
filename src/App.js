@@ -22,6 +22,7 @@ import PrivacyPolicy from './components/PrivacyPolicy';
 import RentalTerms from './components/RentalTerms';
 import AnnouncementDetail from './components/AnnouncementDetail';
 import CampingSpace from './components/CampingSpace';
+import Spaciva from './components/Spaciva';
 import { getGlobalSettings, updateGlobalSettings } from './data/globalSettings';
 import storageManager from './utils/storageManager';
 
@@ -343,6 +344,7 @@ function AppContent() {
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/rental-terms" element={<RentalTerms />} />
           <Route path="/camping-space" element={<CampingSpace />} />
+          <Route path="/spaciva" element={<Spaciva />} />
           
           {/* Admin Routes (Hidden from main navigation) */}
           <Route path="/admin-login" element={<AdminLogin setIsAdmin={setIsAdmin} onSuccess={() => window.location.href = '/admin'} />} />
