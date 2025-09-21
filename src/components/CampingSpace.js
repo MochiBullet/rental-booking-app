@@ -87,13 +87,15 @@ const CampingSpace = () => {
           <div className="pricing-single">
             <div className="pricing-card featured">
               <h3>車中泊プラン</h3>
-              <div className="price">¥2,000</div>
+              <div className="price">¥4,000</div>
               <p className="price-period">/ 1泊</p>
+              <p className="price-description">1ブースあたり5名まで。6名以上の場合は1名あたり500円追加料金をいただきます。</p>
+              <div className="power-pricing">電源利用料金: ¥1,000</div>
               <ul>
                 <li>駐車スペース</li>
                 <li>トイレ・水道利用</li>
                 <li>ゴミ処理</li>
-                <li>電源利用</li>
+                <li>電源利用（別途料金）</li>
               </ul>
             </div>
           </div>
