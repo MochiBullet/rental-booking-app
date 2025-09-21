@@ -131,8 +131,8 @@ const CampingSpace = () => {
         </section>
 
         {/* アクセス情報 */}
-        <section className="access-section">
-          <h2>アクセス・ご予約</h2>
+        <div className="contact-section">
+          <h3 className="contact-section-title">アクセス・ご予約</h3>
           <div className="contact-info-grid">
             <div className="info-card phone-card" onClick={() => window.open(`tel:${contactInfo.phone}`, '_self')}>
               <div className="info-icon">📞</div>
@@ -175,7 +175,7 @@ const CampingSpace = () => {
               </div>
             </div>
           </div>
-        </section>
+        </div>
 
         {/* 周辺情報 */}
         <section className="nearby-section">
