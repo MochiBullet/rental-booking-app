@@ -91,36 +91,38 @@ const Spaciva = () => {
           <h2>料金プラン</h2>
           <div className="pricing-cards">
             <div className="pricing-card">
-              <h3>スタンダードコース</h3>
-              <div className="price">¥8,000</div>
-              <p className="price-period">/ 90分</p>
+              <h3>全身ボディケア</h3>
+              <div className="price">¥3,300〜</div>
+              <p className="price-period">/ 30分〜</p>
               <ul>
-                <li>フェイシャルケア</li>
-                <li>ボディマッサージ</li>
-                <li>アフターケア</li>
-              </ul>
-            </div>
-            <div className="pricing-card featured">
-              <div className="featured-badge">人気</div>
-              <h3>プレミアムコース</h3>
-              <div className="price">¥15,000</div>
-              <p className="price-period">/ 120分</p>
-              <ul>
-                <li>フルフェイシャルケア</li>
-                <li>全身ボディケア</li>
-                <li>ネイルケア</li>
-                <li>ヘアケア</li>
-                <li>プレミアムアフターケア</li>
+                <li>🌿アロマオイルリンパトリートメント</li>
               </ul>
             </div>
             <div className="pricing-card">
-              <h3>リラクゼーションコース</h3>
-              <div className="price">¥6,000</div>
+              <h3>ヘッドマッサージ</h3>
+              <div className="price">¥3,300〜</div>
+              <p className="price-period">/ 30分〜</p>
+            </div>
+            <div className="pricing-card featured">
+              <div className="featured-badge">人気</div>
+              <h3>フェイシャルエステ</h3>
+              <div className="price">¥6,600〜</div>
               <p className="price-period">/ 60分</p>
               <ul>
-                <li>ボディマッサージ</li>
-                <li>アロマテラピー</li>
-                <li>リラクゼーション</li>
+                <li>🌿エイジングケア Rコース ¥8,800</li>
+                <li>🌿美白ケア Aコース ¥7,700</li>
+                <li>🌿リフレッシュ Uコース ¥6,600</li>
+              </ul>
+            </div>
+          </div>
+          <div className="pricing-cards">
+            <div className="pricing-card outdoor-therapy">
+              <h3>アウトドアセラピー</h3>
+              <div className="price">¥3,300〜</div>
+              <p className="price-period">木音-ボディケア / 30分〜</p>
+              <ul>
+                <li>🌿木音-ボディケア 30分〜 ¥3,300</li>
+                <li>🌿木音-ボディ＆フェイシャルケア 90分〜 ¥9,900〜</li>
               </ul>
             </div>
           </div>
