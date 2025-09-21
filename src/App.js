@@ -57,6 +57,11 @@ function AppContent() {
   const [siteSettings, setSiteSettings] = useState(null);
   const location = useLocation();
 
+  // ページ移動時に必ずトップにスクロール
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
   useEffect(() => {
     // 404.htmlからのリダイレクト処理
     const redirectPath = sessionStorage.getItem('redirectPath');
