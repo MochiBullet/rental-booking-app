@@ -79,7 +79,7 @@ const Spaciva = () => {
               <p>頭皮の血行促進とリラクゼーション</p>
             </div>
             <div className="service-card">
-              <div className="service-icon">⚡</div>
+              <div className="service-icon">🦷</div>
               <h3>ホワイトニング</h3>
               <p>歯の美白とオーラルケア</p>
             </div>
