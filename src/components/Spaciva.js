@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './Spaciva.css';
 import { siteSettingsAPI } from '../services/siteSettingsAPI';
-import spacivaBg from '../images/spaciva-bg.jpg';
+import spacivaBg from '../images/spaciva-bg2.jpg';
 import spacivaLogo from '../images/spaciva-logo.png';
 
 const Spaciva = () => {
