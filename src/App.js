@@ -268,7 +268,7 @@ function AppContent() {
     setLogoClickTimer(timer);
     
     if (logoClickCount === 9) {
-      window.location.href = '/admin-login';
+      navigate('/admin-login');
       setLogoClickCount(0);
     }
   };
