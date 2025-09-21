@@ -74,14 +74,14 @@ const Spaciva = () => {
               <p>全身リラクゼーション＆美容ケア</p>
             </div>
             <div className="service-card">
-              <div className="service-icon">💅</div>
-              <h3>ネイルケア</h3>
-              <p>美しい指先を演出するネイルアート</p>
+              <div className="service-icon">🛁</div>
+              <h3>ヘッドスパ</h3>
+              <p>頭皮の血行促進とリラクゼーション</p>
             </div>
             <div className="service-card">
-              <div className="service-icon">🧴</div>
-              <h3>ヘアケア</h3>
-              <p>髪質改善トリートメント</p>
+              <div className="service-icon">⚡</div>
+              <h3>ホワイトニング</h3>
+              <p>歯の美白とオーラルケア</p>
             </div>
           </div>
         </section>
@@ -132,14 +132,13 @@ const Spaciva = () => {
         <div className="contact-section">
           <h3 className="contact-section-title">アクセス・ご予約</h3>
           <div className="contact-info-grid">
-            <div className="info-card phone-card" onClick={() => window.open(`tel:${contactInfo.phone}`, '_self')}>
-              <div className="info-icon">📞</div>
+            <div className="info-card line-card" onClick={() => window.open('https://lin.ee/mPNgeBD', '_blank')}>
+              <div className="info-icon">💬</div>
               <div className="info-details">
-                <h3>お電話でのご予約</h3>
-                <p className="contact-value phone-number">{contactInfo.phone}</p>
-                <span className="contact-hours">{contactInfo.businessHours?.weekday}</span>
-                <span className="contact-hours">{contactInfo.businessHours?.weekend}</span>
-                <div className="click-hint">📱 タップして発信</div>
+                <h3>ご予約は公式ラインから</h3>
+                <p className="contact-value line-text">LINE公式アカウント</p>
+                <span className="contact-hours">24時間受付可能</span>
+                <div className="click-hint">📱 タップしてLINEを開く</div>
               </div>
             </div>
 
