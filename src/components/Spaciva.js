@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './Spaciva.css';
 import { siteSettingsAPI } from '../services/siteSettingsAPI';
+import spacivaBg from '../images/spaciva-bg.jpg';
 
 const Spaciva = () => {
   const [contactInfo, setContactInfo] = useState({
@@ -31,7 +32,20 @@ const Spaciva = () => {
   return (
     <div className="spaciva-page">
       {/* 流れる背景 */}
-      <div className="spaciva-background">
+      <div
+        className="spaciva-background"
+        style={{
+          backgroundImage: `
+            linear-gradient(-45deg,
+              rgba(255, 107, 157, 0.8),
+              rgba(196, 69, 105, 0.8),
+              rgba(248, 181, 0, 0.7),
+              rgba(255, 107, 157, 0.8)
+            ),
+            url(${spacivaBg})
+          `
+        }}
+      >
         <div className="flowing-overlay"></div>
       </div>
 
