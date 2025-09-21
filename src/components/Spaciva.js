@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './Spaciva.css';
 import { siteSettingsAPI } from '../services/siteSettingsAPI';
 import spacivaBg from '../images/spaciva-bg.jpg';
+import spacivaLogo from '../images/spaciva-logo.png';
 
 const Spaciva = () => {
   const [contactInfo, setContactInfo] = useState({
@@ -43,7 +44,7 @@ const Spaciva = () => {
       {/* ヘッダー */}
       <header className="spaciva-header">
         <div className="header-content">
-          <h1 className="spaciva-title">SPACIVA</h1>
+          <img src={spacivaLogo} alt="SPACIVA エステティックサロン スパシーバ" className="spaciva-logo" />
           <p className="spaciva-subtitle">美容と癒しのエステサロン</p>
         </div>
       </header>

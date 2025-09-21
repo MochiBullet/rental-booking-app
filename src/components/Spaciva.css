@@ -31,6 +31,14 @@
   z-index: 1;
 }
 
+.spaciva-logo {
+  max-width: 500px;
+  width: 100%;
+  height: auto;
+  margin-bottom: 1rem;
+  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.1));
+}
+
 .spaciva-title {
   font-size: 4.5rem;
   font-weight: bold;
@@ -397,6 +405,10 @@
 
 /* レスポンシブ対応 */
 @media (max-width: 768px) {
+  .spaciva-logo {
+    max-width: 350px;
+  }
+
   .spaciva-title {
     font-size: 3rem;
     letter-spacing: 0.2rem;
