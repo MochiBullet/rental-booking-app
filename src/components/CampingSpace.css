@@ -238,58 +238,120 @@
   flex: 1;
 }
 
-/* アクセス情報 */
-.access-content {
+/* アクセス情報 - ホームページと統一 */
+.contact-info-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 3rem;
-  margin-top: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 2rem auto 0;
 }
 
-.access-info h3,
-.reservation-info h3 {
-  font-size: 1.3rem;
-  color: #333;
-  margin-bottom: 1rem;
-}
-
-.phone-number {
-  font-size: 1.8rem;
-  font-weight: bold;
-  color: #667eea;
-  margin: 1rem 0;
-}
-
-.business-hours {
-  color: #666;
-  margin-bottom: 1.5rem;
-}
-
-.map-button,
-.call-button {
-  padding: 12px 30px;
-  border: none;
-  border-radius: 25px;
-  font-size: 1rem;
-  font-weight: bold;
-  cursor: pointer;
+.info-card {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  cursor: pointer;
 }
 
-.map-button {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+.info-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
 }
 
-.call-button {
+.phone-card {
   background: linear-gradient(135deg, #43a047 0%, #66bb6a 100%);
   color: white;
 }
 
-.map-button:hover,
-.call-button:hover {
+.phone-card .info-details h3,
+.phone-card .contact-value,
+.phone-card .contact-hours,
+.phone-card .click-hint {
+  color: white !important;
+}
+
+.location-card {
+  background: white;
+}
+
+.info-icon {
+  font-size: 3rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.info-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.info-details h3 {
+  font-size: 1.3rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.contact-value {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin: 0.5rem 0;
+  color: #444;
+}
+
+.phone-number {
+  font-size: 1.5rem;
+}
+
+.address-text {
+  line-height: 1.6;
+}
+
+.contact-hours {
+  display: block;
+  font-size: 0.9rem;
+  opacity: 0.9;
+  margin: 0.3rem 0;
+}
+
+.click-hint {
+  font-size: 0.9rem;
+  margin-top: 1rem;
+  opacity: 0.8;
+}
+
+.map-actions {
+  display: flex;
+  gap: 0.8rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.map-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.route-button {
+  background: linear-gradient(135deg, #43a047 0%, #66bb6a 100%);
+}
+
+.map-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 /* 周辺施設 */

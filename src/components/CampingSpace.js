@@ -133,31 +133,46 @@ const CampingSpace = () => {
         {/* アクセス情報 */}
         <section className="access-section">
           <h2>アクセス・ご予約</h2>
-          <div className="access-content">
-            <div className="access-info">
-              <h3>📍 所在地</h3>
-              <p>{contactInfo.address}</p>
-              <button
-                className="map-button"
-                onClick={() => {
-                  const address = encodeURIComponent(contactInfo.address);
-                  window.open(`https://www.google.com/maps/search/?api=1&query=${address}`, '_blank');
-                }}
-              >
-                🗺️ 地図で確認
-              </button>
+          <div className="contact-info-grid">
+            <div className="info-card phone-card" onClick={() => window.open(`tel:${contactInfo.phone}`, '_self')}>
+              <div className="info-icon">📞</div>
+              <div className="info-details">
+                <h3>お電話でのお問い合わせ</h3>
+                <p className="contact-value phone-number">{contactInfo.phone}</p>
+                <span className="contact-hours">{contactInfo.businessHours?.weekday}</span>
+                <span className="contact-hours">{contactInfo.businessHours?.weekend}</span>
+                <div className="click-hint">📱 タップして発信</div>
+              </div>
             </div>
-            <div className="reservation-info">
-              <h3>📞 ご予約・お問い合わせ</h3>
-              <p className="phone-number">{contactInfo.phone}</p>
-              <p className="business-hours">{contactInfo.businessHours?.weekday}</p>
-              <p className="business-hours">{contactInfo.businessHours?.weekend}</p>
-              <button
-                className="call-button"
-                onClick={() => window.open(`tel:${contactInfo.phone}`, '_self')}
-              >
-                📱 電話をかける
-              </button>
+
+            <div className="info-card location-card">
+              <div className="info-icon">📍</div>
+              <div className="info-details">
+                <h3>所在地</h3>
+                <p className="contact-value address-text">{contactInfo.address}</p>
+                <div className="map-actions">
+                  <button
+                    className="map-button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const address = encodeURIComponent(contactInfo.address);
+                      window.open(`https://www.google.com/maps/search/?api=1&query=${address}`, '_blank');
+                    }}
+                  >
+                    🗺️ 地図で見る
+                  </button>
+                  <button
+                    className="map-button route-button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const address = encodeURIComponent(contactInfo.address);
+                      window.open(`https://www.google.com/maps/dir/?api=1&destination=${address}`, '_blank');
+                    }}
+                  >
+                    🚗 ルート検索
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </section>
