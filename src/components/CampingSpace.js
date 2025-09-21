@@ -1,7 +1,33 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './CampingSpace.css';
+import { siteSettingsAPI } from '../services/siteSettingsAPI';
 
 const CampingSpace = () => {
+  const [contactInfo, setContactInfo] = useState({
+    phone: '096-234-0831',
+    address: '〒861-4616 熊本県上益城郡甲佐町田口488-1',
+    businessHours: {
+      weekday: '平日: 9:00〜18:00',
+      weekend: '土日祝: 9:00〜18:00'
+    }
+  });
+
+  useEffect(() => {
+    // DBから連絡先情報を取得
+    const loadContactInfo = async () => {
+      try {
+        const settings = await siteSettingsAPI.getSettings();
+        if (settings && settings.contact) {
+          setContactInfo(settings.contact);
+        }
+      } catch (error) {
+        console.error('連絡先情報の取得エラー:', error);
+        // エラーの場合はデフォルト値を使用
+      }
+    };
+    loadContactInfo();
+  }, []);
+
   return (
     <div className="camping-space-page">
       {/* ヘッダー */}
@@ -38,11 +64,6 @@ const CampingSpace = () => {
               <p>24時間利用可能な清潔なトイレを完備</p>
             </div>
             <div className="facility-card">
-              <div className="facility-icon">💡</div>
-              <h3>照明設備</h3>
-              <p>夜間も安心の照明完備</p>
-            </div>
-            <div className="facility-card">
               <div className="facility-icon">🔌</div>
               <h3>電源設備</h3>
               <p>有料で電源利用可能</p>
@@ -57,49 +78,22 @@ const CampingSpace = () => {
               <h3>ゴミ処理</h3>
               <p>分別ゴミ箱設置</p>
             </div>
-            <div className="facility-card">
-              <div className="facility-icon">📶</div>
-              <h3>Wi-Fi</h3>
-              <p>無料Wi-Fi利用可能</p>
-            </div>
           </div>
         </section>
 
         {/* 料金セクション */}
         <section className="pricing-section">
           <h2>ご利用料金</h2>
-          <div className="pricing-cards">
-            <div className="pricing-card">
-              <h3>日帰り利用</h3>
-              <div className="price">¥1,000</div>
-              <p className="price-period">/ 12時間</p>
-              <ul>
-                <li>駐車スペース</li>
-                <li>トイレ・水道利用</li>
-                <li>ゴミ処理</li>
-              </ul>
-            </div>
+          <div className="pricing-single">
             <div className="pricing-card featured">
-              <div className="featured-badge">おすすめ</div>
-              <h3>1泊2日</h3>
+              <h3>車中泊プラン</h3>
               <div className="price">¥2,000</div>
-              <p className="price-period">/ 24時間</p>
+              <p className="price-period">/ 1泊</p>
               <ul>
                 <li>駐車スペース</li>
                 <li>トイレ・水道利用</li>
                 <li>ゴミ処理</li>
-                <li>電源利用（2時間）</li>
-                <li>Wi-Fi利用</li>
-              </ul>
-            </div>
-            <div className="pricing-card">
-              <h3>連泊プラン</h3>
-              <div className="price">¥1,500</div>
-              <p className="price-period">/ 24時間（2泊目以降）</p>
-              <ul>
-                <li>全設備利用可能</li>
-                <li>電源利用（4時間）</li>
-                <li>優先駐車スペース</li>
+                <li>電源利用</li>
               </ul>
             </div>
           </div>
@@ -142,11 +136,11 @@ const CampingSpace = () => {
           <div className="access-content">
             <div className="access-info">
               <h3>📍 所在地</h3>
-              <p>〒861-4616 熊本県上益城郡甲佐町田口488-1</p>
+              <p>{contactInfo.address}</p>
               <button
                 className="map-button"
                 onClick={() => {
-                  const address = encodeURIComponent('熊本県上益城郡甲佐町田口488-1');
+                  const address = encodeURIComponent(contactInfo.address);
                   window.open(`https://www.google.com/maps/search/?api=1&query=${address}`, '_blank');
                 }}
               >
@@ -155,11 +149,12 @@ const CampingSpace = () => {
             </div>
             <div className="reservation-info">
               <h3>📞 ご予約・お問い合わせ</h3>
-              <p className="phone-number">096-234-0831</p>
-              <p className="business-hours">受付時間: 9:00〜18:00</p>
+              <p className="phone-number">{contactInfo.phone}</p>
+              <p className="business-hours">{contactInfo.businessHours?.weekday}</p>
+              <p className="business-hours">{contactInfo.businessHours?.weekend}</p>
               <button
                 className="call-button"
-                onClick={() => window.open('tel:096-234-0831', '_self')}
+                onClick={() => window.open(`tel:${contactInfo.phone}`, '_self')}
               >
                 📱 電話をかける
               </button>

@@ -129,6 +129,17 @@
   margin-top: 2rem;
 }
 
+.pricing-single {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.pricing-single .pricing-card {
+  max-width: 400px;
+  width: 100%;
+}
+
 .pricing-card {
   background: white;
   border: 2px solid #e0e0e0;
