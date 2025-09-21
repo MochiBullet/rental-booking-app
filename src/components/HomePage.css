@@ -547,14 +547,20 @@
   margin: 0 auto;
 }
 
-.info-card {
+.contact-info-grid .info-card {
   background: white;
   border-radius: 20px;
   padding: 2rem;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
   text-align: center;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  color: #333;
+  color: #333 !important;
+}
+
+.contact-info-grid .info-card h3,
+.contact-info-grid .info-card p,
+.contact-info-grid .info-card span {
+  color: #333 !important;
 }
 
 .info-card:hover {
