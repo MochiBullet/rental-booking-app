@@ -1,12 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  sessionManager,
-  checkRateLimit,
-  sanitizeInput,
-  securityLogger,
-  validateAdminCredentials
-} from '../utils/security';
 import './AdminLogin.css';
 
 const AdminLogin = ({ setIsAdmin, onSuccess }) => {
@@ -22,81 +15,21 @@ const AdminLogin = ({ setIsAdmin, onSuccess }) => {
     setError('');
 
     try {
-      // 入力値サニタイゼーション
-      const cleanUsername = sanitizeInput(username);
-      const cleanPassword = sanitizeInput(password);
+      // シンプルな管理者認証
+      if (username === 'admin' && password === 'msbase7032') {
+        setIsAdmin(true);
 
-      // レート制限チェック
-      const rateCheck = checkRateLimit(cleanUsername, 'admin_login');
-      if (!rateCheck.allowed) {
-        setError(`ログイン試行回数が上限に達しました。${rateCheck.remainingTime}分後に再試行してください。`);
-        securityLogger.loginAttempt(cleanUsername, false, 'rate_limited');
-        setIsLogging(false);
-        return;
-      }
+        // 管理者情報をlocalStorageに保存
+        localStorage.setItem('adminUser', 'true');
+        localStorage.setItem('adminLoginTime', Date.now().toString());
+        sessionStorage.setItem('adminSession', 'true');
 
-      // 本番環境用管理者認証（環境変数対応）
-      const authResult = await validateAdminCredentials(cleanUsername, cleanPassword);
-
-      if (authResult.valid) {
-        try {
-          setIsAdmin(true);
-
-          // セキュアなセッション作成
-          const sessionData = sessionManager.create(authResult.user, true);
-
-          // ログイン成功のログ記録
-          securityLogger.loginAttempt(cleanUsername, true, 'admin_success');
-
-          const adminInfo = {
-            username: authResult.user.username,
-            role: authResult.user.role,
-            loginTime: Date.now(),
-            lastActivity: Date.now(),
-            sessionToken: sessionData.token,
-            csrfToken: sessionData.csrfToken,
-            permissions: authResult.user.permissions
-          };
-          localStorage.setItem('adminInfo', JSON.stringify(adminInfo));
-        
         navigate('/admin');
-        } catch (error) {
-          console.error('管理者ログイン処理エラー:', error);
-          securityLogger.suspiciousActivity('ADMIN_LOGIN_ERROR', { error: error.message });
-          setError('ログイン処理でエラーが発生しました');
-        }
       } else {
-        // ログイン失敗のログ記録（詳細な理由付き）
-        securityLogger.loginAttempt(cleanUsername, false, authResult.reason || 'invalid_credentials');
-
-        // ユーザー向けエラーメッセージ（セキュリティ上の理由で詳細は隠す）
-        let errorMessage = 'ユーザー名またはパスワードが正しくありません';
-
-        // 開発環境でのみ詳細表示
-        if (process.env.NODE_ENV === 'development') {
-          switch (authResult.reason) {
-            case 'MISSING_CREDENTIALS':
-              errorMessage = 'ユーザー名とパスワードを入力してください';
-              break;
-            case 'INVALID_USERNAME':
-              errorMessage = 'ユーザー名が正しくありません';
-              break;
-            case 'INVALID_PASSWORD':
-              errorMessage = 'パスワードが正しくありません';
-              break;
-            case 'SYSTEM_ERROR':
-              errorMessage = 'システムエラーが発生しました';
-              break;
-            default:
-              errorMessage = 'ユーザー名またはパスワードが正しくありません';
-          }
-        }
-
-        setError(errorMessage);
+        setError('ユーザー名またはパスワードが正しくありません');
       }
     } catch (error) {
       console.error('ログイン処理中のエラー:', error);
-      securityLogger.suspiciousActivity('LOGIN_SYSTEM_ERROR', { error: error.message });
       setError('システムエラーが発生しました。しばらくしてから再試行してください。');
     }
 
