@@ -13,20 +13,29 @@
   width: 100%;
   height: 100%;
   z-index: -2;
-  background: linear-gradient(-45deg, #ff6b9d, #c44569, #f8b500, #ff6b9d);
-  background-size: 400% 400%;
+  background:
+    linear-gradient(-45deg,
+      rgba(255, 107, 157, 0.8),
+      rgba(196, 69, 105, 0.8),
+      rgba(248, 181, 0, 0.7),
+      rgba(255, 107, 157, 0.8)
+    ),
+    url('/spaciva-bg.jpg');
+  background-size: 400% 400%, cover;
+  background-position: center center;
+  background-repeat: no-repeat;
   animation: flowingBackground 15s ease infinite;
 }
 
 @keyframes flowingBackground {
   0% {
-    background-position: 0% 50%;
+    background-position: 0% 50%, center center;
   }
   50% {
-    background-position: 100% 50%;
+    background-position: 100% 50%, center center;
   }
   100% {
-    background-position: 0% 50%;
+    background-position: 0% 50%, center center;
   }
 }
 
