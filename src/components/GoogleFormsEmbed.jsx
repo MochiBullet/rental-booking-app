@@ -76,6 +76,9 @@ const GoogleFormsEmbed = ({ vehicleInfo = null, onClose }) => {
           marginWidth="0"
           title="M's BASE レンタル予約フォーム"
           style={{ width: '100%', height: '100%' }}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+          loading="lazy"
         >
           読み込み中...
         </iframe>
