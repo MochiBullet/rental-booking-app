@@ -4,11 +4,11 @@ import { siteSettingsAPI } from '../services/siteSettingsAPI';
 
 const CampingSpace = () => {
   const [contactInfo, setContactInfo] = useState({
-    phone: '096-234-0831',
-    address: '〒861-4616 熊本県上益城郡甲佐町田口488-1',
+    phone: '0575-74-3127',
+    address: '〒501-4222 岐阜県郡上市八幡町稲成372-7',
     businessHours: {
-      weekday: '平日: 9:00〜18:00',
-      weekend: '土日祝: 9:00〜18:00'
+      weekday: '平日: 9:00 - 18:00',
+      weekend: '土日祝: 10:00 - 18:00'
     }
   });
 
