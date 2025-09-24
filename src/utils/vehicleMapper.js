@@ -1,6 +1,11 @@
 // 車両データのAPI変換ヘルパー - CREATE用（name必須）
 export const mapVehicleForCreate = (vehicleData) => {
   console.log('🔄 車両データをCREATE API形式に変換中...', vehicleData);
+  console.log('📝 コメントフィールド確認:', {
+    comment: vehicleData.comment,
+    hasComment: !!vehicleData.comment,
+    commentLength: vehicleData.comment ? vehicleData.comment.length : 0
+  });
   
   return {
     // 必須フィールド（APIテスト済み）
@@ -11,7 +16,7 @@ export const mapVehicleForCreate = (vehicleData) => {
     
     // オプションフィールド
     vehicleName: vehicleData.name,
-    vehicleDescription: vehicleData.description || '',
+    licensePlate: vehicleData.comment ? `[COMMENT]${vehicleData.comment}` : vehicleData.licensePlate || '',
     pricePerDay: parseFloat(vehicleData.price || vehicleData.pricePerDay || 0),
     vehicleCapacity: parseInt(vehicleData.specifications?.seats || vehicleData.passengers || 4),
     fuelType: vehicleData.specifications?.fuelType || vehicleData.fuelType || 'ガソリン',
@@ -28,7 +33,6 @@ export const mapVehicleForCreate = (vehicleData) => {
     vehicleModel: vehicleData.model || '',
     vehicleYear: vehicleData.year || new Date().getFullYear(),
     vehicleLocation: vehicleData.location || '東京都',
-    licensePlate: vehicleData.licensePlate || '',
     engineSize: vehicleData.specifications?.cc || vehicleData.engineSize || 1500,
     vehicleInsurance: vehicleData.insurance || {
       description: '車両・対物・対人保険込み',
@@ -40,6 +44,11 @@ export const mapVehicleForCreate = (vehicleData) => {
 // 車両データのAPI変換ヘルパー - UPDATE用（DynamoDB予約語除外）
 export const mapVehicleForUpdate = (vehicleData) => {
   console.log('🔄 車両データをUPDATE API形式に変換中（DynamoDB予約語除外）...', vehicleData);
+  console.log('📝 UPDATE時のコメント確認:', {
+    comment: vehicleData.comment,
+    hasComment: !!vehicleData.comment,
+    commentLength: vehicleData.comment ? vehicleData.comment.length : 0
+  });
   
   return {
     // UPDATE時は予約語「name」「capacity」を除外
@@ -49,7 +58,7 @@ export const mapVehicleForUpdate = (vehicleData) => {
     
     // オプションフィールド（nameは除外）
     vehicleName: vehicleData.name, // こちらは予約語ではない
-    vehicleDescription: vehicleData.description || '',
+    licensePlate: vehicleData.comment ? `[COMMENT]${vehicleData.comment}` : vehicleData.licensePlate || '',
     pricePerDay: parseFloat(vehicleData.price || vehicleData.pricePerDay || 0),
     vehicleCapacity: parseInt(vehicleData.specifications?.seats || vehicleData.passengers || 4),
     fuelType: vehicleData.specifications?.fuelType || vehicleData.fuelType || 'ガソリン',
@@ -66,7 +75,6 @@ export const mapVehicleForUpdate = (vehicleData) => {
     vehicleModel: vehicleData.model || '',
     vehicleYear: vehicleData.year || new Date().getFullYear(),
     vehicleLocation: vehicleData.location || '東京都',
-    licensePlate: vehicleData.licensePlate || '',
     engineSize: vehicleData.specifications?.cc || vehicleData.engineSize || 1500,
     vehicleInsurance: vehicleData.insurance || {
       description: '車両・対物・対人保険込み',

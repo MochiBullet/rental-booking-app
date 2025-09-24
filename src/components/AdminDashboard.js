@@ -600,6 +600,9 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
         price: vehicle.price,
         passengers: vehicle.passengers,
         features: vehicle.features,
+        comment: vehicle.comment,
+        hasComment: !!vehicle.comment,
+        commentText: vehicle.comment || '(コメントなし)',
         hasImage: !!vehicle.image,
         imageLength: vehicle.image ? vehicle.image.length : 0
       });
@@ -684,6 +687,11 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
       }
       
       console.log('🔄 データベースで車両を更新中...', vehicleData);
+      console.log('📝 更新データのコメント情報:', {
+        comment: vehicleData.comment,
+        hasComment: !!vehicleData.comment,
+        commentLength: vehicleData.comment ? vehicleData.comment.length : 0
+      });
       
       // データベースで車両を更新
       const updatedVehicle = await vehicleAPI.update(selectedVehicle.id, vehicleData);

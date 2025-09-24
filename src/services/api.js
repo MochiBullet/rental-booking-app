@@ -10,8 +10,15 @@ class ApiService {
   // DynamoDBの車両データをフロントエンドの形式に変換
   transformVehicleData(vehicle) {
     if (!vehicle || !vehicle.vehicleId) return vehicle;
-    
-    return {
+
+    console.log('🔍 transformVehicleData - 変換前データ:', vehicle);
+    console.log('💬 transformVehicleData - コメント確認:', {
+      vehicleComment: vehicle.vehicleComment,
+      comment: vehicle.comment,
+      finalComment: vehicle.vehicleComment || vehicle.comment || ''
+    });
+
+    const transformedData = {
       id: vehicle.vehicleId,
       vehicleId: vehicle.vehicleId,
       name: vehicle.vehicleName || vehicle.name,
@@ -23,16 +30,23 @@ class ApiService {
       available: vehicle.isAvailable,
       isAvailable: vehicle.isAvailable,
       category: vehicle.vehicleCategory || vehicle.category,
-      description: vehicle.vehicleDescription || vehicle.description,
+      description: (() => {
+        const desc = vehicle.description || '';
+        // [COMMENT]プレフィックスがある場合は除去
+        if (desc.startsWith('[COMMENT]')) {
+          return '';
+        }
+        return desc;
+      })(),
       image: (() => {
         // 優先順位: vehicleImages[0] > images[0] > デフォルトSVG
         const primaryImage = (vehicle.vehicleImages && vehicle.vehicleImages[0]) || (vehicle.images && vehicle.images[0]);
-        
+
         // placeholder URLをフィルタリング
         if (primaryImage && !primaryImage.includes('via.placeholder.com') && !primaryImage.includes('placeholder.com')) {
           return primaryImage;
         }
-        
+
         // SVGデフォルト画像を生成
         return `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200"><rect width="300" height="200" fill="#f0f0f0"/><text x="150" y="100" font-family="Arial" font-size="14" fill="#999" text-anchor="middle">${vehicle.vehicleName || vehicle.name || 'Vehicle'}</text></svg>`)}`;
       })(),
@@ -49,12 +63,40 @@ class ApiService {
       model: vehicle.vehicleModel || vehicle.model,
       year: vehicle.vehicleYear || vehicle.year,
       location: vehicle.vehicleLocation || vehicle.location,
-      licensePlate: vehicle.licensePlate,
+      licensePlate: (() => {
+        const plate = vehicle.licensePlate || '';
+        // [COMMENT]プレフィックスがある場合は空文字に
+        if (plate.startsWith('[COMMENT]')) {
+          return '';
+        }
+        return plate;
+      })(),
       features: vehicle.vehicleFeatures || vehicle.features || [],
-      comment: vehicle.vehicleComment || vehicle.comment || '',
+      comment: (() => {
+        // 優先順位: vehicleComment > comment > licensePlateから[COMMENT]抽出
+        console.log('🔧 コメント抽出処理:', {
+          vehicleComment: vehicle.vehicleComment,
+          comment: vehicle.comment,
+          licensePlate: vehicle.licensePlate,
+          hasLicensePlateComment: vehicle.licensePlate && vehicle.licensePlate.startsWith('[COMMENT]')
+        });
+
+        if (vehicle.vehicleComment) return vehicle.vehicleComment;
+        if (vehicle.comment) return vehicle.comment;
+        if (vehicle.licensePlate && vehicle.licensePlate.startsWith('[COMMENT]')) {
+          const extractedComment = vehicle.licensePlate.replace('[COMMENT]', '');
+          console.log('✅ licensePlateからコメント抽出:', extractedComment);
+          return extractedComment;
+        }
+        return '';
+      })(),
       createdAt: vehicle.createdAt,
       updatedAt: vehicle.updatedAt
     };
+
+    console.log('✅ transformVehicleData - 変換後データ:', transformedData);
+
+    return transformedData;
   }
 
   // 共通のリクエスト処理
@@ -137,27 +179,47 @@ class ApiService {
 
   async createVehicle(vehicleData) {
     const { mapVehicleForCreate, validateVehicleData } = await import('../utils/vehicleMapper.js');
-    
+
+    console.log('🚗 createVehicle - 受信データ:', vehicleData);
+    console.log('📝 createVehicle - コメント確認:', {
+      comment: vehicleData.comment,
+      hasComment: !!vehicleData.comment
+    });
+
     // データ検証
     validateVehicleData(vehicleData);
-    
+
     // CREATE用API形式に変換（name必須）
     const apiData = mapVehicleForCreate(vehicleData);
-    
+
+    console.log('🔄 createVehicle - API送信データ:', apiData);
+    console.log('💬 createVehicle - API送信コメント:', {
+      comment: apiData.comment,
+      vehicleComment: apiData.vehicleComment
+    });
+
     const response = await this.request('/vehicles', {
       method: 'POST',
       body: JSON.stringify(apiData),
     });
-    
+
+    console.log('✅ createVehicle - API応答:', response);
+
     return this.transformVehicleData(response);
   }
 
   async updateVehicle(vehicleId, vehicleData) {
     const { mapVehicleForUpdate, validateVehicleData } = await import('../utils/vehicleMapper.js');
-    
+
+    console.log('🔄 updateVehicle - 受信データ:', vehicleData);
+    console.log('📝 updateVehicle - コメント確認:', {
+      comment: vehicleData.comment,
+      hasComment: !!vehicleData.comment
+    });
+
     // データ検証
     validateVehicleData(vehicleData);
-    
+
     // UPDATE用API形式に変換（DynamoDB予約語除外）
     const apiData = mapVehicleForUpdate(vehicleData);
 
@@ -167,12 +229,20 @@ class ApiService {
         delete apiData[key];
       }
     });
-    
+
+    console.log('🔄 updateVehicle - API送信データ:', apiData);
+    console.log('💬 updateVehicle - API送信コメント:', {
+      comment: apiData.comment,
+      vehicleComment: apiData.vehicleComment
+    });
+
     const response = await this.request(`/vehicles/${vehicleId}`, {
       method: 'PUT',
       body: JSON.stringify(apiData),
     });
-    
+
+    console.log('✅ updateVehicle - API応答:', response);
+
     return this.transformVehicleData(response);
   }
 
