@@ -330,6 +330,11 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
                   <span key={idx} className="feature-tag">{typeof feature === 'string' ? feature.trim() : feature}</span>
                 ))}
               </div>
+              {vehicle.comment && (
+                <div className="vehicle-comment">
+                  <p>💬 {vehicle.comment}</p>
+                </div>
+              )}
               
               <div className="vehicle-pricing">
                 <div className="price-display">

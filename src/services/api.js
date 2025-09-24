@@ -51,6 +51,7 @@ class ApiService {
       location: vehicle.vehicleLocation || vehicle.location,
       licensePlate: vehicle.licensePlate,
       features: vehicle.vehicleFeatures || vehicle.features || [],
+      comment: vehicle.vehicleComment || vehicle.comment || '',
       createdAt: vehicle.createdAt,
       updatedAt: vehicle.updatedAt
     };

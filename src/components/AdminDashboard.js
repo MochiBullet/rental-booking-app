@@ -205,6 +205,7 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
     price: '',
     passengers: '',
     features: '',
+    comment: '',
     image: '' // 車両画像のBase64データ
   });
   const [siteSettings, setSiteSettings] = useState({
@@ -571,6 +572,7 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
         passengers: parseInt(newVehicle.passengers) || 4,
         available: true,
         features: newVehicle.features ? newVehicle.features.split(',').map(f => f.trim()) : [],
+        comment: newVehicle.comment || '',
         image: newVehicle.image || null,
         images: newVehicle.image ? [newVehicle.image] : [],
         specifications: {
@@ -635,6 +637,7 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
         price: '',
         passengers: '',
         features: '',
+        comment: '',
         image: '' // 画像データもリセット
       });
       setShowAddVehicleModal(false);
@@ -663,8 +666,9 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
         price: parseFloat(selectedVehicle.price),
         passengers: parseInt(selectedVehicle.passengers) || 4,
         available: selectedVehicle.available,
-        features: selectedVehicle.features ? 
+        features: selectedVehicle.features ?
           (Array.isArray(selectedVehicle.features) ? selectedVehicle.features : selectedVehicle.features.split(',').map(f => f.trim())) : [],
+        comment: selectedVehicle.comment || '',
         specifications: {
           seats: parseInt(selectedVehicle.passengers) || 4,
           transmission: selectedVehicle.transmission || 'AT',
@@ -2196,10 +2200,19 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
             </div>
             <div className="form-group">
               <label>Features</label>
-              <textarea 
+              <textarea
                 value={newVehicle.features}
                 onChange={(e) => setNewVehicle({...newVehicle, features: e.target.value})}
                 placeholder="GPS, Bluetooth, Backup Camera"
+              />
+            </div>
+            <div className="form-group">
+              <label>コメント</label>
+              <textarea
+                value={newVehicle.comment}
+                onChange={(e) => setNewVehicle({...newVehicle, comment: e.target.value})}
+                placeholder="お客様に表示するコメントを入力"
+                rows="3"
               />
             </div>
             
@@ -2312,7 +2325,16 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
                 placeholder="例: GPS, Bluetooth, Backup Camera"
               />
             </div>
-            
+            <div className="form-group">
+              <label>コメント</label>
+              <textarea
+                value={selectedVehicle.comment || ''}
+                onChange={(e) => setSelectedVehicle({...selectedVehicle, comment: e.target.value})}
+                placeholder="お客様に表示するコメントを入力"
+                rows="3"
+              />
+            </div>
+
             {/* 車両画像編集 */}
             <div className="form-group">
               <label>車両画像</label>
