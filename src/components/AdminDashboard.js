@@ -2305,10 +2305,11 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
               />
             </div>
             <div className="form-group">
-              <label>Features</label>
+              <label>Features (カンマ区切り)</label>
               <textarea
                 value={Array.isArray(selectedVehicle.features) ? selectedVehicle.features.join(', ') : selectedVehicle.features || ''}
                 onChange={(e) => setSelectedVehicle({...selectedVehicle, features: e.target.value})}
+                placeholder="例: GPS, Bluetooth, Backup Camera"
               />
             </div>
             
