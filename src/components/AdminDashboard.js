@@ -1347,7 +1347,7 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
                         <p><strong>Type:</strong> {vehicle.type}</p>
                         <p><strong>Price:</strong> {formatCurrency(vehicle.price)}/day</p>
                         <p><strong>Capacity:</strong> {vehicle.passengers} passengers</p>
-                        <p><strong>Features:</strong> {vehicle.features || 'None'}</p>
+                        <p><strong>Features:</strong> {Array.isArray(vehicle.features) ? vehicle.features.join(', ') : vehicle.features || 'None'}</p>
                       </div>
                       <div className="vehicle-admin-actions">
                         <button 
@@ -1399,7 +1399,7 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
                         <p><strong>Type:</strong> {vehicle.type}</p>
                         <p><strong>Price:</strong> {formatCurrency(vehicle.price)}/day</p>
                         <p><strong>Capacity:</strong> {vehicle.passengers} passengers</p>
-                        <p><strong>Features:</strong> {vehicle.features || 'None'}</p>
+                        <p><strong>Features:</strong> {Array.isArray(vehicle.features) ? vehicle.features.join(', ') : vehicle.features || 'None'}</p>
                       </div>
                       <div className="vehicle-admin-actions">
                         <button 
@@ -2306,8 +2306,8 @@ const AdminDashboard = ({ onSettingsUpdate }) => {
             </div>
             <div className="form-group">
               <label>Features</label>
-              <textarea 
-                value={selectedVehicle.features || ''}
+              <textarea
+                value={Array.isArray(selectedVehicle.features) ? selectedVehicle.features.join(', ') : selectedVehicle.features || ''}
                 onChange={(e) => setSelectedVehicle({...selectedVehicle, features: e.target.value})}
               />
             </div>
