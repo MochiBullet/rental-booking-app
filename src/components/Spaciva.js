@@ -201,6 +201,56 @@ const Spaciva = () => {
               </div>
             </div>
           </div>
+
+          {/* 関連サービス */}
+          <div className="spaciva-related-services">
+            <h3 className="spaciva-related-title">関連サービス</h3>
+            <div className="spaciva-related-grid">
+              <div
+                className="spaciva-related-card rental"
+                onClick={() => window.location.href = '/#/'}
+              >
+                <div className="spaciva-related-icon">🚗</div>
+                <div className="spaciva-related-details">
+                  <h4>M's BASE Rental</h4>
+                  <p>車・バイクレンタル</p>
+                </div>
+              </div>
+
+              <div
+                className="spaciva-related-card during-field"
+                onClick={() => window.location.href = '/#/during-field'}
+              >
+                <div className="spaciva-related-icon">🏗️</div>
+                <div className="spaciva-related-details">
+                  <h4>DURING FIELD</h4>
+                  <p>土木建設工事</p>
+                </div>
+              </div>
+
+              <div
+                className="spaciva-related-card camping"
+                onClick={() => window.location.href = '/#/camping-space'}
+              >
+                <div className="spaciva-related-icon">🏕️</div>
+                <div className="spaciva-related-details">
+                  <h4>車中泊スペース</h4>
+                  <p>快適な車中泊</p>
+                </div>
+              </div>
+
+              <div
+                className="spaciva-related-card shuriken"
+                onClick={() => window.location.href = '/#/shuriken'}
+              >
+                <div className="spaciva-related-icon">📇</div>
+                <div className="spaciva-related-details">
+                  <h4>shuriken</h4>
+                  <p>電子名刺</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

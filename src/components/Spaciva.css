@@ -477,6 +477,78 @@
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
+/* 関連サービス */
+.spaciva-related-services {
+  margin-top: 2rem;
+}
+
+.spaciva-related-title {
+  font-size: 1.3rem;
+  color: #333;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.spaciva-related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.spaciva-related-card {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 15px;
+  padding: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 107, 157, 0.2);
+}
+
+.spaciva-related-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.spaciva-related-card.rental:hover {
+  background: linear-gradient(135deg, #43a047 0%, #66bb6a 100%);
+}
+
+.spaciva-related-card.during-field:hover {
+  background: linear-gradient(135deg, #f39c12 0%, #d68910 100%);
+}
+
+.spaciva-related-card.camping:hover {
+  background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%);
+}
+
+.spaciva-related-card.shuriken:hover {
+  background: linear-gradient(135deg, #2c3e50 0%, #1a252f 100%);
+}
+
+.spaciva-related-card:hover .spaciva-related-details h4,
+.spaciva-related-card:hover .spaciva-related-details p {
+  color: white;
+}
+
+.spaciva-related-icon {
+  font-size: 2rem;
+}
+
+.spaciva-related-details h4 {
+  margin: 0 0 3px 0;
+  font-size: 1rem;
+  color: #333;
+}
+
+.spaciva-related-details p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #666;
+}
+
 /* レスポンシブ対応 */
 @media (max-width: 768px) {
   .spaciva-nav-container {

@@ -219,6 +219,18 @@ const DuringField = () => {
                   <div className="df-click-hint">詳細を見る →</div>
                 </div>
               </div>
+
+              <div
+                className="df-related-card shuriken"
+                onClick={() => window.location.href = '/#/shuriken'}
+              >
+                <div className="df-related-icon">📇</div>
+                <div className="df-related-details">
+                  <h4>shuriken</h4>
+                  <p>あなただけの電子名刺</p>
+                  <div className="df-click-hint">詳細を見る →</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

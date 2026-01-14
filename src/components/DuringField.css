@@ -951,6 +951,16 @@
   color: white;
 }
 
+.df-related-card.shuriken:hover {
+  background: linear-gradient(135deg, #2c3e50 0%, #1a252f 100%);
+}
+
+.df-related-card.shuriken:hover .df-related-details h4,
+.df-related-card.shuriken:hover .df-related-details p,
+.df-related-card.shuriken:hover .df-click-hint {
+  color: white;
+}
+
 .df-related-icon {
   font-size: 2.5rem;
   min-width: 60px;
