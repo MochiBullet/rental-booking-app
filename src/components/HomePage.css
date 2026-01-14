@@ -863,3 +863,34 @@
   font-size: 0.9rem;
   margin-top: 10px;
 }
+
+/* Shurikenカード */
+.shuriken-card {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #2c3e50 0%, #1a252f 100%);
+}
+
+.shuriken-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(44, 62, 80, 0.4);
+}
+
+.shuriken-card .info-icon {
+  font-size: 3rem;
+}
+
+.shuriken-card .info-details h3 {
+  color: white;
+}
+
+.shuriken-card .info-details p,
+.shuriken-card .info-details span {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.shuriken-card .click-hint {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+  margin-top: 10px;
+}

@@ -1,0 +1,249 @@
+/* Shuriken LP スタイル */
+
+.shuriken-page {
+  height: 100vh;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  background: #1a1a1a;
+}
+
+/* ナビゲーションヘッダー */
+.shuriken-nav {
+  background: linear-gradient(135deg, #2c3e50 0%, #1a252f 100%);
+  padding: 15px 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+}
+
+.shuriken-nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.shuriken-nav-logo {
+  color: white;
+  font-size: 1.8rem;
+  font-weight: 700;
+  text-decoration: none;
+  letter-spacing: 3px;
+}
+
+.shuriken-nav-menu {
+  list-style: none;
+  display: flex;
+  gap: 25px;
+  margin: 0;
+  padding: 0;
+}
+
+.shuriken-nav-menu li a {
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.3s ease;
+}
+
+.shuriken-nav-menu li a:hover {
+  color: white;
+}
+
+/* メインコンテンツ */
+.shuriken-content {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 各スライド */
+.shuriken-image-container {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+.shuriken-image-container img {
+  width: 100%;
+  height: auto;
+  max-height: 100vh;
+  object-fit: contain;
+  display: block;
+}
+
+/* 最後のセクション（8枚目 + お問い合わせ） */
+.shuriken-last-section {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  padding: 20px;
+  box-sizing: border-box;
+  gap: 20px;
+}
+
+.shuriken-last-image {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.shuriken-last-image img {
+  width: 100%;
+  height: auto;
+  max-height: 50vh;
+  object-fit: contain;
+}
+
+.shuriken-contact-title {
+  color: white;
+  font-size: 1.5rem;
+  margin: 10px 0;
+  text-align: center;
+}
+
+.shuriken-contact-grid {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 800px;
+}
+
+.shuriken-contact-card {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  padding: 20px;
+  min-width: 250px;
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.shuriken-contact-card:hover {
+  transform: translateY(-5px);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.shuriken-contact-card.phone:hover {
+  background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+}
+
+.shuriken-contact-card.location {
+  cursor: default;
+}
+
+.shuriken-contact-icon {
+  font-size: 2.5rem;
+}
+
+.shuriken-contact-details h3 {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+}
+
+.shuriken-contact-value {
+  color: white;
+  font-size: 1.3rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.shuriken-click-hint {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.85rem;
+}
+
+.shuriken-map-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+  flex-wrap: wrap;
+}
+
+.shuriken-map-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 25px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  color: white;
+}
+
+.shuriken-map-button.route {
+  background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+}
+
+.shuriken-map-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  .shuriken-nav-container {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .shuriken-nav-logo {
+    font-size: 1.5rem;
+  }
+
+  .shuriken-nav-menu {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+  }
+
+  .shuriken-nav-menu li a {
+    font-size: 0.8rem;
+  }
+
+  .shuriken-image-container img {
+    width: 100%;
+  }
+
+  .shuriken-contact-grid {
+    flex-direction: column;
+  }
+
+  .shuriken-contact-card {
+    min-width: auto;
+    width: 100%;
+  }
+
+  .shuriken-contact-title {
+    font-size: 1.5rem;
+  }
+
+  .shuriken-map-actions {
+    flex-direction: column;
+  }
+
+  .shuriken-map-button {
+    width: 100%;
+    text-align: center;
+  }
+}

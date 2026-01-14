@@ -649,6 +649,16 @@ function HomePage() {
                 <div className="click-hint">詳細を見る →</div>
               </div>
             </div>
+
+            <div className="info-card shuriken-card" onClick={() => window.location.href = '/#/shuriken'}>
+              <div className="info-icon">📇</div>
+              <div className="info-details">
+                <h3>shuriken</h3>
+                <p className="contact-value">あなただけの電子名刺</p>
+                <span className="contact-hours">デジタル名刺で印象に残る自己紹介</span>
+                <div className="click-hint">詳細を見る →</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

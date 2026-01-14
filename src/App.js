@@ -28,6 +28,7 @@ import DuringFieldCompany from './components/DuringFieldCompany';
 import DuringFieldBusiness from './components/DuringFieldBusiness';
 import DuringFieldWorks from './components/DuringFieldWorks';
 import DuringFieldContact from './components/DuringFieldContact';
+import Shuriken from './components/Shuriken';
 import { getGlobalSettings, updateGlobalSettings } from './data/globalSettings';
 import storageManager from './utils/storageManager';
 
@@ -321,8 +322,8 @@ function AppContent() {
     }));
   };
 
-  // DURING FIELDページではメインヘッダーを非表示
-  const hiddenHeaderPaths = ['/during-field', '/spaciva'];
+  // サブブランドページではメインヘッダーを非表示
+  const hiddenHeaderPaths = ['/during-field', '/spaciva', '/shuriken'];
   const shouldHideHeader = hiddenHeaderPaths.some(path => location.pathname.startsWith(path));
 
   return (
@@ -368,6 +369,9 @@ function AppContent() {
           <Route path="/during-field/business" element={<DuringFieldBusiness />} />
           <Route path="/during-field/works" element={<DuringFieldWorks />} />
           <Route path="/during-field/contact" element={<DuringFieldContact />} />
+
+          {/* Shuriken Routes */}
+          <Route path="/shuriken" element={<Shuriken />} />
 
           {/* Admin Routes (Hidden from main navigation) */}
           <Route path="/admin-login" element={<AdminLogin setIsAdmin={setIsAdmin} onSuccess={() => navigate('/admin')} />} />
