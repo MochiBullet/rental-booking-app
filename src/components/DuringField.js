@@ -151,18 +151,31 @@ const DuringField = () => {
               </div>
             </div>
 
-            <div
-              className="df-contact-card address"
-              onClick={() => {
-                const address = encodeURIComponent(contactInfo.address);
-                window.open(`https://www.google.com/maps/search/?api=1&query=${address}`, '_blank');
-              }}
-            >
+            <div className="df-contact-card address">
               <div className="df-contact-icon">📍</div>
               <div className="df-contact-details">
                 <h3>所在地</h3>
                 <p className="df-contact-value address-text">{contactInfo.address}</p>
-                <div className="df-click-hint">地図で見る</div>
+                <div className="df-map-actions">
+                  <button
+                    className="df-map-button"
+                    onClick={() => {
+                      const address = encodeURIComponent(contactInfo.address);
+                      window.open(`https://www.google.com/maps/search/?api=1&query=${address}`, '_blank');
+                    }}
+                  >
+                    🗺️ 地図で見る
+                  </button>
+                  <button
+                    className="df-map-button route"
+                    onClick={() => {
+                      const address = encodeURIComponent(contactInfo.address);
+                      window.open(`https://www.google.com/maps/dir/?api=1&destination=${address}`, '_blank');
+                    }}
+                  >
+                    🚗 ルート検索
+                  </button>
+                </div>
               </div>
             </div>
           </div>

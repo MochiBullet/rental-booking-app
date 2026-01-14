@@ -261,14 +261,13 @@
   color: white;
 }
 
-.df-contact-card.address:hover {
-  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+.df-contact-card.address {
+  cursor: default;
 }
 
-.df-contact-card.address:hover .df-contact-details h3,
-.df-contact-card.address:hover .df-contact-value,
-.df-contact-card.address:hover .df-click-hint {
-  color: white;
+.df-contact-card.address:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
 }
 
 .df-contact-icon {
@@ -304,6 +303,35 @@
   font-size: 0.85rem;
   color: #888;
   margin-top: 10px;
+}
+
+/* マップボタン */
+.df-map-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+  flex-wrap: wrap;
+}
+
+.df-map-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 25px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  color: white;
+}
+
+.df-map-button.route {
+  background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+}
+
+.df-map-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 /* フッター */
