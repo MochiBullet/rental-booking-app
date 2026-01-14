@@ -496,33 +496,30 @@ const VehicleList = ({ user, vehicles: vehiclesProp, initialFilter }) => {
                         <div className="final-price-display sticky-estimate">
                           <h3>見積もり合計: {formatCurrency(totalPrice)}</h3>
                           <p className="estimate-notice">
-                            ※本画面はお見積りのみであり、実際のご予約は画面下部「予約フォームへ進む」よりご予約いただきますよう、お願いいたします。
+                            ※本画面はお見積りのみです。ご予約・お問い合わせはお電話にてお願いいたします。
                           </p>
                         </div>
                       </div>
-                      {/* Google Forms予約ボタンを強制表示 */}
-                      {true && (
-                        <button 
-                          className="reserve-btn" 
-                          onClick={() => {
-                            setShowSimulationModal(false);
-                            setShowGoogleForms(true);
-                          }}
-                          style={{
-                            backgroundColor: '#4caf50',
-                            color: 'white',
-                            padding: '12px 30px',
-                            border: 'none',
-                            borderRadius: '5px',
-                            fontSize: '16px',
-                            fontWeight: 'bold',
-                            cursor: 'pointer',
-                            marginRight: '10px'
-                          }}
-                        >
-                          予約フォームへ進む →
-                        </button>
-                      )}
+                      {/* お店へ問い合わせボタン（電話発信） */}
+                      <button
+                        className="reserve-btn"
+                        onClick={() => {
+                          window.open('tel:0575-74-3127', '_self');
+                        }}
+                        style={{
+                          backgroundColor: '#4caf50',
+                          color: 'white',
+                          padding: '12px 30px',
+                          border: 'none',
+                          borderRadius: '5px',
+                          fontSize: '16px',
+                          fontWeight: 'bold',
+                          cursor: 'pointer',
+                          marginRight: '10px'
+                        }}
+                      >
+                        📞 お店へ問い合わせをする
+                      </button>
                       <button className="close-simulation-btn" onClick={() => setShowSimulationModal(false)}>
                         閉じる
                       </button>
