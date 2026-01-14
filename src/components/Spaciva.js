@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import './Spaciva.css';
 import { siteSettingsAPI } from '../services/siteSettingsAPI';
 import spacivaBg from '../images/spaciva-bg2.jpg';
@@ -32,6 +33,18 @@ const Spaciva = () => {
 
   return (
     <div className="spaciva-page">
+      {/* ナビゲーションヘッダー */}
+      <nav className="spaciva-nav">
+        <div className="spaciva-nav-container">
+          <Link to="/spaciva" className="spaciva-nav-logo">SPACIVA</Link>
+          <ul className="spaciva-nav-menu">
+            <li><Link to="/">M's BASE</Link></li>
+            <li><Link to="/during-field">DURING FIELD</Link></li>
+            <li><Link to="/camping-space">車中泊</Link></li>
+          </ul>
+        </div>
+      </nav>
+
       {/* 流れる背景 */}
       <div
         className="spaciva-background"

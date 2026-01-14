@@ -5,6 +5,51 @@
   overflow-x: hidden;
 }
 
+/* ナビゲーションヘッダー */
+.spaciva-nav {
+  background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
+  padding: 15px 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.spaciva-nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.spaciva-nav-logo {
+  color: white;
+  font-size: 1.8rem;
+  font-weight: 700;
+  text-decoration: none;
+  letter-spacing: 3px;
+}
+
+.spaciva-nav-menu {
+  list-style: none;
+  display: flex;
+  gap: 25px;
+  margin: 0;
+  padding: 0;
+}
+
+.spaciva-nav-menu li a {
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.3s ease;
+}
+
+.spaciva-nav-menu li a:hover {
+  color: white;
+}
+
 /* 流れる背景 */
 .spaciva-background {
   position: fixed;
@@ -434,6 +479,25 @@
 
 /* レスポンシブ対応 */
 @media (max-width: 768px) {
+  .spaciva-nav-container {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .spaciva-nav-logo {
+    font-size: 1.5rem;
+  }
+
+  .spaciva-nav-menu {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+  }
+
+  .spaciva-nav-menu li a {
+    font-size: 0.8rem;
+  }
+
   .spaciva-logo {
     max-width: 350px;
   }

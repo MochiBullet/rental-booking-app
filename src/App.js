@@ -23,6 +23,11 @@ import RentalTerms from './components/RentalTerms';
 import AnnouncementDetail from './components/AnnouncementDetail';
 import CampingSpace from './components/CampingSpace';
 import Spaciva from './components/Spaciva';
+import DuringField from './components/DuringField';
+import DuringFieldCompany from './components/DuringFieldCompany';
+import DuringFieldBusiness from './components/DuringFieldBusiness';
+import DuringFieldWorks from './components/DuringFieldWorks';
+import DuringFieldContact from './components/DuringFieldContact';
 import { getGlobalSettings, updateGlobalSettings } from './data/globalSettings';
 import storageManager from './utils/storageManager';
 
@@ -316,25 +321,31 @@ function AppContent() {
     }));
   };
 
+  // DURING FIELDページではメインヘッダーを非表示
+  const hiddenHeaderPaths = ['/during-field', '/spaciva'];
+  const shouldHideHeader = hiddenHeaderPaths.some(path => location.pathname.startsWith(path));
+
   return (
     <div className="App">
-        <header className="main-header">
-          <div className="header-container">
-            <Link to="/" className="logo-section" onClick={handleLogoClick} style={{cursor: 'pointer', textDecoration: 'none', color: 'inherit'}}>
-              <h1 className="site-title">
-                {siteSettings?.branding?.siteName || 'M\'s BASE Rental'}
-              </h1>
-            </Link>
-            
-            <nav className="header-nav">
-              {(location.pathname === '/admin' || location.pathname === '/admin-login') && isAdmin && (
-                <div className="admin-indicator">
-                  <span className="admin-badge">管理者モード</span>
-                </div>
-              )}
-            </nav>
-          </div>
-        </header>
+        {!shouldHideHeader && (
+          <header className="main-header">
+            <div className="header-container">
+              <Link to="/" className="logo-section" onClick={handleLogoClick} style={{cursor: 'pointer', textDecoration: 'none', color: 'inherit'}}>
+                <h1 className="site-title">
+                  {siteSettings?.branding?.siteName || 'M\'s BASE Rental'}
+                </h1>
+              </Link>
+
+              <nav className="header-nav">
+                {(location.pathname === '/admin' || location.pathname === '/admin-login') && isAdmin && (
+                  <div className="admin-indicator">
+                    <span className="admin-badge">管理者モード</span>
+                  </div>
+                )}
+              </nav>
+            </div>
+          </header>
+        )}
 
         <Routes>
           {/* INFO SITE MODE: Core Routes */}
@@ -352,7 +363,12 @@ function AppContent() {
           <Route path="/rental-terms" element={<RentalTerms />} />
           <Route path="/camping-space" element={<CampingSpace />} />
           <Route path="/spaciva" element={<Spaciva />} />
-          
+          <Route path="/during-field" element={<DuringField />} />
+          <Route path="/during-field/company" element={<DuringFieldCompany />} />
+          <Route path="/during-field/business" element={<DuringFieldBusiness />} />
+          <Route path="/during-field/works" element={<DuringFieldWorks />} />
+          <Route path="/during-field/contact" element={<DuringFieldContact />} />
+
           {/* Admin Routes (Hidden from main navigation) */}
           <Route path="/admin-login" element={<AdminLogin setIsAdmin={setIsAdmin} onSuccess={() => navigate('/admin')} />} />
           <Route path="/admin" element={isAdmin ? <AdminDashboard onSettingsUpdate={handleSiteSettingsUpdate} /> : <Navigate to="/admin-login" replace />} />

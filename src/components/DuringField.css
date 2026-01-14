@@ -1,0 +1,999 @@
+/* DURING FIELD ページスタイル */
+
+.during-field-page {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+/* コンテナ */
+.df-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* ヒーローセクション */
+.df-hero {
+  position: relative;
+  height: 500px;
+  background: linear-gradient(135deg, #f39c12 0%, #d68910 50%, #b7791f 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.df-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+  opacity: 0.3;
+}
+
+.df-hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.df-hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  color: white;
+  padding: 20px;
+}
+
+.df-company-name {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 30px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.df-catchphrase {
+  font-size: 1.3rem;
+  line-height: 2;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* セクションタイトル */
+.df-section-title {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.df-section-title .eng {
+  display: block;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: #f39c12;
+}
+
+.df-section-title .ja {
+  display: block;
+  font-size: 1rem;
+  margin-top: 10px;
+  color: #333;
+}
+
+.df-section-title.white .eng,
+.df-section-title.white .ja {
+  color: white;
+}
+
+/* ご挨拶セクション */
+.df-greeting {
+  padding: 80px 0;
+  background: #f9f9f9;
+}
+
+.df-company-lead {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 50px;
+}
+
+.df-company-lead span {
+  font-size: 1rem;
+  color: #888;
+}
+
+.df-greeting-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 50px;
+  align-items: center;
+}
+
+.df-greeting-image img {
+  width: 100%;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.df-greeting-text p {
+  margin-bottom: 15px;
+  line-height: 1.8;
+  color: #555;
+}
+
+/* 事業内容セクション */
+.df-business {
+  padding: 80px 0;
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+}
+
+.df-business-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.df-business-list li {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 30px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: all 0.3s ease;
+}
+
+.df-business-list li:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-5px);
+}
+
+.df-business-num {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #f39c12;
+  min-width: 60px;
+}
+
+.df-business-list li p {
+  color: white;
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+/* 施工実績セクション */
+.df-works {
+  padding: 80px 0;
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+}
+
+.df-gallery {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 25px;
+}
+
+.df-gallery li {
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.df-gallery li:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.df-gallery li img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.df-gallery li p {
+  padding: 15px;
+  margin: 0;
+  text-align: center;
+  font-weight: 500;
+  color: #333;
+}
+
+/* お問い合わせセクション */
+.df-contact {
+  padding: 80px 0;
+  background: linear-gradient(135deg, #f39c12 0%, #d68910 100%);
+}
+
+.df-contact-lead {
+  text-align: center;
+  color: white;
+  font-size: 1.2rem;
+  margin-bottom: 40px;
+  line-height: 1.8;
+}
+
+.df-contact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.df-contact-card {
+  background: white;
+  border-radius: 15px;
+  padding: 30px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.df-contact-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+}
+
+.df-contact-card.phone:hover {
+  background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+}
+
+.df-contact-card.phone:hover .df-contact-details h3,
+.df-contact-card.phone:hover .df-contact-value,
+.df-contact-card.phone:hover .df-contact-sub,
+.df-contact-card.phone:hover .df-click-hint {
+  color: white;
+}
+
+.df-contact-card.address:hover {
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+}
+
+.df-contact-card.address:hover .df-contact-details h3,
+.df-contact-card.address:hover .df-contact-value,
+.df-contact-card.address:hover .df-click-hint {
+  color: white;
+}
+
+.df-contact-icon {
+  font-size: 3rem;
+  margin-bottom: 15px;
+}
+
+.df-contact-details h3 {
+  color: #333;
+  margin-bottom: 10px;
+  font-size: 1rem;
+}
+
+.df-contact-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #f39c12;
+  margin-bottom: 5px;
+}
+
+.df-contact-value.address-text {
+  font-size: 1rem;
+}
+
+.df-contact-sub {
+  font-size: 0.9rem;
+  color: #888;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.df-click-hint {
+  font-size: 0.85rem;
+  color: #888;
+  margin-top: 10px;
+}
+
+/* フッター */
+.df-footer {
+  background: #2c3e50;
+  color: white;
+  padding: 40px 0;
+  text-align: center;
+}
+
+.df-footer-logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+
+.df-footer-address,
+.df-footer-tel {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 10px;
+}
+
+.df-copyright {
+  margin-top: 20px;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* レスポンシブ */
+@media (max-width: 768px) {
+  .df-hero {
+    height: 400px;
+  }
+
+  .df-company-name {
+    font-size: 1.8rem;
+  }
+
+  .df-catchphrase {
+    font-size: 1rem;
+  }
+
+  .df-greeting-content {
+    grid-template-columns: 1fr;
+  }
+
+  .df-greeting-image {
+    order: -1;
+  }
+
+  .df-section-title .eng {
+    font-size: 1.5rem;
+  }
+
+  .df-gallery {
+    grid-template-columns: 1fr;
+  }
+
+  .df-contact-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .df-contact-value {
+    font-size: 1.3rem;
+  }
+}
+
+/* ========================================
+   ナビゲーション
+======================================== */
+.df-nav {
+  background: #2c3e50;
+  padding: 15px 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.df-nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.df-nav-logo {
+  color: #f39c12;
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.df-nav-menu {
+  list-style: none;
+  display: flex;
+  gap: 30px;
+  margin: 0;
+  padding: 0;
+}
+
+.df-nav-menu li a {
+  color: white;
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: color 0.3s ease;
+}
+
+.df-nav-menu li a:hover,
+.df-nav-menu li a.active {
+  color: #f39c12;
+}
+
+/* ========================================
+   ページタイトル
+======================================== */
+.df-page-title {
+  background: linear-gradient(135deg, #f39c12 0%, #d68910 100%);
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.df-page-title h1 {
+  color: white;
+  margin: 0;
+}
+
+.df-page-title .eng {
+  display: block;
+  font-size: 2.5rem;
+  font-weight: 700;
+  letter-spacing: 3px;
+}
+
+/* ========================================
+   パンくずリスト
+======================================== */
+.df-breadcrumb {
+  list-style: none;
+  display: flex;
+  gap: 10px;
+  padding: 15px 20px;
+  margin: 0;
+  background: white;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.df-breadcrumb li {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.df-breadcrumb li a {
+  color: #f39c12;
+  text-decoration: none;
+}
+
+.df-breadcrumb li:not(:last-child)::after {
+  content: '>';
+  margin-left: 10px;
+  color: #ccc;
+}
+
+/* ========================================
+   セクション共通
+======================================== */
+.df-section {
+  padding: 80px 0;
+}
+
+.df-section.gray {
+  background: #f5f5f5;
+}
+
+.df-subtitle {
+  text-align: center;
+  font-size: 1.3rem;
+  color: #333;
+  margin-bottom: 30px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #f39c12;
+  display: inline-block;
+  width: 100%;
+}
+
+/* ========================================
+   会社概要ページ
+======================================== */
+.df-policy-text {
+  text-align: center;
+  font-size: 1.8rem;
+  color: #f39c12;
+  line-height: 2;
+  font-weight: 500;
+}
+
+.df-greeting-box {
+  background: white;
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.df-greeting-box p {
+  margin-bottom: 20px;
+  line-height: 1.8;
+  color: #555;
+}
+
+.df-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 50px;
+}
+
+.df-info-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.df-info-table th,
+.df-info-table td {
+  padding: 15px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+.df-info-table th {
+  background: #f39c12;
+  color: white;
+  width: 120px;
+}
+
+.df-info-table td {
+  background: white;
+}
+
+.df-history-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.df-history-table th,
+.df-history-table td {
+  padding: 15px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.df-history-table th {
+  background: #f5f5f5;
+  width: 100px;
+}
+
+.df-map iframe {
+  border-radius: 10px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* ========================================
+   事業内容ページ
+======================================== */
+.df-business-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 50px;
+  align-items: center;
+}
+
+.df-business-image img {
+  width: 100%;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.df-business-list-page {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.df-business-list-page li {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+  background: white;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.df-business-list-page li:hover {
+  transform: translateX(10px);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+}
+
+.df-business-list-page .df-business-num {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #f39c12;
+  min-width: 50px;
+}
+
+.df-business-list-page li p {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+/* ========================================
+   施工実績ページ
+======================================== */
+.df-works-notice {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.df-works-notice p {
+  display: inline-block;
+  background: #f39c12;
+  color: white;
+  padding: 15px 40px;
+  border-radius: 30px;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.df-works-main-image {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.df-works-main-image img {
+  max-width: 700px;
+  width: 100%;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.df-gallery-page {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 25px;
+}
+
+.df-gallery-page li {
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.df-gallery-page li:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+}
+
+.df-gallery-page li img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.df-gallery-page li p {
+  padding: 15px;
+  margin: 0;
+  text-align: center;
+  font-weight: 500;
+  color: #333;
+}
+
+/* 画像モーダル */
+.df-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.df-modal-content {
+  position: relative;
+  max-width: 90%;
+  max-height: 90%;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.df-modal-content img {
+  max-width: 100%;
+  max-height: 80vh;
+  display: block;
+}
+
+.df-modal-content p {
+  padding: 15px;
+  margin: 0;
+  text-align: center;
+  background: white;
+}
+
+.df-modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  cursor: pointer;
+  z-index: 10;
+}
+
+/* ========================================
+   お問い合わせページ
+======================================== */
+.df-contact-box {
+  background: white;
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  margin-bottom: 40px;
+}
+
+.df-contact-intro {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #555;
+}
+
+.df-contact-info-box {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.df-tel-box,
+.df-fax-box,
+.df-email-box {
+  text-align: center;
+  padding: 25px;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.df-tel-box {
+  background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+  cursor: pointer;
+}
+
+.df-tel-box:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(39, 174, 96, 0.3);
+}
+
+.df-fax-box {
+  background: #f5f5f5;
+}
+
+.df-email-box {
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  cursor: pointer;
+}
+
+.df-email-box:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(52, 152, 219, 0.3);
+}
+
+.df-label {
+  font-size: 0.9rem;
+  margin-bottom: 5px;
+}
+
+.df-tel-box .df-label,
+.df-tel-box .df-value,
+.df-email-box .df-label,
+.df-email-box .df-value {
+  color: white;
+}
+
+.df-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.df-email-box .df-value {
+  font-size: 1rem;
+  word-break: break-all;
+}
+
+.df-contact-notice {
+  text-align: center;
+  color: #e74c3c;
+  font-weight: 500;
+}
+
+/* ========================================
+   関連サービスタイル
+======================================== */
+.df-related-services {
+  margin-top: 60px;
+  padding-top: 40px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.df-related-title {
+  text-align: center;
+  color: white;
+  font-size: 1.3rem;
+  margin-bottom: 30px;
+}
+
+.df-related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.df-related-card {
+  background: white;
+  border-radius: 15px;
+  padding: 25px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.df-related-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+}
+
+.df-related-card.rental:hover {
+  background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+}
+
+.df-related-card.rental:hover .df-related-details h4,
+.df-related-card.rental:hover .df-related-details p,
+.df-related-card.rental:hover .df-click-hint {
+  color: white;
+}
+
+.df-related-card.spaciva:hover {
+  background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
+}
+
+.df-related-card.spaciva:hover .df-related-details h4,
+.df-related-card.spaciva:hover .df-related-details p,
+.df-related-card.spaciva:hover .df-click-hint {
+  color: white;
+}
+
+.df-related-card.camping:hover {
+  background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%);
+}
+
+.df-related-card.camping:hover .df-related-details h4,
+.df-related-card.camping:hover .df-related-details p,
+.df-related-card.camping:hover .df-click-hint {
+  color: white;
+}
+
+.df-related-icon {
+  font-size: 2.5rem;
+  min-width: 60px;
+  text-align: center;
+}
+
+.df-related-details h4 {
+  margin: 0 0 5px 0;
+  color: #333;
+  font-size: 1.2rem;
+}
+
+.df-related-details p {
+  margin: 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.df-related-details .df-click-hint {
+  margin-top: 8px;
+  color: #888;
+  font-size: 0.85rem;
+}
+
+.df-privacy-policy {
+  background: white;
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.df-privacy-policy h3 {
+  color: #333;
+  border-bottom: 2px solid #f39c12;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.df-privacy-content {
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 15px;
+}
+
+.df-privacy-content h4 {
+  color: #f39c12;
+  margin: 20px 0 10px;
+  font-size: 1rem;
+}
+
+.df-privacy-content p {
+  color: #555;
+  line-height: 1.8;
+  margin-bottom: 15px;
+}
+
+.df-privacy-content ul {
+  margin: 10px 0 20px 20px;
+  color: #555;
+}
+
+.df-privacy-content ul li {
+  margin-bottom: 5px;
+}
+
+/* ========================================
+   レスポンシブ追加
+======================================== */
+@media (max-width: 768px) {
+  .df-nav-container {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .df-nav-menu {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+  }
+
+  .df-nav-menu li a {
+    font-size: 0.85rem;
+  }
+
+  .df-page-title .eng {
+    font-size: 1.8rem;
+  }
+
+  .df-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .df-business-content {
+    grid-template-columns: 1fr;
+  }
+
+  .df-policy-text {
+    font-size: 1.3rem;
+  }
+
+  .df-contact-info-box {
+    grid-template-columns: 1fr;
+  }
+}
