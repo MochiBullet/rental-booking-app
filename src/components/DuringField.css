@@ -334,6 +334,36 @@
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
+/* アクセスカード */
+.df-access-card {
+  background: white;
+  border-radius: 20px;
+  padding: 2.5rem;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.df-access-card .df-contact-icon {
+  font-size: 3rem;
+  margin-bottom: 0;
+}
+
+.df-access-card .df-contact-details h3 {
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.df-access-card .df-contact-value {
+  font-size: 1.1rem;
+  color: #555;
+  line-height: 1.6;
+}
+
 /* フッター */
 .df-footer {
   background: #2c3e50;

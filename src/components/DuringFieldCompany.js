@@ -126,16 +126,32 @@ const DuringFieldCompany = () => {
             <span className="eng">Access Map</span>
             <span className="ja">アクセスマップ</span>
           </h2>
-          <div className="df-map">
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3237.525163133299!2d136.93579161526114!3d35.76247408017539!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6002f10198dfd867%3A0x495b72fa63a0257e!2z44CSNTAxLTQyMzUg5bKQ6Zic55yM6YOh5LiK5biC5YWr5bmh55S65pyJ5Z2C77yS77yW77yW4oiS77yR!5e0!3m2!1sja!2sjp!4v1599029198920!5m2!1sja!2sjp"
-              width="100%"
-              height="450"
-              style={{ border: 0 }}
-              allowFullScreen=""
-              loading="lazy"
-              title="DURING FIELD 所在地"
-            ></iframe>
+          <div className="df-access-card">
+            <div className="df-contact-icon">📍</div>
+            <div className="df-contact-details">
+              <h3>所在地</h3>
+              <p className="df-contact-value address-text">{companyInfo.address}</p>
+              <div className="df-map-actions">
+                <button
+                  className="df-map-button"
+                  onClick={() => {
+                    const address = encodeURIComponent(companyInfo.address);
+                    window.open(`https://www.google.com/maps/search/?api=1&query=${address}`, '_blank');
+                  }}
+                >
+                  🗺️ 地図で見る
+                </button>
+                <button
+                  className="df-map-button route"
+                  onClick={() => {
+                    const address = encodeURIComponent(companyInfo.address);
+                    window.open(`https://www.google.com/maps/dir/?api=1&destination=${address}`, '_blank');
+                  }}
+                >
+                  🚗 ルート検索
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </section>
