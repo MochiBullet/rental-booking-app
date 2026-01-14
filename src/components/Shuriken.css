@@ -202,8 +202,16 @@
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
+/* PC専用（モバイルで非表示） */
+.desktop-only {
+  display: flex;
+}
+
 /* レスポンシブ対応 */
 @media (max-width: 768px) {
+  .desktop-only {
+    display: none !important;
+  }
   .shuriken-nav-container {
     flex-direction: column;
     gap: 10px;

@@ -54,7 +54,8 @@ const Shuriken = () => {
 
       {/* メインコンテンツ */}
       <div className="shuriken-content">
-        {images.slice(0, 7).map((img, index) => (
+        {/* 1-6枚目: PC・モバイル両方表示 */}
+        {images.slice(0, 6).map((img, index) => (
           <div key={index} className="shuriken-image-container">
             <picture>
               <source media="(max-width: 768px)" srcSet={img.mobile} />
@@ -63,13 +64,15 @@ const Shuriken = () => {
           </div>
         ))}
 
-        {/* 最後のスライド: 8枚目 + お問い合わせ */}
+        {/* 7枚目: PCのみ表示 */}
+        <div className="shuriken-image-container desktop-only">
+          <img src={gif7} alt="shuriken feature 7" />
+        </div>
+
+        {/* 最後のスライド: 8枚目（PCのみ） + お問い合わせ */}
         <div className="shuriken-last-section">
-          <div className="shuriken-last-image">
-            <picture>
-              <source media="(max-width: 768px)" srcSet={images[7].mobile} />
-              <img src={images[7].pc} alt="shuriken feature 8" />
-            </picture>
+          <div className="shuriken-last-image desktop-only">
+            <img src={gif8} alt="shuriken feature 8" />
           </div>
           <h2 className="shuriken-contact-title">お問い合わせ</h2>
           <div className="shuriken-contact-grid">
