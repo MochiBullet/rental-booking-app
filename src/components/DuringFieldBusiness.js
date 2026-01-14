@@ -2,6 +2,9 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import './DuringField.css';
 
+// 画像インポート
+import business01 from '../images/during-field/business01.jpg';
+
 const DuringFieldBusiness = () => {
   const businessList = [
     { num: '01', title: '高速道路関連/道路工事/土工事' },
@@ -47,7 +50,7 @@ const DuringFieldBusiness = () => {
           </h2>
           <div className="df-business-content">
             <div className="df-business-image">
-              <img src="https://www.duringfield.com/img/business01.jpg" alt="事業内容" />
+              <img src={business01} alt="事業内容" />
             </div>
             <div className="df-business-detail">
               <ul className="df-business-list-page">
