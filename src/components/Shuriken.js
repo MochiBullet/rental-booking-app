@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './Shuriken.css';
 
@@ -20,7 +20,19 @@ import m4 from '../images/shuriken/m4.jpg';
 import m5 from '../images/shuriken/m5.jpg';
 import m6 from '../images/shuriken/m6.jpg';
 
+// ローディング用ロゴ
+import shurikenLogo from '../images/shuriken/logo.png';
+
 const Shuriken = () => {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // 1秒後にローディング終了
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
   // PC用とモバイル用の画像ペア（モバイル用がない場合はPC用を使用）
   const images = [
     { pc: gif1, mobile: m1 },
@@ -37,6 +49,15 @@ const Shuriken = () => {
     phone: '0575-74-3127',
     address: '〒501-4222 岐阜県郡上市八幡町稲成372-7',
   };
+
+  // ローディング画面
+  if (isLoading) {
+    return (
+      <div className="shuriken-loading">
+        <img src={shurikenLogo} alt="shuriken" className="shuriken-loading-logo" />
+      </div>
+    );
+  }
 
   return (
     <div className="shuriken-page">

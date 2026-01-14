@@ -1,5 +1,31 @@
 /* Shuriken LP スタイル */
 
+/* ローディング画面 */
+.shuriken-loading {
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #1a1a1a;
+}
+
+.shuriken-loading-logo {
+  width: 150px;
+  height: 150px;
+  object-fit: contain;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .shuriken-page {
   height: 100vh;
   height: 100dvh; /* モバイルブラウザ対応 */
@@ -10,13 +36,19 @@
 
 /* ナビゲーションヘッダー */
 .shuriken-nav {
-  background: linear-gradient(135deg, #2c3e50 0%, #1a252f 100%);
+  background: linear-gradient(135deg, rgba(44, 62, 80, 0.9) 0%, rgba(26, 37, 47, 0.9) 100%);
+  backdrop-filter: blur(10px);
   padding: 15px 0;
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 100;
+}
+
+/* 最初の画像コンテナにヘッダー分のパディングを追加 */
+.shuriken-image-container:first-child {
+  padding-top: 60px;
 }
 
 .shuriken-nav-container {
