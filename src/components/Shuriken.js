@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import './Shuriken.css';
 
-// 画像インポート
+// PC用画像インポート
 import gif1 from '../images/shuriken/1.gif';
 import gif2 from '../images/shuriken/2.gif';
 import gif3 from '../images/shuriken/3.gif';
@@ -12,8 +12,26 @@ import gif6 from '../images/shuriken/6.gif';
 import gif7 from '../images/shuriken/7.gif';
 import gif8 from '../images/shuriken/8.gif';
 
+// モバイル用画像インポート
+import m1 from '../images/shuriken/m1.jpg';
+import m2 from '../images/shuriken/m2.jpg';
+import m3 from '../images/shuriken/m3.jpg';
+import m4 from '../images/shuriken/m4.jpg';
+import m5 from '../images/shuriken/m5.jpg';
+import m6 from '../images/shuriken/m6.jpg';
+
 const Shuriken = () => {
-  const images = [gif1, gif2, gif3, gif4, gif5, gif6, gif7, gif8];
+  // PC用とモバイル用の画像ペア（モバイル用がない場合はPC用を使用）
+  const images = [
+    { pc: gif1, mobile: m1 },
+    { pc: gif2, mobile: m2 },
+    { pc: gif3, mobile: m3 },
+    { pc: gif4, mobile: m4 },
+    { pc: gif5, mobile: m5 },
+    { pc: gif6, mobile: m6 },
+    { pc: gif7, mobile: gif7 },  // モバイル用なし
+    { pc: gif8, mobile: gif8 },  // モバイル用なし
+  ];
 
   const contactInfo = {
     phone: '0575-74-3127',
@@ -38,14 +56,20 @@ const Shuriken = () => {
       <div className="shuriken-content">
         {images.slice(0, 7).map((img, index) => (
           <div key={index} className="shuriken-image-container">
-            <img src={img} alt={`shuriken feature ${index + 1}`} />
+            <picture>
+              <source media="(max-width: 768px)" srcSet={img.mobile} />
+              <img src={img.pc} alt={`shuriken feature ${index + 1}`} />
+            </picture>
           </div>
         ))}
 
         {/* 最後のスライド: 8枚目 + お問い合わせ */}
         <div className="shuriken-last-section">
           <div className="shuriken-last-image">
-            <img src={gif8} alt="shuriken feature 8" />
+            <picture>
+              <source media="(max-width: 768px)" srcSet={images[7].mobile} />
+              <img src={images[7].pc} alt="shuriken feature 8" />
+            </picture>
           </div>
           <h2 className="shuriken-contact-title">お問い合わせ</h2>
           <div className="shuriken-contact-grid">
