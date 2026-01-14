@@ -212,6 +212,11 @@
   .desktop-only {
     display: none !important;
   }
+
+  .shuriken-nav {
+    display: none;
+  }
+
   .shuriken-nav-container {
     flex-direction: column;
     gap: 10px;
