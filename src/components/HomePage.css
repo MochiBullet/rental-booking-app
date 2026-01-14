@@ -832,3 +832,34 @@
   font-size: 0.9rem;
   margin-top: 10px;
 }
+
+/* DURING FIELD 土木建設タイル */
+.during-field-card {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #f39c12 0%, #d68910 100%);
+}
+
+.during-field-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(243, 156, 18, 0.3);
+}
+
+.during-field-card .info-icon {
+  font-size: 3rem;
+}
+
+.during-field-card .info-details h3 {
+  color: white;
+}
+
+.during-field-card .info-details p,
+.during-field-card .info-details span {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.during-field-card .click-hint {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+  margin-top: 10px;
+}

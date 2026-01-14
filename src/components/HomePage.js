@@ -639,6 +639,16 @@ function HomePage() {
                 <div className="click-hint">詳細を見る →</div>
               </div>
             </div>
+
+            <div className="info-card during-field-card" onClick={() => window.location.href = '/#/during-field'}>
+              <div className="info-icon">🏗️</div>
+              <div className="info-details">
+                <h3>株式会社 DURING FIELD</h3>
+                <p className="contact-value">土木建設工事全般・道路関連工事</p>
+                <span className="contact-hours">お気軽にお問い合わせください</span>
+                <div className="click-hint">詳細を見る →</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
