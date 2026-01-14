@@ -326,6 +326,10 @@ function AppContent() {
   const hiddenHeaderPaths = ['/during-field', '/spaciva', '/shuriken'];
   const shouldHideHeader = hiddenHeaderPaths.some(path => location.pathname.startsWith(path));
 
+  // Shurikenページではフッターも非表示
+  const hiddenFooterPaths = ['/shuriken'];
+  const shouldHideFooter = hiddenFooterPaths.some(path => location.pathname.startsWith(path));
+
   return (
     <div className="App">
         {!shouldHideHeader && (
@@ -390,17 +394,19 @@ function AppContent() {
           */}
         </Routes>
 
-        <footer className="main-footer">
-          <div className="footer-container">
-            <p>&copy; {siteSettings?.branding?.copyrightYear || new Date().getFullYear()} {siteSettings?.branding?.siteName || "M's BASE Rental"}</p>
-            <div className="footer-links">
-              {/* <Link to="/contact">お問い合わせ</Link> REMOVED: Contact moved to HomePage */}
-              <Link to="/terms">利用規約</Link>
-              <Link to="/privacy">プライバシーポリシー</Link>
-              <Link to="/rental-terms">レンタカー約款</Link>
+        {!shouldHideFooter && (
+          <footer className="main-footer">
+            <div className="footer-container">
+              <p>&copy; {siteSettings?.branding?.copyrightYear || new Date().getFullYear()} {siteSettings?.branding?.siteName || "M's BASE Rental"}</p>
+              <div className="footer-links">
+                {/* <Link to="/contact">お問い合わせ</Link> REMOVED: Contact moved to HomePage */}
+                <Link to="/terms">利用規約</Link>
+                <Link to="/privacy">プライバシーポリシー</Link>
+                <Link to="/rental-terms">レンタカー約款</Link>
+              </div>
             </div>
-          </div>
-        </footer>
+          </footer>
+        )}
       </div>
   );
 }

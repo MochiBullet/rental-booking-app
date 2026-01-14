@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import './Shuriken.css';
 
 // 画像インポート
@@ -21,6 +22,18 @@ const Shuriken = () => {
 
   return (
     <div className="shuriken-page">
+      {/* ナビゲーションヘッダー */}
+      <nav className="shuriken-nav">
+        <div className="shuriken-nav-container">
+          <Link to="/shuriken" className="shuriken-nav-logo">shuriken</Link>
+          <ul className="shuriken-nav-menu">
+            <li><Link to="/">M's BASE</Link></li>
+            <li><Link to="/spaciva">SPACIVA</Link></li>
+            <li><Link to="/during-field">DURING FIELD</Link></li>
+          </ul>
+        </div>
+      </nav>
+
       {/* メインコンテンツ */}
       <div className="shuriken-content">
         {images.slice(0, 7).map((img, index) => (
