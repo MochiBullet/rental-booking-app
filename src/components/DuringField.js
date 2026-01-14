@@ -2,6 +2,15 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './DuringField.css';
 
+// 画像インポート
+import topImg01 from '../images/during-field/top-img01.jpg';
+import works01 from '../images/during-field/works-01.jpg';
+import works02 from '../images/during-field/works-02.jpg';
+import works03 from '../images/during-field/works-03.jpg';
+import works04 from '../images/during-field/works-04.jpg';
+import works05 from '../images/during-field/works-05.jpg';
+import works06 from '../images/during-field/works-06.jpg';
+
 const DuringField = () => {
   const [contactInfo] = useState({
     phone: '0575-74-3127',
@@ -20,12 +29,12 @@ const DuringField = () => {
 
   // 施工実績リスト
   const worksList = [
-    { title: '災害復旧工事', image: 'https://www.duringfield.com/works/01.jpg' },
-    { title: '災害復旧工事（護岸工）', image: 'https://www.duringfield.com/works/02.jpg' },
-    { title: '松ノ木反射板工事基礎', image: 'https://www.duringfield.com/works/03.jpg' },
-    { title: '谷止工', image: 'https://www.duringfield.com/works/04.jpg' },
-    { title: '標高1300m（松ノ木反射板工事）', image: 'https://www.duringfield.com/works/05.jpg' },
-    { title: '林道復旧工', image: 'https://www.duringfield.com/works/06.jpg' },
+    { title: '災害復旧工事', image: works01 },
+    { title: '災害復旧工事（護岸工）', image: works02 },
+    { title: '松ノ木反射板工事基礎', image: works03 },
+    { title: '谷止工', image: works04 },
+    { title: '標高1300m（松ノ木反射板工事）', image: works05 },
+    { title: '林道復旧工', image: works06 },
   ];
 
   return (
@@ -62,7 +71,7 @@ const DuringField = () => {
           <p className="df-company-lead">DURING FIELD <span>Co., Ltd.</span></p>
           <div className="df-greeting-content">
             <div className="df-greeting-image">
-              <img src="https://www.duringfield.com/img/top-img01.jpg" alt="DURING FIELD" />
+              <img src={topImg01} alt="DURING FIELD" />
             </div>
             <div className="df-greeting-text">
               <h2 className="df-section-title">

@@ -2,18 +2,29 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './DuringField.css';
 
+// 画像インポート
+import kiganImg from '../images/during-field/kigan.jpg';
+import works0101 from '../images/during-field/works-01-01.jpg';
+import works0102 from '../images/during-field/works-01-02.jpg';
+import works01 from '../images/during-field/works-01.jpg';
+import works02 from '../images/during-field/works-02.jpg';
+import works03 from '../images/during-field/works-03.jpg';
+import works04 from '../images/during-field/works-04.jpg';
+import works05 from '../images/during-field/works-05.jpg';
+import works06 from '../images/during-field/works-06.jpg';
+
 const DuringFieldWorks = () => {
   const [selectedImage, setSelectedImage] = useState(null);
 
   const worksList = [
-    { title: 'ボトルユニット', image: 'https://www.duringfield.com/works/01/01.jpg' },
-    { title: '仮設道路(施工中)', image: 'https://www.duringfield.com/works/01/02.jpg' },
-    { title: '災害復旧工事', image: 'https://www.duringfield.com/works/01.jpg' },
-    { title: '災害復旧工事（護岸工）', image: 'https://www.duringfield.com/works/02.jpg' },
-    { title: '松ノ木反射板工事基礎（実績）', image: 'https://www.duringfield.com/works/03.jpg' },
-    { title: '谷止工', image: 'https://www.duringfield.com/works/04.jpg' },
-    { title: '標高1300m（松ノ木反射板工事）', image: 'https://www.duringfield.com/works/05.jpg' },
-    { title: '林道復旧工', image: 'https://www.duringfield.com/works/06.jpg' },
+    { title: 'ボトルユニット', image: works0101 },
+    { title: '仮設道路(施工中)', image: works0102 },
+    { title: '災害復旧工事', image: works01 },
+    { title: '災害復旧工事（護岸工）', image: works02 },
+    { title: '松ノ木反射板工事基礎（実績）', image: works03 },
+    { title: '谷止工', image: works04 },
+    { title: '標高1300m（松ノ木反射板工事）', image: works05 },
+    { title: '林道復旧工', image: works06 },
   ];
 
   return (
@@ -56,7 +67,7 @@ const DuringFieldWorks = () => {
           </div>
 
           <div className="df-works-main-image">
-            <img src="https://www.duringfield.com/img/kigan.jpg" alt="安全祈願" />
+            <img src={kiganImg} alt="安全祈願" />
           </div>
 
           <ul className="df-gallery-page">
