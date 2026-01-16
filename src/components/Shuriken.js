@@ -26,6 +26,11 @@ import shurikenLogo from '../images/shuriken/logo.png';
 const Shuriken = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isBotOpen, setIsBotOpen] = useState(false);
+  const [showContactForm, setShowContactForm] = useState(false);
+  const [contactInfo, setContactInfo] = useState({
+    name: '',
+    email: ''
+  });
 
   // 見積もりBOT用のstate
   const [botAnswers, setBotAnswers] = useState({
@@ -97,11 +102,23 @@ const Shuriken = () => {
     return { total, breakdown, hasDesignConsult: botAnswers.needDesign === 'はい' };
   };
 
-  // 送信処理（スプシ連携用）
+  // 送信ボタン押下時（連絡先入力ポップアップを表示）
   const handleSubmit = () => {
+    setShowContactForm(true);
+  };
+
+  // 最終送信処理（スプシ連携用）
+  const handleFinalSubmit = () => {
+    if (!contactInfo.name || !contactInfo.email) {
+      alert('お名前とメールアドレスを入力してください');
+      return;
+    }
+
     const priceInfo = calculatePrice();
     const data = {
       timestamp: new Date().toISOString(),
+      name: contactInfo.name,
+      email: contactInfo.email,
       hasData: botAnswers.hasData,
       needDesign: botAnswers.needDesign,
       printType: botAnswers.printType,
@@ -111,6 +128,12 @@ const Shuriken = () => {
     console.log('送信データ:', data);
     // TODO: Google Spreadsheet連携
     alert('お問い合わせありがとうございます！\n担当者より折り返しご連絡いたします。');
+
+    // リセット
+    setShowContactForm(false);
+    setIsBotOpen(false);
+    setBotAnswers({ hasData: null, needDesign: null, printType: null, backPrint: null });
+    setContactInfo({ name: '', email: '' });
   };
 
   // 全て選択されているか
@@ -128,7 +151,7 @@ const Shuriken = () => {
     { pc: gif8, mobile: gif8 },  // モバイル用なし
   ];
 
-  const contactInfo = {
+  const shopInfo = {
     phone: '0575-74-3127',
     address: '〒501-4222 岐阜県郡上市八幡町稲成372-7',
   };
@@ -184,12 +207,12 @@ const Shuriken = () => {
           <div className="shuriken-contact-grid">
             <div
               className="shuriken-contact-card phone"
-              onClick={() => window.open(`tel:${contactInfo.phone}`, '_self')}
+              onClick={() => window.open(`tel:${shopInfo.phone}`, '_self')}
             >
               <div className="shuriken-contact-icon">📞</div>
               <div className="shuriken-contact-details">
                 <h3>お電話</h3>
-                <p className="shuriken-contact-value">{contactInfo.phone}</p>
+                <p className="shuriken-contact-value">{shopInfo.phone}</p>
                 <div className="shuriken-click-hint">タップして発信</div>
               </div>
             </div>
@@ -198,12 +221,12 @@ const Shuriken = () => {
               <div className="shuriken-contact-icon">📍</div>
               <div className="shuriken-contact-details">
                 <h3>所在地</h3>
-                <p className="shuriken-contact-value">{contactInfo.address}</p>
+                <p className="shuriken-contact-value">{shopInfo.address}</p>
                 <div className="shuriken-map-actions">
                   <button
                     className="shuriken-map-button"
                     onClick={() => {
-                      const address = encodeURIComponent(contactInfo.address);
+                      const address = encodeURIComponent(shopInfo.address);
                       window.open(`https://www.google.com/maps/search/?api=1&query=${address}`, '_blank');
                     }}
                   >
@@ -212,7 +235,7 @@ const Shuriken = () => {
                   <button
                     className="shuriken-map-button route"
                     onClick={() => {
-                      const address = encodeURIComponent(contactInfo.address);
+                      const address = encodeURIComponent(shopInfo.address);
                       window.open(`https://www.google.com/maps/dir/?api=1&destination=${address}`, '_blank');
                     }}
                   >
@@ -389,6 +412,43 @@ const Shuriken = () => {
           </div>
         )}
       </div>
+
+      {/* 連絡先入力ポップアップ */}
+      {showContactForm && (
+        <div className="shuriken-contact-overlay" onClick={() => setShowContactForm(false)}>
+          <div className="shuriken-contact-popup" onClick={(e) => e.stopPropagation()}>
+            <h3>連絡先を入力してください</h3>
+            <div className="shuriken-contact-form">
+              <div className="shuriken-input-group">
+                <label>お名前</label>
+                <input
+                  type="text"
+                  value={contactInfo.name}
+                  onChange={(e) => setContactInfo({ ...contactInfo, name: e.target.value })}
+                  placeholder="山田 太郎"
+                />
+              </div>
+              <div className="shuriken-input-group">
+                <label>メールアドレス</label>
+                <input
+                  type="email"
+                  value={contactInfo.email}
+                  onChange={(e) => setContactInfo({ ...contactInfo, email: e.target.value })}
+                  placeholder="example@email.com"
+                />
+              </div>
+              <div className="shuriken-popup-buttons">
+                <button className="shuriken-popup-submit" onClick={handleFinalSubmit}>
+                  送信する
+                </button>
+                <button className="shuriken-popup-cancel" onClick={() => setShowContactForm(false)}>
+                  戻る
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

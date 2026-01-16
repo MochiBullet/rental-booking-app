@@ -484,6 +484,134 @@
   color: white;
 }
 
+/* 連絡先入力ポップアップ */
+.shuriken-contact-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.shuriken-contact-popup {
+  background: linear-gradient(145deg, #2a2a2a 0%, #1a1a1a 100%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+  padding: 25px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  animation: popIn 0.3s ease;
+}
+
+@keyframes popIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.shuriken-contact-popup h3 {
+  color: white;
+  font-size: 1.2rem;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.shuriken-contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.shuriken-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.shuriken-input-group label {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.85rem;
+}
+
+.shuriken-input-group input {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  padding: 12px;
+  color: white;
+  font-size: 1rem;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.shuriken-input-group input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.shuriken-input-group input:focus {
+  border-color: #3498db;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.shuriken-popup-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.shuriken-popup-submit {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.shuriken-popup-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
+}
+
+.shuriken-popup-cancel {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  transition: all 0.3s ease;
+}
+
+.shuriken-popup-cancel:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
 /* PC専用（モバイルで非表示） */
 .desktop-only {
   display: flex;
