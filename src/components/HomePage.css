@@ -471,20 +471,20 @@
   }
   
   .vehicle-tiles {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
+    grid-template-columns: repeat(2, 1fr); /* スマホでも2列表示 */
+    gap: 1rem;
   }
-  
+
   .tile-content {
-    padding: 1.5rem;
+    padding: 1rem;
   }
-  
+
   .tile-title {
-    font-size: 1.5rem;
+    font-size: 1.1rem;
   }
-  
+
   .tile-image-large {
-    min-height: 200px;
+    min-height: 120px;
   }
   
   .tile-title-large {
@@ -688,13 +688,22 @@
     padding: 2rem 1rem;
     margin-top: 10px; /* 画像と被らないように */
   }
-  
-  .tile-content {
-    padding: 1rem;
+
+  .vehicle-tiles {
+    grid-template-columns: repeat(2, 1fr); /* 小さいスマホでも2列 */
+    gap: 0.5rem;
   }
-  
+
+  .tile-content {
+    padding: 0.8rem;
+  }
+
+  .tile-title {
+    font-size: 0.9rem;
+  }
+
   .tile-image-large {
-    min-height: 150px;
+    min-height: 100px;
   }
   
   .tile-title-large {
