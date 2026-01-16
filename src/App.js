@@ -327,7 +327,7 @@ function AppContent() {
   const shouldHideHeader = hiddenHeaderPaths.some(path => location.pathname.startsWith(path));
 
   // サブブランドページではフッターも非表示
-  const hiddenFooterPaths = ['/shuriken', '/during-field'];
+  const hiddenFooterPaths = ['/shuriken', '/during-field', '/spaciva'];
   const shouldHideFooter = hiddenFooterPaths.some(path => location.pathname.startsWith(path));
 
   return (
