@@ -4,11 +4,57 @@
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
+/* ナビゲーションヘッダー */
+.camp-nav {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
+  backdrop-filter: blur(10px);
+  padding: 15px 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.camp-nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.camp-nav-logo {
+  color: white;
+  font-size: 1.8rem;
+  font-weight: 700;
+  text-decoration: none;
+  letter-spacing: 3px;
+}
+
+.camp-nav-menu {
+  list-style: none;
+  display: flex;
+  gap: 25px;
+  margin: 0;
+  padding: 0;
+}
+
+.camp-nav-menu li a {
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.3s ease;
+}
+
+.camp-nav-menu li a:hover {
+  color: white;
+}
+
 /* ヘッダー */
 .camping-header {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
-  padding: 80px 20px 40px;
+  padding: 40px 20px;
   text-align: center;
   color: white;
 }
@@ -422,6 +468,25 @@
 
 /* レスポンシブ対応 */
 @media (max-width: 768px) {
+  .camp-nav-container {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .camp-nav-logo {
+    font-size: 1.5rem;
+  }
+
+  .camp-nav-menu {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+  }
+
+  .camp-nav-menu li a {
+    font-size: 0.8rem;
+  }
+
   .header-content h1 {
     font-size: 2.5rem;
     letter-spacing: 0.1rem;

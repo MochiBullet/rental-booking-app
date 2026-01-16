@@ -323,11 +323,11 @@ function AppContent() {
   };
 
   // サブブランドページではメインヘッダーを非表示
-  const hiddenHeaderPaths = ['/during-field', '/spaciva', '/shuriken'];
+  const hiddenHeaderPaths = ['/during-field', '/spaciva', '/shuriken', '/camping-space'];
   const shouldHideHeader = hiddenHeaderPaths.some(path => location.pathname.startsWith(path));
 
   // サブブランドページではフッターも非表示
-  const hiddenFooterPaths = ['/shuriken', '/during-field', '/spaciva'];
+  const hiddenFooterPaths = ['/shuriken', '/during-field', '/spaciva', '/camping-space'];
   const shouldHideFooter = hiddenFooterPaths.some(path => location.pathname.startsWith(path));
 
   return (

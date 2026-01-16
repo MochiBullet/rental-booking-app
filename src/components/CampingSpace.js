@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import './CampingSpace.css';
 import { siteSettingsAPI } from '../services/siteSettingsAPI';
 
@@ -30,6 +31,18 @@ const CampingSpace = () => {
 
   return (
     <div className="camping-space-page">
+      {/* ナビゲーションヘッダー */}
+      <nav className="camp-nav">
+        <div className="camp-nav-container">
+          <Link to="/camping-space" className="camp-nav-logo">CAMP</Link>
+          <ul className="camp-nav-menu">
+            <li><Link to="/">M's BASE</Link></li>
+            <li><Link to="/spaciva">SPACIVA</Link></li>
+            <li><Link to="/during-field">DURING FIELD</Link></li>
+          </ul>
+        </div>
+      </nav>
+
       {/* ヘッダー */}
       <header className="camping-header">
         <div className="header-content">
