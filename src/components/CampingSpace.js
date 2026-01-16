@@ -35,7 +35,7 @@ const CampingSpace = () => {
       {/* ナビゲーションヘッダー */}
       <nav className="camp-nav">
         <div className="camp-nav-container">
-          <Link to="/camping-space" className="camp-nav-logo">CAMP</Link>
+          <Link to="/camping-space" className="camp-nav-logo">M's FIELD</Link>
           <ul className="camp-nav-menu">
             <li><Link to="/">M's BASE</Link></li>
             <li><Link to="/spaciva">SPACIVA</Link></li>
@@ -47,7 +47,6 @@ const CampingSpace = () => {
       {/* ヘッダー */}
       <header className="camping-header">
         <div className="header-content">
-          <h1>M's FIELD</h1>
           <div className="header-image">
             <img
               src={campBanner}
