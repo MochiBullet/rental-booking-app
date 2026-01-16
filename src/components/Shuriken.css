@@ -634,26 +634,28 @@
   }
 
   .shuriken-nav {
-    display: none;
+    display: block;
+    padding: 8px 0;
   }
 
   .shuriken-nav-container {
-    flex-direction: column;
-    gap: 10px;
+    flex-direction: row;
+    gap: 8px;
   }
 
   .shuriken-nav-logo {
-    font-size: 1.5rem;
+    font-size: 0.85rem;
   }
 
   .shuriken-nav-menu {
     flex-wrap: wrap;
-    justify-content: center;
-    gap: 15px;
+    justify-content: flex-end;
+    gap: 5px;
   }
 
   .shuriken-nav-menu li a {
-    font-size: 0.8rem;
+    font-size: 0.65rem;
+    padding: 3px 6px;
   }
 
   .shuriken-image-container img {
