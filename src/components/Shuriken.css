@@ -349,6 +349,16 @@
   margin-bottom: 10px;
 }
 
+.shuriken-bot-disabled-message {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.9rem;
+  text-align: center;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+}
+
 .shuriken-bot-tiles {
   display: grid;
   grid-template-columns: repeat(2, 1fr);

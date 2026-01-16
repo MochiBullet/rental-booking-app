@@ -50,8 +50,40 @@ const Shuriken = () => {
 
   // タイル選択の処理
   const handleSelect = (key, value) => {
-    setBotAnswers(prev => ({ ...prev, [key]: value }));
+    setBotAnswers(prev => {
+      const newAnswers = { ...prev, [key]: value };
+
+      // ロゴのみを選択した場合、裏面印刷を「なし」に自動設定
+      if (key === 'printType' && (value === 'ロゴのみ（白カード）' || value === 'ロゴのみ（黒カード）')) {
+        newAnswers.backPrint = 'なし';
+      }
+
+      // カラー印刷または白印刷を選択した場合、シルバー・ゴールドが選択されていたらリセット
+      if (key === 'printType' && (value === 'カラー印刷（白カード）' || value === '白印刷（入稿）')) {
+        if (prev.backPrint === 'シルバー・ゴールド') {
+          newAnswers.backPrint = null;
+        }
+      }
+
+      // 黒カードを選択した場合、カラーが選択されていたらリセット
+      if (key === 'printType' && (value === 'ロゴのみ（黒カード）' || value === 'シルバー・ゴールド（黒カード）')) {
+        if (prev.backPrint === 'カラー') {
+          newAnswers.backPrint = null;
+        }
+      }
+
+      return newAnswers;
+    });
   };
+
+  // ロゴのみかどうか判定
+  const isLogoOnly = botAnswers.printType === 'ロゴのみ（白カード）' || botAnswers.printType === 'ロゴのみ（黒カード）';
+
+  // カラー・白印刷かどうか判定（シルバー・ゴールド裏面不可）
+  const isColorOrWhitePrint = botAnswers.printType === 'カラー印刷（白カード）' || botAnswers.printType === '白印刷（入稿）';
+
+  // 黒カードかどうか判定（カラー裏面不可）
+  const isBlackCard = botAnswers.printType === 'ロゴのみ（黒カード）' || botAnswers.printType === 'シルバー・ゴールド（黒カード）';
 
   // 価格計算
   const calculatePrice = () => {
@@ -79,6 +111,7 @@ const Shuriken = () => {
       'ロゴのみ（白カード）': 3500,
       'ロゴのみ（黒カード）': 4000,
       'カラー印刷（白カード）': 5500,
+      '白印刷（入稿）': 5500,
       'シルバー・ゴールド（白カード）': 10000,
       'シルバー・ゴールド（黒カード）': 10500
     };
@@ -332,6 +365,12 @@ const Shuriken = () => {
                     カラー印刷<br />（白カードのみ）<span className="tile-price">¥5,500</span>
                   </button>
                   <button
+                    className={`shuriken-bot-tile ${botAnswers.printType === '白印刷（入稿）' ? 'selected' : ''}`}
+                    onClick={() => handleSelect('printType', '白印刷（入稿）')}
+                  >
+                    白印刷<br />（入稿）<span className="tile-price">¥5,500</span>
+                  </button>
+                  <button
                     className={`shuriken-bot-tile ${botAnswers.printType === 'シルバー・ゴールド（白カード）' ? 'selected' : ''}`}
                     onClick={() => handleSelect('printType', 'シルバー・ゴールド（白カード）')}
                   >
@@ -349,32 +388,42 @@ const Shuriken = () => {
               {/* 質問4: 裏面印刷 */}
               <div className="shuriken-bot-question">
                 <h3>④ 裏面も印刷しますか？</h3>
-                <div className="shuriken-bot-tiles back-print-options">
-                  <button
-                    className={`shuriken-bot-tile ${botAnswers.backPrint === 'なし' ? 'selected' : ''}`}
-                    onClick={() => handleSelect('backPrint', 'なし')}
-                  >
-                    なし<span className="tile-price">¥0</span>
-                  </button>
-                  <button
-                    className={`shuriken-bot-tile ${botAnswers.backPrint === '白黒単色' ? 'selected' : ''}`}
-                    onClick={() => handleSelect('backPrint', '白黒単色')}
-                  >
-                    白黒単色<span className="tile-price">+¥1,000</span>
-                  </button>
-                  <button
-                    className={`shuriken-bot-tile ${botAnswers.backPrint === 'カラー' ? 'selected' : ''}`}
-                    onClick={() => handleSelect('backPrint', 'カラー')}
-                  >
-                    カラー<span className="tile-price">+¥2,000</span>
-                  </button>
-                  <button
-                    className={`shuriken-bot-tile ${botAnswers.backPrint === 'シルバー・ゴールド' ? 'selected' : ''}`}
-                    onClick={() => handleSelect('backPrint', 'シルバー・ゴールド')}
-                  >
-                    シルバー・ゴールド<span className="tile-price">+¥3,000</span>
-                  </button>
-                </div>
+                {isLogoOnly ? (
+                  <div className="shuriken-bot-disabled-message">
+                    ※ロゴのみの場合、裏面印刷はできません
+                  </div>
+                ) : (
+                  <div className="shuriken-bot-tiles back-print-options">
+                    <button
+                      className={`shuriken-bot-tile ${botAnswers.backPrint === 'なし' ? 'selected' : ''}`}
+                      onClick={() => handleSelect('backPrint', 'なし')}
+                    >
+                      なし<span className="tile-price">¥0</span>
+                    </button>
+                    <button
+                      className={`shuriken-bot-tile ${botAnswers.backPrint === '白黒単色' ? 'selected' : ''}`}
+                      onClick={() => handleSelect('backPrint', '白黒単色')}
+                    >
+                      白黒単色<span className="tile-price">+¥1,000</span>
+                    </button>
+                    {!isBlackCard && (
+                      <button
+                        className={`shuriken-bot-tile ${botAnswers.backPrint === 'カラー' ? 'selected' : ''}`}
+                        onClick={() => handleSelect('backPrint', 'カラー')}
+                      >
+                        カラー<span className="tile-price">+¥2,000</span>
+                      </button>
+                    )}
+                    {!isColorOrWhitePrint && !isBlackCard && (
+                      <button
+                        className={`shuriken-bot-tile ${botAnswers.backPrint === 'シルバー・ゴールド' ? 'selected' : ''}`}
+                        onClick={() => handleSelect('backPrint', 'シルバー・ゴールド')}
+                      >
+                        シルバー・ゴールド<span className="tile-price">+¥3,000</span>
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* 概算表示 */}
