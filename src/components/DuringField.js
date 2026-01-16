@@ -44,11 +44,10 @@ const DuringField = () => {
         <div className="df-nav-container">
           <Link to="/during-field" className="df-nav-logo">DURING FIELD</Link>
           <ul className="df-nav-menu">
-            <li><Link to="/during-field" className="active">Home</Link></li>
-            <li><Link to="/during-field/company">会社概要</Link></li>
-            <li><Link to="/during-field/business">事業内容</Link></li>
-            <li><Link to="/during-field/works">施工実績</Link></li>
-            <li><Link to="/during-field/contact">お問い合わせ</Link></li>
+            <li><Link to="/">M's BASE</Link></li>
+            <li><Link to="/spaciva">SPACIVA</Link></li>
+            <li><Link to="/camping-space">車中泊</Link></li>
+            <li><Link to="/shuriken">Shuriken</Link></li>
           </ul>
         </div>
       </nav>

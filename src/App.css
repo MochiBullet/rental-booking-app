@@ -408,6 +408,42 @@ body {
   gap: 24px;
 }
 
+/* Main Navigation Menu - Cross-links to sub-brands */
+.main-nav-menu {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.main-nav-menu li {
+  margin: 0;
+}
+
+.main-nav-menu li a {
+  color: white;
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.main-nav-menu li a:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Mobile responsive for main nav menu */
+@media (max-width: 768px) {
+  .main-nav-menu {
+    display: none;
+  }
+}
+
 .user-menu {
   display: flex;
   align-items: center;

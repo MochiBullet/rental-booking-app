@@ -41,6 +41,7 @@ const Spaciva = () => {
             <li><Link to="/">M's BASE</Link></li>
             <li><Link to="/during-field">DURING FIELD</Link></li>
             <li><Link to="/camping-space">車中泊</Link></li>
+            <li><Link to="/shuriken">Shuriken</Link></li>
           </ul>
         </div>
       </nav>

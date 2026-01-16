@@ -40,6 +40,7 @@ const CampingSpace = () => {
             <li><Link to="/">M's BASE</Link></li>
             <li><Link to="/spaciva">SPACIVA</Link></li>
             <li><Link to="/during-field">DURING FIELD</Link></li>
+            <li><Link to="/shuriken">Shuriken</Link></li>
           </ul>
         </div>
       </nav>

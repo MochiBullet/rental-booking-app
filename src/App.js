@@ -342,6 +342,12 @@ function AppContent() {
               </Link>
 
               <nav className="header-nav">
+                <ul className="main-nav-menu">
+                  <li><Link to="/spaciva">SPACIVA</Link></li>
+                  <li><Link to="/during-field">DURING FIELD</Link></li>
+                  <li><Link to="/camping-space">車中泊</Link></li>
+                  <li><Link to="/shuriken">Shuriken</Link></li>
+                </ul>
                 {(location.pathname === '/admin' || location.pathname === '/admin-login') && isAdmin && (
                   <div className="admin-indicator">
                     <span className="admin-badge">管理者モード</span>

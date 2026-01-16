@@ -69,6 +69,7 @@ const Shuriken = () => {
             <li><Link to="/">M's BASE</Link></li>
             <li><Link to="/spaciva">SPACIVA</Link></li>
             <li><Link to="/during-field">DURING FIELD</Link></li>
+            <li><Link to="/camping-space">車中泊</Link></li>
           </ul>
         </div>
       </nav>
