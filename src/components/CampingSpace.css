@@ -384,6 +384,10 @@
 }
 
 /* 周辺施設 */
+.nearby-section {
+  margin-top: 3rem;
+}
+
 .nearby-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
