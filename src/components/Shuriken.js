@@ -25,6 +25,15 @@ import shurikenLogo from '../images/shuriken/logo.png';
 
 const Shuriken = () => {
   const [isLoading, setIsLoading] = useState(true);
+  const [isBotOpen, setIsBotOpen] = useState(false);
+
+  // 見積もりBOT用のstate
+  const [botAnswers, setBotAnswers] = useState({
+    hasData: null,      // データあり/なし
+    needDesign: null,   // デザイン相談する/しない
+    printType: null,    // 印刷タイプ
+    backPrint: null     // 裏面印刷
+  });
 
   useEffect(() => {
     // 1秒後にローディング終了
@@ -33,6 +42,80 @@ const Shuriken = () => {
     }, 1000);
     return () => clearTimeout(timer);
   }, []);
+
+  // タイル選択の処理
+  const handleSelect = (key, value) => {
+    setBotAnswers(prev => ({ ...prev, [key]: value }));
+  };
+
+  // 価格計算
+  const calculatePrice = () => {
+    let total = 0;
+    let breakdown = [];
+
+    // データ料金
+    if (botAnswers.hasData === 'ない') {
+      total += 1000;
+      breakdown.push('データ作成: ¥1,000');
+    } else if (botAnswers.hasData === 'ある') {
+      breakdown.push('データ作成: ¥0');
+    }
+
+    // デザイン相談料金
+    if (botAnswers.needDesign === 'はい') {
+      total += 3000;
+      breakdown.push('デザイン相談: ¥3,000～');
+    } else if (botAnswers.needDesign === 'いいえ') {
+      breakdown.push('デザイン相談: ¥0');
+    }
+
+    // 印刷タイプ料金
+    const printPrices = {
+      'ロゴのみ（白カード）': 3500,
+      'ロゴのみ（黒カード）': 4000,
+      'カラー印刷（白カード）': 5500,
+      'シルバー・ゴールド（白カード）': 10000,
+      'シルバー・ゴールド（黒カード）': 10500
+    };
+    if (botAnswers.printType && printPrices[botAnswers.printType]) {
+      total += printPrices[botAnswers.printType];
+      breakdown.push(`印刷: ¥${printPrices[botAnswers.printType].toLocaleString()}`);
+    }
+
+    // 裏面印刷料金
+    const backPrices = {
+      'なし': 0,
+      '白黒単色': 1000,
+      'カラー': 2000,
+      'シルバー・ゴールド': 3000
+    };
+    if (botAnswers.backPrint && backPrices[botAnswers.backPrint] !== undefined) {
+      total += backPrices[botAnswers.backPrint];
+      breakdown.push(`裏面印刷: ¥${backPrices[botAnswers.backPrint].toLocaleString()}`);
+    }
+
+    return { total, breakdown, hasDesignConsult: botAnswers.needDesign === 'はい' };
+  };
+
+  // 送信処理（スプシ連携用）
+  const handleSubmit = () => {
+    const priceInfo = calculatePrice();
+    const data = {
+      timestamp: new Date().toISOString(),
+      hasData: botAnswers.hasData,
+      needDesign: botAnswers.needDesign,
+      printType: botAnswers.printType,
+      backPrint: botAnswers.backPrint,
+      estimatedPrice: priceInfo.total
+    };
+    console.log('送信データ:', data);
+    // TODO: Google Spreadsheet連携
+    alert('お問い合わせありがとうございます！\n担当者より折り返しご連絡いたします。');
+  };
+
+  // 全て選択されているか
+  const isComplete = botAnswers.hasData && botAnswers.needDesign && botAnswers.printType && botAnswers.backPrint;
+  const priceInfo = calculatePrice();
   // PC用とモバイル用の画像ペア（モバイル用がない場合はPC用を使用）
   const images = [
     { pc: gif1, mobile: m1 },
@@ -96,6 +179,7 @@ const Shuriken = () => {
           <div className="shuriken-last-image desktop-only">
             <img src={gif8} alt="shuriken feature 8" />
           </div>
+
           <h2 className="shuriken-contact-title">お問い合わせ</h2>
           <div className="shuriken-contact-grid">
             <div
@@ -139,6 +223,171 @@ const Shuriken = () => {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* フローティング見積もりBOT */}
+      <div className={`shuriken-floating-bot ${isBotOpen ? 'open' : ''}`}>
+        {/* フローティングボタン */}
+        <button
+          className="shuriken-floating-btn"
+          onClick={() => setIsBotOpen(!isBotOpen)}
+        >
+          {isBotOpen ? (
+            <span className="close-icon">✕</span>
+          ) : (
+            <>
+              <img src={shurikenLogo} alt="" className="floating-logo" />
+              <span className="floating-text">かんたん見積もり</span>
+            </>
+          )}
+        </button>
+
+        {/* BOTパネル */}
+        {isBotOpen && (
+          <div className="shuriken-bot-panel">
+            <div className="shuriken-bot-panel-content">
+              <h2 className="shuriken-bot-title">かんたん見積もり</h2>
+
+              {/* 質問1: データの有無 */}
+              <div className="shuriken-bot-question">
+                <h3>① 名刺のデータはありますか？</h3>
+                <div className="shuriken-bot-tiles">
+                  <button
+                    className={`shuriken-bot-tile ${botAnswers.hasData === 'ある' ? 'selected' : ''}`}
+                    onClick={() => handleSelect('hasData', 'ある')}
+                  >
+                    ある<span className="tile-price">¥0</span>
+                  </button>
+                  <button
+                    className={`shuriken-bot-tile ${botAnswers.hasData === 'ない' ? 'selected' : ''}`}
+                    onClick={() => handleSelect('hasData', 'ない')}
+                  >
+                    ない<span className="tile-price">¥1,000</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* 質問2: デザイン相談 */}
+              <div className="shuriken-bot-question">
+                <h3>② 新規でデザインを相談しますか？</h3>
+                <div className="shuriken-bot-tiles">
+                  <button
+                    className={`shuriken-bot-tile ${botAnswers.needDesign === 'はい' ? 'selected' : ''}`}
+                    onClick={() => handleSelect('needDesign', 'はい')}
+                  >
+                    はい<span className="tile-price">¥3,000～</span>
+                  </button>
+                  <button
+                    className={`shuriken-bot-tile ${botAnswers.needDesign === 'いいえ' ? 'selected' : ''}`}
+                    onClick={() => handleSelect('needDesign', 'いいえ')}
+                  >
+                    いいえ<span className="tile-price">¥0</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* 質問3: 印刷タイプ */}
+              <div className="shuriken-bot-question">
+                <h3>③ どんな印刷にしますか？</h3>
+                <div className="shuriken-bot-tiles print-options">
+                  <button
+                    className={`shuriken-bot-tile ${botAnswers.printType === 'ロゴのみ（白カード）' ? 'selected' : ''}`}
+                    onClick={() => handleSelect('printType', 'ロゴのみ（白カード）')}
+                  >
+                    shurikenロゴのみ<br />（白カード）<span className="tile-price">¥3,500</span>
+                  </button>
+                  <button
+                    className={`shuriken-bot-tile ${botAnswers.printType === 'ロゴのみ（黒カード）' ? 'selected' : ''}`}
+                    onClick={() => handleSelect('printType', 'ロゴのみ（黒カード）')}
+                  >
+                    shurikenロゴのみ<br />（黒カード）<span className="tile-price">¥4,000</span>
+                  </button>
+                  <button
+                    className={`shuriken-bot-tile ${botAnswers.printType === 'カラー印刷（白カード）' ? 'selected' : ''}`}
+                    onClick={() => handleSelect('printType', 'カラー印刷（白カード）')}
+                  >
+                    カラー印刷<br />（白カードのみ）<span className="tile-price">¥5,500</span>
+                  </button>
+                  <button
+                    className={`shuriken-bot-tile ${botAnswers.printType === 'シルバー・ゴールド（白カード）' ? 'selected' : ''}`}
+                    onClick={() => handleSelect('printType', 'シルバー・ゴールド（白カード）')}
+                  >
+                    シルバー・ゴールド<br />（白カード）<span className="tile-price">¥10,000</span>
+                  </button>
+                  <button
+                    className={`shuriken-bot-tile ${botAnswers.printType === 'シルバー・ゴールド（黒カード）' ? 'selected' : ''}`}
+                    onClick={() => handleSelect('printType', 'シルバー・ゴールド（黒カード）')}
+                  >
+                    シルバー・ゴールド<br />（黒カード）<span className="tile-price">¥10,500</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* 質問4: 裏面印刷 */}
+              <div className="shuriken-bot-question">
+                <h3>④ 裏面も印刷しますか？</h3>
+                <div className="shuriken-bot-tiles back-print-options">
+                  <button
+                    className={`shuriken-bot-tile ${botAnswers.backPrint === 'なし' ? 'selected' : ''}`}
+                    onClick={() => handleSelect('backPrint', 'なし')}
+                  >
+                    なし<span className="tile-price">¥0</span>
+                  </button>
+                  <button
+                    className={`shuriken-bot-tile ${botAnswers.backPrint === '白黒単色' ? 'selected' : ''}`}
+                    onClick={() => handleSelect('backPrint', '白黒単色')}
+                  >
+                    白黒単色<span className="tile-price">+¥1,000</span>
+                  </button>
+                  <button
+                    className={`shuriken-bot-tile ${botAnswers.backPrint === 'カラー' ? 'selected' : ''}`}
+                    onClick={() => handleSelect('backPrint', 'カラー')}
+                  >
+                    カラー<span className="tile-price">+¥2,000</span>
+                  </button>
+                  <button
+                    className={`shuriken-bot-tile ${botAnswers.backPrint === 'シルバー・ゴールド' ? 'selected' : ''}`}
+                    onClick={() => handleSelect('backPrint', 'シルバー・ゴールド')}
+                  >
+                    シルバー・ゴールド<span className="tile-price">+¥3,000</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* 概算表示 */}
+              {(botAnswers.hasData || botAnswers.needDesign || botAnswers.printType || botAnswers.backPrint) && (
+                <div className="shuriken-bot-estimate">
+                  <h3>概算金額</h3>
+                  <div className="estimate-breakdown">
+                    {priceInfo.breakdown.map((item, index) => (
+                      <div key={index} className="estimate-item">{item}</div>
+                    ))}
+                  </div>
+                  <div className="estimate-total">
+                    合計: ¥{priceInfo.total.toLocaleString()}{priceInfo.hasDesignConsult && '～'}
+                  </div>
+                </div>
+              )}
+
+              {/* 送信ボタン */}
+              <button
+                className={`shuriken-bot-submit ${isComplete ? 'active' : ''}`}
+                onClick={handleSubmit}
+                disabled={!isComplete}
+              >
+                お問い合わせを送信
+              </button>
+
+              {/* キャンセルボタン */}
+              <button
+                className="shuriken-bot-cancel"
+                onClick={() => setIsBotOpen(false)}
+              >
+                キャンセル
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
