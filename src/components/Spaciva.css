@@ -112,6 +112,21 @@
   z-index: 1;
 }
 
+/* バナー画像 */
+.spaciva-banner {
+  width: 100%;
+  margin-bottom: 2rem;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+}
+
+.spaciva-banner img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
 /* セクション共通 */
 .spaciva-container section,
 .spaciva-container .contact-section {

@@ -4,6 +4,7 @@ import './Spaciva.css';
 import { siteSettingsAPI } from '../services/siteSettingsAPI';
 import spacivaBg from '../images/spaciva-bg2.jpg';
 import spacivaLogo from '../images/spaciva-logo.png';
+import spacivaBanner from '../images/spaciva-banner.svg';
 
 const Spaciva = () => {
   const [contactInfo, setContactInfo] = useState({
@@ -57,6 +58,11 @@ const Spaciva = () => {
 
       {/* メインコンテンツ */}
       <div className="spaciva-container">
+        {/* バナー画像 */}
+        <div className="spaciva-banner">
+          <img src={spacivaBanner} alt="SPACIVA" />
+        </div>
+
         {/* 紹介セクション */}
         <section className="intro-section">
           <h2>SPACIVAへようこそ</h2>
