@@ -440,7 +440,24 @@ body {
 /* Mobile responsive for main nav menu */
 @media (max-width: 768px) {
   .main-nav-menu {
-    display: none;
+    display: flex;
+    gap: 4px;
+  }
+
+  .main-nav-menu li a {
+    padding: 4px 8px;
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-nav-menu {
+    gap: 2px;
+  }
+
+  .main-nav-menu li a {
+    padding: 3px 5px;
+    font-size: 9px;
   }
 }
 
