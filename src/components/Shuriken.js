@@ -149,7 +149,6 @@ const Shuriken = () => {
 
     const priceInfo = calculatePrice();
     const data = {
-      timestamp: new Date().toISOString(),
       name: contactInfo.name,
       email: contactInfo.email,
       hasData: botAnswers.hasData,
@@ -158,8 +157,23 @@ const Shuriken = () => {
       backPrint: botAnswers.backPrint,
       estimatedPrice: priceInfo.total
     };
-    console.log('送信データ:', data);
-    // TODO: Google Spreadsheet連携
+
+    // Google Spreadsheetに送信（Image方式でCORS回避）
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbwzUgt6asH3gy8V_HPEwTkGB6b1_dtCANrpdEMeJSXxDU6_HerUE3kL4zoCE6YA3XOZgg/exec';
+
+    const params = new URLSearchParams({
+      name: data.name,
+      email: data.email,
+      hasData: data.hasData,
+      needDesign: data.needDesign,
+      printType: data.printType,
+      backPrint: data.backPrint,
+      estimatedPrice: data.estimatedPrice
+    });
+
+    const img = new Image();
+    img.src = `${GAS_URL}?${params.toString()}`;
+
     alert('お問い合わせありがとうございます！\n担当者より折り返しご連絡いたします。');
 
     // リセット
