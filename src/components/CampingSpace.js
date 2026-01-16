@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './CampingSpace.css';
 import { siteSettingsAPI } from '../services/siteSettingsAPI';
+import campBanner from '../images/canp1.png';
 
 const CampingSpace = () => {
   const [contactInfo, setContactInfo] = useState({
@@ -49,7 +50,7 @@ const CampingSpace = () => {
           <h1>M's FIELD</h1>
           <div className="header-image">
             <img
-              src="https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80"
+              src={campBanner}
               alt="M's FIELD キャンプ場"
             />
           </div>
