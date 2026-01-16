@@ -44,7 +44,7 @@
 
 .hero-section {
   position: relative;
-  height: 60vh; /* 高さを縮小して余白を詰める */
+  height: 35vh; /* 緑背景を狭く - 画像より少し広い程度 */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -61,7 +61,7 @@
   left: 0;
   transform: translateY(-50%);
   width: 100%;
-  height: 50%; /* 高さを半分に */
+  height: 80%; /* 画像を大きく表示 */
   z-index: 1;
   overflow: hidden;
 }
@@ -166,7 +166,7 @@
   max-width: 1200px;
   margin: 0 auto;
   background: white;
-  margin-top: -50px;
+  margin-top: 20px; /* 画像と被らないように下にずらす */
   border-radius: 30px 30px 0 0;
   position: relative;
   z-index: 4;
@@ -462,7 +462,7 @@
   
   .selection-container {
     padding: 3rem 1rem;
-    margin-top: -30px;
+    margin-top: 15px; /* 画像と被らないように */
     border-radius: 20px 20px 0 0;
   }
   
@@ -673,19 +673,20 @@
 
 @media (max-width: 480px) {
   .hero-section {
-    height: 70vh;
+    height: 30vh; /* モバイルでも狭く */
   }
-  
+
   .hero-title {
     font-size: 2rem;
   }
-  
+
   .hero-subtitle {
     font-size: 1rem;
   }
-  
+
   .selection-container {
     padding: 2rem 1rem;
+    margin-top: 10px; /* 画像と被らないように */
   }
   
   .tile-content {

@@ -441,7 +441,7 @@ function HomePage() {
         
         {/* コンテンツ */}
         <div className="hero-content">
-          <h2 className="hero-title">{homeContent.heroTitle}</h2>
+          <h2 className="hero-title">車・バイクレンタル<br />M's BASE Rental</h2>
           <p className="hero-subtitle">{homeContent.heroSubtitle}</p>
         </div>
       </div>
@@ -553,8 +553,8 @@ function HomePage() {
             中古バイクも取り扱っております
           </h2>
           <div className="webike-banner-container" style={{
-            maxWidth: '100%',
-            width: '540px',
+            maxWidth: '1000px',
+            width: '100%',
             boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
             borderRadius: '10px',
             overflow: 'hidden',
@@ -562,11 +562,12 @@ function HomePage() {
           }}>
             <iframe
               src="https://moto.webike.net/widget_bike_list.html?dlr=25604&wvc=3&per=9&srt=15"
-              width="540"
-              height="400"
+              width="1000"
+              height="600"
               scrolling="auto"
               style={{
                 width: '100%',
+                height: '600px',
                 border: 'none',
                 display: 'block'
               }}
