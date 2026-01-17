@@ -465,15 +465,17 @@ const ShurikenDesigner = () => {
   };
 
   // DOMを実際の画像に変換してからキャプチャする
+  // metallicType: 'gold', 'silver', または 'print'（印刷用黒色）
   const preRenderMetallicElements = async (container, metallicType) => {
     const restorationData = [];
 
     // metallicType が指定されていない場合はスキップ
-    if (!metallicType || (metallicType !== 'gold' && metallicType !== 'silver')) {
+    if (!metallicType || (metallicType !== 'gold' && metallicType !== 'silver' && metallicType !== 'print')) {
       return restorationData;
     }
 
     const isGold = metallicType === 'gold';
+    const isPrint = metallicType === 'print';
 
     // 金銀マスク画像を処理
     const metallicImages = container.querySelectorAll('.metallic-masked-image');
@@ -504,22 +506,26 @@ const ShurikenDesigner = () => {
           canvas.width = img.width || rect.width * 2 || 200;
           canvas.height = img.height || rect.height * 2 || 200;
 
-          // グラデーション
-          const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-          if (isGold) {
-            gradient.addColorStop(0, '#D4AF37');
-            gradient.addColorStop(0.25, '#FFD700');
-            gradient.addColorStop(0.5, '#FFF8DC');
-            gradient.addColorStop(0.75, '#FFD700');
-            gradient.addColorStop(1, '#B8860B');
+          // 塗りつぶし色（印刷モードは黒、それ以外はグラデーション）
+          if (isPrint) {
+            ctx.fillStyle = '#000000';
           } else {
-            gradient.addColorStop(0, '#C0C0C0');
-            gradient.addColorStop(0.25, '#E8E8E8');
-            gradient.addColorStop(0.5, '#FFFFFF');
-            gradient.addColorStop(0.75, '#E8E8E8');
-            gradient.addColorStop(1, '#A0A0A0');
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            if (isGold) {
+              gradient.addColorStop(0, '#D4AF37');
+              gradient.addColorStop(0.25, '#FFD700');
+              gradient.addColorStop(0.5, '#FFF8DC');
+              gradient.addColorStop(0.75, '#FFD700');
+              gradient.addColorStop(1, '#B8860B');
+            } else {
+              gradient.addColorStop(0, '#C0C0C0');
+              gradient.addColorStop(0.25, '#E8E8E8');
+              gradient.addColorStop(0.5, '#FFFFFF');
+              gradient.addColorStop(0.75, '#E8E8E8');
+              gradient.addColorStop(1, '#A0A0A0');
+            }
+            ctx.fillStyle = gradient;
           }
-          ctx.fillStyle = gradient;
           ctx.fillRect(0, 0, canvas.width, canvas.height);
           ctx.globalCompositeOperation = 'destination-in';
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
@@ -571,23 +577,28 @@ const ShurikenDesigner = () => {
       canvas.width = Math.ceil(metrics.width) + 16;
       canvas.height = Math.ceil(fontSize * 1.4);
 
-      const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-      if (isGold) {
-        gradient.addColorStop(0, '#bf953f');
-        gradient.addColorStop(0.25, '#fcf6ba');
-        gradient.addColorStop(0.5, '#b38728');
-        gradient.addColorStop(0.75, '#fbf5b7');
-        gradient.addColorStop(1, '#aa771c');
-      } else {
-        gradient.addColorStop(0, '#c0c0c0');
-        gradient.addColorStop(0.25, '#ffffff');
-        gradient.addColorStop(0.5, '#a8a8a8');
-        gradient.addColorStop(0.75, '#e8e8e8');
-        gradient.addColorStop(1, '#909090');
-      }
-
       ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
-      ctx.fillStyle = gradient;
+
+      // 塗りつぶし色（印刷モードは黒、それ以外はグラデーション）
+      if (isPrint) {
+        ctx.fillStyle = '#000000';
+      } else {
+        const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+        if (isGold) {
+          gradient.addColorStop(0, '#bf953f');
+          gradient.addColorStop(0.25, '#fcf6ba');
+          gradient.addColorStop(0.5, '#b38728');
+          gradient.addColorStop(0.75, '#fbf5b7');
+          gradient.addColorStop(1, '#aa771c');
+        } else {
+          gradient.addColorStop(0, '#c0c0c0');
+          gradient.addColorStop(0.25, '#ffffff');
+          gradient.addColorStop(0.5, '#a8a8a8');
+          gradient.addColorStop(0.75, '#e8e8e8');
+          gradient.addColorStop(1, '#909090');
+        }
+        ctx.fillStyle = gradient;
+      }
       ctx.textBaseline = 'top';
       ctx.fillText(text, 8, 8);
 
@@ -672,13 +683,27 @@ const ShurikenDesigner = () => {
       // 元に戻す
       restoreMetallicElements(restorationData);
 
-      // 表面印刷版キャプチャ（店舗用：金銀→黒）
+      // 表面印刷版キャプチャ（店舗用：金銀→黒、透過維持）
+      // 金銀の場合は事前レンダリングで黒色に変換
+      const frontPrintType = frontData.printType;
+      const needsPrintRender = frontPrintType === 'gold' || frontPrintType === 'silver';
+
+      let frontPrintRestorationData = [];
+      if (needsPrintRender) {
+        frontPrintRestorationData = await preRenderMetallicElements(wrapper, 'print');
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+
       setCaptureMode('print');
       await waitForRender();
       await new Promise(resolve => setTimeout(resolve, 300));
 
       const frontPrintCanvas = await html2canvas(wrapper, html2canvasOptions);
       results.front.print = frontPrintCanvas.toDataURL('image/png');
+
+      if (needsPrintRender) {
+        restoreMetallicElements(frontPrintRestorationData);
+      }
       setCaptureMode(null);
 
       // 裏面に内容があるかチェック
@@ -705,13 +730,26 @@ const ShurikenDesigner = () => {
         // 元に戻す
         restoreMetallicElements(backRestorationData);
 
-        // 裏面印刷版キャプチャ（店舗用）
+        // 裏面印刷版キャプチャ（店舗用：金銀→黒、透過維持）
+        const backPrintType = backData.printType;
+        const needsBackPrintRender = backPrintType === 'gold' || backPrintType === 'silver';
+
+        let backPrintRestorationData = [];
+        if (needsBackPrintRender) {
+          backPrintRestorationData = await preRenderMetallicElements(wrapper, 'print');
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+
         setCaptureMode('print');
         await waitForRender();
         await new Promise(resolve => setTimeout(resolve, 300));
 
         const backPrintCanvas = await html2canvas(wrapper, html2canvasOptions);
         results.back.print = backPrintCanvas.toDataURL('image/png');
+
+        if (needsBackPrintRender) {
+          restoreMetallicElements(backPrintRestorationData);
+        }
         setCaptureMode(null);
       }
 

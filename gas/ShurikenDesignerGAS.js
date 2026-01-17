@@ -135,26 +135,35 @@ function logToSpreadsheet(data, savedImages) {
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   let sheet = ss.getSheetByName('デザイン履歴');
 
+  // ヘッダー行の定義
+  const headerRow = [
+    '受付日時',
+    'お名前',
+    'メールアドレス',
+    'カード色',
+    '印刷タイプ',
+    '裏面印刷',
+    '合計金額',
+    '表面プレビュー',
+    '表面印刷用',
+    '裏面プレビュー',
+    '裏面印刷用',
+    'フォルダリンク'
+  ];
+
   // シートがなければ作成
   if (!sheet) {
     sheet = ss.insertSheet('デザイン履歴');
-    // ヘッダー行を追加
-    sheet.appendRow([
-      '受付日時',
-      'お名前',
-      'メールアドレス',
-      'カード色',
-      '印刷タイプ',
-      '裏面印刷',
-      '合計金額',
-      '表面プレビュー',
-      '表面印刷用',
-      '裏面プレビュー',
-      '裏面印刷用',
-      'フォルダリンク'
-    ]);
+  }
+
+  // 1行目をチェックしてヘッダーがなければ追加
+  const firstRowValue = sheet.getRange(1, 1).getValue();
+  if (firstRowValue !== '受付日時') {
+    // 1行目にヘッダーを挿入
+    sheet.insertRowBefore(1);
+    sheet.getRange(1, 1, 1, headerRow.length).setValues([headerRow]);
     // ヘッダー行のスタイル
-    sheet.getRange(1, 1, 1, 12).setBackground('#4a4a4a').setFontColor('#ffffff').setFontWeight('bold');
+    sheet.getRange(1, 1, 1, headerRow.length).setBackground('#4a4a4a').setFontColor('#ffffff').setFontWeight('bold');
   }
 
   const now = new Date();
