@@ -504,8 +504,7 @@ const ShurikenDesigner = () => {
                   alt="背景"
                   className="preview-background"
                   style={{
-                    transform: `scale(${templateScale / 100})`,
-                    transformOrigin: 'center center',
+                    transform: `translate(-50%, -50%) scale(${templateScale / 100})`,
                   }}
                 />
               )}
