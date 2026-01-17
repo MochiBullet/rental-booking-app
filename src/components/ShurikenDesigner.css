@@ -238,6 +238,94 @@
   margin: 0 0 0.5rem;
 }
 
+/* ラジオボタングループ */
+.radio-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.radio-group.vertical {
+  flex-direction: column;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: #0f1a2e;
+  border: 1px solid #3a4a6a;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex: 1;
+}
+
+.radio-group.vertical .radio-option {
+  flex: none;
+}
+
+.radio-option:hover {
+  border-color: #667eea;
+  background: #152238;
+}
+
+.radio-option.selected {
+  border-color: #667eea;
+  background: rgba(102, 126, 234, 0.2);
+}
+
+.radio-option input[type="radio"] {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #3a4a6a;
+  border-radius: 50%;
+  background: #0f1a2e;
+  cursor: pointer;
+  position: relative;
+}
+
+.radio-option input[type="radio"]:checked {
+  border-color: #667eea;
+  background: #667eea;
+}
+
+.radio-option input[type="radio"]:checked::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 6px;
+  height: 6px;
+  background: #fff;
+  border-radius: 50%;
+}
+
+.radio-label {
+  font-size: 0.85rem;
+  color: #fff;
+}
+
+/* 金色テキスト */
+.radio-label.gold-text {
+  background: linear-gradient(135deg, #bf953f 0%, #fcf6ba 25%, #b38728 50%, #fbf5b7 75%, #aa771c 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 600;
+}
+
+/* 銀色テキスト */
+.radio-label.silver-text {
+  background: linear-gradient(135deg, #c0c0c0 0%, #ffffff 25%, #a8a8a8 50%, #e8e8e8 75%, #909090 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 600;
+}
+
 /* サイズスライダー */
 .size-slider {
   margin-top: 0.75rem;

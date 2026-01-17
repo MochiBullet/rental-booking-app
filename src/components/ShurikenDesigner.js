@@ -56,6 +56,11 @@ const GOOGLE_FONTS = [
 const ShurikenDesigner = () => {
   const previewRef = useRef(null);
 
+  // カード色（white/black）
+  const [cardColor, setCardColor] = useState('white');
+  // 印刷タイプ（gold/silver/none）
+  const [printType, setPrintType] = useState('none');
+
   // テンプレート画像
   const [templateImage, setTemplateImage] = useState(null);
   const [templateScale, setTemplateScale] = useState(100); // 背景画像サイズ %
@@ -170,6 +175,26 @@ const ShurikenDesigner = () => {
     }));
   };
 
+  // カード色変更時にテキスト色をデフォルトに更新
+  const handleCardColorChange = (newColor) => {
+    setCardColor(newColor);
+    const defaultColors = newColor === 'white'
+      ? { main: '#000000', sub: '#333333', detail: '#222222' }
+      : { main: '#ffffff', sub: '#cccccc', detail: '#dddddd' };
+
+    setFormData(prev => ({
+      ...prev,
+      name: { ...prev.name, color: defaultColors.main },
+      nameKana: { ...prev.nameKana, color: defaultColors.sub },
+      company: { ...prev.company, color: defaultColors.main },
+      position: { ...prev.position, color: defaultColors.sub },
+      phone: { ...prev.phone, color: defaultColors.detail },
+      email: { ...prev.email, color: defaultColors.detail },
+      address: { ...prev.address, color: defaultColors.detail },
+      website: { ...prev.website, color: defaultColors.detail },
+    }));
+  };
+
   // テキスト位置更新
   const handleTextDrag = (field, e, data) => {
     // プレビュー領域内に制限
@@ -204,6 +229,8 @@ const ShurikenDesigner = () => {
 
   // リセット
   const handleReset = () => {
+    setCardColor('white');
+    setPrintType('none');
     setTemplateImage(null);
     setTemplateScale(100);
     setLogoImage(null);
@@ -285,6 +312,70 @@ const ShurikenDesigner = () => {
         {/* 左側: フォーム */}
         <div className="designer-form-panel">
           <h3>編集</h3>
+
+          {/* カード色選択 */}
+          <div className="form-section card-color-section">
+            <h4>カードの色</h4>
+            <div className="radio-group">
+              <label className={`radio-option ${cardColor === 'white' ? 'selected' : ''}`}>
+                <input
+                  type="radio"
+                  name="cardColor"
+                  value="white"
+                  checked={cardColor === 'white'}
+                  onChange={() => handleCardColorChange('white')}
+                />
+                <span className="radio-label">白カード</span>
+              </label>
+              <label className={`radio-option ${cardColor === 'black' ? 'selected' : ''}`}>
+                <input
+                  type="radio"
+                  name="cardColor"
+                  value="black"
+                  checked={cardColor === 'black'}
+                  onChange={() => handleCardColorChange('black')}
+                />
+                <span className="radio-label">黒カード</span>
+              </label>
+            </div>
+          </div>
+
+          {/* 印刷タイプ選択 */}
+          <div className="form-section print-type-section">
+            <h4>印刷の種類</h4>
+            <div className="radio-group vertical">
+              <label className={`radio-option ${printType === 'none' ? 'selected' : ''}`}>
+                <input
+                  type="radio"
+                  name="printType"
+                  value="none"
+                  checked={printType === 'none'}
+                  onChange={() => setPrintType('none')}
+                />
+                <span className="radio-label">金銀を使用しない</span>
+              </label>
+              <label className={`radio-option ${printType === 'gold' ? 'selected' : ''}`}>
+                <input
+                  type="radio"
+                  name="printType"
+                  value="gold"
+                  checked={printType === 'gold'}
+                  onChange={() => setPrintType('gold')}
+                />
+                <span className="radio-label gold-text">金色</span>
+              </label>
+              <label className={`radio-option ${printType === 'silver' ? 'selected' : ''}`}>
+                <input
+                  type="radio"
+                  name="printType"
+                  value="silver"
+                  checked={printType === 'silver'}
+                  onChange={() => setPrintType('silver')}
+                />
+                <span className="radio-label silver-text">銀色</span>
+              </label>
+            </div>
+          </div>
 
           {/* フォント選択 - カスタムドロップダウン */}
           <div className="global-font-select" ref={fontDropdownRef}>
@@ -490,12 +581,19 @@ const ShurikenDesigner = () => {
             />
           </div>
 
-          <div className="card-preview-container" ref={previewRef}>
+          <div
+            className="card-preview-container"
+            ref={previewRef}
+            style={{
+              background: cardColor === 'white' ? '#1a1a2e' : '#4a4a5a',
+            }}
+          >
             <div
               className="card-preview-wrapper"
               style={{
                 transform: `scale(${previewZoom / 100})`,
                 transformOrigin: 'center center',
+                background: cardColor === 'white' ? '#ffffff' : '#1a1a1a',
               }}
             >
               {/* 背景画像 */}
@@ -553,6 +651,37 @@ const ShurikenDesigner = () => {
                 const displayText = getDisplayText(field);
                 if (!displayText) return null;
 
+                // 金銀グラデーションスタイル
+                const getTextStyle = () => {
+                  const baseStyle = {
+                    fontSize: `${data.fontSize}px`,
+                    fontFamily: globalFont,
+                  };
+
+                  if (printType === 'gold') {
+                    return {
+                      ...baseStyle,
+                      background: 'linear-gradient(135deg, #bf953f 0%, #fcf6ba 25%, #b38728 50%, #fbf5b7 75%, #aa771c 100%)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      backgroundClip: 'text',
+                    };
+                  } else if (printType === 'silver') {
+                    return {
+                      ...baseStyle,
+                      background: 'linear-gradient(135deg, #c0c0c0 0%, #ffffff 25%, #a8a8a8 50%, #e8e8e8 75%, #909090 100%)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      backgroundClip: 'text',
+                    };
+                  } else {
+                    return {
+                      ...baseStyle,
+                      color: data.color,
+                    };
+                  }
+                };
+
                 return (
                   <Draggable
                     key={field}
@@ -561,12 +690,8 @@ const ShurikenDesigner = () => {
                     bounds="parent"
                   >
                     <div
-                      className="draggable-element text-element"
-                      style={{
-                        color: data.color,
-                        fontSize: `${data.fontSize}px`,
-                        fontFamily: globalFont,
-                      }}
+                      className={`draggable-element text-element ${printType !== 'none' ? 'metallic-text' : ''}`}
+                      style={getTextStyle()}
                     >
                       {displayText}
                     </div>
