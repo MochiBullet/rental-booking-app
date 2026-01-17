@@ -524,12 +524,21 @@ const ShurikenDesigner = () => {
                 <div className="field-header">
                   <label>{fieldLabels[field]}</label>
                   <div className="field-controls">
-                    <input
-                      type="color"
-                      value={data.color}
-                      onChange={(e) => handleInputChange(field, 'color', e.target.value)}
-                      title="文字色"
-                    />
+                    {printType === 'none' ? (
+                      <input
+                        type="color"
+                        value={data.color}
+                        onChange={(e) => handleInputChange(field, 'color', e.target.value)}
+                        title="文字色"
+                      />
+                    ) : (
+                      <span
+                        className={`color-locked ${printType}`}
+                        title={printType === 'gold' ? '金色固定' : '銀色固定'}
+                      >
+                        {printType === 'gold' ? '🥇' : '🥈'}
+                      </span>
+                    )}
                     <input
                       type="number"
                       value={data.fontSize}
@@ -541,13 +550,23 @@ const ShurikenDesigner = () => {
                     />
                   </div>
                 </div>
-                <input
-                  type="text"
-                  value={data.text}
-                  onChange={(e) => handleInputChange(field, 'text', e.target.value)}
-                  placeholder={fieldPlaceholders[field]}
-                  style={{ fontFamily: globalFont }}
-                />
+                {field === 'address' ? (
+                  <textarea
+                    value={data.text}
+                    onChange={(e) => handleInputChange(field, 'text', e.target.value)}
+                    placeholder={fieldPlaceholders[field]}
+                    style={{ fontFamily: globalFont }}
+                    rows={2}
+                  />
+                ) : (
+                  <input
+                    type="text"
+                    value={data.text}
+                    onChange={(e) => handleInputChange(field, 'text', e.target.value)}
+                    placeholder={fieldPlaceholders[field]}
+                    style={{ fontFamily: globalFont }}
+                  />
+                )}
               </div>
             ))}
           </div>

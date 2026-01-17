@@ -491,6 +491,29 @@
   border: none;
 }
 
+/* 金銀選択時のカラーロック表示 */
+.color-locked {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 2px solid #3a4a6a;
+  border-radius: 6px;
+  font-size: 1rem;
+  background: #0f1a2e;
+}
+
+.color-locked.gold {
+  border-color: #bf953f;
+  background: linear-gradient(135deg, rgba(191, 149, 63, 0.2) 0%, rgba(170, 119, 28, 0.2) 100%);
+}
+
+.color-locked.silver {
+  border-color: #c0c0c0;
+  background: linear-gradient(135deg, rgba(192, 192, 192, 0.2) 0%, rgba(144, 144, 144, 0.2) 100%);
+}
+
 .font-size-input {
   width: 50px;
   padding: 0.3rem 0.4rem;
@@ -519,6 +542,30 @@
 }
 
 .form-field > input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* 住所用テキストエリア */
+.form-field > textarea {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #3a4a6a;
+  border-radius: 6px;
+  background: #0f1a2e;
+  color: #fff;
+  font-size: 0.9rem;
+  resize: vertical;
+  min-height: 50px;
+  line-height: 1.4;
+}
+
+.form-field > textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  background: #152238;
+}
+
+.form-field > textarea::placeholder {
   color: rgba(255, 255, 255, 0.5);
 }
 
@@ -1022,7 +1069,8 @@
     order: 3;
   }
 
-  .form-field > input[type="text"] {
+  .form-field > input[type="text"],
+  .form-field > textarea {
     font-size: 16px; /* iOS zoom防止 */
   }
 
