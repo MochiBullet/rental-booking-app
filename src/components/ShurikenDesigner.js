@@ -92,6 +92,11 @@ const ShurikenDesigner = () => {
   const previewRef = useRef(null);
   const isInitialLoad = useRef(true);
 
+  // デザインモード（free: 自由デザイン / template: テンプレート）
+  const [designMode, setDesignMode] = useState('free');
+  // 選択中のテンプレート（複数選択可能）
+  const [selectedTemplates, setSelectedTemplates] = useState([]);
+
   // 表裏切り替え（front/back）
   const [cardSide, setCardSide] = useState('front');
 
@@ -162,6 +167,8 @@ const ShurikenDesigner = () => {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const data = JSON.parse(saved);
+        if (data.designMode) setDesignMode(data.designMode);
+        if (data.selectedTemplates) setSelectedTemplates(data.selectedTemplates);
         if (data.cardColor) setCardColor(data.cardColor);
         if (data.globalFont) setGlobalFont(data.globalFont);
         if (data.frontData) setFrontData({ ...getDefaultSideData(data.cardColor === 'black'), ...data.frontData });
@@ -179,6 +186,8 @@ const ShurikenDesigner = () => {
     if (isInitialLoad.current) return;
     try {
       const data = {
+        designMode,
+        selectedTemplates,
         cardSide,
         cardColor,
         globalFont,
@@ -189,7 +198,7 @@ const ShurikenDesigner = () => {
     } catch (e) {
       console.error('Failed to save data:', e);
     }
-  }, [cardSide, cardColor, globalFont, frontData, backData]);
+  }, [designMode, selectedTemplates, cardSide, cardColor, globalFont, frontData, backData]);
 
   // Google Fonts読み込み
   useEffect(() => {
@@ -365,6 +374,8 @@ const ShurikenDesigner = () => {
   const handleReset = () => {
     if (!window.confirm('表面・裏面の両方をリセットします。よろしいですか？')) return;
 
+    setDesignMode('free');
+    setSelectedTemplates([]);
     setCardSide('front');
     setCardColor('white');
     setGlobalFont(GOOGLE_FONTS[0].value);
@@ -423,7 +434,34 @@ const ShurikenDesigner = () => {
       <div className="designer-main two-column">
         {/* 左側: フォーム */}
         <div className="designer-form-panel">
+          {/* デザインモード切り替え */}
+          <div className="design-mode-toggle">
+            <button
+              className={`design-mode-btn ${designMode === 'free' ? 'active' : ''}`}
+              onClick={() => setDesignMode('free')}
+            >
+              自由デザイン
+            </button>
+            <button
+              className={`design-mode-btn ${designMode === 'template' ? 'active' : ''}`}
+              onClick={() => setDesignMode('template')}
+            >
+              テンプレート
+            </button>
+          </div>
+
           <h3>編集</h3>
+
+          {/* テンプレートモードの場合 */}
+          {designMode === 'template' && (
+            <div className="form-section template-section">
+              <h4>テンプレート選択</h4>
+              <p className="template-coming-soon">
+                テンプレートは現在準備中です。<br />
+                複数のテンプレートから選択できるようになります。
+              </p>
+            </div>
+          )}
 
           {/* 表裏切り替え */}
           <div className="form-section card-side-section">
@@ -658,6 +696,13 @@ const ShurikenDesigner = () => {
               </div>
             )}
           </div>
+
+          {/* 画像アップロード注意書き */}
+          {(printType === 'gold' || printType === 'silver') && (
+            <div className="upload-warning">
+              ※金銀を選択している場合は単色で背景透過ではない場合、印刷がうまく行かない場合があります。
+            </div>
+          )}
 
           {/* テキスト入力フォーム */}
           <div className="form-section">

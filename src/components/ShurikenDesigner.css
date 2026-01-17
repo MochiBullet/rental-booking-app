@@ -238,6 +238,65 @@
   margin: 0 0 0.5rem;
 }
 
+/* デザインモード切り替え */
+.design-mode-toggle {
+  display: flex;
+  gap: 0;
+  background: #0f1a2e;
+  border-radius: 10px;
+  padding: 4px;
+  border: 1px solid #3a4a6a;
+  margin-bottom: 1rem;
+}
+
+.design-mode-btn {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.3s;
+}
+
+.design-mode-btn:hover {
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.design-mode-btn.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+/* テンプレート準備中メッセージ */
+.template-coming-soon {
+  padding: 1.5rem;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  background: rgba(102, 126, 234, 0.1);
+  border-radius: 8px;
+  border: 1px dashed rgba(102, 126, 234, 0.3);
+}
+
+/* 画像アップロード注意書き */
+.upload-warning {
+  margin: 0 0 1rem;
+  padding: 0.75rem;
+  font-size: 0.75rem;
+  color: #ffa726;
+  background: rgba(255, 167, 38, 0.1);
+  border-radius: 6px;
+  border-left: 3px solid #ffa726;
+  line-height: 1.5;
+}
+
 /* 表裏切り替えトグル */
 .side-toggle {
   display: flex;
