@@ -537,6 +537,7 @@ function HomePage() {
         {/* Webikeバナーセクション */}
         <div className="webike-banner-section" style={{
           padding: '40px 20px',
+          marginTop: '60px',
           backgroundColor: '#f8f9fa',
           display: 'flex',
           flexDirection: 'column',
