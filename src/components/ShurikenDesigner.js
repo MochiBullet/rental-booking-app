@@ -331,14 +331,28 @@ const ShurikenDesigner = () => {
   // 印刷タイプ変更ハンドラー
   const handlePrintTypeChange = (newType) => {
     const oldType = printType;
-    updateCurrentData({ printType: newType });
 
-    // 金銀間の切り替え時は再マウント用カウンターをインクリメント
+    // 金銀間の直接切り替え時はデータ保存後にリロード
     const wasMetallic = oldType === 'gold' || oldType === 'silver';
     const isNewMetallic = newType === 'gold' || newType === 'silver';
     if (wasMetallic && isNewMetallic && oldType !== newType) {
-      setMetallicRenderKey(prev => prev + 1);
+      // 先にlocalStorageに保存してからリロード
+      const newData = { ...currentData, printType: newType };
+      const savedData = {
+        designMode,
+        selectedTemplates,
+        cardSide,
+        cardColor,
+        globalFont,
+        frontData: cardSide === 'front' ? newData : frontData,
+        backData: cardSide === 'back' ? newData : backData,
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(savedData));
+      window.location.reload();
+      return;
     }
+
+    updateCurrentData({ printType: newType });
 
     // 表面の印刷タイプを変更した場合、裏面の選択肢が制限される可能性がある
     if (cardSide === 'front') {
