@@ -11,47 +11,66 @@ const GOOGLE_FONTS = [
   { name: 'Noto Sans JP', value: "'Noto Sans JP', sans-serif", category: 'ゴシック' },
   { name: 'M PLUS 1p', value: "'M PLUS 1p', sans-serif", category: 'ゴシック' },
   { name: 'M PLUS Rounded 1c', value: "'M PLUS Rounded 1c', sans-serif", category: 'ゴシック' },
+  { name: 'M PLUS 1', value: "'M PLUS 1', sans-serif", category: 'ゴシック' },
+  { name: 'M PLUS 2', value: "'M PLUS 2', sans-serif", category: 'ゴシック' },
+  { name: 'M PLUS 1 Code', value: "'M PLUS 1 Code', monospace", category: 'ゴシック' },
   { name: 'Kosugi', value: "'Kosugi', sans-serif", category: 'ゴシック' },
   { name: 'Kosugi Maru', value: "'Kosugi Maru', sans-serif", category: '丸ゴシック' },
   { name: 'Sawarabi Gothic', value: "'Sawarabi Gothic', sans-serif", category: 'ゴシック' },
   { name: 'Zen Kaku Gothic New', value: "'Zen Kaku Gothic New', sans-serif", category: 'ゴシック' },
+  { name: 'Zen Kaku Gothic Antique', value: "'Zen Kaku Gothic Antique', sans-serif", category: 'ゴシック' },
   { name: 'Zen Maru Gothic', value: "'Zen Maru Gothic', sans-serif", category: '丸ゴシック' },
   { name: 'Murecho', value: "'Murecho', sans-serif", category: 'ゴシック' },
   { name: 'BIZ UDGothic', value: "'BIZ UDGothic', sans-serif", category: 'ゴシック' },
   { name: 'BIZ UDPGothic', value: "'BIZ UDPGothic', sans-serif", category: 'ゴシック' },
   { name: 'IBM Plex Sans JP', value: "'IBM Plex Sans JP', sans-serif", category: 'ゴシック' },
   { name: 'Kiwi Maru', value: "'Kiwi Maru', serif", category: '丸ゴシック' },
+  { name: 'Kiwi Maru Light', value: "'Kiwi Maru', serif", category: '丸ゴシック' },
+  // デザイン系
   { name: 'Reggae One', value: "'Reggae One', cursive", category: 'デザイン' },
   { name: 'RocknRoll One', value: "'RocknRoll One', sans-serif", category: 'デザイン' },
   { name: 'Stick', value: "'Stick', sans-serif", category: 'デザイン' },
   { name: 'DotGothic16', value: "'DotGothic16', sans-serif", category: 'デザイン' },
   { name: 'Rampart One', value: "'Rampart One', cursive", category: 'デザイン' },
   { name: 'Train One', value: "'Train One', cursive", category: 'デザイン' },
+  { name: 'Dela Gothic One', value: "'Dela Gothic One', cursive", category: 'デザイン' },
+  { name: 'Cherry Bomb One', value: "'Cherry Bomb One', cursive", category: 'デザイン' },
+  { name: 'Slackside One', value: "'Slackside One', cursive", category: 'デザイン' },
+  { name: 'Darumadrop One', value: "'Darumadrop One', cursive", category: 'デザイン' },
   // 明朝系
   { name: 'Noto Serif JP', value: "'Noto Serif JP', serif", category: '明朝' },
   { name: 'Sawarabi Mincho', value: "'Sawarabi Mincho', serif", category: '明朝' },
   { name: 'Shippori Mincho', value: "'Shippori Mincho', serif", category: '明朝' },
   { name: 'Shippori Mincho B1', value: "'Shippori Mincho B1', serif", category: '明朝' },
+  { name: 'Shippori Antique', value: "'Shippori Antique', serif", category: '明朝' },
+  { name: 'Shippori Antique B1', value: "'Shippori Antique B1', serif", category: '明朝' },
   { name: 'Zen Old Mincho', value: "'Zen Old Mincho', serif", category: '明朝' },
   { name: 'Zen Antique', value: "'Zen Antique', serif", category: '明朝' },
   { name: 'Zen Antique Soft', value: "'Zen Antique Soft', serif", category: '明朝' },
   { name: 'BIZ UDMincho', value: "'BIZ UDMincho', serif", category: '明朝' },
   { name: 'BIZ UDPMincho', value: "'BIZ UDPMincho', serif", category: '明朝' },
   { name: 'Hina Mincho', value: "'Hina Mincho', serif", category: '明朝' },
-  // 筆記・手書き系
-  { name: 'Yomogi', value: "'Yomogi', cursive", category: '手書き' },
-  { name: 'Yuji Syuku', value: "'Yuji Syuku', serif", category: '筆記' },
-  { name: 'Yuji Mai', value: "'Yuji Mai', serif", category: '筆記' },
-  { name: 'Yuji Boku', value: "'Yuji Boku', serif", category: '筆記' },
-  { name: 'Kaisei Decol', value: "'Kaisei Decol', serif", category: '手書き' },
+  { name: 'New Tegomin', value: "'New Tegomin', serif", category: '明朝' },
   { name: 'Kaisei Tokumin', value: "'Kaisei Tokumin', serif", category: '明朝' },
   { name: 'Kaisei Opti', value: "'Kaisei Opti', serif", category: '明朝' },
   { name: 'Kaisei HarunoUmi', value: "'Kaisei HarunoUmi', serif", category: '明朝' },
-  { name: 'Dela Gothic One', value: "'Dela Gothic One', cursive", category: 'デザイン' },
+  // 筆記・行書系
+  { name: 'Yuji Syuku', value: "'Yuji Syuku', serif", category: '行書' },
+  { name: 'Yuji Mai', value: "'Yuji Mai', serif", category: '行書' },
+  { name: 'Yuji Boku', value: "'Yuji Boku', serif", category: '行書' },
+  { name: 'Zen Kurenaido', value: "'Zen Kurenaido', serif", category: '行書' },
+  { name: 'Kaisei Decol', value: "'Kaisei Decol', serif", category: '行書' },
+  // 手書き系
+  { name: 'Yomogi', value: "'Yomogi', cursive", category: '手書き' },
+  { name: 'Klee One', value: "'Klee One', cursive", category: '手書き' },
+  { name: 'Komorebi Gothic', value: "'Komorebi Gothic', sans-serif", category: '手書き' },
+  // ポップ系
   { name: 'Mochiy Pop One', value: "'Mochiy Pop One', sans-serif", category: 'ポップ' },
   { name: 'Mochiy Pop P One', value: "'Mochiy Pop P One', sans-serif", category: 'ポップ' },
   { name: 'Potta One', value: "'Potta One', cursive", category: 'ポップ' },
   { name: 'Hachi Maru Pop', value: "'Hachi Maru Pop', cursive", category: 'ポップ' },
+  { name: 'Palette Mosaic', value: "'Palette Mosaic', cursive", category: 'ポップ' },
+  { name: 'Otomanopee One', value: "'Otomanopee One', sans-serif", category: 'ポップ' },
 ];
 
 // デフォルトデータ（printTypeを各面に持たせる）
@@ -945,6 +964,7 @@ const ShurikenDesigner = () => {
     const text = formData[field]?.text;
     if (!text || text.trim() === '') return null;
     if (field === 'phone') return `TEL: ${text}`;
+    if (field === 'email') return `mail: ${text}`;
     return text;
   };
 

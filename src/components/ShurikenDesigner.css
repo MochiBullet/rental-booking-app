@@ -731,6 +731,8 @@
   text-align: right;
   font-weight: 500;
   color: #fff;
+  font-family: 'Yuji Syuku', serif;
+  font-size: 1rem;
 }
 
 .price-total {
@@ -751,7 +753,8 @@
 
 .price-total .price-amount {
   color: #ffd700;
-  font-size: 1.1rem;
+  font-size: 1.3rem;
+  font-family: 'Yuji Syuku', serif;
 }
 
 .reset-btn {
@@ -1520,9 +1523,10 @@
 }
 
 .capture-modal-price .price-value {
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   font-weight: bold;
   color: #f5c542;
+  font-family: 'Yuji Syuku', serif;
 }
 
 .capture-modal-actions {
