@@ -538,11 +538,12 @@ const ShurikenDesigner = () => {
               gradient.addColorStop(0.75, '#FFD700');
               gradient.addColorStop(1, '#B8860B');
             } else {
-              gradient.addColorStop(0, '#C0C0C0');
-              gradient.addColorStop(0.25, '#E8E8E8');
-              gradient.addColorStop(0.5, '#FFFFFF');
-              gradient.addColorStop(0.75, '#E8E8E8');
-              gradient.addColorStop(1, '#A0A0A0');
+              // シルバー（暗めに調整）
+              gradient.addColorStop(0, '#707070');
+              gradient.addColorStop(0.25, '#A0A0A0');
+              gradient.addColorStop(0.5, '#C8C8C8');
+              gradient.addColorStop(0.75, '#A0A0A0');
+              gradient.addColorStop(1, '#606060');
             }
             ctx.fillStyle = gradient;
           }
@@ -611,11 +612,12 @@ const ShurikenDesigner = () => {
           gradient.addColorStop(0.75, '#fbf5b7');
           gradient.addColorStop(1, '#aa771c');
         } else {
-          gradient.addColorStop(0, '#c0c0c0');
-          gradient.addColorStop(0.25, '#ffffff');
-          gradient.addColorStop(0.5, '#a8a8a8');
-          gradient.addColorStop(0.75, '#e8e8e8');
-          gradient.addColorStop(1, '#909090');
+          // シルバー（暗めに調整）
+          gradient.addColorStop(0, '#707070');
+          gradient.addColorStop(0.25, '#B0B0B0');
+          gradient.addColorStop(0.5, '#808080');
+          gradient.addColorStop(0.75, '#A8A8A8');
+          gradient.addColorStop(1, '#606060');
         }
         ctx.fillStyle = gradient;
       }
@@ -1005,41 +1007,41 @@ const ShurikenDesigner = () => {
     }
     if (printType === 'silver') {
       if (cardColor === 'black') {
-        // 黒カード用：より明るく輝くシルバー（白に近い）
+        // 黒カード用：暗めのシルバー（視認性向上）
         return `linear-gradient(135deg,
-          #C0C0C0 0%,
-          #E8E8E8 5%,
-          #FFFFFF 12%,
-          #F0F0F0 18%,
-          #FFFFFF 25%,
-          #E0E0E0 32%,
-          #FFFFFF 40%,
-          #FFFFFF 50%,
-          #FFFFFF 60%,
-          #E8E8E8 68%,
-          #FFFFFF 75%,
-          #F5F5F5 82%,
-          #FFFFFF 88%,
-          #E0E0E0 94%,
-          #C0C0C0 100%)`;
+          #808080 0%,
+          #A8A8A8 5%,
+          #C8C8C8 12%,
+          #B0B0B0 18%,
+          #C8C8C8 25%,
+          #A0A0A0 32%,
+          #C0C0C0 40%,
+          #D0D0D0 50%,
+          #C0C0C0 60%,
+          #A8A8A8 68%,
+          #C8C8C8 75%,
+          #B8B8B8 82%,
+          #C0C0C0 88%,
+          #A0A0A0 94%,
+          #808080 100%)`;
       }
-      // 白カード用：コントラストのある光沢
+      // 白カード用：暗めのシルバー（視認性向上）
       return `linear-gradient(135deg,
-        #6B6B6B 0%,
-        #9A9A9A 8%,
-        #FFFFFF 15%,
-        #C0C0C0 22%,
-        #8A8A8A 30%,
-        #E8E8E8 38%,
-        #FFFFFF 45%,
-        #F5F5F5 50%,
-        #FFFFFF 55%,
-        #D0D0D0 62%,
-        #909090 70%,
-        #FFFFFF 78%,
-        #B8B8B8 85%,
-        #7A7A7A 92%,
-        #6B6B6B 100%)`;
+        #505050 0%,
+        #787878 8%,
+        #A8A8A8 15%,
+        #909090 22%,
+        #686868 30%,
+        #A0A0A0 38%,
+        #B8B8B8 45%,
+        #C0C0C0 50%,
+        #B8B8B8 55%,
+        #989898 62%,
+        #707070 70%,
+        #A8A8A8 78%,
+        #888888 85%,
+        #606060 92%,
+        #505050 100%)`;
     }
     return 'none';
   };
@@ -1679,7 +1681,7 @@ const ShurikenDesigner = () => {
                   } else if (printType === 'silver') {
                     return {
                       ...baseStyle,
-                      background: 'linear-gradient(135deg, #c0c0c0 0%, #ffffff 25%, #a8a8a8 50%, #e8e8e8 75%, #909090 100%)',
+                      background: 'linear-gradient(135deg, #707070 0%, #B0B0B0 25%, #808080 50%, #A8A8A8 75%, #606060 100%)',
                       WebkitBackgroundClip: 'text',
                       WebkitTextFillColor: 'transparent',
                       backgroundClip: 'text',
