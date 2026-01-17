@@ -847,8 +847,16 @@
 }
 
 @media (max-width: 768px) {
+  .shuriken-designer {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+  }
+
   .designer-header {
     padding: 0.5rem 1rem;
+    flex-shrink: 0;
   }
 
   .designer-header h1 {
@@ -857,23 +865,81 @@
 
   .designer-main.three-column,
   .designer-main.two-column {
-    padding: 0.75rem;
-    gap: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    gap: 0;
+    height: calc(100vh - 50px);
+    overflow: hidden;
   }
 
-  .designer-form-panel,
-  .designer-preview-panel,
-  .designer-layers-panel {
+  /* プレビューを上部に固定 */
+  .designer-preview-panel {
+    order: 1;
+    flex-shrink: 0;
+    padding: 0.5rem;
+    border-radius: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    max-height: 45vh;
+    min-height: auto;
+  }
+
+  .designer-preview-panel h3 {
+    font-size: 0.85rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .preview-zoom-control {
+    padding: 0.4rem 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .card-preview-container {
+    padding: 0.5rem;
+  }
+
+  .card-preview-wrapper {
+    width: 100%;
+    max-width: 280px;
+    height: auto;
+    aspect-ratio: 91 / 55;
+  }
+
+  .preview-note {
+    display: none;
+  }
+
+  /* フォームをスクロール可能に */
+  .designer-form-panel {
+    order: 2;
+    flex: 1;
+    overflow-y: auto;
     padding: 0.75rem;
+    border-radius: 0;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .designer-form-panel h3 {
+    position: sticky;
+    top: 0;
+    background: rgba(26, 39, 68, 0.95);
+    padding: 0.5rem 0;
+    margin: -0.75rem -0.75rem 0.5rem;
+    padding: 0.5rem 0.75rem;
+    z-index: 10;
+    backdrop-filter: blur(10px);
+  }
+
+  .designer-layers-panel {
+    order: 3;
   }
 
   .form-field > input[type="text"] {
     font-size: 16px; /* iOS zoom防止 */
   }
 
-  .card-preview-wrapper {
-    width: 100%;
-    max-width: 300px;
+  .form-section {
+    margin-bottom: 0.75rem;
   }
 
   .layers-list {
@@ -885,5 +951,14 @@
   .layer-item {
     flex: 1 1 calc(50% - 0.25rem);
     min-width: 120px;
+  }
+
+  .submit-section {
+    position: sticky;
+    bottom: 0;
+    background: rgba(26, 39, 68, 0.95);
+    margin: 0 -0.75rem -0.75rem;
+    padding: 0.75rem;
+    backdrop-filter: blur(10px);
   }
 }
