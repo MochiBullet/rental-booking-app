@@ -1072,6 +1072,35 @@ const ShurikenDesigner = () => {
             </div>
           )}
 
+          {/* カード色選択（表面編集時のみ表示） */}
+          {cardSide === 'front' && (
+            <div className="form-section card-color-section">
+              <h4>カードの色（両面共通）</h4>
+              <div className="radio-group">
+                <label className={`radio-option ${cardColor === 'white' ? 'selected' : ''}`}>
+                  <input
+                    type="radio"
+                    name="cardColor"
+                    value="white"
+                    checked={cardColor === 'white'}
+                    onChange={() => handleCardColorChange('white')}
+                  />
+                  <span className="radio-label">白カード</span>
+                </label>
+                <label className={`radio-option ${cardColor === 'black' ? 'selected' : ''}`}>
+                  <input
+                    type="radio"
+                    name="cardColor"
+                    value="black"
+                    checked={cardColor === 'black'}
+                    onChange={() => handleCardColorChange('black')}
+                  />
+                  <span className="radio-label">黒カード</span>
+                </label>
+              </div>
+            </div>
+          )}
+
           {/* 表裏切り替え */}
           <div className="form-section card-side-section">
             <h4>編集する面</h4>
@@ -1088,33 +1117,6 @@ const ShurikenDesigner = () => {
               >
                 裏面
               </button>
-            </div>
-          </div>
-
-          {/* カード色選択 */}
-          <div className="form-section card-color-section">
-            <h4>カードの色（両面共通）</h4>
-            <div className="radio-group">
-              <label className={`radio-option ${cardColor === 'white' ? 'selected' : ''}`}>
-                <input
-                  type="radio"
-                  name="cardColor"
-                  value="white"
-                  checked={cardColor === 'white'}
-                  onChange={() => handleCardColorChange('white')}
-                />
-                <span className="radio-label">白カード</span>
-              </label>
-              <label className={`radio-option ${cardColor === 'black' ? 'selected' : ''}`}>
-                <input
-                  type="radio"
-                  name="cardColor"
-                  value="black"
-                  checked={cardColor === 'black'}
-                  onChange={() => handleCardColorChange('black')}
-                />
-                <span className="radio-label">黒カード</span>
-              </label>
             </div>
           </div>
 
