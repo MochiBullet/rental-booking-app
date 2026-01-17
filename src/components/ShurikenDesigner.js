@@ -53,8 +53,9 @@ const GOOGLE_FONTS = [
   { name: 'Hachi Maru Pop', value: "'Hachi Maru Pop', cursive", category: 'ポップ' },
 ];
 
-// デフォルトデータ
-const getDefaultSideData = () => ({
+// デフォルトデータ（printTypeを各面に持たせる）
+const getDefaultSideData = (isBlackCard = false) => ({
+  printType: isBlackCard ? 'white' : 'none', // 黒カード: white, 白カード: none(カラー)
   templateImage: null,
   templateScale: 100,
   logoImage: null,
@@ -96,18 +97,20 @@ const ShurikenDesigner = () => {
 
   // カード色（white/black）- 両面共通
   const [cardColor, setCardColor] = useState('white');
-  // 印刷タイプ（gold/silver/none）- 両面共通
-  const [printType, setPrintType] = useState('none');
   // グローバルフォント設定 - 両面共通
   const [globalFont, setGlobalFont] = useState(GOOGLE_FONTS[0].value);
 
-  // 表面・裏面データを別々に保持
-  const [frontData, setFrontData] = useState(getDefaultSideData());
-  const [backData, setBackData] = useState(getDefaultSideData());
+  // 表面・裏面データを別々に保持（printTypeは各面に含まれる）
+  const [frontData, setFrontData] = useState(getDefaultSideData(false));
+  const [backData, setBackData] = useState(getDefaultSideData(false));
 
   // 現在の面のデータを取得
   const currentData = cardSide === 'front' ? frontData : backData;
   const setCurrentData = cardSide === 'front' ? setFrontData : setBackData;
+
+  // 印刷タイプ（各面から取得）
+  const printType = currentData.printType;
+  const frontPrintType = frontData.printType;
 
   // プレビューズーム - UI用
   const [previewZoom, setPreviewZoom] = useState(100);
@@ -127,6 +130,32 @@ const ShurikenDesigner = () => {
   const textPositions = currentData.textPositions;
   const formData = currentData.formData;
 
+  // 裏面で選択可能な印刷タイプを取得
+  const getAvailableBackPrintTypes = () => {
+    if (cardColor === 'white') {
+      // 白カード: 表面がnone(カラー)なら裏面もnoneのみ、金銀なら全選択可
+      if (frontPrintType === 'none') {
+        return ['none'];
+      }
+      return ['none', 'gold', 'silver'];
+    } else {
+      // 黒カード: 表面がwhiteなら裏面もwhiteのみ、金銀なら全選択可
+      if (frontPrintType === 'white') {
+        return ['white'];
+      }
+      return ['white', 'gold', 'silver'];
+    }
+  };
+
+  // 表面で選択可能な印刷タイプを取得
+  const getAvailableFrontPrintTypes = () => {
+    if (cardColor === 'white') {
+      return ['none', 'gold', 'silver']; // カラー、金、銀
+    } else {
+      return ['white', 'gold', 'silver']; // 白、金、銀（カラーなし）
+    }
+  };
+
   // localStorageから読み込み
   useEffect(() => {
     try {
@@ -134,10 +163,9 @@ const ShurikenDesigner = () => {
       if (saved) {
         const data = JSON.parse(saved);
         if (data.cardColor) setCardColor(data.cardColor);
-        if (data.printType) setPrintType(data.printType);
         if (data.globalFont) setGlobalFont(data.globalFont);
-        if (data.frontData) setFrontData({ ...getDefaultSideData(), ...data.frontData });
-        if (data.backData) setBackData({ ...getDefaultSideData(), ...data.backData });
+        if (data.frontData) setFrontData({ ...getDefaultSideData(data.cardColor === 'black'), ...data.frontData });
+        if (data.backData) setBackData({ ...getDefaultSideData(data.cardColor === 'black'), ...data.backData });
         if (data.cardSide) setCardSide(data.cardSide);
       }
     } catch (e) {
@@ -153,7 +181,6 @@ const ShurikenDesigner = () => {
       const data = {
         cardSide,
         cardColor,
-        printType,
         globalFont,
         frontData,
         backData,
@@ -162,7 +189,7 @@ const ShurikenDesigner = () => {
     } catch (e) {
       console.error('Failed to save data:', e);
     }
-  }, [cardSide, cardColor, printType, globalFont, frontData, backData]);
+  }, [cardSide, cardColor, globalFont, frontData, backData]);
 
   // Google Fonts読み込み
   useEffect(() => {
@@ -247,15 +274,19 @@ const ShurikenDesigner = () => {
     });
   };
 
-  // カード色変更時にテキスト色をデフォルトに更新（両面に適用）
+  // カード色変更時にテキスト色と印刷タイプをデフォルトに更新（両面に適用）
   const handleCardColorChange = (newColor) => {
     setCardColor(newColor);
     const defaultColors = newColor === 'white'
       ? { main: '#000000', sub: '#333333', detail: '#222222' }
       : { main: '#ffffff', sub: '#cccccc', detail: '#dddddd' };
 
-    const updateFormDataColors = (prevData) => ({
+    // 黒カードの場合はwhite、白カードの場合はnone
+    const defaultPrintType = newColor === 'white' ? 'none' : 'white';
+
+    const updateSideData = (prevData) => ({
       ...prevData,
+      printType: defaultPrintType,
       formData: {
         ...prevData.formData,
         name: { ...prevData.formData.name, color: defaultColors.main },
@@ -269,8 +300,31 @@ const ShurikenDesigner = () => {
       }
     });
 
-    setFrontData(updateFormDataColors);
-    setBackData(updateFormDataColors);
+    setFrontData(updateSideData);
+    setBackData(updateSideData);
+  };
+
+  // 印刷タイプ変更ハンドラー
+  const handlePrintTypeChange = (newType) => {
+    updateCurrentData({ printType: newType });
+
+    // 表面の印刷タイプを変更した場合、裏面の選択肢が制限される可能性がある
+    if (cardSide === 'front') {
+      // 裏面の印刷タイプが新しい制限に違反している場合はリセット
+      const newAvailableTypes = (() => {
+        if (cardColor === 'white') {
+          if (newType === 'none') return ['none'];
+          return ['none', 'gold', 'silver'];
+        } else {
+          if (newType === 'white') return ['white'];
+          return ['white', 'gold', 'silver'];
+        }
+      })();
+
+      if (!newAvailableTypes.includes(backData.printType)) {
+        setBackData(prev => ({ ...prev, printType: newAvailableTypes[0] }));
+      }
+    }
   };
 
   // テキスト位置更新
@@ -313,11 +367,10 @@ const ShurikenDesigner = () => {
 
     setCardSide('front');
     setCardColor('white');
-    setPrintType('none');
     setGlobalFont(GOOGLE_FONTS[0].value);
     setPreviewZoom(100);
-    setFrontData(getDefaultSideData());
-    setBackData(getDefaultSideData());
+    setFrontData(getDefaultSideData(false));
+    setBackData(getDefaultSideData(false));
     localStorage.removeItem(STORAGE_KEY);
   };
 
@@ -420,39 +473,51 @@ const ShurikenDesigner = () => {
 
           {/* 印刷タイプ選択 */}
           <div className="form-section print-type-section">
-            <h4>印刷の種類</h4>
-            <div className="radio-group vertical">
-              <label className={`radio-option ${printType === 'none' ? 'selected' : ''}`}>
-                <input
-                  type="radio"
-                  name="printType"
-                  value="none"
-                  checked={printType === 'none'}
-                  onChange={() => setPrintType('none')}
-                />
-                <span className="radio-label">金銀を使用しない</span>
-              </label>
-              <label className={`radio-option ${printType === 'gold' ? 'selected' : ''}`}>
-                <input
-                  type="radio"
-                  name="printType"
-                  value="gold"
-                  checked={printType === 'gold'}
-                  onChange={() => setPrintType('gold')}
-                />
-                <span className="radio-label gold-text">金色</span>
-              </label>
-              <label className={`radio-option ${printType === 'silver' ? 'selected' : ''}`}>
-                <input
-                  type="radio"
-                  name="printType"
-                  value="silver"
-                  checked={printType === 'silver'}
-                  onChange={() => setPrintType('silver')}
-                />
-                <span className="radio-label silver-text">銀色</span>
-              </label>
-            </div>
+            <h4>印刷の種類（{cardSide === 'front' ? '表面' : '裏面'}）</h4>
+            {(() => {
+              const availableTypes = cardSide === 'front'
+                ? getAvailableFrontPrintTypes()
+                : getAvailableBackPrintTypes();
+
+              const typeLabels = {
+                none: 'カラー印刷',
+                white: '白印刷',
+                gold: '金色',
+                silver: '銀色',
+              };
+
+              const typeClasses = {
+                gold: 'gold-text',
+                silver: 'silver-text',
+              };
+
+              return (
+                <div className="radio-group vertical">
+                  {availableTypes.map(type => (
+                    <label
+                      key={type}
+                      className={`radio-option ${printType === type ? 'selected' : ''}`}
+                    >
+                      <input
+                        type="radio"
+                        name="printType"
+                        value={type}
+                        checked={printType === type}
+                        onChange={() => handlePrintTypeChange(type)}
+                      />
+                      <span className={`radio-label ${typeClasses[type] || ''}`}>
+                        {typeLabels[type]}
+                      </span>
+                    </label>
+                  ))}
+                  {cardSide === 'back' && availableTypes.length === 1 && (
+                    <p className="print-type-note">
+                      ※ 表面で{cardColor === 'white' ? 'カラー' : '白'}印刷を選択しているため、裏面も同じ設定です
+                    </p>
+                  )}
+                </div>
+              );
+            })()}
           </div>
 
           {/* フォント選択 - カスタムドロップダウン */}
@@ -612,9 +677,13 @@ const ShurikenDesigner = () => {
                     ) : (
                       <span
                         className={`color-locked ${printType}`}
-                        title={printType === 'gold' ? '金色固定' : '銀色固定'}
+                        title={
+                          printType === 'gold' ? '金色固定' :
+                          printType === 'silver' ? '銀色固定' : '白色固定'
+                        }
                       >
-                        {printType === 'gold' ? '🥇' : '🥈'}
+                        {printType === 'gold' ? '🥇' :
+                         printType === 'silver' ? '🥈' : '⬜'}
                       </span>
                     )}
                     <input
@@ -696,7 +765,7 @@ const ShurikenDesigner = () => {
                 background: cardColor === 'white' ? '#ffffff' : '#1a1a1a',
               }}
             >
-              {/* 背景画像 */}
+              {/* 背景画像（黒カードの場合はグレースケール→白に変換） */}
               {templateImage && (
                 <img
                   src={templateImage}
@@ -704,11 +773,12 @@ const ShurikenDesigner = () => {
                   className="preview-background"
                   style={{
                     transform: `translate(-50%, -50%) scale(${templateScale / 100})`,
+                    filter: cardColor === 'black' ? 'grayscale(100%) brightness(2) contrast(0.5)' : 'none',
                   }}
                 />
               )}
 
-              {/* アイコン1 */}
+              {/* アイコン1（黒カードの場合はグレースケール→白に変換） */}
               {logoImage && (
                 <Draggable
                   position={logoPosition}
@@ -722,12 +792,18 @@ const ShurikenDesigner = () => {
                       height: 'auto',
                     }}
                   >
-                    <img src={logoImage} alt="アイコン1" />
+                    <img
+                      src={logoImage}
+                      alt="アイコン1"
+                      style={{
+                        filter: cardColor === 'black' ? 'grayscale(100%) brightness(2) contrast(0.5)' : 'none',
+                      }}
+                    />
                   </div>
                 </Draggable>
               )}
 
-              {/* アイコン2 */}
+              {/* アイコン2（黒カードの場合はグレースケール→白に変換） */}
               {logo2Image && (
                 <Draggable
                   position={logo2Position}
@@ -741,7 +817,13 @@ const ShurikenDesigner = () => {
                       height: 'auto',
                     }}
                   >
-                    <img src={logo2Image} alt="アイコン2" />
+                    <img
+                      src={logo2Image}
+                      alt="アイコン2"
+                      style={{
+                        filter: cardColor === 'black' ? 'grayscale(100%) brightness(2) contrast(0.5)' : 'none',
+                      }}
+                    />
                   </div>
                 </Draggable>
               )}
@@ -751,7 +833,7 @@ const ShurikenDesigner = () => {
                 const displayText = getDisplayText(field);
                 if (!displayText) return null;
 
-                // 金銀グラデーションスタイル
+                // 印刷タイプに応じたテキストスタイル
                 const getTextStyle = () => {
                   const baseStyle = {
                     fontSize: `${data.fontSize}px`,
@@ -774,7 +856,14 @@ const ShurikenDesigner = () => {
                       WebkitTextFillColor: 'transparent',
                       backgroundClip: 'text',
                     };
+                  } else if (printType === 'white') {
+                    // 黒カード用: 白印刷
+                    return {
+                      ...baseStyle,
+                      color: '#ffffff',
+                    };
                   } else {
+                    // none: カラー印刷（白カード用）
                     return {
                       ...baseStyle,
                       color: data.color,
@@ -790,7 +879,7 @@ const ShurikenDesigner = () => {
                     bounds="parent"
                   >
                     <div
-                      className={`draggable-element text-element ${printType !== 'none' ? 'metallic-text' : ''}`}
+                      className={`draggable-element text-element ${(printType === 'gold' || printType === 'silver') ? 'metallic-text' : ''}`}
                       style={{
                         ...getTextStyle(),
                         whiteSpace: field === 'address' ? 'pre-line' : 'nowrap',
