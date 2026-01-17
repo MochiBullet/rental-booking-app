@@ -87,6 +87,7 @@ const getDefaultSideData = (isBlackCard = false) => ({
 });
 
 const STORAGE_KEY = 'shuriken-designer-data';
+const SCROLL_POSITION_KEY = 'shuriken-designer-scroll';
 
 const ShurikenDesigner = () => {
   const previewRef = useRef(null);
@@ -177,6 +178,14 @@ const ShurikenDesigner = () => {
         if (data.frontData) setFrontData({ ...getDefaultSideData(data.cardColor === 'black'), ...data.frontData });
         if (data.backData) setBackData({ ...getDefaultSideData(data.cardColor === 'black'), ...data.backData });
         if (data.cardSide) setCardSide(data.cardSide);
+      }
+      // 金銀切り替えリロード後のスクロール位置復帰
+      const savedScroll = sessionStorage.getItem(SCROLL_POSITION_KEY);
+      if (savedScroll) {
+        sessionStorage.removeItem(SCROLL_POSITION_KEY);
+        setTimeout(() => {
+          window.scrollTo(0, parseInt(savedScroll, 10));
+        }, 100);
       }
     } catch (e) {
       console.error('Failed to load saved data:', e);
@@ -348,6 +357,8 @@ const ShurikenDesigner = () => {
         backData: cardSide === 'back' ? newData : backData,
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(savedData));
+      // スクロール位置を保存してリロード
+      sessionStorage.setItem(SCROLL_POSITION_KEY, window.scrollY.toString());
       window.location.reload();
       return;
     }
