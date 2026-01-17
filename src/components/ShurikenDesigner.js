@@ -416,25 +416,14 @@ const ShurikenDesigner = () => {
     website: 'https://example.com',
   };
 
-  // 画像に適用するフィルターを取得（金銀は両カードで対応）
+  // 金銀選択時かどうか
+  const isMetallic = printType === 'gold' || printType === 'silver';
+
+  // 画像に適用するフィルターを取得
   const getImageFilter = () => {
-    // 金を選択した場合（白カード・黒カード両方対応）
-    if (printType === 'gold') {
-      if (cardColor === 'black') {
-        // 黒カード + 金: より明るい金色
-        return 'sepia(100%) saturate(500%) brightness(1.3) contrast(1.2) hue-rotate(-10deg)';
-      }
-      // 白カード + 金
-      return 'sepia(100%) saturate(450%) brightness(0.95) contrast(1.1) hue-rotate(-8deg)';
-    }
-    // 銀を選択した場合（白カード・黒カード両方対応）
-    if (printType === 'silver') {
-      if (cardColor === 'black') {
-        // 黒カード + 銀: 明るい銀色
-        return 'grayscale(100%) brightness(1.5) contrast(1.3)';
-      }
-      // 白カード + 銀
-      return 'grayscale(100%) brightness(1.05) contrast(1.15)';
+    // 金銀選択時はマスクで塗りつぶすのでフィルターは使わない
+    if (isMetallic) {
+      return 'none';
     }
     // 黒カードでカラー/白印刷の場合は白に変換
     if (cardColor === 'black') {
@@ -444,15 +433,31 @@ const ShurikenDesigner = () => {
     return 'none';
   };
 
-  // 金銀の光沢オーバーレイを取得
-  const getMetallicOverlay = () => {
+  // 金銀の塗りつぶしグラデーション（光沢感付き）
+  const getMetallicFill = () => {
     if (printType === 'gold') {
-      return 'linear-gradient(135deg, rgba(255,215,0,0.3) 0%, rgba(255,180,0,0.1) 30%, rgba(255,223,0,0.4) 50%, rgba(218,165,32,0.1) 70%, rgba(255,215,0,0.3) 100%)';
+      return 'linear-gradient(135deg, #D4AF37 0%, #FFD700 25%, #FFF8DC 45%, #FFD700 55%, #B8860B 75%, #D4AF37 100%)';
     }
     if (printType === 'silver') {
-      return 'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(192,192,192,0.1) 30%, rgba(255,255,255,0.5) 50%, rgba(169,169,169,0.1) 70%, rgba(255,255,255,0.4) 100%)';
+      return 'linear-gradient(135deg, #A8A8A8 0%, #D8D8D8 25%, #FFFFFF 45%, #E8E8E8 55%, #B0B0B0 75%, #A8A8A8 100%)';
     }
     return 'none';
+  };
+
+  // 画像を金銀マスクとして使用するスタイル
+  const getMetallicImageStyle = (imageSrc) => {
+    if (!isMetallic) return {};
+    return {
+      WebkitMaskImage: `url(${imageSrc})`,
+      maskImage: `url(${imageSrc})`,
+      WebkitMaskSize: 'contain',
+      maskSize: 'contain',
+      WebkitMaskRepeat: 'no-repeat',
+      maskRepeat: 'no-repeat',
+      WebkitMaskPosition: 'center',
+      maskPosition: 'center',
+      background: getMetallicFill(),
+    };
   };
 
   return (
@@ -849,28 +854,34 @@ const ShurikenDesigner = () => {
                 background: cardColor === 'white' ? '#ffffff' : '#1a1a1a',
               }}
             >
-              {/* 背景画像（印刷タイプに応じてフィルター適用） */}
+              {/* 背景画像（金銀選択時はマスクで塗りつぶし） */}
               {templateImage && (
                 <div className="preview-background-wrapper" style={{
                   transform: `translate(-50%, -50%) scale(${templateScale / 100})`,
                 }}>
-                  <img
-                    src={templateImage}
-                    alt="背景"
-                    className="preview-background"
-                    style={{
-                      filter: getImageFilter(),
-                    }}
-                  />
-                  {(printType === 'gold' || printType === 'silver') && (
-                    <div className="metallic-overlay" style={{
-                      background: getMetallicOverlay(),
-                    }} />
+                  {isMetallic ? (
+                    <div
+                      className="preview-background metallic-masked-image"
+                      style={{
+                        ...getMetallicImageStyle(templateImage),
+                        width: '100%',
+                        height: '100%',
+                      }}
+                    />
+                  ) : (
+                    <img
+                      src={templateImage}
+                      alt="背景"
+                      className="preview-background"
+                      style={{
+                        filter: getImageFilter(),
+                      }}
+                    />
                   )}
                 </div>
               )}
 
-              {/* アイコン1（印刷タイプに応じてフィルター適用） */}
+              {/* アイコン1（金銀選択時はマスクで塗りつぶし） */}
               {logoImage && (
                 <Draggable
                   position={logoPosition}
@@ -884,23 +895,29 @@ const ShurikenDesigner = () => {
                       height: 'auto',
                     }}
                   >
-                    <img
-                      src={logoImage}
-                      alt="アイコン1"
-                      style={{
-                        filter: getImageFilter(),
-                      }}
-                    />
-                    {(printType === 'gold' || printType === 'silver') && (
-                      <div className="metallic-overlay" style={{
-                        background: getMetallicOverlay(),
-                      }} />
+                    {isMetallic ? (
+                      <div
+                        className="metallic-masked-image"
+                        style={{
+                          ...getMetallicImageStyle(logoImage),
+                          width: '100%',
+                          paddingBottom: '100%',
+                        }}
+                      />
+                    ) : (
+                      <img
+                        src={logoImage}
+                        alt="アイコン1"
+                        style={{
+                          filter: getImageFilter(),
+                        }}
+                      />
                     )}
                   </div>
                 </Draggable>
               )}
 
-              {/* アイコン2（印刷タイプに応じてフィルター適用） */}
+              {/* アイコン2（金銀選択時はマスクで塗りつぶし） */}
               {logo2Image && (
                 <Draggable
                   position={logo2Position}
@@ -914,17 +931,23 @@ const ShurikenDesigner = () => {
                       height: 'auto',
                     }}
                   >
-                    <img
-                      src={logo2Image}
-                      alt="アイコン2"
-                      style={{
-                        filter: getImageFilter(),
-                      }}
-                    />
-                    {(printType === 'gold' || printType === 'silver') && (
-                      <div className="metallic-overlay" style={{
-                        background: getMetallicOverlay(),
-                      }} />
+                    {isMetallic ? (
+                      <div
+                        className="metallic-masked-image"
+                        style={{
+                          ...getMetallicImageStyle(logo2Image),
+                          width: '100%',
+                          paddingBottom: '100%',
+                        }}
+                      />
+                    ) : (
+                      <img
+                        src={logo2Image}
+                        alt="アイコン2"
+                        style={{
+                          filter: getImageFilter(),
+                        }}
+                      />
                     )}
                   </div>
                 </Draggable>

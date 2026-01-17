@@ -789,34 +789,30 @@
   display: block;
 }
 
-/* 金銀の光沢オーバーレイ */
-.metallic-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  pointer-events: none;
-  mix-blend-mode: overlay;
-  animation: shimmer 3s ease-in-out infinite;
+/* 金銀マスク画像（透過部分は透明、それ以外は金銀で塗りつぶし） */
+.metallic-masked-image {
+  animation: metallic-shimmer 4s ease-in-out infinite;
+  background-size: 200% 200%;
 }
 
-@keyframes shimmer {
+@keyframes metallic-shimmer {
   0%, 100% {
-    opacity: 0.6;
+    background-position: 0% 0%;
   }
   50% {
-    opacity: 1;
+    background-position: 100% 100%;
   }
 }
 
-/* logo-element内のオーバーレイ */
+/* logo-element */
 .logo-element {
   position: relative;
 }
 
-.logo-element .metallic-overlay {
-  border-radius: inherit;
+.logo-element .metallic-masked-image {
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 /* ドラッグ可能要素 */
