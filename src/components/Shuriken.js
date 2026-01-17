@@ -250,13 +250,6 @@ const Shuriken = () => {
             <img src={gif8} alt="shuriken feature 8" />
           </div>
 
-          {/* デザインページへのリンク */}
-          <Link to="/shuriken/design" className="shuriken-design-link">
-            <span className="design-link-icon">🎨</span>
-            <span className="design-link-text">オリジナル名刺をデザインする</span>
-            <span className="design-link-arrow">→</span>
-          </Link>
-
           <h2 className="shuriken-contact-title">お問い合わせ</h2>
           <div className="shuriken-contact-grid">
             <div
@@ -299,6 +292,13 @@ const Shuriken = () => {
               </div>
             </div>
           </div>
+
+          {/* デザインページへのリンク */}
+          <Link to="/shuriken/design" className="shuriken-design-link">
+            <span className="design-link-icon">🎨</span>
+            <span className="design-link-text">オリジナル名刺をデザインする</span>
+            <span className="design-link-arrow">→</span>
+          </Link>
         </div>
       </div>
 
