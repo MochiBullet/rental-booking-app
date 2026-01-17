@@ -1366,6 +1366,7 @@ const ShurikenDesigner = () => {
                 <div className="field-header">
                   <label>{fieldLabels[field]}</label>
                   <div className="field-controls">
+                    <span className="control-label">色</span>
                     {printType === 'none' ? (
                       <input
                         type="color"
@@ -1385,6 +1386,7 @@ const ShurikenDesigner = () => {
                          printType === 'silver' ? '🥈' : '⬜'}
                       </span>
                     )}
+                    <span className="control-label">サイズ</span>
                     <input
                       type="number"
                       value={data.fontSize}
