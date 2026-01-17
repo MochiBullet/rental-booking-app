@@ -276,20 +276,18 @@
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
-/* フローティング見積もりBOT */
-.shuriken-floating-bot {
+/* フローティングデザインボタン */
+.shuriken-floating-design-btn {
   position: fixed;
   bottom: 20px;
   right: 20px;
   z-index: 1000;
-}
-
-.shuriken-floating-btn {
   background: linear-gradient(145deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
   color: white;
+  text-decoration: none;
   border: 2px solid rgba(255, 255, 255, 0.3);
   border-radius: 8px;
-  padding: 10px 18px;
+  padding: 12px 20px;
   cursor: pointer;
   box-shadow:
     0 4px 20px rgba(0, 0, 0, 0.5),
@@ -301,43 +299,27 @@
   gap: 10px;
 }
 
-.shuriken-floating-btn:hover {
+.shuriken-floating-design-btn:hover {
   transform: translateY(-3px);
-  border-color: rgba(255, 255, 255, 0.5);
+  border-color: rgba(255, 215, 0, 0.6);
   box-shadow:
     0 8px 30px rgba(0, 0, 0, 0.6),
+    0 0 20px rgba(255, 215, 0, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  color: #ffd700;
 }
 
-.floating-logo {
+.shuriken-floating-design-btn .floating-logo {
   width: 28px;
   height: 28px;
   animation: spin 2s linear infinite;
 }
 
-.floating-text {
+.shuriken-floating-design-btn .floating-text {
   font-family: 'Shippori Mincho', serif;
   font-size: 1rem;
   font-weight: 600;
   letter-spacing: 2px;
-}
-
-.close-icon {
-  font-size: 1.3rem;
-  font-weight: bold;
-}
-
-.shuriken-floating-bot.open .shuriken-floating-btn {
-  background: linear-gradient(145deg, #2a2a2a 0%, #3a3a3a 100%);
-  border-color: rgba(255, 255, 255, 0.4);
-  border-radius: 50%;
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  justify-content: center;
-  position: absolute;
-  top: -55px;
-  right: 0;
 }
 
 .shuriken-bot-panel {
@@ -725,36 +707,22 @@
     text-align: center;
   }
 
-  /* モバイル用フローティングBOT */
-  .shuriken-floating-bot {
+  /* モバイル用フローティングデザインボタン */
+  .shuriken-floating-design-btn {
     bottom: 15px;
     right: 15px;
-  }
-
-  .shuriken-floating-btn {
-    padding: 8px 14px;
+    padding: 10px 16px;
     gap: 8px;
   }
 
-  .floating-logo {
+  .shuriken-floating-design-btn .floating-logo {
     width: 24px;
     height: 24px;
   }
 
-  .floating-text {
+  .shuriken-floating-design-btn .floating-text {
     font-size: 0.85rem;
     letter-spacing: 1px;
-  }
-
-  .shuriken-bot-panel {
-    max-width: 100%;
-    max-height: 85vh;
-    border-radius: 15px 15px 0 0;
-  }
-
-  .shuriken-bot-panel-content {
-    padding: 15px;
-    max-height: 85vh;
   }
 
   .shuriken-bot-title {
