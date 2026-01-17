@@ -684,19 +684,20 @@ const ShurikenDesigner = () => {
       restoreMetallicElements(restorationData);
 
       // 表面印刷版キャプチャ（店舗用：金銀→黒、透過維持）
-      // 金銀の場合は事前レンダリングで黒色に変換
       const frontPrintType = frontData.printType;
       const needsPrintRender = frontPrintType === 'gold' || frontPrintType === 'silver';
 
+      // 先にcaptureModeを設定してReactを再レンダリング
+      setCaptureMode('print');
+      await waitForRender();
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      // 金銀の場合は事前レンダリングで黒色に変換（React再レンダリング後に実行）
       let frontPrintRestorationData = [];
       if (needsPrintRender) {
         frontPrintRestorationData = await preRenderMetallicElements(wrapper, 'print');
         await new Promise(resolve => setTimeout(resolve, 100));
       }
-
-      setCaptureMode('print');
-      await waitForRender();
-      await new Promise(resolve => setTimeout(resolve, 300));
 
       const frontPrintCanvas = await html2canvas(wrapper, html2canvasOptions);
       results.front.print = frontPrintCanvas.toDataURL('image/png');
@@ -734,15 +735,17 @@ const ShurikenDesigner = () => {
         const backPrintType = backData.printType;
         const needsBackPrintRender = backPrintType === 'gold' || backPrintType === 'silver';
 
+        // 先にcaptureModeを設定してReactを再レンダリング
+        setCaptureMode('print');
+        await waitForRender();
+        await new Promise(resolve => setTimeout(resolve, 300));
+
+        // 金銀の場合は事前レンダリングで黒色に変換（React再レンダリング後に実行）
         let backPrintRestorationData = [];
         if (needsBackPrintRender) {
           backPrintRestorationData = await preRenderMetallicElements(wrapper, 'print');
           await new Promise(resolve => setTimeout(resolve, 100));
         }
-
-        setCaptureMode('print');
-        await waitForRender();
-        await new Promise(resolve => setTimeout(resolve, 300));
 
         const backPrintCanvas = await html2canvas(wrapper, html2canvasOptions);
         results.back.print = backPrintCanvas.toDataURL('image/png');
@@ -1511,8 +1514,8 @@ const ShurikenDesigner = () => {
                         WebkitMaskPosition: 'center',
                         maskPosition: 'center',
                         background: getMetallicFill(),
-                        width: '100%',
-                        height: '100%',
+                        width: '364px',
+                        height: '220px',
                       }}
                     />
                   ) : (
