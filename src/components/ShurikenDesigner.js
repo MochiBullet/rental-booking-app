@@ -5,16 +5,53 @@ import Draggable from 'react-draggable';
 import './ShurikenDesigner.css';
 import shurikenLogo from '../images/shuriken/logo.png';
 
-// Google Fonts リスト
+// Google Fonts リスト（無料で利用可能な日本語フォント）
 const GOOGLE_FONTS = [
-  { name: 'Noto Sans JP', value: "'Noto Sans JP', sans-serif" },
-  { name: 'Noto Serif JP', value: "'Noto Serif JP', serif" },
-  { name: 'M PLUS 1p', value: "'M PLUS 1p', sans-serif" },
-  { name: 'Kosugi Maru', value: "'Kosugi Maru', sans-serif" },
-  { name: 'Sawarabi Mincho', value: "'Sawarabi Mincho', serif" },
-  { name: 'Sawarabi Gothic', value: "'Sawarabi Gothic', sans-serif" },
-  { name: 'Zen Kaku Gothic New', value: "'Zen Kaku Gothic New', sans-serif" },
-  { name: 'Shippori Mincho', value: "'Shippori Mincho', serif" },
+  // ゴシック系
+  { name: 'Noto Sans JP', value: "'Noto Sans JP', sans-serif", category: 'ゴシック' },
+  { name: 'M PLUS 1p', value: "'M PLUS 1p', sans-serif", category: 'ゴシック' },
+  { name: 'M PLUS Rounded 1c', value: "'M PLUS Rounded 1c', sans-serif", category: 'ゴシック' },
+  { name: 'Kosugi', value: "'Kosugi', sans-serif", category: 'ゴシック' },
+  { name: 'Kosugi Maru', value: "'Kosugi Maru', sans-serif", category: '丸ゴシック' },
+  { name: 'Sawarabi Gothic', value: "'Sawarabi Gothic', sans-serif", category: 'ゴシック' },
+  { name: 'Zen Kaku Gothic New', value: "'Zen Kaku Gothic New', sans-serif", category: 'ゴシック' },
+  { name: 'Zen Maru Gothic', value: "'Zen Maru Gothic', sans-serif", category: '丸ゴシック' },
+  { name: 'Murecho', value: "'Murecho', sans-serif", category: 'ゴシック' },
+  { name: 'BIZ UDGothic', value: "'BIZ UDGothic', sans-serif", category: 'ゴシック' },
+  { name: 'BIZ UDPGothic', value: "'BIZ UDPGothic', sans-serif", category: 'ゴシック' },
+  { name: 'IBM Plex Sans JP', value: "'IBM Plex Sans JP', sans-serif", category: 'ゴシック' },
+  { name: 'Kiwi Maru', value: "'Kiwi Maru', serif", category: '丸ゴシック' },
+  { name: 'Reggae One', value: "'Reggae One', cursive", category: 'デザイン' },
+  { name: 'RocknRoll One', value: "'RocknRoll One', sans-serif", category: 'デザイン' },
+  { name: 'Stick', value: "'Stick', sans-serif", category: 'デザイン' },
+  { name: 'DotGothic16', value: "'DotGothic16', sans-serif", category: 'デザイン' },
+  { name: 'Rampart One', value: "'Rampart One', cursive", category: 'デザイン' },
+  { name: 'Train One', value: "'Train One', cursive", category: 'デザイン' },
+  // 明朝系
+  { name: 'Noto Serif JP', value: "'Noto Serif JP', serif", category: '明朝' },
+  { name: 'Sawarabi Mincho', value: "'Sawarabi Mincho', serif", category: '明朝' },
+  { name: 'Shippori Mincho', value: "'Shippori Mincho', serif", category: '明朝' },
+  { name: 'Shippori Mincho B1', value: "'Shippori Mincho B1', serif", category: '明朝' },
+  { name: 'Zen Old Mincho', value: "'Zen Old Mincho', serif", category: '明朝' },
+  { name: 'Zen Antique', value: "'Zen Antique', serif", category: '明朝' },
+  { name: 'Zen Antique Soft', value: "'Zen Antique Soft', serif", category: '明朝' },
+  { name: 'BIZ UDMincho', value: "'BIZ UDMincho', serif", category: '明朝' },
+  { name: 'BIZ UDPMincho', value: "'BIZ UDPMincho', serif", category: '明朝' },
+  { name: 'Hina Mincho', value: "'Hina Mincho', serif", category: '明朝' },
+  // 筆記・手書き系
+  { name: 'Yomogi', value: "'Yomogi', cursive", category: '手書き' },
+  { name: 'Yuji Syuku', value: "'Yuji Syuku', serif", category: '筆記' },
+  { name: 'Yuji Mai', value: "'Yuji Mai', serif", category: '筆記' },
+  { name: 'Yuji Boku', value: "'Yuji Boku', serif", category: '筆記' },
+  { name: 'Kaisei Decol', value: "'Kaisei Decol', serif", category: '手書き' },
+  { name: 'Kaisei Tokumin', value: "'Kaisei Tokumin', serif", category: '明朝' },
+  { name: 'Kaisei Opti', value: "'Kaisei Opti', serif", category: '明朝' },
+  { name: 'Kaisei HarunoUmi', value: "'Kaisei HarunoUmi', serif", category: '明朝' },
+  { name: 'Dela Gothic One', value: "'Dela Gothic One', cursive", category: 'デザイン' },
+  { name: 'Mochiy Pop One', value: "'Mochiy Pop One', sans-serif", category: 'ポップ' },
+  { name: 'Mochiy Pop P One', value: "'Mochiy Pop P One', sans-serif", category: 'ポップ' },
+  { name: 'Potta One', value: "'Potta One', cursive", category: 'ポップ' },
+  { name: 'Hachi Maru Pop', value: "'Hachi Maru Pop', cursive", category: 'ポップ' },
 ];
 
 const ShurikenDesigner = () => {
@@ -35,6 +72,8 @@ const ShurikenDesigner = () => {
 
   // グローバルフォント設定
   const [globalFont, setGlobalFont] = useState(GOOGLE_FONTS[0].value);
+  const [fontDropdownOpen, setFontDropdownOpen] = useState(false);
+  const fontDropdownRef = useRef(null);
 
   // テキスト要素の位置
   const [textPositions, setTextPositions] = useState({
@@ -63,10 +102,23 @@ const ShurikenDesigner = () => {
   // Google Fonts読み込み
   useEffect(() => {
     const link = document.createElement('link');
-    link.href = 'https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Noto+Serif+JP:wght@400;700&family=M+PLUS+1p:wght@400;700&family=Kosugi+Maru&family=Sawarabi+Mincho&family=Sawarabi+Gothic&family=Zen+Kaku+Gothic+New:wght@400;700&family=Shippori+Mincho:wght@400;700&display=swap';
+    // 全フォントを読み込み
+    const fontFamilies = GOOGLE_FONTS.map(f => f.name.replace(/ /g, '+')).join('&family=');
+    link.href = `https://fonts.googleapis.com/css2?family=${fontFamilies}&display=swap`;
     link.rel = 'stylesheet';
     document.head.appendChild(link);
     return () => document.head.removeChild(link);
+  }, []);
+
+  // ドロップダウン外クリックで閉じる
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (fontDropdownRef.current && !fontDropdownRef.current.contains(event.target)) {
+        setFontDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   // テンプレート画像アップロード
@@ -221,20 +273,53 @@ const ShurikenDesigner = () => {
         <div className="designer-form-panel">
           <h3>編集</h3>
 
-          {/* フォント選択 */}
-          <div className="global-font-select">
-            <label>フォント</label>
-            <select
-              value={globalFont}
-              onChange={(e) => setGlobalFont(e.target.value)}
-              style={{ fontFamily: globalFont }}
+          {/* フォント選択 - カスタムドロップダウン */}
+          <div className="global-font-select" ref={fontDropdownRef}>
+            <label>フォント（{GOOGLE_FONTS.length}種類）</label>
+            <div
+              className="font-dropdown-trigger"
+              onClick={() => setFontDropdownOpen(!fontDropdownOpen)}
             >
-              {GOOGLE_FONTS.map(font => (
-                <option key={font.name} value={font.value} style={{ fontFamily: font.value }}>
-                  {font.name}
-                </option>
-              ))}
-            </select>
+              <span
+                className="font-dropdown-selected"
+                style={{ fontFamily: globalFont }}
+              >
+                {GOOGLE_FONTS.find(f => f.value === globalFont)?.name || 'フォントを選択'}
+              </span>
+              <span className="font-dropdown-arrow">{fontDropdownOpen ? '▲' : '▼'}</span>
+            </div>
+            {fontDropdownOpen && (
+              <div className="font-dropdown-menu">
+                {/* カテゴリごとにグループ化 */}
+                {['ゴシック', '丸ゴシック', '明朝', '手書き', '筆記', 'ポップ', 'デザイン'].map(category => {
+                  const fontsInCategory = GOOGLE_FONTS.filter(f => f.category === category);
+                  if (fontsInCategory.length === 0) return null;
+                  return (
+                    <div key={category} className="font-category-group">
+                      <div className="font-category-label">{category}</div>
+                      {fontsInCategory.map(font => (
+                        <div
+                          key={font.name}
+                          className={`font-dropdown-item ${globalFont === font.value ? 'selected' : ''}`}
+                          onClick={() => {
+                            setGlobalFont(font.value);
+                            setFontDropdownOpen(false);
+                          }}
+                        >
+                          <span className="font-item-name">{font.name}</span>
+                          <span
+                            className="font-item-sample"
+                            style={{ fontFamily: font.value }}
+                          >
+                            あいうえお 山田太郎
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* 背景画像アップロード */}

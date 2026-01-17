@@ -91,6 +91,7 @@
   border-radius: 8px;
   padding: 0.75rem;
   border: 1px solid #2a3a5a;
+  position: relative;
 }
 
 .global-font-select label {
@@ -101,19 +102,124 @@
   margin-bottom: 0.5rem;
 }
 
-.global-font-select select {
-  width: 100%;
+/* カスタムフォントドロップダウン */
+.font-dropdown-trigger {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   padding: 0.6rem 0.75rem;
   border-radius: 6px;
   border: 1px solid #3a4a6a;
   background: #0f1a2e;
   color: #fff;
   font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-.global-font-select select option {
+.font-dropdown-trigger:hover {
+  border-color: #667eea;
+  background: #152238;
+}
+
+.font-dropdown-selected {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.font-dropdown-arrow {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-left: 0.5rem;
+}
+
+.font-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 400px;
+  overflow-y: auto;
   background: #0f1a2e;
+  border: 1px solid #3a4a6a;
+  border-radius: 8px;
+  margin-top: 4px;
+  z-index: 100;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.font-dropdown-menu::-webkit-scrollbar {
+  width: 8px;
+}
+
+.font-dropdown-menu::-webkit-scrollbar-track {
+  background: #1a2744;
+  border-radius: 4px;
+}
+
+.font-dropdown-menu::-webkit-scrollbar-thumb {
+  background: #3a4a6a;
+  border-radius: 4px;
+}
+
+.font-dropdown-menu::-webkit-scrollbar-thumb:hover {
+  background: #4a5a7a;
+}
+
+.font-category-group {
+  border-bottom: 1px solid #2a3a5a;
+}
+
+.font-category-group:last-child {
+  border-bottom: none;
+}
+
+.font-category-label {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.7rem;
+  color: #667eea;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: rgba(102, 126, 234, 0.1);
+  position: sticky;
+  top: 0;
+}
+
+.font-dropdown-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.6rem 0.75rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.font-dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.font-dropdown-item:hover {
+  background: #1a2744;
+}
+
+.font-dropdown-item.selected {
+  background: rgba(102, 126, 234, 0.2);
+  border-left: 3px solid #667eea;
+}
+
+.font-item-name {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.font-item-sample {
+  font-size: 1.1rem;
   color: #fff;
+  line-height: 1.4;
 }
 
 /* フォームセクション */
