@@ -142,6 +142,47 @@
   object-fit: contain;
 }
 
+/* デザインページへのリンク */
+.shuriken-design-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 20px auto;
+  padding: 16px 32px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50px;
+  text-decoration: none;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  max-width: 400px;
+}
+
+.shuriken-design-link:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+}
+
+.design-link-icon {
+  font-size: 1.4rem;
+}
+
+.design-link-text {
+  flex: 1;
+}
+
+.design-link-arrow {
+  font-size: 1.2rem;
+  transition: transform 0.3s;
+}
+
+.shuriken-design-link:hover .design-link-arrow {
+  transform: translateX(5px);
+}
+
 .shuriken-contact-title {
   color: white;
   font-size: 1.2rem;

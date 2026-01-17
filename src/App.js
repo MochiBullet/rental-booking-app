@@ -29,6 +29,7 @@ import DuringFieldBusiness from './components/DuringFieldBusiness';
 import DuringFieldWorks from './components/DuringFieldWorks';
 import DuringFieldContact from './components/DuringFieldContact';
 import Shuriken from './components/Shuriken';
+import ShurikenDesigner from './components/ShurikenDesigner';
 import { getGlobalSettings, updateGlobalSettings } from './data/globalSettings';
 import storageManager from './utils/storageManager';
 
@@ -382,6 +383,7 @@ function AppContent() {
 
           {/* Shuriken Routes */}
           <Route path="/shuriken" element={<Shuriken />} />
+          <Route path="/shuriken/design" element={<ShurikenDesigner />} />
 
           {/* Admin Routes (Hidden from main navigation) */}
           <Route path="/admin-login" element={<AdminLogin setIsAdmin={setIsAdmin} onSuccess={() => navigate('/admin')} />} />
