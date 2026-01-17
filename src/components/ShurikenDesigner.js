@@ -482,8 +482,8 @@ const ShurikenDesigner = () => {
             <label>ズーム: {previewZoom}%</label>
             <input
               type="range"
-              min="50"
-              max="200"
+              min="100"
+              max="300"
               value={previewZoom}
               onChange={(e) => setPreviewZoom(Number(e.target.value))}
             />
