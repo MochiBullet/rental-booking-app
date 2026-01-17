@@ -416,21 +416,42 @@ const ShurikenDesigner = () => {
     website: 'https://example.com',
   };
 
-  // 画像に適用するフィルターを取得
+  // 画像に適用するフィルターを取得（金銀は両カードで対応）
   const getImageFilter = () => {
-    // 黒カードの場合は白に変換
+    // 金を選択した場合（白カード・黒カード両方対応）
+    if (printType === 'gold') {
+      if (cardColor === 'black') {
+        // 黒カード + 金: より明るい金色
+        return 'sepia(100%) saturate(500%) brightness(1.3) contrast(1.2) hue-rotate(-10deg)';
+      }
+      // 白カード + 金
+      return 'sepia(100%) saturate(450%) brightness(0.95) contrast(1.1) hue-rotate(-8deg)';
+    }
+    // 銀を選択した場合（白カード・黒カード両方対応）
+    if (printType === 'silver') {
+      if (cardColor === 'black') {
+        // 黒カード + 銀: 明るい銀色
+        return 'grayscale(100%) brightness(1.5) contrast(1.3)';
+      }
+      // 白カード + 銀
+      return 'grayscale(100%) brightness(1.05) contrast(1.15)';
+    }
+    // 黒カードでカラー/白印刷の場合は白に変換
     if (cardColor === 'black') {
       return 'grayscale(100%) brightness(2) contrast(0.5)';
     }
-    // 白カードで金を選択した場合は金色フィルター
+    // 白カードでカラー印刷の場合はフィルターなし
+    return 'none';
+  };
+
+  // 金銀の光沢オーバーレイを取得
+  const getMetallicOverlay = () => {
     if (printType === 'gold') {
-      return 'sepia(100%) saturate(400%) brightness(0.9) hue-rotate(-5deg)';
+      return 'linear-gradient(135deg, rgba(255,215,0,0.3) 0%, rgba(255,180,0,0.1) 30%, rgba(255,223,0,0.4) 50%, rgba(218,165,32,0.1) 70%, rgba(255,215,0,0.3) 100%)';
     }
-    // 白カードで銀を選択した場合は銀色フィルター
     if (printType === 'silver') {
-      return 'grayscale(100%) brightness(1.1) contrast(0.95)';
+      return 'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(192,192,192,0.1) 30%, rgba(255,255,255,0.5) 50%, rgba(169,169,169,0.1) 70%, rgba(255,255,255,0.4) 100%)';
     }
-    // カラー印刷の場合はフィルターなし
     return 'none';
   };
 
@@ -830,15 +851,23 @@ const ShurikenDesigner = () => {
             >
               {/* 背景画像（印刷タイプに応じてフィルター適用） */}
               {templateImage && (
-                <img
-                  src={templateImage}
-                  alt="背景"
-                  className="preview-background"
-                  style={{
-                    transform: `translate(-50%, -50%) scale(${templateScale / 100})`,
-                    filter: getImageFilter(),
-                  }}
-                />
+                <div className="preview-background-wrapper" style={{
+                  transform: `translate(-50%, -50%) scale(${templateScale / 100})`,
+                }}>
+                  <img
+                    src={templateImage}
+                    alt="背景"
+                    className="preview-background"
+                    style={{
+                      filter: getImageFilter(),
+                    }}
+                  />
+                  {(printType === 'gold' || printType === 'silver') && (
+                    <div className="metallic-overlay" style={{
+                      background: getMetallicOverlay(),
+                    }} />
+                  )}
+                </div>
               )}
 
               {/* アイコン1（印刷タイプに応じてフィルター適用） */}
@@ -862,6 +891,11 @@ const ShurikenDesigner = () => {
                         filter: getImageFilter(),
                       }}
                     />
+                    {(printType === 'gold' || printType === 'silver') && (
+                      <div className="metallic-overlay" style={{
+                        background: getMetallicOverlay(),
+                      }} />
+                    )}
                   </div>
                 </Draggable>
               )}
@@ -887,6 +921,11 @@ const ShurikenDesigner = () => {
                         filter: getImageFilter(),
                       }}
                     />
+                    {(printType === 'gold' || printType === 'silver') && (
+                      <div className="metallic-overlay" style={{
+                        background: getMetallicOverlay(),
+                      }} />
+                    )}
                   </div>
                 </Draggable>
               )}
