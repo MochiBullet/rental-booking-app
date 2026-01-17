@@ -879,6 +879,76 @@ const ShurikenDesigner = () => {
             ))}
           </div>
 
+          {/* 金額明細 */}
+          <div className="price-breakdown">
+            <h4>金額明細</h4>
+            <div className="price-items">
+              <div className="price-item">
+                <span className="price-label">カード</span>
+                <span className="price-value">
+                  {cardColor === 'white' ? '白カード' : '黒カード'}
+                </span>
+                <span className="price-amount">
+                  ¥{cardColor === 'white' ? '0' : '500'}
+                </span>
+              </div>
+              <div className="price-item">
+                <span className="price-label">表面印刷</span>
+                <span className="price-value">
+                  {frontData.printType === 'gold' || frontData.printType === 'silver' ? '金銀印刷' : 'カラー印刷'}
+                </span>
+                <span className="price-amount">
+                  ¥{frontData.printType === 'gold' || frontData.printType === 'silver' ? '10,000' : '5,500'}
+                </span>
+              </div>
+              {(() => {
+                // 裏面に何かコンテンツがあるかチェック
+                const hasBackContent = backData.templateImage ||
+                  backData.logoImage ||
+                  backData.logo2Image ||
+                  Object.values(backData.formData).some(field => field.text && field.text.trim() !== '');
+
+                if (hasBackContent) {
+                  const isBackMetallic = backData.printType === 'gold' || backData.printType === 'silver';
+                  return (
+                    <div className="price-item">
+                      <span className="price-label">裏面印刷</span>
+                      <span className="price-value">
+                        {isBackMetallic ? '金銀印刷' : '通常印刷'}
+                      </span>
+                      <span className="price-amount">
+                        ¥{isBackMetallic ? '3,000' : '2,000'}
+                      </span>
+                    </div>
+                  );
+                }
+                return null;
+              })()}
+              <div className="price-total">
+                <span className="price-label">合計</span>
+                <span className="price-amount">
+                  ¥{(() => {
+                    let total = 0;
+                    // カード代
+                    total += cardColor === 'black' ? 500 : 0;
+                    // 表面印刷
+                    total += (frontData.printType === 'gold' || frontData.printType === 'silver') ? 10000 : 5500;
+                    // 裏面印刷
+                    const hasBackContent = backData.templateImage ||
+                      backData.logoImage ||
+                      backData.logo2Image ||
+                      Object.values(backData.formData).some(field => field.text && field.text.trim() !== '');
+                    if (hasBackContent) {
+                      const isBackMetallic = backData.printType === 'gold' || backData.printType === 'silver';
+                      total += isBackMetallic ? 3000 : 2000;
+                    }
+                    return total.toLocaleString();
+                  })()}
+                </span>
+              </div>
+            </div>
+          </div>
+
           <button className="reset-btn" onClick={handleReset}>
             リセット
           </button>

@@ -678,6 +678,82 @@
   color: rgba(255, 255, 255, 0.5);
 }
 
+/* 金額明細 */
+.price-breakdown {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 1.5rem;
+}
+
+.price-breakdown h4 {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #ffd700;
+  border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+  padding-bottom: 0.5rem;
+}
+
+.price-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.price-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.4rem 0;
+  font-size: 0.85rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.price-item:last-child {
+  border-bottom: none;
+}
+
+.price-label {
+  color: rgba(255, 255, 255, 0.7);
+  min-width: 70px;
+}
+
+.price-value {
+  flex: 1;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.price-amount {
+  min-width: 80px;
+  text-align: right;
+  font-weight: 500;
+  color: #fff;
+}
+
+.price-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0 0.25rem 0;
+  margin-top: 0.5rem;
+  border-top: 2px solid rgba(255, 215, 0, 0.5);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.price-total .price-label {
+  color: #ffd700;
+  font-size: 1rem;
+}
+
+.price-total .price-amount {
+  color: #ffd700;
+  font-size: 1.1rem;
+}
+
 .reset-btn {
   width: 100%;
   padding: 0.7rem;
