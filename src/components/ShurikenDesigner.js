@@ -416,6 +416,24 @@ const ShurikenDesigner = () => {
     website: 'https://example.com',
   };
 
+  // 画像に適用するフィルターを取得
+  const getImageFilter = () => {
+    // 黒カードの場合は白に変換
+    if (cardColor === 'black') {
+      return 'grayscale(100%) brightness(2) contrast(0.5)';
+    }
+    // 白カードで金を選択した場合は金色フィルター
+    if (printType === 'gold') {
+      return 'sepia(100%) saturate(400%) brightness(0.9) hue-rotate(-5deg)';
+    }
+    // 白カードで銀を選択した場合は銀色フィルター
+    if (printType === 'silver') {
+      return 'grayscale(100%) brightness(1.1) contrast(0.95)';
+    }
+    // カラー印刷の場合はフィルターなし
+    return 'none';
+  };
+
   return (
     <div className="shuriken-designer">
       {/* ヘッダー */}
@@ -810,7 +828,7 @@ const ShurikenDesigner = () => {
                 background: cardColor === 'white' ? '#ffffff' : '#1a1a1a',
               }}
             >
-              {/* 背景画像（黒カードの場合はグレースケール→白に変換） */}
+              {/* 背景画像（印刷タイプに応じてフィルター適用） */}
               {templateImage && (
                 <img
                   src={templateImage}
@@ -818,12 +836,12 @@ const ShurikenDesigner = () => {
                   className="preview-background"
                   style={{
                     transform: `translate(-50%, -50%) scale(${templateScale / 100})`,
-                    filter: cardColor === 'black' ? 'grayscale(100%) brightness(2) contrast(0.5)' : 'none',
+                    filter: getImageFilter(),
                   }}
                 />
               )}
 
-              {/* アイコン1（黒カードの場合はグレースケール→白に変換） */}
+              {/* アイコン1（印刷タイプに応じてフィルター適用） */}
               {logoImage && (
                 <Draggable
                   position={logoPosition}
@@ -841,14 +859,14 @@ const ShurikenDesigner = () => {
                       src={logoImage}
                       alt="アイコン1"
                       style={{
-                        filter: cardColor === 'black' ? 'grayscale(100%) brightness(2) contrast(0.5)' : 'none',
+                        filter: getImageFilter(),
                       }}
                     />
                   </div>
                 </Draggable>
               )}
 
-              {/* アイコン2（黒カードの場合はグレースケール→白に変換） */}
+              {/* アイコン2（印刷タイプに応じてフィルター適用） */}
               {logo2Image && (
                 <Draggable
                   position={logo2Position}
@@ -866,7 +884,7 @@ const ShurikenDesigner = () => {
                       src={logo2Image}
                       alt="アイコン2"
                       style={{
-                        filter: cardColor === 'black' ? 'grayscale(100%) brightness(2) contrast(0.5)' : 'none',
+                        filter: getImageFilter(),
                       }}
                     />
                   </div>
