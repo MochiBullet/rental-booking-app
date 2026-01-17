@@ -1212,55 +1212,6 @@ const ShurikenDesigner = () => {
             })()}
           </div>
 
-          {/* フォント選択 - カスタムドロップダウン */}
-          <div className="global-font-select" ref={fontDropdownRef}>
-            <label>フォント（{GOOGLE_FONTS.length}種類）</label>
-            <div
-              className="font-dropdown-trigger"
-              onClick={() => setFontDropdownOpen(!fontDropdownOpen)}
-            >
-              <span
-                className="font-dropdown-selected"
-                style={{ fontFamily: globalFont }}
-              >
-                {GOOGLE_FONTS.find(f => f.value === globalFont)?.name || 'フォントを選択'}
-              </span>
-              <span className="font-dropdown-arrow">{fontDropdownOpen ? '▲' : '▼'}</span>
-            </div>
-            {fontDropdownOpen && (
-              <div className="font-dropdown-menu">
-                {/* カテゴリごとにグループ化 */}
-                {['ゴシック', '丸ゴシック', '明朝', '手書き', '筆記', 'ポップ', 'デザイン'].map(category => {
-                  const fontsInCategory = GOOGLE_FONTS.filter(f => f.category === category);
-                  if (fontsInCategory.length === 0) return null;
-                  return (
-                    <div key={category} className="font-category-group">
-                      <div className="font-category-label">{category}</div>
-                      {fontsInCategory.map(font => (
-                        <div
-                          key={font.name}
-                          className={`font-dropdown-item ${globalFont === font.value ? 'selected' : ''}`}
-                          onClick={() => {
-                            setGlobalFont(font.value);
-                            setFontDropdownOpen(false);
-                          }}
-                        >
-                          <span className="font-item-name">{font.name}</span>
-                          <span
-                            className="font-item-sample"
-                            style={{ fontFamily: font.value }}
-                          >
-                            あいうえお 山田太郎
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-
           {/* 背景画像アップロード */}
           <div className="form-section">
             <h4>背景画像（{cardSide === 'front' ? '表面' : '裏面'}）</h4>
@@ -1361,6 +1312,56 @@ const ShurikenDesigner = () => {
           {/* テキスト入力フォーム */}
           <div className="form-section">
             <h4>テキスト情報</h4>
+
+            {/* フォント選択 - カスタムドロップダウン */}
+            <div className="global-font-select" ref={fontDropdownRef}>
+              <label>フォント（{GOOGLE_FONTS.length}種類）</label>
+              <div
+                className="font-dropdown-trigger"
+                onClick={() => setFontDropdownOpen(!fontDropdownOpen)}
+              >
+                <span
+                  className="font-dropdown-selected"
+                  style={{ fontFamily: globalFont }}
+                >
+                  {GOOGLE_FONTS.find(f => f.value === globalFont)?.name || 'フォントを選択'}
+                </span>
+                <span className="font-dropdown-arrow">{fontDropdownOpen ? '▲' : '▼'}</span>
+              </div>
+              {fontDropdownOpen && (
+                <div className="font-dropdown-menu">
+                  {/* カテゴリごとにグループ化 */}
+                  {['ゴシック', '丸ゴシック', '明朝', '行書', '手書き', 'ポップ', 'デザイン'].map(category => {
+                    const fontsInCategory = GOOGLE_FONTS.filter(f => f.category === category);
+                    if (fontsInCategory.length === 0) return null;
+                    return (
+                      <div key={category} className="font-category-group">
+                        <div className="font-category-label">{category}</div>
+                        {fontsInCategory.map(font => (
+                          <div
+                            key={font.name}
+                            className={`font-dropdown-item ${globalFont === font.value ? 'selected' : ''}`}
+                            onClick={() => {
+                              setGlobalFont(font.value);
+                              setFontDropdownOpen(false);
+                            }}
+                          >
+                            <span className="font-item-name">{font.name}</span>
+                            <span
+                              className="font-item-sample"
+                              style={{ fontFamily: font.value }}
+                            >
+                              あいうえお 山田太郎
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
             {Object.entries(formData).map(([field, data]) => (
               <div key={field} className="form-field">
                 <div className="field-header">
