@@ -238,6 +238,40 @@
   margin: 0 0 0.5rem;
 }
 
+/* 表裏切り替えトグル */
+.side-toggle {
+  display: flex;
+  gap: 0;
+  background: #0f1a2e;
+  border-radius: 8px;
+  padding: 4px;
+  border: 1px solid #3a4a6a;
+}
+
+.side-toggle-btn {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.side-toggle-btn:hover {
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.side-toggle-btn.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
 /* ラジオボタングループ */
 .radio-group {
   display: flex;

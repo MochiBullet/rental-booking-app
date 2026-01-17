@@ -53,51 +53,27 @@ const GOOGLE_FONTS = [
   { name: 'Hachi Maru Pop', value: "'Hachi Maru Pop', cursive", category: 'ポップ' },
 ];
 
-const ShurikenDesigner = () => {
-  const previewRef = useRef(null);
-
-  // カード色（white/black）
-  const [cardColor, setCardColor] = useState('white');
-  // 印刷タイプ（gold/silver/none）
-  const [printType, setPrintType] = useState('none');
-
-  // テンプレート画像
-  const [templateImage, setTemplateImage] = useState(null);
-  const [templateScale, setTemplateScale] = useState(100); // 背景画像サイズ %
-
-  // ロゴ/アイコン1
-  const [logoImage, setLogoImage] = useState(null);
-  const [logoScale, setLogoScale] = useState(60); // ロゴサイズ px
-  const [logoPosition, setLogoPosition] = useState({ x: 10, y: 10 });
-
-  // ロゴ/アイコン2
-  const [logo2Image, setLogo2Image] = useState(null);
-  const [logo2Scale, setLogo2Scale] = useState(60);
-  const [logo2Position, setLogo2Position] = useState({ x: 280, y: 10 });
-
-  // プレビューズーム
-  const [previewZoom, setPreviewZoom] = useState(100);
-
-  // グローバルフォント設定
-  const [globalFont, setGlobalFont] = useState(GOOGLE_FONTS[0].value);
-  const [fontDropdownOpen, setFontDropdownOpen] = useState(false);
-  const fontDropdownRef = useRef(null);
-
-  // テキスト要素の位置（名刺らしい配置）
-  // カードサイズ: 364x220
-  const [textPositions, setTextPositions] = useState({
-    company: { x: 15, y: 15 },      // 左上: 会社名
-    position: { x: 15, y: 35 },     // 会社名の下: 役職
-    nameKana: { x: 15, y: 70 },     // フリガナ
-    name: { x: 15, y: 85 },         // 名前（大きめ）
-    phone: { x: 15, y: 140 },       // 連絡先エリア
+// デフォルトデータ
+const getDefaultSideData = () => ({
+  templateImage: null,
+  templateScale: 100,
+  logoImage: null,
+  logoScale: 60,
+  logoPosition: { x: 10, y: 10 },
+  logo2Image: null,
+  logo2Scale: 60,
+  logo2Position: { x: 280, y: 10 },
+  textPositions: {
+    company: { x: 15, y: 15 },
+    position: { x: 15, y: 35 },
+    nameKana: { x: 15, y: 70 },
+    name: { x: 15, y: 85 },
+    phone: { x: 15, y: 140 },
     email: { x: 15, y: 158 },
     address: { x: 15, y: 176 },
     website: { x: 15, y: 194 },
-  });
-
-  // テキストフォーム（濃い色をデフォルトに）
-  const [formData, setFormData] = useState({
+  },
+  formData: {
     name: { text: '', color: '#000000', fontSize: 20, visible: true },
     nameKana: { text: '', color: '#333333', fontSize: 10, visible: true },
     company: { text: '', color: '#000000', fontSize: 12, visible: true },
@@ -106,7 +82,87 @@ const ShurikenDesigner = () => {
     email: { text: '', color: '#222222', fontSize: 9, visible: true },
     address: { text: '', color: '#222222', fontSize: 8, visible: true },
     website: { text: '', color: '#222222', fontSize: 8, visible: true },
-  });
+  },
+});
+
+const STORAGE_KEY = 'shuriken-designer-data';
+
+const ShurikenDesigner = () => {
+  const previewRef = useRef(null);
+  const isInitialLoad = useRef(true);
+
+  // 表裏切り替え（front/back）
+  const [cardSide, setCardSide] = useState('front');
+
+  // カード色（white/black）- 両面共通
+  const [cardColor, setCardColor] = useState('white');
+  // 印刷タイプ（gold/silver/none）- 両面共通
+  const [printType, setPrintType] = useState('none');
+  // グローバルフォント設定 - 両面共通
+  const [globalFont, setGlobalFont] = useState(GOOGLE_FONTS[0].value);
+
+  // 表面・裏面データを別々に保持
+  const [frontData, setFrontData] = useState(getDefaultSideData());
+  const [backData, setBackData] = useState(getDefaultSideData());
+
+  // 現在の面のデータを取得
+  const currentData = cardSide === 'front' ? frontData : backData;
+  const setCurrentData = cardSide === 'front' ? setFrontData : setBackData;
+
+  // プレビューズーム - UI用
+  const [previewZoom, setPreviewZoom] = useState(100);
+
+  const [fontDropdownOpen, setFontDropdownOpen] = useState(false);
+  const fontDropdownRef = useRef(null);
+
+  // 現在のデータから展開（便利なエイリアス）
+  const templateImage = currentData.templateImage;
+  const templateScale = currentData.templateScale;
+  const logoImage = currentData.logoImage;
+  const logoScale = currentData.logoScale;
+  const logoPosition = currentData.logoPosition;
+  const logo2Image = currentData.logo2Image;
+  const logo2Scale = currentData.logo2Scale;
+  const logo2Position = currentData.logo2Position;
+  const textPositions = currentData.textPositions;
+  const formData = currentData.formData;
+
+  // localStorageから読み込み
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const data = JSON.parse(saved);
+        if (data.cardColor) setCardColor(data.cardColor);
+        if (data.printType) setPrintType(data.printType);
+        if (data.globalFont) setGlobalFont(data.globalFont);
+        if (data.frontData) setFrontData({ ...getDefaultSideData(), ...data.frontData });
+        if (data.backData) setBackData({ ...getDefaultSideData(), ...data.backData });
+        if (data.cardSide) setCardSide(data.cardSide);
+      }
+    } catch (e) {
+      console.error('Failed to load saved data:', e);
+    }
+    isInitialLoad.current = false;
+  }, []);
+
+  // localStorageに保存
+  useEffect(() => {
+    if (isInitialLoad.current) return;
+    try {
+      const data = {
+        cardSide,
+        cardColor,
+        printType,
+        globalFont,
+        frontData,
+        backData,
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    } catch (e) {
+      console.error('Failed to save data:', e);
+    }
+  }, [cardSide, cardColor, printType, globalFont, frontData, backData]);
 
   // Google Fonts読み込み
   useEffect(() => {
@@ -130,14 +186,21 @@ const ShurikenDesigner = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // データ更新用ヘルパー
+  const updateCurrentData = (updates) => {
+    setCurrentData(prev => ({ ...prev, ...updates }));
+  };
+
   // テンプレート画像アップロード
   const handleTemplateUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = (event) => {
-        setTemplateImage(event.target.result);
-        setTemplateScale(100);
+        updateCurrentData({
+          templateImage: event.target.result,
+          templateScale: 100,
+        });
       };
       reader.readAsDataURL(file);
     }
@@ -149,7 +212,7 @@ const ShurikenDesigner = () => {
     if (file) {
       const reader = new FileReader();
       reader.onload = (event) => {
-        setLogoImage(event.target.result);
+        updateCurrentData({ logoImage: event.target.result });
       };
       reader.readAsDataURL(file);
     }
@@ -161,7 +224,7 @@ const ShurikenDesigner = () => {
     if (file) {
       const reader = new FileReader();
       reader.onload = (event) => {
-        setLogo2Image(event.target.result);
+        updateCurrentData({ logo2Image: event.target.result });
       };
       reader.readAsDataURL(file);
     }
@@ -176,30 +239,38 @@ const ShurikenDesigner = () => {
         value = lines.slice(0, 2).join('\n');
       }
     }
-    setFormData(prev => ({
-      ...prev,
-      [field]: { ...prev[field], [key]: value }
-    }));
+    updateCurrentData({
+      formData: {
+        ...formData,
+        [field]: { ...formData[field], [key]: value }
+      }
+    });
   };
 
-  // カード色変更時にテキスト色をデフォルトに更新
+  // カード色変更時にテキスト色をデフォルトに更新（両面に適用）
   const handleCardColorChange = (newColor) => {
     setCardColor(newColor);
     const defaultColors = newColor === 'white'
       ? { main: '#000000', sub: '#333333', detail: '#222222' }
       : { main: '#ffffff', sub: '#cccccc', detail: '#dddddd' };
 
-    setFormData(prev => ({
-      ...prev,
-      name: { ...prev.name, color: defaultColors.main },
-      nameKana: { ...prev.nameKana, color: defaultColors.sub },
-      company: { ...prev.company, color: defaultColors.main },
-      position: { ...prev.position, color: defaultColors.sub },
-      phone: { ...prev.phone, color: defaultColors.detail },
-      email: { ...prev.email, color: defaultColors.detail },
-      address: { ...prev.address, color: defaultColors.detail },
-      website: { ...prev.website, color: defaultColors.detail },
-    }));
+    const updateFormDataColors = (prevData) => ({
+      ...prevData,
+      formData: {
+        ...prevData.formData,
+        name: { ...prevData.formData.name, color: defaultColors.main },
+        nameKana: { ...prevData.formData.nameKana, color: defaultColors.sub },
+        company: { ...prevData.formData.company, color: defaultColors.main },
+        position: { ...prevData.formData.position, color: defaultColors.sub },
+        phone: { ...prevData.formData.phone, color: defaultColors.detail },
+        email: { ...prevData.formData.email, color: defaultColors.detail },
+        address: { ...prevData.formData.address, color: defaultColors.detail },
+        website: { ...prevData.formData.website, color: defaultColors.detail },
+      }
+    });
+
+    setFrontData(updateFormDataColors);
+    setBackData(updateFormDataColors);
   };
 
   // テキスト位置更新
@@ -210,10 +281,12 @@ const ShurikenDesigner = () => {
     const newX = Math.max(0, Math.min(data.x, maxX));
     const newY = Math.max(0, Math.min(data.y, maxY));
 
-    setTextPositions(prev => ({
-      ...prev,
-      [field]: { x: newX, y: newY }
-    }));
+    updateCurrentData({
+      textPositions: {
+        ...textPositions,
+        [field]: { x: newX, y: newY }
+      }
+    });
   };
 
   // ロゴ1位置更新
@@ -222,7 +295,7 @@ const ShurikenDesigner = () => {
     const maxY = 220 - logoScale;
     const newX = Math.max(0, Math.min(data.x, maxX));
     const newY = Math.max(0, Math.min(data.y, maxY));
-    setLogoPosition({ x: newX, y: newY });
+    updateCurrentData({ logoPosition: { x: newX, y: newY } });
   };
 
   // ロゴ2位置更新
@@ -231,42 +304,21 @@ const ShurikenDesigner = () => {
     const maxY = 220 - logo2Scale;
     const newX = Math.max(0, Math.min(data.x, maxX));
     const newY = Math.max(0, Math.min(data.y, maxY));
-    setLogo2Position({ x: newX, y: newY });
+    updateCurrentData({ logo2Position: { x: newX, y: newY } });
   };
 
-  // リセット
+  // リセット（両面とも初期化）
   const handleReset = () => {
+    if (!window.confirm('表面・裏面の両方をリセットします。よろしいですか？')) return;
+
+    setCardSide('front');
     setCardColor('white');
     setPrintType('none');
-    setTemplateImage(null);
-    setTemplateScale(100);
-    setLogoImage(null);
-    setLogoScale(60);
-    setLogoPosition({ x: 10, y: 10 });
-    setLogo2Image(null);
-    setLogo2Scale(60);
-    setLogo2Position({ x: 280, y: 10 });
+    setGlobalFont(GOOGLE_FONTS[0].value);
     setPreviewZoom(100);
-    setTextPositions({
-      company: { x: 15, y: 15 },
-      position: { x: 15, y: 35 },
-      nameKana: { x: 15, y: 70 },
-      name: { x: 15, y: 85 },
-      phone: { x: 15, y: 140 },
-      email: { x: 15, y: 158 },
-      address: { x: 15, y: 176 },
-      website: { x: 15, y: 194 },
-    });
-    setFormData({
-      name: { text: '', color: '#000000', fontSize: 20, visible: true },
-      nameKana: { text: '', color: '#333333', fontSize: 10, visible: true },
-      company: { text: '', color: '#000000', fontSize: 12, visible: true },
-      position: { text: '', color: '#333333', fontSize: 10, visible: true },
-      phone: { text: '', color: '#222222', fontSize: 9, visible: true },
-      email: { text: '', color: '#222222', fontSize: 9, visible: true },
-      address: { text: '', color: '#222222', fontSize: 8, visible: true },
-      website: { text: '', color: '#222222', fontSize: 8, visible: true },
-    });
+    setFrontData(getDefaultSideData());
+    setBackData(getDefaultSideData());
+    localStorage.removeItem(STORAGE_KEY);
   };
 
   // テキスト表示内容を取得（入力がある場合のみ表示）
@@ -320,9 +372,28 @@ const ShurikenDesigner = () => {
         <div className="designer-form-panel">
           <h3>編集</h3>
 
+          {/* 表裏切り替え */}
+          <div className="form-section card-side-section">
+            <h4>編集する面</h4>
+            <div className="side-toggle">
+              <button
+                className={`side-toggle-btn ${cardSide === 'front' ? 'active' : ''}`}
+                onClick={() => setCardSide('front')}
+              >
+                表面
+              </button>
+              <button
+                className={`side-toggle-btn ${cardSide === 'back' ? 'active' : ''}`}
+                onClick={() => setCardSide('back')}
+              >
+                裏面
+              </button>
+            </div>
+          </div>
+
           {/* カード色選択 */}
           <div className="form-section card-color-section">
-            <h4>カードの色</h4>
+            <h4>カードの色（両面共通）</h4>
             <div className="radio-group">
               <label className={`radio-option ${cardColor === 'white' ? 'selected' : ''}`}>
                 <input
@@ -435,12 +506,12 @@ const ShurikenDesigner = () => {
 
           {/* 背景画像アップロード */}
           <div className="form-section">
-            <h4>背景画像</h4>
+            <h4>背景画像（{cardSide === 'front' ? '表面' : '裏面'}）</h4>
             <div className="upload-compact">
               {templateImage ? (
                 <div className="upload-thumb">
                   <img src={templateImage} alt="背景" />
-                  <button onClick={() => setTemplateImage(null)}>✕</button>
+                  <button onClick={() => updateCurrentData({ templateImage: null })}>✕</button>
                 </div>
               ) : (
                 <label className="upload-btn">
@@ -457,7 +528,7 @@ const ShurikenDesigner = () => {
                   min="50"
                   max="200"
                   value={templateScale}
-                  onChange={(e) => setTemplateScale(Number(e.target.value))}
+                  onChange={(e) => updateCurrentData({ templateScale: Number(e.target.value) })}
                 />
               </div>
             )}
@@ -465,12 +536,12 @@ const ShurikenDesigner = () => {
 
           {/* アイコン1アップロード */}
           <div className="form-section">
-            <h4>アイコン1</h4>
+            <h4>アイコン1（{cardSide === 'front' ? '表面' : '裏面'}）</h4>
             <div className="upload-compact">
               {logoImage ? (
                 <div className="upload-thumb">
                   <img src={logoImage} alt="アイコン1" />
-                  <button onClick={() => setLogoImage(null)}>✕</button>
+                  <button onClick={() => updateCurrentData({ logoImage: null })}>✕</button>
                 </div>
               ) : (
                 <label className="upload-btn">
@@ -487,7 +558,7 @@ const ShurikenDesigner = () => {
                   min="20"
                   max="150"
                   value={logoScale}
-                  onChange={(e) => setLogoScale(Number(e.target.value))}
+                  onChange={(e) => updateCurrentData({ logoScale: Number(e.target.value) })}
                 />
               </div>
             )}
@@ -495,12 +566,12 @@ const ShurikenDesigner = () => {
 
           {/* アイコン2アップロード */}
           <div className="form-section">
-            <h4>アイコン2</h4>
+            <h4>アイコン2（{cardSide === 'front' ? '表面' : '裏面'}）</h4>
             <div className="upload-compact">
               {logo2Image ? (
                 <div className="upload-thumb">
                   <img src={logo2Image} alt="アイコン2" />
-                  <button onClick={() => setLogo2Image(null)}>✕</button>
+                  <button onClick={() => updateCurrentData({ logo2Image: null })}>✕</button>
                 </div>
               ) : (
                 <label className="upload-btn">
@@ -517,7 +588,7 @@ const ShurikenDesigner = () => {
                   min="20"
                   max="150"
                   value={logo2Scale}
-                  onChange={(e) => setLogo2Scale(Number(e.target.value))}
+                  onChange={(e) => updateCurrentData({ logo2Scale: Number(e.target.value) })}
                 />
               </div>
             )}
@@ -593,7 +664,10 @@ const ShurikenDesigner = () => {
 
         {/* 右側: プレビュー */}
         <div className="designer-preview-panel">
-          <h3>プレビュー <span className="drag-hint">（ドラッグで配置変更）</span></h3>
+          <h3>
+            プレビュー（{cardSide === 'front' ? '表面' : '裏面'}）
+            <span className="drag-hint">ドラッグで配置変更</span>
+          </h3>
 
           {/* プレビューズームスライダー */}
           <div className="preview-zoom-control">
