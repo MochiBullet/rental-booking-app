@@ -78,16 +78,17 @@ const ShurikenDesigner = () => {
   const [fontDropdownOpen, setFontDropdownOpen] = useState(false);
   const fontDropdownRef = useRef(null);
 
-  // テキスト要素の位置
+  // テキスト要素の位置（名刺らしい配置）
+  // カードサイズ: 364x220
   const [textPositions, setTextPositions] = useState({
-    company: { x: 10, y: 70 },
-    position: { x: 10, y: 90 },
-    name: { x: 10, y: 110 },
-    nameKana: { x: 10, y: 140 },
-    phone: { x: 10, y: 160 },
-    email: { x: 10, y: 175 },
-    address: { x: 10, y: 190 },
-    website: { x: 10, y: 205 },
+    company: { x: 15, y: 15 },      // 左上: 会社名
+    position: { x: 15, y: 35 },     // 会社名の下: 役職
+    nameKana: { x: 15, y: 70 },     // フリガナ
+    name: { x: 15, y: 85 },         // 名前（大きめ）
+    phone: { x: 15, y: 140 },       // 連絡先エリア
+    email: { x: 15, y: 158 },
+    address: { x: 15, y: 176 },
+    website: { x: 15, y: 194 },
   });
 
   // テキストフォーム（濃い色をデフォルトに）
@@ -213,14 +214,14 @@ const ShurikenDesigner = () => {
     setLogo2Position({ x: 280, y: 10 });
     setPreviewZoom(100);
     setTextPositions({
-      company: { x: 10, y: 70 },
-      position: { x: 10, y: 90 },
-      name: { x: 10, y: 110 },
-      nameKana: { x: 10, y: 140 },
-      phone: { x: 10, y: 160 },
-      email: { x: 10, y: 175 },
-      address: { x: 10, y: 190 },
-      website: { x: 10, y: 205 },
+      company: { x: 15, y: 15 },
+      position: { x: 15, y: 35 },
+      nameKana: { x: 15, y: 70 },
+      name: { x: 15, y: 85 },
+      phone: { x: 15, y: 140 },
+      email: { x: 15, y: 158 },
+      address: { x: 15, y: 176 },
+      website: { x: 15, y: 194 },
     });
     setFormData({
       name: { text: '', color: '#000000', fontSize: 20, visible: true },
@@ -234,12 +235,28 @@ const ShurikenDesigner = () => {
     });
   };
 
-  // テキスト表示内容を取得
+  // サンプルテキスト（プレビュー用）
+  const sampleTexts = {
+    name: '山田 太郎',
+    nameKana: 'ヤマダ タロウ',
+    company: '株式会社サンプル',
+    position: '代表取締役',
+    phone: '090-1234-5678',
+    email: 'sample@example.com',
+    address: '〒123-4567 東京都渋谷区...',
+    website: 'https://example.com',
+  };
+
+  // テキスト表示内容を取得（入力がない場合はサンプル表示）
   const getDisplayText = (field) => {
-    const text = formData[field]?.text;
-    if (!text) return null;
+    const text = formData[field]?.text || sampleTexts[field];
     if (field === 'phone') return `TEL: ${text}`;
     return text;
+  };
+
+  // 入力済みかどうか（スタイル用）
+  const hasUserInput = (field) => {
+    return formData[field]?.text && formData[field].text.trim() !== '';
   };
 
   // フィールドラベル
@@ -550,7 +567,7 @@ const ShurikenDesigner = () => {
               {/* テキスト要素 */}
               {Object.entries(formData).map(([field, data]) => {
                 const displayText = getDisplayText(field);
-                if (!displayText) return null;
+                const isUserInput = hasUserInput(field);
 
                 return (
                   <Draggable
@@ -560,11 +577,12 @@ const ShurikenDesigner = () => {
                     bounds="parent"
                   >
                     <div
-                      className="draggable-element text-element"
+                      className={`draggable-element text-element ${!isUserInput ? 'sample-text' : ''}`}
                       style={{
-                        color: data.color,
+                        color: isUserInput ? data.color : '#999999',
                         fontSize: `${data.fontSize}px`,
                         fontFamily: globalFont,
+                        opacity: isUserInput ? 1 : 0.5,
                       }}
                     >
                       {displayText}
