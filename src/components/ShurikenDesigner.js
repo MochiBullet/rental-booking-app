@@ -495,21 +495,6 @@ const ShurikenDesigner = () => {
     return 'none';
   };
 
-  // 画像を金銀マスクとして使用するスタイル
-  const getMetallicImageStyle = (imageSrc) => {
-    if (!isMetallic) return {};
-    return {
-      WebkitMaskImage: `url(${imageSrc})`,
-      maskImage: `url(${imageSrc})`,
-      WebkitMaskSize: 'contain',
-      maskSize: 'contain',
-      WebkitMaskRepeat: 'no-repeat',
-      maskRepeat: 'no-repeat',
-      WebkitMaskPosition: 'center',
-      maskPosition: 'center',
-      background: getMetallicFill(),
-    };
-  };
 
   return (
     <div className="shuriken-designer">
@@ -908,7 +893,7 @@ const ShurikenDesigner = () => {
               {/* 背景画像（金銀選択時はマスクで塗りつぶし） */}
               {templateImage && (
                 <div
-                  key={`bg-${printType}-${cardColor}`}
+                  key={`bg-wrapper-${printType}-${cardColor}-${templateImage.substring(0, 50)}`}
                   className="preview-background-wrapper"
                   style={{
                     transform: `translate(-50%, -50%) scale(${templateScale / 100})`,
@@ -916,9 +901,18 @@ const ShurikenDesigner = () => {
                 >
                   {isMetallic ? (
                     <div
+                      key={`bg-metallic-${printType}-${cardColor}`}
                       className="preview-background metallic-masked-image"
                       style={{
-                        ...getMetallicImageStyle(templateImage),
+                        WebkitMaskImage: `url(${templateImage})`,
+                        maskImage: `url(${templateImage})`,
+                        WebkitMaskSize: 'contain',
+                        maskSize: 'contain',
+                        WebkitMaskRepeat: 'no-repeat',
+                        maskRepeat: 'no-repeat',
+                        WebkitMaskPosition: 'center',
+                        maskPosition: 'center',
+                        background: getMetallicFill(),
                         width: '100%',
                         height: '100%',
                       }}
@@ -939,7 +933,7 @@ const ShurikenDesigner = () => {
               {/* アイコン1（金銀選択時はマスクで塗りつぶし） */}
               {logoImage && (
                 <Draggable
-                  key={`logo1-${printType}-${cardColor}`}
+                  key={`logo1-drag-${printType}-${cardColor}`}
                   position={logoPosition}
                   onStop={handleLogoDrag}
                   bounds="parent"
@@ -953,9 +947,18 @@ const ShurikenDesigner = () => {
                   >
                     {isMetallic ? (
                       <div
+                        key={`logo1-metallic-${printType}-${cardColor}`}
                         className="metallic-masked-image"
                         style={{
-                          ...getMetallicImageStyle(logoImage),
+                          WebkitMaskImage: `url(${logoImage})`,
+                          maskImage: `url(${logoImage})`,
+                          WebkitMaskSize: 'contain',
+                          maskSize: 'contain',
+                          WebkitMaskRepeat: 'no-repeat',
+                          maskRepeat: 'no-repeat',
+                          WebkitMaskPosition: 'center',
+                          maskPosition: 'center',
+                          background: getMetallicFill(),
                           width: '100%',
                           paddingBottom: '100%',
                         }}
@@ -976,7 +979,7 @@ const ShurikenDesigner = () => {
               {/* アイコン2（金銀選択時はマスクで塗りつぶし） */}
               {logo2Image && (
                 <Draggable
-                  key={`logo2-${printType}-${cardColor}`}
+                  key={`logo2-drag-${printType}-${cardColor}`}
                   position={logo2Position}
                   onStop={handleLogo2Drag}
                   bounds="parent"
@@ -990,9 +993,18 @@ const ShurikenDesigner = () => {
                   >
                     {isMetallic ? (
                       <div
+                        key={`logo2-metallic-${printType}-${cardColor}`}
                         className="metallic-masked-image"
                         style={{
-                          ...getMetallicImageStyle(logo2Image),
+                          WebkitMaskImage: `url(${logo2Image})`,
+                          maskImage: `url(${logo2Image})`,
+                          WebkitMaskSize: 'contain',
+                          maskSize: 'contain',
+                          WebkitMaskRepeat: 'no-repeat',
+                          maskRepeat: 'no-repeat',
+                          WebkitMaskPosition: 'center',
+                          maskPosition: 'center',
+                          background: getMetallicFill(),
                           width: '100%',
                           paddingBottom: '100%',
                         }}
