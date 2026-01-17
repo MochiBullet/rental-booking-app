@@ -475,6 +475,10 @@
     gap: 1rem;
   }
 
+  .vehicle-tile {
+    aspect-ratio: auto; /* モバイルでテキストが切れないように */
+  }
+
   .tile-content {
     padding: 1rem;
   }
@@ -694,6 +698,10 @@
     gap: 0.5rem;
   }
 
+  .vehicle-tile {
+    aspect-ratio: auto; /* モバイルでテキストが切れないように */
+  }
+
   .tile-content {
     padding: 0.8rem;
   }
@@ -705,12 +713,12 @@
   .tile-image-large {
     min-height: 100px;
   }
-  
+
   .tile-title-large {
-    font-size: 1.8rem;
-    letter-spacing: 0.08em;
+    font-size: 1.2rem;
+    letter-spacing: 0.05em;
   }
-  
+
   .tile-text-section {
     padding: 0.8rem;
     min-height: 50px;
