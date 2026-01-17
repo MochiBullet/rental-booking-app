@@ -33,6 +33,7 @@ jobs:
         REACT_APP_ADMIN_USERNAME: ${{ secrets.REACT_APP_ADMIN_USERNAME }}
         REACT_APP_ADMIN_PASSWORD: ${{ secrets.REACT_APP_ADMIN_PASSWORD }}
         REACT_APP_ENVIRONMENT: production
+        REACT_APP_GAS_WEBAPP_URL: https://script.google.com/macros/s/AKfycbydish3qa6PrAg9c5Z-iOm-a18hbpnGFKJ1CfkfwPv8BvwjyPVUFxucQkKxDZq_IdP2bg/exec
     
     - name: Check GitHub Secrets
       run: |
