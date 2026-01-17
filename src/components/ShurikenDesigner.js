@@ -92,6 +92,9 @@ const ShurikenDesigner = () => {
   const previewRef = useRef(null);
   const isInitialLoad = useRef(true);
 
+  // 金銀切り替え時の再マウント用カウンター
+  const [metallicRenderKey, setMetallicRenderKey] = useState(0);
+
   // デザインモード（free: 自由デザイン / template: テンプレート）
   const [designMode, setDesignMode] = useState('free');
   // 選択中のテンプレート（複数選択可能）
@@ -327,7 +330,15 @@ const ShurikenDesigner = () => {
 
   // 印刷タイプ変更ハンドラー
   const handlePrintTypeChange = (newType) => {
+    const oldType = printType;
     updateCurrentData({ printType: newType });
+
+    // 金銀間の切り替え時は再マウント用カウンターをインクリメント
+    const wasMetallic = oldType === 'gold' || oldType === 'silver';
+    const isNewMetallic = newType === 'gold' || newType === 'silver';
+    if (wasMetallic && isNewMetallic && oldType !== newType) {
+      setMetallicRenderKey(prev => prev + 1);
+    }
 
     // 表面の印刷タイプを変更した場合、裏面の選択肢が制限される可能性がある
     if (cardSide === 'front') {
@@ -901,7 +912,7 @@ const ShurikenDesigner = () => {
                 >
                   {isMetallic ? (
                     <div
-                      key={`bg-metallic-${printType}-${cardColor}`}
+                      key={`bg-metallic-${printType}-${cardColor}-${metallicRenderKey}`}
                       className="preview-background metallic-masked-image"
                       style={{
                         WebkitMaskImage: `url(${templateImage})`,
@@ -947,7 +958,7 @@ const ShurikenDesigner = () => {
                   >
                     {isMetallic ? (
                       <div
-                        key={`logo1-metallic-${printType}-${cardColor}`}
+                        key={`logo1-metallic-${printType}-${cardColor}-${metallicRenderKey}`}
                         className="metallic-masked-image"
                         style={{
                           WebkitMaskImage: `url(${logoImage})`,
@@ -993,7 +1004,7 @@ const ShurikenDesigner = () => {
                   >
                     {isMetallic ? (
                       <div
-                        key={`logo2-metallic-${printType}-${cardColor}`}
+                        key={`logo2-metallic-${printType}-${cardColor}-${metallicRenderKey}`}
                         className="metallic-masked-image"
                         style={{
                           WebkitMaskImage: `url(${logo2Image})`,
