@@ -235,28 +235,12 @@ const ShurikenDesigner = () => {
     });
   };
 
-  // サンプルテキスト（プレビュー用）
-  const sampleTexts = {
-    name: '山田 太郎',
-    nameKana: 'ヤマダ タロウ',
-    company: '株式会社サンプル',
-    position: '代表取締役',
-    phone: '090-1234-5678',
-    email: 'sample@example.com',
-    address: '〒123-4567 東京都渋谷区...',
-    website: 'https://example.com',
-  };
-
-  // テキスト表示内容を取得（入力がない場合はサンプル表示）
+  // テキスト表示内容を取得（入力がある場合のみ表示）
   const getDisplayText = (field) => {
-    const text = formData[field]?.text || sampleTexts[field];
+    const text = formData[field]?.text;
+    if (!text || text.trim() === '') return null;
     if (field === 'phone') return `TEL: ${text}`;
     return text;
-  };
-
-  // 入力済みかどうか（スタイル用）
-  const hasUserInput = (field) => {
-    return formData[field]?.text && formData[field].text.trim() !== '';
   };
 
   // フィールドラベル
@@ -567,7 +551,7 @@ const ShurikenDesigner = () => {
               {/* テキスト要素 */}
               {Object.entries(formData).map(([field, data]) => {
                 const displayText = getDisplayText(field);
-                const isUserInput = hasUserInput(field);
+                if (!displayText) return null;
 
                 return (
                   <Draggable
@@ -577,12 +561,11 @@ const ShurikenDesigner = () => {
                     bounds="parent"
                   >
                     <div
-                      className={`draggable-element text-element ${!isUserInput ? 'sample-text' : ''}`}
+                      className="draggable-element text-element"
                       style={{
-                        color: isUserInput ? data.color : '#999999',
+                        color: data.color,
                         fontSize: `${data.fontSize}px`,
                         fontFamily: globalFont,
-                        opacity: isUserInput ? 1 : 0.5,
                       }}
                     >
                       {displayText}
