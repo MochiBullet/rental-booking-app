@@ -1322,3 +1322,304 @@
   }
 }
 
+/* キャプチャモーダル */
+.capture-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.capture-modal {
+  background: linear-gradient(135deg, #1a2744 0%, #0f1a2e 100%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  padding: 1.5rem;
+  max-width: 900px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.capture-modal h2 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+  color: #ffd700;
+  text-align: center;
+}
+
+.capture-modal-description {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.85rem;
+  margin-bottom: 1.5rem;
+}
+
+.capture-images-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.capture-section h3 {
+  margin: 0 0 0.75rem 0;
+  font-size: 1rem;
+  color: #fff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 0.5rem;
+}
+
+.capture-image-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.capture-image-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.capture-label {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+}
+
+.capture-image-item img {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: #fff;
+}
+
+.capture-image-single {
+  text-align: center;
+}
+
+.capture-image-single img {
+  max-width: 100%;
+  max-height: 300px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: #fff;
+  object-fit: contain;
+}
+
+/* モーダル内の表面/裏面タブ */
+.modal-side-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.modal-side-tab {
+  padding: 0.5rem 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 0.9rem;
+}
+
+.modal-side-tab:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.modal-side-tab.active {
+  background: linear-gradient(135deg, #f5c542, #d4a437);
+  color: #1a1a1a;
+  border-color: transparent;
+  font-weight: 600;
+}
+
+/* お客様情報入力セクション */
+.customer-info-section {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.customer-info-section h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  color: #f5c542;
+}
+
+.customer-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.customer-input-group label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.customer-input-group label span {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.customer-input-group label .required {
+  color: #ff6b6b;
+}
+
+.customer-input-group input {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 1rem;
+  transition: all 0.3s;
+}
+
+.customer-input-group input:focus {
+  outline: none;
+  border-color: #f5c542;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.customer-input-group input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.customer-input-group input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.capture-modal-price {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+  border-radius: 8px;
+  font-size: 1.1rem;
+}
+
+.capture-modal-price .price-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #f5c542;
+}
+
+.capture-modal-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+  justify-content: center;
+}
+
+.capture-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.capture-btn {
+  padding: 0.75rem 2rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: none;
+}
+
+.capture-btn.primary {
+  background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
+  color: #1a1a1a;
+}
+
+.capture-btn.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
+}
+
+.capture-btn.secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.capture-btn.secondary:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* キャプチャ中のローディング */
+.capture-loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+}
+
+.capture-loading-content {
+  text-align: center;
+  color: #fff;
+}
+
+.capture-loading-logo {
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+.capture-loading-content p {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* モバイル対応 */
+@media (max-width: 600px) {
+  .capture-modal {
+    padding: 1rem;
+  }
+
+  .capture-image-pair {
+    grid-template-columns: 1fr;
+  }
+
+  .capture-modal-actions {
+    flex-direction: column;
+  }
+
+  .capture-btn {
+    width: 100%;
+  }
+}
+

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Draggable from 'react-draggable';
+import html2canvas from 'html2canvas';
 import './ShurikenDesigner.css';
 import shurikenLogo from '../images/shuriken/logo.png';
 
@@ -124,8 +125,27 @@ const ShurikenDesigner = () => {
   // プレビューズーム - UI用
   const [previewZoom, setPreviewZoom] = useState(100);
 
+  // 画像キャプチャ用
+  const [captureMode, setCaptureMode] = useState(null); // null, 'preview', 'print'
+  const [capturedImages, setCapturedImages] = useState(null);
+  const [showCaptureModal, setShowCaptureModal] = useState(false);
+  const [isCapturing, setIsCapturing] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // お客様情報入力用
+  const [customerName, setCustomerName] = useState('');
+  const [customerEmail, setCustomerEmail] = useState('');
+
+  // 確認モーダル用の表示面
+  const [modalPreviewSide, setModalPreviewSide] = useState('front');
+
+  // GAS WebアプリのURL（設定が必要）
+  const GAS_WEBAPP_URL = process.env.REACT_APP_GAS_WEBAPP_URL || '';
+
   const [fontDropdownOpen, setFontDropdownOpen] = useState(false);
   const fontDropdownRef = useRef(null);
+  const frontPreviewRef = useRef(null);
+  const backPreviewRef = useRef(null);
 
   // 現在のデータから展開（便利なエイリアス）
   const templateImage = currentData.templateImage;
@@ -433,6 +453,430 @@ const ShurikenDesigner = () => {
     localStorage.removeItem(STORAGE_KEY);
   };
 
+  // レンダリング完了を待つヘルパー関数
+  const waitForRender = () => {
+    return new Promise(resolve => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setTimeout(resolve, 100);
+        });
+      });
+    });
+  };
+
+  // DOMを実際の画像に変換してからキャプチャする
+  const preRenderMetallicElements = async (container, metallicType) => {
+    const restorationData = [];
+
+    // metallicType が指定されていない場合はスキップ
+    if (!metallicType || (metallicType !== 'gold' && metallicType !== 'silver')) {
+      return restorationData;
+    }
+
+    const isGold = metallicType === 'gold';
+
+    // 金銀マスク画像を処理
+    const metallicImages = container.querySelectorAll('.metallic-masked-image');
+    for (const element of metallicImages) {
+      const computedStyle = window.getComputedStyle(element);
+      const maskImageUrl = computedStyle.maskImage || computedStyle.WebkitMaskImage;
+      if (!maskImageUrl || maskImageUrl === 'none') continue;
+
+      const urlMatch = maskImageUrl.match(/url\(["']?([^"')]+)["']?\)/);
+      if (!urlMatch) continue;
+
+      const imageSrc = urlMatch[1];
+      const rect = element.getBoundingClientRect();
+      const originalHTML = element.innerHTML;
+      const originalStyles = {
+        background: element.style.background,
+        maskImage: element.style.maskImage,
+        WebkitMaskImage: element.style.WebkitMaskImage,
+      };
+
+      // Canvas で描画
+      const dataUrl = await new Promise((resolve) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          canvas.width = img.width || rect.width * 2 || 200;
+          canvas.height = img.height || rect.height * 2 || 200;
+
+          // グラデーション
+          const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+          if (isGold) {
+            gradient.addColorStop(0, '#D4AF37');
+            gradient.addColorStop(0.25, '#FFD700');
+            gradient.addColorStop(0.5, '#FFF8DC');
+            gradient.addColorStop(0.75, '#FFD700');
+            gradient.addColorStop(1, '#B8860B');
+          } else {
+            gradient.addColorStop(0, '#C0C0C0');
+            gradient.addColorStop(0.25, '#E8E8E8');
+            gradient.addColorStop(0.5, '#FFFFFF');
+            gradient.addColorStop(0.75, '#E8E8E8');
+            gradient.addColorStop(1, '#A0A0A0');
+          }
+          ctx.fillStyle = gradient;
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.globalCompositeOperation = 'destination-in';
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          resolve(canvas.toDataURL('image/png'));
+        };
+        img.onerror = () => resolve(null);
+        img.src = imageSrc;
+      });
+
+      if (dataUrl) {
+        const imgEl = document.createElement('img');
+        imgEl.src = dataUrl;
+        imgEl.style.width = '100%';
+        imgEl.style.height = '100%';
+        imgEl.style.objectFit = 'contain';
+        element.innerHTML = '';
+        element.appendChild(imgEl);
+        element.style.background = 'none';
+        element.style.maskImage = 'none';
+        element.style.WebkitMaskImage = 'none';
+
+        restorationData.push({ element, originalHTML, originalStyles, type: 'image' });
+      }
+    }
+
+    // 金銀テキストを処理
+    const metallicTexts = container.querySelectorAll('.metallic-text');
+    for (const element of metallicTexts) {
+      const text = element.textContent;
+      if (!text || text.trim() === '') continue;
+
+      const computedStyle = window.getComputedStyle(element);
+      const fontSize = parseFloat(computedStyle.fontSize) * 2; // 高解像度用
+      const fontFamily = computedStyle.fontFamily;
+      const fontWeight = computedStyle.fontWeight;
+
+      const originalHTML = element.innerHTML;
+      const originalStyles = {
+        background: element.style.background,
+        WebkitBackgroundClip: element.style.WebkitBackgroundClip,
+        WebkitTextFillColor: element.style.WebkitTextFillColor,
+        backgroundClip: element.style.backgroundClip,
+      };
+
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
+      const metrics = ctx.measureText(text);
+      canvas.width = Math.ceil(metrics.width) + 16;
+      canvas.height = Math.ceil(fontSize * 1.4);
+
+      const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+      if (isGold) {
+        gradient.addColorStop(0, '#bf953f');
+        gradient.addColorStop(0.25, '#fcf6ba');
+        gradient.addColorStop(0.5, '#b38728');
+        gradient.addColorStop(0.75, '#fbf5b7');
+        gradient.addColorStop(1, '#aa771c');
+      } else {
+        gradient.addColorStop(0, '#c0c0c0');
+        gradient.addColorStop(0.25, '#ffffff');
+        gradient.addColorStop(0.5, '#a8a8a8');
+        gradient.addColorStop(0.75, '#e8e8e8');
+        gradient.addColorStop(1, '#909090');
+      }
+
+      ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
+      ctx.fillStyle = gradient;
+      ctx.textBaseline = 'top';
+      ctx.fillText(text, 8, 8);
+
+      const imgEl = document.createElement('img');
+      imgEl.src = canvas.toDataURL('image/png');
+      imgEl.style.height = `${parseFloat(computedStyle.fontSize) * 1.15}px`;
+      imgEl.style.display = 'block';
+      imgEl.style.verticalAlign = 'middle';
+
+      element.innerHTML = '';
+      element.appendChild(imgEl);
+      element.style.background = 'none';
+      element.style.WebkitBackgroundClip = 'unset';
+      element.style.WebkitTextFillColor = 'unset';
+      element.style.backgroundClip = 'unset';
+
+      restorationData.push({ element, originalHTML, originalStyles, type: 'text' });
+    }
+
+    return restorationData;
+  };
+
+  // 元の状態に戻す
+  const restoreMetallicElements = (restorationData) => {
+    for (const data of restorationData) {
+      data.element.innerHTML = data.originalHTML;
+      if (data.type === 'image') {
+        data.element.style.background = data.originalStyles.background;
+        data.element.style.maskImage = data.originalStyles.maskImage;
+        data.element.style.WebkitMaskImage = data.originalStyles.WebkitMaskImage;
+      } else {
+        data.element.style.background = data.originalStyles.background;
+        data.element.style.WebkitBackgroundClip = data.originalStyles.WebkitBackgroundClip;
+        data.element.style.WebkitTextFillColor = data.originalStyles.WebkitTextFillColor;
+        data.element.style.backgroundClip = data.originalStyles.backgroundClip;
+      }
+    }
+  };
+
+  // 画像キャプチャ処理
+  const handleCapture = async () => {
+    if (!previewRef.current) return;
+
+    setIsCapturing(true);
+
+    try {
+      const results = {
+        front: { preview: null, print: null },
+        back: { preview: null, print: null },
+      };
+
+      // 現在の面とズームを保存
+      const originalSide = cardSide;
+      const originalZoom = previewZoom;
+
+      // ズームを100%に固定（キャプチャ用）
+      setPreviewZoom(100);
+
+      const html2canvasOptions = {
+        backgroundColor: null,
+        scale: 2,
+        useCORS: true,
+        logging: false,
+      };
+
+      // 表面をキャプチャ
+      setCardSide('front');
+      await waitForRender();
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      const wrapper = previewRef.current.querySelector('.card-preview-wrapper');
+
+      // 表面の印刷タイプを取得して金銀要素を事前に画像化
+      const frontMetallicType = frontData.printType;
+      const restorationData = await preRenderMetallicElements(wrapper, frontMetallicType);
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // 表面プレビュー版キャプチャ（お客様用：金銀効果付き）
+      const frontPreviewCanvas = await html2canvas(wrapper, html2canvasOptions);
+      results.front.preview = frontPreviewCanvas.toDataURL('image/png');
+
+      // 元に戻す
+      restoreMetallicElements(restorationData);
+
+      // 表面印刷版キャプチャ（店舗用：金銀→黒）
+      setCaptureMode('print');
+      await waitForRender();
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      const frontPrintCanvas = await html2canvas(wrapper, html2canvasOptions);
+      results.front.print = frontPrintCanvas.toDataURL('image/png');
+      setCaptureMode(null);
+
+      // 裏面に内容があるかチェック
+      const hasBackContent = backData.templateImage ||
+        backData.logoImage ||
+        backData.logo2Image ||
+        Object.values(backData.formData).some(field => field.text && field.text.trim() !== '');
+
+      if (hasBackContent) {
+        // 裏面をキャプチャ
+        setCardSide('back');
+        await waitForRender();
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // 裏面の印刷タイプを取得して金銀要素を事前に画像化
+        const backMetallicType = backData.printType;
+        const backRestorationData = await preRenderMetallicElements(wrapper, backMetallicType);
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        // 裏面プレビュー版キャプチャ（お客様用）
+        const backPreviewCanvas = await html2canvas(wrapper, html2canvasOptions);
+        results.back.preview = backPreviewCanvas.toDataURL('image/png');
+
+        // 元に戻す
+        restoreMetallicElements(backRestorationData);
+
+        // 裏面印刷版キャプチャ（店舗用）
+        setCaptureMode('print');
+        await waitForRender();
+        await new Promise(resolve => setTimeout(resolve, 300));
+
+        const backPrintCanvas = await html2canvas(wrapper, html2canvasOptions);
+        results.back.print = backPrintCanvas.toDataURL('image/png');
+        setCaptureMode(null);
+      }
+
+      // 元の状態に戻す
+      setCardSide(originalSide);
+      setPreviewZoom(originalZoom);
+
+      setCapturedImages(results);
+      setModalPreviewSide('front');
+      setShowCaptureModal(true);
+    } catch (error) {
+      console.error('キャプチャエラー:', error);
+      alert('画像の生成に失敗しました。');
+    } finally {
+      setIsCapturing(false);
+      setCaptureMode(null);
+    }
+  };
+
+  // GASに送信
+  const handleSubmitToGAS = async () => {
+    if (!capturedImages) return;
+
+    // 入力バリデーション
+    if (!customerName.trim()) {
+      alert('お名前を入力してください。');
+      return;
+    }
+    if (!customerEmail.trim()) {
+      alert('メールアドレスを入力してください。');
+      return;
+    }
+    // 簡易メールバリデーション
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)) {
+      alert('正しいメールアドレスを入力してください。');
+      return;
+    }
+
+    // GAS URLが設定されていない場合
+    if (!GAS_WEBAPP_URL) {
+      alert('送信先が設定されていません。\n管理者にお問い合わせください。');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // 送信データを作成
+      const submitData = {
+        customerInfo: {
+          name: customerName.trim(),
+          email: customerEmail.trim(),
+        },
+        images: {
+          frontPreview: capturedImages.front.preview,
+          frontPrint: capturedImages.front.print,
+          backPreview: capturedImages.back.preview || null,
+          backPrint: capturedImages.back.print || null,
+        },
+        designData: {
+          cardColor: cardColor,
+          printType: frontData.printType,
+          backPrintType: backData.printType,
+          hasBackPrint: !!(capturedImages.back.preview),
+          totalPrice: calculateTotalPrice(),
+          frontFormData: frontData.formData,
+          backFormData: backData.formData,
+          globalFont: globalFont,
+        },
+        timestamp: new Date().toISOString(),
+      };
+
+      // hidden formで送信（CORS回避）
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = GAS_WEBAPP_URL;
+      form.target = 'gas-iframe';
+      form.style.display = 'none';
+      form.enctype = 'application/x-www-form-urlencoded';
+
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'data';
+      input.value = JSON.stringify(submitData);
+      form.appendChild(input);
+
+      // iframe作成
+      let iframe = document.getElementById('gas-iframe');
+      if (!iframe) {
+        iframe = document.createElement('iframe');
+        iframe.id = 'gas-iframe';
+        iframe.name = 'gas-iframe';
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+      }
+
+      document.body.appendChild(form);
+      form.submit();
+      document.body.removeChild(form);
+
+      // 送信完了を待つ
+      await new Promise(resolve => setTimeout(resolve, 2500));
+
+      alert('送信が完了しました！\n担当者より連絡いたします。');
+      setShowCaptureModal(false);
+      setCustomerName('');
+      setCustomerEmail('');
+
+    } catch (error) {
+      console.error('送信エラー:', error);
+      alert('送信に失敗しました。\nしばらく経ってからお試しください。');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // 合計金額を計算
+  const calculateTotalPrice = () => {
+    let price = 0;
+
+    // カード料金
+    if (cardColor === 'black') {
+      price += 500;
+    }
+
+    // 印刷タイプ料金（表面）
+    if (frontData.printType === 'gold' || frontData.printType === 'silver') {
+      price += 10000;
+    } else if (frontData.printType === 'none') {
+      price += 5500; // カラー印刷
+    }
+
+    // 裏面印刷
+    const hasBackContent = backData.templateImage ||
+      backData.logoImage ||
+      backData.logo2Image ||
+      Object.values(backData.formData).some(field => field.text && field.text.trim() !== '');
+
+    if (hasBackContent) {
+      price += 2000;
+      // 裏面が金銀の場合追加料金
+      if (backData.printType === 'gold' || backData.printType === 'silver') {
+        price += 3000;
+      }
+    }
+
+    return price;
+  };
+
+  // 印刷用の色を取得（金銀→黒、黒カード→白カードで黒）
+  const getPrintModeStyles = () => {
+    if (captureMode !== 'print') return {};
+
+    const currentPrintType = currentData.printType;
+    const isCurrentMetallic = currentPrintType === 'gold' || currentPrintType === 'silver';
+
+    return {
+      cardBackground: '#ffffff', // 常に白カード
+      textColor: '#000000', // 常に黒文字
+      imageFilter: isCurrentMetallic ? 'grayscale(100%) brightness(0)' : 'grayscale(100%) brightness(0)',
+    };
+  };
+
+  const printStyles = getPrintModeStyles();
+
   // テキスト表示内容を取得（入力がある場合のみ表示）
   const getDisplayText = (field) => {
     const text = formData[field]?.text;
@@ -469,6 +913,10 @@ const ShurikenDesigner = () => {
 
   // 画像に適用するフィルターを取得
   const getImageFilter = () => {
+    // 印刷モードでは黒に変換
+    if (captureMode === 'print') {
+      return 'grayscale(100%) brightness(0)';
+    }
     // 金銀選択時はマスクで塗りつぶすのでフィルターは使わない
     if (isMetallic) {
       return 'none';
@@ -483,6 +931,10 @@ const ShurikenDesigner = () => {
 
   // 金銀の塗りつぶしグラデーション（光沢感付き）
   const getMetallicFill = () => {
+    // 印刷モードでは黒一色
+    if (captureMode === 'print') {
+      return '#000000';
+    }
     if (printType === 'gold') {
       if (cardColor === 'black') {
         // 黒カード用：より明るい金色
@@ -954,10 +1406,12 @@ const ShurikenDesigner = () => {
           </button>
 
           <div className="submit-section">
-            <button className="action-btn primary" onClick={() => {
-              alert('この機能は準備中です。\nお問い合わせからデザインデータをお送りください。');
-            }}>
-              この内容で依頼する
+            <button
+              className="action-btn primary"
+              onClick={handleCapture}
+              disabled={isCapturing}
+            >
+              {isCapturing ? '画像生成中...' : 'この内容で依頼する'}
             </button>
           </div>
         </div>
@@ -985,7 +1439,7 @@ const ShurikenDesigner = () => {
             className="card-preview-container"
             ref={previewRef}
             style={{
-              background: cardColor === 'white' ? '#1a1a2e' : '#4a4a5a',
+              background: captureMode === 'print' ? '#ffffff' : (cardColor === 'white' ? '#1a1a2e' : '#4a4a5a'),
             }}
           >
             <div
@@ -993,7 +1447,7 @@ const ShurikenDesigner = () => {
               style={{
                 transform: `scale(${previewZoom / 100})`,
                 transformOrigin: 'center center',
-                background: cardColor === 'white' ? '#ffffff' : '#1a1a1a',
+                background: captureMode === 'print' ? '#ffffff' : (cardColor === 'white' ? '#ffffff' : '#1a1a1a'),
               }}
             >
               {/* 背景画像（金銀選択時はマスクで塗りつぶし） */}
@@ -1140,6 +1594,17 @@ const ShurikenDesigner = () => {
                     fontFamily: globalFont,
                   };
 
+                  // 印刷モードでは常に黒文字
+                  if (captureMode === 'print') {
+                    return {
+                      ...baseStyle,
+                      color: '#000000',
+                      background: 'none',
+                      WebkitBackgroundClip: 'unset',
+                      WebkitTextFillColor: '#000000',
+                    };
+                  }
+
                   if (printType === 'gold') {
                     return {
                       ...baseStyle,
@@ -1196,6 +1661,106 @@ const ShurikenDesigner = () => {
         </div>
       </div>
 
+      {/* キャプチャ結果モーダル */}
+      {showCaptureModal && capturedImages && (
+        <div className="capture-modal-overlay" onClick={() => !isSubmitting && setShowCaptureModal(false)}>
+          <div className="capture-modal" onClick={(e) => e.stopPropagation()}>
+            <h2>デザイン確認・送信</h2>
+            <p className="capture-modal-description">
+              デザイン内容をご確認ください
+            </p>
+
+            {/* 表面/裏面 切り替えタブ */}
+            {capturedImages.back.preview && (
+              <div className="modal-side-tabs">
+                <button
+                  className={`modal-side-tab ${modalPreviewSide === 'front' ? 'active' : ''}`}
+                  onClick={() => setModalPreviewSide('front')}
+                >
+                  表面
+                </button>
+                <button
+                  className={`modal-side-tab ${modalPreviewSide === 'back' ? 'active' : ''}`}
+                  onClick={() => setModalPreviewSide('back')}
+                >
+                  裏面
+                </button>
+              </div>
+            )}
+
+            <div className="capture-images-grid">
+              <div className="capture-section">
+                {!capturedImages.back.preview && <h3>表面</h3>}
+                <div className="capture-image-single">
+                  <img
+                    src={modalPreviewSide === 'front' ? capturedImages.front.preview : capturedImages.back.preview}
+                    alt={modalPreviewSide === 'front' ? '表面' : '裏面'}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="capture-modal-price">
+              <span>合計金額:</span>
+              <span className="price-value">¥{calculateTotalPrice().toLocaleString()}</span>
+            </div>
+
+            {/* お客様情報入力 */}
+            <div className="customer-info-section">
+              <h3>お客様情報</h3>
+              <div className="customer-input-group">
+                <label>
+                  <span>お名前 <span className="required">*</span></span>
+                  <input
+                    type="text"
+                    value={customerName}
+                    onChange={(e) => setCustomerName(e.target.value)}
+                    placeholder="山田 太郎"
+                    disabled={isSubmitting}
+                  />
+                </label>
+                <label>
+                  <span>メールアドレス <span className="required">*</span></span>
+                  <input
+                    type="email"
+                    value={customerEmail}
+                    onChange={(e) => setCustomerEmail(e.target.value)}
+                    placeholder="example@email.com"
+                    disabled={isSubmitting}
+                  />
+                </label>
+              </div>
+            </div>
+
+            <div className="capture-modal-actions">
+              <button
+                className="capture-btn primary"
+                onClick={handleSubmitToGAS}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? '送信中...' : 'この内容で注文する'}
+              </button>
+              <button
+                className="capture-btn secondary"
+                onClick={() => setShowCaptureModal(false)}
+                disabled={isSubmitting}
+              >
+                戻って編集する
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* キャプチャ中のオーバーレイ */}
+      {isCapturing && (
+        <div className="capture-loading-overlay">
+          <div className="capture-loading-content">
+            <img src={shurikenLogo} alt="" className="capture-loading-logo" />
+            <p>画像を生成しています...</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
