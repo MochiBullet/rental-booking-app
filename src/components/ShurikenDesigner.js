@@ -169,6 +169,13 @@ const ShurikenDesigner = () => {
 
   // フォーム入力
   const handleInputChange = (field, key, value) => {
+    // 住所は最大2行まで
+    if (field === 'address' && key === 'text') {
+      const lines = value.split('\n');
+      if (lines.length > 2) {
+        value = lines.slice(0, 2).join('\n');
+      }
+    }
     setFormData(prev => ({
       ...prev,
       [field]: { ...prev[field], [key]: value }
@@ -710,7 +717,10 @@ const ShurikenDesigner = () => {
                   >
                     <div
                       className={`draggable-element text-element ${printType !== 'none' ? 'metallic-text' : ''}`}
-                      style={getTextStyle()}
+                      style={{
+                        ...getTextStyle(),
+                        whiteSpace: field === 'address' ? 'pre-line' : 'nowrap',
+                      }}
                     >
                       {displayText}
                     </div>
