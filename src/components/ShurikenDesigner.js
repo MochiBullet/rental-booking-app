@@ -150,6 +150,7 @@ const ShurikenDesigner = () => {
   const [showCaptureModal, setShowCaptureModal] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showOrderConfirm, setShowOrderConfirm] = useState(false);
 
   // お客様情報入力用
   const [customerName, setCustomerName] = useState('');
@@ -1393,6 +1394,32 @@ const ShurikenDesigner = () => {
                       title="フォントサイズ"
                       className="font-size-input"
                     />
+                    <div className="font-size-buttons">
+                      <button
+                        type="button"
+                        className="font-size-btn"
+                        onClick={() => handleInputChange(field, 'fontSize', Math.max(6, data.fontSize - 5))}
+                        title="-5"
+                      >-5</button>
+                      <button
+                        type="button"
+                        className="font-size-btn"
+                        onClick={() => handleInputChange(field, 'fontSize', Math.max(6, data.fontSize - 1))}
+                        title="-1"
+                      >-1</button>
+                      <button
+                        type="button"
+                        className="font-size-btn"
+                        onClick={() => handleInputChange(field, 'fontSize', Math.min(36, data.fontSize + 1))}
+                        title="+1"
+                      >+1</button>
+                      <button
+                        type="button"
+                        className="font-size-btn"
+                        onClick={() => handleInputChange(field, 'fontSize', Math.min(36, data.fontSize + 5))}
+                        title="+5"
+                      >+5</button>
+                    </div>
                   </div>
                 </div>
                 {field === 'address' ? (
@@ -1462,7 +1489,7 @@ const ShurikenDesigner = () => {
                 return null;
               })()}
               <div className="price-total">
-                <span className="price-label">合計</span>
+                <span className="price-label">合計<span className="price-tax-small">（税込）</span></span>
                 <span className="price-amount">
                   ¥{(() => {
                     let total = 0;
@@ -1483,6 +1510,7 @@ const ShurikenDesigner = () => {
                   })()}
                 </span>
               </div>
+              <div className="price-shipping-info">送料無料</div>
             </div>
           </div>
 
@@ -1754,6 +1782,11 @@ const ShurikenDesigner = () => {
             <p className="capture-modal-description">
               デザイン内容をご確認ください
             </p>
+            <ul className="capture-modal-notes">
+              <li>実際の印刷と色味や見え方が異なる場合がございます。</li>
+              <li>提出後担当者からの折り返しのメールが来てから最終的なご注文の確定となります。</li>
+              <li>この画面でのプレビューを画像として保存していただけます。</li>
+            </ul>
 
             {/* 表面/裏面 切り替えタブ */}
             {capturedImages.back.preview && (
@@ -1787,7 +1820,8 @@ const ShurikenDesigner = () => {
 
             <div className="capture-modal-price">
               <span>合計金額:</span>
-              <span className="price-value">¥{calculateTotalPrice().toLocaleString()}</span>
+              <span className="price-value">¥{calculateTotalPrice().toLocaleString()}<span className="price-tax">（税込）</span></span>
+              <span className="price-shipping">送料無料</span>
             </div>
 
             {/* お客様情報入力 */}
@@ -1820,7 +1854,7 @@ const ShurikenDesigner = () => {
             <div className="capture-modal-actions">
               <button
                 className="capture-btn primary"
-                onClick={handleSubmitToGAS}
+                onClick={() => setShowOrderConfirm(true)}
                 disabled={isSubmitting}
               >
                 {isSubmitting ? '送信中...' : 'この内容で注文する'}
@@ -1831,6 +1865,34 @@ const ShurikenDesigner = () => {
                 disabled={isSubmitting}
               >
                 戻って編集する
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 注文確認ポップアップ */}
+      {showOrderConfirm && (
+        <div className="order-confirm-overlay" onClick={() => !isSubmitting && setShowOrderConfirm(false)}>
+          <div className="order-confirm-modal" onClick={(e) => e.stopPropagation()}>
+            <p className="order-confirm-message">提出します。よろしいですか？</p>
+            <div className="order-confirm-buttons">
+              <button
+                className="order-confirm-btn yes"
+                onClick={() => {
+                  setShowOrderConfirm(false);
+                  handleSubmitToGAS();
+                }}
+                disabled={isSubmitting}
+              >
+                はい
+              </button>
+              <button
+                className="order-confirm-btn no"
+                onClick={() => setShowOrderConfirm(false)}
+                disabled={isSubmitting}
+              >
+                いいえ
               </button>
             </div>
           </div>
