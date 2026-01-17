@@ -439,7 +439,23 @@ const ShurikenDesigner = () => {
       return 'linear-gradient(135deg, #D4AF37 0%, #FFD700 25%, #FFF8DC 45%, #FFD700 55%, #B8860B 75%, #D4AF37 100%)';
     }
     if (printType === 'silver') {
-      return 'linear-gradient(135deg, #A8A8A8 0%, #D8D8D8 25%, #FFFFFF 45%, #E8E8E8 55%, #B0B0B0 75%, #A8A8A8 100%)';
+      // 大げさな光沢グラデーション（複数の光の反射を表現）
+      return `linear-gradient(135deg,
+        #6B6B6B 0%,
+        #9A9A9A 8%,
+        #FFFFFF 15%,
+        #C0C0C0 22%,
+        #8A8A8A 30%,
+        #E8E8E8 38%,
+        #FFFFFF 45%,
+        #F5F5F5 50%,
+        #FFFFFF 55%,
+        #D0D0D0 62%,
+        #909090 70%,
+        #FFFFFF 78%,
+        #B8B8B8 85%,
+        #7A7A7A 92%,
+        #6B6B6B 100%)`;
     }
     return 'none';
   };

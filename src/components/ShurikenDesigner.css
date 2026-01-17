@@ -791,16 +791,25 @@
 
 /* 金銀マスク画像（透過部分は透明、それ以外は金銀で塗りつぶし） */
 .metallic-masked-image {
-  animation: metallic-shimmer 4s ease-in-out infinite;
-  background-size: 200% 200%;
+  animation: metallic-shimmer 3s ease-in-out infinite;
+  background-size: 300% 300%;
 }
 
 @keyframes metallic-shimmer {
-  0%, 100% {
+  0% {
     background-position: 0% 0%;
+  }
+  25% {
+    background-position: 100% 0%;
   }
   50% {
     background-position: 100% 100%;
+  }
+  75% {
+    background-position: 0% 100%;
+  }
+  100% {
+    background-position: 0% 0%;
   }
 }
 
