@@ -9,45 +9,140 @@ const useBGM = () => {
   const audioContextRef = useRef(null);
   const gainNodeRef = useRef(null);
   const isPlayingRef = useRef(false);
+  const chantIntervalRef = useRef(null);
   const [isMuted, setIsMuted] = useState(() => {
     const saved = localStorage.getItem('shuriken-bgm-muted');
     return saved === 'true';
   });
 
+  // 4つの異なるメロディ
+  const melodies = [
+    // メロディ1: オリジナル（楽しいポップ）
+    [
+      { note: 523.25, duration: 0.15 }, { note: 587.33, duration: 0.15 },
+      { note: 659.25, duration: 0.15 }, { note: 523.25, duration: 0.15 },
+      { note: 659.25, duration: 0.2 }, { note: 659.25, duration: 0.2 },
+      { note: 587.33, duration: 0.4 }, { note: 523.25, duration: 0.15 },
+      { note: 587.33, duration: 0.15 }, { note: 659.25, duration: 0.15 },
+      { note: 523.25, duration: 0.15 }, { note: 587.33, duration: 0.4 },
+      { note: 523.25, duration: 0.4 }, { note: 0, duration: 0.3 },
+      { note: 659.25, duration: 0.15 }, { note: 698.46, duration: 0.15 },
+      { note: 783.99, duration: 0.15 }, { note: 659.25, duration: 0.15 },
+      { note: 783.99, duration: 0.2 }, { note: 783.99, duration: 0.2 },
+      { note: 698.46, duration: 0.4 }, { note: 659.25, duration: 0.15 },
+      { note: 587.33, duration: 0.15 }, { note: 523.25, duration: 0.3 },
+      { note: 587.33, duration: 0.15 }, { note: 659.25, duration: 0.3 },
+      { note: 523.25, duration: 0.5 }, { note: 0, duration: 0.5 },
+    ],
+    // メロディ2: 忍者風（和風スケール）
+    [
+      { note: 440, duration: 0.2 }, { note: 493.88, duration: 0.2 },
+      { note: 523.25, duration: 0.3 }, { note: 659.25, duration: 0.2 },
+      { note: 698.46, duration: 0.4 }, { note: 659.25, duration: 0.2 },
+      { note: 523.25, duration: 0.3 }, { note: 0, duration: 0.2 },
+      { note: 440, duration: 0.15 }, { note: 440, duration: 0.15 },
+      { note: 523.25, duration: 0.3 }, { note: 493.88, duration: 0.2 },
+      { note: 440, duration: 0.5 }, { note: 0, duration: 0.3 },
+      { note: 659.25, duration: 0.15 }, { note: 698.46, duration: 0.15 },
+      { note: 783.99, duration: 0.3 }, { note: 698.46, duration: 0.2 },
+      { note: 659.25, duration: 0.4 }, { note: 523.25, duration: 0.3 },
+      { note: 440, duration: 0.5 }, { note: 0, duration: 0.5 },
+    ],
+    // メロディ3: アップビート（祭り風）
+    [
+      { note: 587.33, duration: 0.1 }, { note: 587.33, duration: 0.1 },
+      { note: 783.99, duration: 0.2 }, { note: 698.46, duration: 0.1 },
+      { note: 659.25, duration: 0.1 }, { note: 587.33, duration: 0.2 },
+      { note: 0, duration: 0.1 }, { note: 523.25, duration: 0.1 },
+      { note: 587.33, duration: 0.1 }, { note: 659.25, duration: 0.3 },
+      { note: 587.33, duration: 0.2 }, { note: 523.25, duration: 0.2 },
+      { note: 0, duration: 0.2 }, { note: 783.99, duration: 0.15 },
+      { note: 880, duration: 0.15 }, { note: 783.99, duration: 0.15 },
+      { note: 698.46, duration: 0.15 }, { note: 659.25, duration: 0.3 },
+      { note: 587.33, duration: 0.2 }, { note: 523.25, duration: 0.2 },
+      { note: 587.33, duration: 0.4 }, { note: 0, duration: 0.4 },
+    ],
+    // メロディ4: ファンファーレ風
+    [
+      { note: 523.25, duration: 0.15 }, { note: 659.25, duration: 0.15 },
+      { note: 783.99, duration: 0.3 }, { note: 1046.5, duration: 0.4 },
+      { note: 0, duration: 0.2 }, { note: 783.99, duration: 0.15 },
+      { note: 659.25, duration: 0.15 }, { note: 783.99, duration: 0.3 },
+      { note: 523.25, duration: 0.4 }, { note: 0, duration: 0.2 },
+      { note: 587.33, duration: 0.15 }, { note: 698.46, duration: 0.15 },
+      { note: 880, duration: 0.3 }, { note: 783.99, duration: 0.2 },
+      { note: 698.46, duration: 0.2 }, { note: 659.25, duration: 0.3 },
+      { note: 523.25, duration: 0.5 }, { note: 0, duration: 0.5 },
+    ],
+  ];
+
+  // 「しゅりけん！しゅりけん！」コールを生成
+  const playShirikenChant = useCallback(() => {
+    if (!audioContextRef.current || isMuted) return;
+
+    const ctx = audioContextRef.current;
+    const masterGain = ctx.createGain();
+    masterGain.gain.value = 0.4;
+    masterGain.connect(ctx.destination);
+
+    const currentTime = ctx.currentTime;
+
+    // 群衆の声をシミュレート（複数のオシレーターを重ねる）
+    const createVoice = (startTime, baseFreq, duration) => {
+      // 複数の声を重ねて群衆感を出す
+      for (let i = 0; i < 8; i++) {
+        const osc = ctx.createOscillator();
+        const oscGain = ctx.createGain();
+        const filter = ctx.createBiquadFilter();
+
+        // 各声に少しランダム性を持たせる
+        const freqVariation = baseFreq * (0.95 + Math.random() * 0.1);
+        const timeVariation = startTime + (Math.random() * 0.03);
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(freqVariation, timeVariation);
+        osc.frequency.setValueAtTime(freqVariation * 0.8, timeVariation + duration * 0.7);
+
+        filter.type = 'bandpass';
+        filter.frequency.value = 1000 + Math.random() * 500;
+        filter.Q.value = 2;
+
+        oscGain.gain.setValueAtTime(0, timeVariation);
+        oscGain.gain.linearRampToValueAtTime(0.08, timeVariation + 0.05);
+        oscGain.gain.setValueAtTime(0.08, timeVariation + duration * 0.6);
+        oscGain.gain.linearRampToValueAtTime(0, timeVariation + duration);
+
+        osc.connect(filter);
+        filter.connect(oscGain);
+        oscGain.connect(masterGain);
+
+        osc.start(timeVariation);
+        osc.stop(timeVariation + duration);
+      }
+    };
+
+    // 「しゅ」- 高い音
+    createVoice(currentTime, 400, 0.2);
+    // 「り」- 少し低い
+    createVoice(currentTime + 0.2, 350, 0.15);
+    // 「けん」- 下がる
+    createVoice(currentTime + 0.35, 300, 0.25);
+
+    // 少し間を空けて繰り返し
+    // 「しゅ」
+    createVoice(currentTime + 0.8, 420, 0.2);
+    // 「り」
+    createVoice(currentTime + 1.0, 370, 0.15);
+    // 「けん！」- 強調
+    createVoice(currentTime + 1.15, 320, 0.35);
+
+  }, [isMuted]);
+
   const playMelody = useCallback(async () => {
     if (!audioContextRef.current || isMuted) return;
 
-    // 楽しいメロディのノート（周波数）
-    const melody = [
-      { note: 523.25, duration: 0.15 }, // C5
-      { note: 587.33, duration: 0.15 }, // D5
-      { note: 659.25, duration: 0.15 }, // E5
-      { note: 523.25, duration: 0.15 }, // C5
-      { note: 659.25, duration: 0.2 },  // E5
-      { note: 659.25, duration: 0.2 },  // E5
-      { note: 587.33, duration: 0.4 },  // D5
-      { note: 523.25, duration: 0.15 }, // C5
-      { note: 587.33, duration: 0.15 }, // D5
-      { note: 659.25, duration: 0.15 }, // E5
-      { note: 523.25, duration: 0.15 }, // C5
-      { note: 587.33, duration: 0.4 },  // D5
-      { note: 523.25, duration: 0.4 },  // C5
-      { note: 0, duration: 0.3 },       // rest
-      { note: 659.25, duration: 0.15 }, // E5
-      { note: 698.46, duration: 0.15 }, // F5
-      { note: 783.99, duration: 0.15 }, // G5
-      { note: 659.25, duration: 0.15 }, // E5
-      { note: 783.99, duration: 0.2 },  // G5
-      { note: 783.99, duration: 0.2 },  // G5
-      { note: 698.46, duration: 0.4 },  // F5
-      { note: 659.25, duration: 0.15 }, // E5
-      { note: 587.33, duration: 0.15 }, // D5
-      { note: 523.25, duration: 0.3 },  // C5
-      { note: 587.33, duration: 0.15 }, // D5
-      { note: 659.25, duration: 0.3 },  // E5
-      { note: 523.25, duration: 0.5 },  // C5
-      { note: 0, duration: 0.5 },       // rest
-    ];
+    // ランダムにメロディを選択
+    const melody = melodies[Math.floor(Math.random() * melodies.length)];
 
     const ctx = audioContextRef.current;
     const gain = gainNodeRef.current;
@@ -102,10 +197,25 @@ const useBGM = () => {
       gainNodeRef.current.connect(audioContextRef.current.destination);
       isPlayingRef.current = true;
       playMelody();
+
+      // 30秒ごとに「しゅりけん！」コール
+      chantIntervalRef.current = setInterval(() => {
+        if (isPlayingRef.current && !isMuted) {
+          playShirikenChant();
+        }
+      }, 30000);
+
+      // 最初のコールを5秒後に
+      setTimeout(() => {
+        if (isPlayingRef.current && !isMuted) {
+          playShirikenChant();
+        }
+      }, 5000);
+
     } catch (e) {
       console.error('BGM start failed:', e);
     }
-  }, [isMuted, playMelody]);
+  }, [isMuted, playMelody, playShirikenChant]);
 
   const toggleMute = useCallback(() => {
     const newMuted = !isMuted;
@@ -120,6 +230,15 @@ const useBGM = () => {
       startBGM();
     }
   }, [isMuted, startBGM]);
+
+  useEffect(() => {
+    // クリーンアップ
+    return () => {
+      if (chantIntervalRef.current) {
+        clearInterval(chantIntervalRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     // ユーザーインタラクション後にBGM開始
