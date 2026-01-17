@@ -1,6 +1,5 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import Cropper from 'react-easy-crop';
 import Draggable from 'react-draggable';
 import './ShurikenDesigner.css';
 import shurikenLogo from '../images/shuriken/logo.png';
@@ -61,14 +60,18 @@ const ShurikenDesigner = () => {
   const [templateImage, setTemplateImage] = useState(null);
   const [templateScale, setTemplateScale] = useState(100); // 背景画像サイズ %
 
-  // ロゴ/写真用の状態
+  // ロゴ/アイコン1
   const [logoImage, setLogoImage] = useState(null);
-  const [logoCrop, setLogoCrop] = useState({ x: 0, y: 0 });
-  const [logoZoom, setLogoZoom] = useState(1);
-  const [showLogoCropper, setShowLogoCropper] = useState(false);
-  const [croppedLogoImage, setCroppedLogoImage] = useState(null);
   const [logoScale, setLogoScale] = useState(60); // ロゴサイズ px
   const [logoPosition, setLogoPosition] = useState({ x: 10, y: 10 });
+
+  // ロゴ/アイコン2
+  const [logo2Image, setLogo2Image] = useState(null);
+  const [logo2Scale, setLogo2Scale] = useState(60);
+  const [logo2Position, setLogo2Position] = useState({ x: 280, y: 10 });
+
+  // プレビューズーム
+  const [previewZoom, setPreviewZoom] = useState(100);
 
   // グローバルフォント設定
   const [globalFont, setGlobalFont] = useState(GOOGLE_FONTS[0].value);
@@ -134,30 +137,28 @@ const ShurikenDesigner = () => {
     }
   };
 
-  // ロゴ/写真アップロード
+  // ロゴ/アイコン1アップロード（クロップなし・元画像保持）
   const handleLogoUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = (event) => {
         setLogoImage(event.target.result);
-        setShowLogoCropper(true);
       };
       reader.readAsDataURL(file);
     }
   };
 
-  // クロップ完了時
-  const onCropComplete = useCallback(async (croppedArea, croppedAreaPixels) => {
-    // クロップ領域を保存
-  }, []);
-
-  // クロップ確定
-  const confirmCrop = async () => {
-    if (logoImage) {
-      setCroppedLogoImage(logoImage);
+  // ロゴ/アイコン2アップロード
+  const handleLogo2Upload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setLogo2Image(event.target.result);
+      };
+      reader.readAsDataURL(file);
     }
-    setShowLogoCropper(false);
   };
 
   // フォーム入力
@@ -182,14 +183,22 @@ const ShurikenDesigner = () => {
     }));
   };
 
-  // ロゴ位置更新
+  // ロゴ1位置更新
   const handleLogoDrag = (e, data) => {
     const maxX = 364 - logoScale;
     const maxY = 220 - logoScale;
     const newX = Math.max(0, Math.min(data.x, maxX));
     const newY = Math.max(0, Math.min(data.y, maxY));
-
     setLogoPosition({ x: newX, y: newY });
+  };
+
+  // ロゴ2位置更新
+  const handleLogo2Drag = (e, data) => {
+    const maxX = 364 - logo2Scale;
+    const maxY = 220 - logo2Scale;
+    const newX = Math.max(0, Math.min(data.x, maxX));
+    const newY = Math.max(0, Math.min(data.y, maxY));
+    setLogo2Position({ x: newX, y: newY });
   };
 
   // リセット
@@ -197,9 +206,12 @@ const ShurikenDesigner = () => {
     setTemplateImage(null);
     setTemplateScale(100);
     setLogoImage(null);
-    setCroppedLogoImage(null);
     setLogoScale(60);
     setLogoPosition({ x: 10, y: 10 });
+    setLogo2Image(null);
+    setLogo2Scale(60);
+    setLogo2Position({ x: 280, y: 10 });
+    setPreviewZoom(100);
     setTextPositions({
       company: { x: 10, y: 70 },
       position: { x: 10, y: 90 },
@@ -352,14 +364,14 @@ const ShurikenDesigner = () => {
             )}
           </div>
 
-          {/* ロゴ画像アップロード */}
+          {/* アイコン1アップロード */}
           <div className="form-section">
-            <h4>ロゴ・写真</h4>
+            <h4>アイコン1</h4>
             <div className="upload-compact">
-              {croppedLogoImage || logoImage ? (
+              {logoImage ? (
                 <div className="upload-thumb">
-                  <img src={croppedLogoImage || logoImage} alt="ロゴ" />
-                  <button onClick={() => { setLogoImage(null); setCroppedLogoImage(null); }}>✕</button>
+                  <img src={logoImage} alt="アイコン1" />
+                  <button onClick={() => setLogoImage(null)}>✕</button>
                 </div>
               ) : (
                 <label className="upload-btn">
@@ -368,7 +380,7 @@ const ShurikenDesigner = () => {
                 </label>
               )}
             </div>
-            {(croppedLogoImage || logoImage) && (
+            {logoImage && (
               <div className="size-slider">
                 <label>サイズ: {logoScale}px</label>
                 <input
@@ -377,6 +389,36 @@ const ShurikenDesigner = () => {
                   max="150"
                   value={logoScale}
                   onChange={(e) => setLogoScale(Number(e.target.value))}
+                />
+              </div>
+            )}
+          </div>
+
+          {/* アイコン2アップロード */}
+          <div className="form-section">
+            <h4>アイコン2</h4>
+            <div className="upload-compact">
+              {logo2Image ? (
+                <div className="upload-thumb">
+                  <img src={logo2Image} alt="アイコン2" />
+                  <button onClick={() => setLogo2Image(null)}>✕</button>
+                </div>
+              ) : (
+                <label className="upload-btn">
+                  <input type="file" accept="image/*" onChange={handleLogo2Upload} hidden />
+                  🖼️ アップロード
+                </label>
+              )}
+            </div>
+            {logo2Image && (
+              <div className="size-slider">
+                <label>サイズ: {logo2Scale}px</label>
+                <input
+                  type="range"
+                  min="20"
+                  max="150"
+                  value={logo2Scale}
+                  onChange={(e) => setLogo2Scale(Number(e.target.value))}
                 />
               </div>
             )}
@@ -434,8 +476,27 @@ const ShurikenDesigner = () => {
         {/* 右側: プレビュー */}
         <div className="designer-preview-panel">
           <h3>プレビュー <span className="drag-hint">（ドラッグで配置変更）</span></h3>
+
+          {/* プレビューズームスライダー */}
+          <div className="preview-zoom-control">
+            <label>ズーム: {previewZoom}%</label>
+            <input
+              type="range"
+              min="50"
+              max="200"
+              value={previewZoom}
+              onChange={(e) => setPreviewZoom(Number(e.target.value))}
+            />
+          </div>
+
           <div className="card-preview-container" ref={previewRef}>
-            <div className="card-preview-wrapper">
+            <div
+              className="card-preview-wrapper"
+              style={{
+                transform: `scale(${previewZoom / 100})`,
+                transformOrigin: 'center center',
+              }}
+            >
               {/* 背景画像 */}
               {templateImage && (
                 <img
@@ -449,8 +510,8 @@ const ShurikenDesigner = () => {
                 />
               )}
 
-              {/* ロゴ */}
-              {(croppedLogoImage || logoImage) && (
+              {/* アイコン1 */}
+              {logoImage && (
                 <Draggable
                   position={logoPosition}
                   onStop={handleLogoDrag}
@@ -460,10 +521,29 @@ const ShurikenDesigner = () => {
                     className="draggable-element logo-element"
                     style={{
                       width: `${logoScale}px`,
-                      height: `${logoScale}px`,
+                      height: 'auto',
                     }}
                   >
-                    <img src={croppedLogoImage || logoImage} alt="ロゴ" />
+                    <img src={logoImage} alt="アイコン1" />
+                  </div>
+                </Draggable>
+              )}
+
+              {/* アイコン2 */}
+              {logo2Image && (
+                <Draggable
+                  position={logo2Position}
+                  onStop={handleLogo2Drag}
+                  bounds="parent"
+                >
+                  <div
+                    className="draggable-element logo-element"
+                    style={{
+                      width: `${logo2Scale}px`,
+                      height: 'auto',
+                    }}
+                  >
+                    <img src={logo2Image} alt="アイコン2" />
                   </div>
                 </Draggable>
               )}
@@ -499,47 +579,6 @@ const ShurikenDesigner = () => {
         </div>
       </div>
 
-      {/* ロゴクロッパーモーダル */}
-      {showLogoCropper && logoImage && (
-        <div className="cropper-modal">
-          <div className="cropper-container">
-            <h3>画像の位置を調整</h3>
-            <div className="cropper-area">
-              <Cropper
-                image={logoImage}
-                crop={logoCrop}
-                zoom={logoZoom}
-                aspect={1}
-                onCropChange={setLogoCrop}
-                onZoomChange={setLogoZoom}
-                onCropComplete={onCropComplete}
-              />
-            </div>
-            <div className="cropper-controls">
-              <label>ズーム</label>
-              <input
-                type="range"
-                min={1}
-                max={3}
-                step={0.1}
-                value={logoZoom}
-                onChange={(e) => setLogoZoom(Number(e.target.value))}
-              />
-            </div>
-            <div className="cropper-actions">
-              <button className="confirm-btn" onClick={confirmCrop}>
-                確定
-              </button>
-              <button className="cancel-btn" onClick={() => {
-                setShowLogoCropper(false);
-                setLogoImage(null);
-              }}>
-                キャンセル
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
