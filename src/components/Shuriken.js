@@ -151,7 +151,7 @@ const Shuriken = () => {
       </div>
 
       {/* フローティングデザインボタン */}
-      <Link to="/shuriken/designer" className="shuriken-floating-design-btn">
+      <Link to="/shuriken/design" className="shuriken-floating-design-btn">
         <img src={shurikenLogo} alt="" className="floating-logo" />
         <span className="floating-text">デザインしてみよう</span>
       </Link>
