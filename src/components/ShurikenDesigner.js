@@ -290,24 +290,36 @@ const ShurikenDesigner = () => {
       ? { main: '#000000', sub: '#333333', detail: '#222222' }
       : { main: '#ffffff', sub: '#cccccc', detail: '#dddddd' };
 
-    // 黒カードの場合はwhite、白カードの場合はnone
-    const defaultPrintType = newColor === 'white' ? 'none' : 'white';
-
-    const updateSideData = (prevData) => ({
-      ...prevData,
-      printType: defaultPrintType,
-      formData: {
-        ...prevData.formData,
-        name: { ...prevData.formData.name, color: defaultColors.main },
-        nameKana: { ...prevData.formData.nameKana, color: defaultColors.sub },
-        company: { ...prevData.formData.company, color: defaultColors.main },
-        position: { ...prevData.formData.position, color: defaultColors.sub },
-        phone: { ...prevData.formData.phone, color: defaultColors.detail },
-        email: { ...prevData.formData.email, color: defaultColors.detail },
-        address: { ...prevData.formData.address, color: defaultColors.detail },
-        website: { ...prevData.formData.website, color: defaultColors.detail },
+    const updateSideData = (prevData) => {
+      // 金銀は保持、カラー印刷(none)で黒カードに変更した場合は白印刷に変更
+      let newPrintType = prevData.printType;
+      if (prevData.printType === 'gold' || prevData.printType === 'silver') {
+        // 金銀は保持
+        newPrintType = prevData.printType;
+      } else if (newColor === 'black' && prevData.printType === 'none') {
+        // 黒カードでカラー印刷は不可なので白印刷に変更
+        newPrintType = 'white';
+      } else if (newColor === 'white' && prevData.printType === 'white') {
+        // 白カードで白印刷ならカラーに戻す
+        newPrintType = 'none';
       }
-    });
+
+      return {
+        ...prevData,
+        printType: newPrintType,
+        formData: {
+          ...prevData.formData,
+          name: { ...prevData.formData.name, color: defaultColors.main },
+          nameKana: { ...prevData.formData.nameKana, color: defaultColors.sub },
+          company: { ...prevData.formData.company, color: defaultColors.main },
+          position: { ...prevData.formData.position, color: defaultColors.sub },
+          phone: { ...prevData.formData.phone, color: defaultColors.detail },
+          email: { ...prevData.formData.email, color: defaultColors.detail },
+          address: { ...prevData.formData.address, color: defaultColors.detail },
+          website: { ...prevData.formData.website, color: defaultColors.detail },
+        }
+      };
+    };
 
     setFrontData(updateSideData);
     setBackData(updateSideData);
@@ -436,10 +448,33 @@ const ShurikenDesigner = () => {
   // 金銀の塗りつぶしグラデーション（光沢感付き）
   const getMetallicFill = () => {
     if (printType === 'gold') {
+      if (cardColor === 'black') {
+        // 黒カード用：より明るい金色
+        return 'linear-gradient(135deg, #FFD700 0%, #FFEC8B 20%, #FFFACD 40%, #FFFFFF 50%, #FFFACD 60%, #FFD700 80%, #DAA520 100%)';
+      }
       return 'linear-gradient(135deg, #D4AF37 0%, #FFD700 25%, #FFF8DC 45%, #FFD700 55%, #B8860B 75%, #D4AF37 100%)';
     }
     if (printType === 'silver') {
-      // 大げさな光沢グラデーション（複数の光の反射を表現）
+      if (cardColor === 'black') {
+        // 黒カード用：より明るく輝くシルバー（白に近い）
+        return `linear-gradient(135deg,
+          #C0C0C0 0%,
+          #E8E8E8 5%,
+          #FFFFFF 12%,
+          #F0F0F0 18%,
+          #FFFFFF 25%,
+          #E0E0E0 32%,
+          #FFFFFF 40%,
+          #FFFFFF 50%,
+          #FFFFFF 60%,
+          #E8E8E8 68%,
+          #FFFFFF 75%,
+          #F5F5F5 82%,
+          #FFFFFF 88%,
+          #E0E0E0 94%,
+          #C0C0C0 100%)`;
+      }
+      // 白カード用：コントラストのある光沢
       return `linear-gradient(135deg,
         #6B6B6B 0%,
         #9A9A9A 8%,
@@ -872,9 +907,13 @@ const ShurikenDesigner = () => {
             >
               {/* 背景画像（金銀選択時はマスクで塗りつぶし） */}
               {templateImage && (
-                <div className="preview-background-wrapper" style={{
-                  transform: `translate(-50%, -50%) scale(${templateScale / 100})`,
-                }}>
+                <div
+                  key={`bg-${printType}-${cardColor}`}
+                  className="preview-background-wrapper"
+                  style={{
+                    transform: `translate(-50%, -50%) scale(${templateScale / 100})`,
+                  }}
+                >
                   {isMetallic ? (
                     <div
                       className="preview-background metallic-masked-image"
@@ -900,6 +939,7 @@ const ShurikenDesigner = () => {
               {/* アイコン1（金銀選択時はマスクで塗りつぶし） */}
               {logoImage && (
                 <Draggable
+                  key={`logo1-${printType}-${cardColor}`}
                   position={logoPosition}
                   onStop={handleLogoDrag}
                   bounds="parent"
@@ -936,6 +976,7 @@ const ShurikenDesigner = () => {
               {/* アイコン2（金銀選択時はマスクで塗りつぶし） */}
               {logo2Image && (
                 <Draggable
+                  key={`logo2-${printType}-${cardColor}`}
                   position={logo2Position}
                   onStop={handleLogo2Drag}
                   bounds="parent"
