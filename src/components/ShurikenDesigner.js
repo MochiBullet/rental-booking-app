@@ -1,8 +1,151 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import Draggable from 'react-draggable';
 import './ShurikenDesigner.css';
 import shurikenLogo from '../images/shuriken/logo.png';
+
+// BGM生成用のカスタムフック
+const useBGM = () => {
+  const audioContextRef = useRef(null);
+  const gainNodeRef = useRef(null);
+  const isPlayingRef = useRef(false);
+  const [isMuted, setIsMuted] = useState(() => {
+    const saved = localStorage.getItem('shuriken-bgm-muted');
+    return saved === 'true';
+  });
+
+  const playMelody = useCallback(async () => {
+    if (!audioContextRef.current || isMuted) return;
+
+    // 楽しいメロディのノート（周波数）
+    const melody = [
+      { note: 523.25, duration: 0.15 }, // C5
+      { note: 587.33, duration: 0.15 }, // D5
+      { note: 659.25, duration: 0.15 }, // E5
+      { note: 523.25, duration: 0.15 }, // C5
+      { note: 659.25, duration: 0.2 },  // E5
+      { note: 659.25, duration: 0.2 },  // E5
+      { note: 587.33, duration: 0.4 },  // D5
+      { note: 523.25, duration: 0.15 }, // C5
+      { note: 587.33, duration: 0.15 }, // D5
+      { note: 659.25, duration: 0.15 }, // E5
+      { note: 523.25, duration: 0.15 }, // C5
+      { note: 587.33, duration: 0.4 },  // D5
+      { note: 523.25, duration: 0.4 },  // C5
+      { note: 0, duration: 0.3 },       // rest
+      { note: 659.25, duration: 0.15 }, // E5
+      { note: 698.46, duration: 0.15 }, // F5
+      { note: 783.99, duration: 0.15 }, // G5
+      { note: 659.25, duration: 0.15 }, // E5
+      { note: 783.99, duration: 0.2 },  // G5
+      { note: 783.99, duration: 0.2 },  // G5
+      { note: 698.46, duration: 0.4 },  // F5
+      { note: 659.25, duration: 0.15 }, // E5
+      { note: 587.33, duration: 0.15 }, // D5
+      { note: 523.25, duration: 0.3 },  // C5
+      { note: 587.33, duration: 0.15 }, // D5
+      { note: 659.25, duration: 0.3 },  // E5
+      { note: 523.25, duration: 0.5 },  // C5
+      { note: 0, duration: 0.5 },       // rest
+    ];
+
+    const ctx = audioContextRef.current;
+    const gain = gainNodeRef.current;
+    let currentTime = ctx.currentTime;
+
+    for (const { note, duration } of melody) {
+      if (!isPlayingRef.current) break;
+
+      if (note > 0) {
+        // メインオシレーター
+        const osc = ctx.createOscillator();
+        const oscGain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = note;
+        oscGain.gain.setValueAtTime(0.15, currentTime);
+        oscGain.gain.exponentialRampToValueAtTime(0.01, currentTime + duration * 0.9);
+        osc.connect(oscGain);
+        oscGain.connect(gain);
+        osc.start(currentTime);
+        osc.stop(currentTime + duration);
+
+        // ハーモニクス（きらきら感）
+        const osc2 = ctx.createOscillator();
+        const osc2Gain = ctx.createGain();
+        osc2.type = 'triangle';
+        osc2.frequency.value = note * 2;
+        osc2Gain.gain.setValueAtTime(0.05, currentTime);
+        osc2Gain.gain.exponentialRampToValueAtTime(0.001, currentTime + duration * 0.8);
+        osc2.connect(osc2Gain);
+        osc2Gain.connect(gain);
+        osc2.start(currentTime);
+        osc2.stop(currentTime + duration);
+      }
+      currentTime += duration;
+    }
+
+    // ループ再生
+    setTimeout(() => {
+      if (isPlayingRef.current && !isMuted) {
+        playMelody();
+      }
+    }, (currentTime - ctx.currentTime) * 1000);
+  }, [isMuted]);
+
+  const startBGM = useCallback(() => {
+    if (isPlayingRef.current) return;
+
+    try {
+      audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
+      gainNodeRef.current = audioContextRef.current.createGain();
+      gainNodeRef.current.gain.value = isMuted ? 0 : 0.3;
+      gainNodeRef.current.connect(audioContextRef.current.destination);
+      isPlayingRef.current = true;
+      playMelody();
+    } catch (e) {
+      console.error('BGM start failed:', e);
+    }
+  }, [isMuted, playMelody]);
+
+  const toggleMute = useCallback(() => {
+    const newMuted = !isMuted;
+    setIsMuted(newMuted);
+    localStorage.setItem('shuriken-bgm-muted', String(newMuted));
+
+    if (gainNodeRef.current) {
+      gainNodeRef.current.gain.value = newMuted ? 0 : 0.3;
+    }
+
+    if (!newMuted && !isPlayingRef.current) {
+      startBGM();
+    }
+  }, [isMuted, startBGM]);
+
+  useEffect(() => {
+    // ユーザーインタラクション後にBGM開始
+    const handleInteraction = () => {
+      if (!isPlayingRef.current && !isMuted) {
+        startBGM();
+      }
+      document.removeEventListener('click', handleInteraction);
+      document.removeEventListener('touchstart', handleInteraction);
+    };
+
+    document.addEventListener('click', handleInteraction);
+    document.addEventListener('touchstart', handleInteraction);
+
+    return () => {
+      document.removeEventListener('click', handleInteraction);
+      document.removeEventListener('touchstart', handleInteraction);
+      isPlayingRef.current = false;
+      if (audioContextRef.current) {
+        audioContextRef.current.close();
+      }
+    };
+  }, [isMuted, startBGM]);
+
+  return { isMuted, toggleMute };
+};
 
 // Google Fonts リスト（無料で利用可能な日本語フォント）
 const GOOGLE_FONTS = [
@@ -91,6 +234,9 @@ const STORAGE_KEY = 'shuriken-designer-data';
 const ShurikenDesigner = () => {
   const previewRef = useRef(null);
   const isInitialLoad = useRef(true);
+
+  // BGM
+  const { isMuted, toggleMute } = useBGM();
 
   // デザインモード（free: 自由デザイン / template: テンプレート）
   const [designMode, setDesignMode] = useState('free');
@@ -941,6 +1087,14 @@ const ShurikenDesigner = () => {
         </div>
       </div>
 
+      {/* BGMミュートボタン */}
+      <button
+        className={`bgm-mute-btn ${isMuted ? 'muted' : ''}`}
+        onClick={toggleMute}
+        title={isMuted ? 'BGMをオンにする' : 'BGMをオフにする'}
+      >
+        {isMuted ? '🔇' : '🎵'}
+      </button>
     </div>
   );
 };
