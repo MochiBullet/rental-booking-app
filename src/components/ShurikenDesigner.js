@@ -357,6 +357,26 @@ const ShurikenDesigner = () => {
     setBackData(updateSideData);
   };
 
+  // 表裏切り替えハンドラー（リロードで確実に反映）
+  const handleCardSideChange = (newSide) => {
+    if (newSide === cardSide) return;
+
+    // 現在のデータを保存してからリロード
+    const savedData = {
+      designMode,
+      selectedTemplates,
+      cardSide: newSide,
+      cardColor,
+      globalFont,
+      frontData,
+      backData,
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(savedData));
+    // スクロール位置を保存してリロード
+    sessionStorage.setItem(SCROLL_POSITION_KEY, window.scrollY.toString());
+    window.location.reload();
+  };
+
   // 印刷タイプ変更ハンドラー
   const handlePrintTypeChange = (newType) => {
     const oldType = printType;
@@ -1107,13 +1127,13 @@ const ShurikenDesigner = () => {
             <div className="side-toggle">
               <button
                 className={`side-toggle-btn ${cardSide === 'front' ? 'active' : ''}`}
-                onClick={() => setCardSide('front')}
+                onClick={() => handleCardSideChange('front')}
               >
                 表面
               </button>
               <button
                 className={`side-toggle-btn ${cardSide === 'back' ? 'active' : ''}`}
-                onClick={() => setCardSide('back')}
+                onClick={() => handleCardSideChange('back')}
               >
                 裏面
               </button>
